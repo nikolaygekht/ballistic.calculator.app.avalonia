@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Avalonia Framework -->
+    <PackageReference Include="Avalonia" Version="11.3.8" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.8" />
+
+    <!-- MVVM -->
+    <PackageReference Include="ReactiveUI.Avalonia" Version="14.7.1" />
+
+    <!-- Business Logic -->
+    <PackageReference Include="Gehtsoft.Measurements" Version="1.1.16" />
+    <PackageReference Include="BallisticCalculator" Version="1.1.7.1" />
+  </ItemGroup>
+
+</Project>

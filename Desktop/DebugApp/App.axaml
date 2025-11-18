@@ -1,0 +1,21 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="DebugApp.App"
+             xmlns:local="using:DebugApp"
+             RequestedThemeVariant="Default">
+
+    <Application.DataTemplates>
+        <local:ViewLocator/>
+    </Application.DataTemplates>
+
+    <Application.Resources>
+        <x:Double x:Key="AppFontSize">13</x:Double>
+    </Application.Resources>
+
+    <Application.Styles>
+        <ClassicTheme />
+        <Style Selector=":is(TemplatedControl)">
+          <Setter Property="FontSize" Value="{DynamicResource AppFontSize}" />
+       </Style>
+    </Application.Styles>
+</Application>

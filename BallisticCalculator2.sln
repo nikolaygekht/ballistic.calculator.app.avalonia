@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{7582CD89-10D6-4795-9963-51EE828FEC49}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BallisticCalculator.Controls", "Common\BallisticCalculator.Controls\BallisticCalculator.Controls.csproj", "{D0176181-BFEA-4D0E-9AE2-84D837B9F01D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BallisticCalculator.Controls.Tests", "Common\BallisticCalculator.Controls.Tests\BallisticCalculator.Controls.Tests.csproj", "{9FE9780C-7801-428D-882A-D6CD2E0053AF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Desktop", "Desktop", "{0706A038-862D-4E8A-892F-789EF48548FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DebugApp", "Desktop\DebugApp\DebugApp.csproj", "{C50F8081-5A98-4238-AF0A-4FE66195F3F2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReticleEditor", "Desktop\ReticleEditor\ReticleEditor.csproj", "{3A68C073-D6AC-4127-AD25-87CA6C95D42B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReticleEditor.Tests", "Desktop\ReticleEditor.Tests\ReticleEditor.Tests.csproj", "{981419CB-ECA1-4165-86E4-214314591A94}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D0176181-BFEA-4D0E-9AE2-84D837B9F01D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0176181-BFEA-4D0E-9AE2-84D837B9F01D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0176181-BFEA-4D0E-9AE2-84D837B9F01D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0176181-BFEA-4D0E-9AE2-84D837B9F01D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FE9780C-7801-428D-882A-D6CD2E0053AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FE9780C-7801-428D-882A-D6CD2E0053AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FE9780C-7801-428D-882A-D6CD2E0053AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FE9780C-7801-428D-882A-D6CD2E0053AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C50F8081-5A98-4238-AF0A-4FE66195F3F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C50F8081-5A98-4238-AF0A-4FE66195F3F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C50F8081-5A98-4238-AF0A-4FE66195F3F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C50F8081-5A98-4238-AF0A-4FE66195F3F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A68C073-D6AC-4127-AD25-87CA6C95D42B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A68C073-D6AC-4127-AD25-87CA6C95D42B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A68C073-D6AC-4127-AD25-87CA6C95D42B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A68C073-D6AC-4127-AD25-87CA6C95D42B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{981419CB-ECA1-4165-86E4-214314591A94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{981419CB-ECA1-4165-86E4-214314591A94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{981419CB-ECA1-4165-86E4-214314591A94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{981419CB-ECA1-4165-86E4-214314591A94}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D0176181-BFEA-4D0E-9AE2-84D837B9F01D} = {7582CD89-10D6-4795-9963-51EE828FEC49}
+		{9FE9780C-7801-428D-882A-D6CD2E0053AF} = {7582CD89-10D6-4795-9963-51EE828FEC49}
+		{C50F8081-5A98-4238-AF0A-4FE66195F3F2} = {0706A038-862D-4E8A-892F-789EF48548FC}
+		{3A68C073-D6AC-4127-AD25-87CA6C95D42B} = {0706A038-862D-4E8A-892F-789EF48548FC}
+		{981419CB-ECA1-4165-86E4-214314591A94} = {0706A038-862D-4E8A-892F-789EF48548FC}
+	EndGlobalSection
+EndGlobal

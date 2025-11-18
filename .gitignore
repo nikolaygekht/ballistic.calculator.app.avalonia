@@ -1,0 +1,9 @@
+bin/
+obj/
+.vs/
+.vscode/
+TestResults/
+*.csproj.user
+TBD.txt
+*.trajectory
+*.csv

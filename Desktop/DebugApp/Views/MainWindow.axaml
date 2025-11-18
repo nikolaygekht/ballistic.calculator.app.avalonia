@@ -1,0 +1,371 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:DebugApp.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="using:BallisticCalculator.Controls.Controls"
+        xmlns:gehtsoft="using:Gehtsoft.Measurements"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+        x:Class="DebugApp.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="BallisticCalculator Debug App"
+        Width="900" Height="700">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <TabControl>
+      <!-- Ballistic Coefficient Tab -->
+      <TabItem Header="Ballistic Coefficient">
+        <ScrollViewer>
+          <StackPanel Margin="20" Spacing="15">
+
+            <!-- Title -->
+            <TextBlock Text="BallisticCoefficientControl Test"
+                       FontWeight="Bold"
+                       Margin="0,0,0,10"/>
+
+            <!-- Basic Test -->
+            <Border BorderBrush="Gray" BorderThickness="1" Padding="15" CornerRadius="5">
+              <StackPanel Spacing="10">
+                <TextBlock Text="Basic Usage" FontWeight="Bold" />
+
+                <TextBlock Text="Ballistic Coefficient:" />
+                <controls:BallisticCoefficientControl
+                    x:Name="BasicBC"
+                    Width="300"
+                    HorizontalAlignment="Left" />
+
+                <TextBlock x:Name="BasicBCChangeCounter"
+                           Text="Changed events: 0"
+                           FontSize="11"
+                           Foreground="DarkBlue"
+                           FontStyle="Italic" />
+
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <Button Content="Set 0.450 G1" Click="OnSetBasicBC" />
+                  <Button Content="Get Value" Click="OnGetBasicBC" />
+                  <Button Content="Clear" Click="OnClearBC" />
+                </StackPanel>
+
+                <Border Background="LightGray" Padding="10" CornerRadius="3">
+                  <TextBlock x:Name="BasicBCDisplay"
+                             Text="Value: (none)"
+                             TextWrapping="Wrap" />
+                </Border>
+              </StackPanel>
+            </Border>
+
+            <!-- Precision Transparency Test (CRITICAL) -->
+            <Border BorderBrush="DarkOrange" BorderThickness="2" Padding="15" CornerRadius="5">
+              <StackPanel Spacing="10">
+                <TextBlock Text="⭐ Precision Transparency Test"
+                           FontWeight="Bold" 
+                           Foreground="DarkOrange" />
+
+                <TextBlock TextWrapping="Wrap">
+                  <Run Text="Critical test: Set value with 5 decimals (0.45678), control displays 3 decimals (0.457)." />
+                  <LineBreak />
+                  <Run Text="Without editing, getting value back should return EXACT original (0.45678)." FontWeight="Bold" />
+                </TextBlock>
+
+                <controls:BallisticCoefficientControl
+                    x:Name="PrecisionBC"
+                    DecimalPoints="3"
+                    Width="300"
+                    HorizontalAlignment="Left" />
+
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <Button Content="1. Set 0.45678" Click="OnSetPrecisionBC" />
+                  <Button Content="2. Get Value" Click="OnGetPrecisionBC" />
+                </StackPanel>
+
+                <Border Background="LightYellow" Padding="10" CornerRadius="3">
+                  <StackPanel Spacing="5">
+                    <TextBlock x:Name="PrecisionResult"
+                               Text="Test result: Click buttons in order"
+                               FontWeight="Bold"
+                               TextWrapping="Wrap" />
+                    <TextBlock x:Name="PrecisionDetails"
+                               Text=""
+                               TextWrapping="Wrap" />
+                  </StackPanel>
+                </Border>
+              </StackPanel>
+            </Border>
+
+            <!-- Drag Tables Order Test -->
+            <Border BorderBrush="Blue" BorderThickness="1" Padding="15" CornerRadius="5">
+              <StackPanel Spacing="10">
+                <TextBlock Text="Drag Tables Order Test" FontWeight="Bold" />
+
+                <TextBlock TextWrapping="Wrap">
+                  <Run Text="Expected order: " />
+                  <Run Text="G1, G2, G5, G6, G7, G8, GI, GS, RA4, GC" FontWeight="Bold" />
+                </TextBlock>
+
+                <controls:BallisticCoefficientControl
+                    x:Name="TablesBC"
+                    Width="300"
+                    HorizontalAlignment="Left" />
+
+                <Button Content="Verify Tables Order" Click="OnVerifyTables" />
+
+                <Border Background="LightGray" Padding="10" CornerRadius="3">
+                  <TextBlock x:Name="TablesDisplay"
+                             Text="Click button to verify"
+                             TextWrapping="Wrap" />
+                </Border>
+              </StackPanel>
+            </Border>
+
+            <!-- Keyboard Navigation Test -->
+            <Border BorderBrush="Green" BorderThickness="1" Padding="15" CornerRadius="5">
+              <StackPanel Spacing="10">
+                <TextBlock Text="Keyboard Navigation Test" FontWeight="Bold" />
+
+                <TextBlock TextWrapping="Wrap">
+                  <Run Text="Test:" />
+                  <LineBreak />
+                  <Run Text="• Tab into control → NumericPart gets focus" />
+                  <LineBreak />
+                  <Run Text="• Tab again → TablePart gets focus" />
+                  <LineBreak />
+                  <Run Text="• Up/Down arrows in NumericPart → increment/decrement" />
+                </TextBlock>
+
+                <controls:BallisticCoefficientControl
+                    x:Name="KeyboardBC"
+                    Width="300"
+                    Increment="0.010"
+                    HorizontalAlignment="Left" />
+
+                <TextBlock Text="Increment: 0.010" FontStyle="Italic" />
+              </StackPanel>
+            </Border>
+
+            <!-- Min/Max Test -->
+            <Border BorderBrush="Red" BorderThickness="1" Padding="15" CornerRadius="5">
+              <StackPanel Spacing="10">
+                <TextBlock Text="Min/Max Validation Test" FontWeight="Bold" />
+
+                <TextBlock TextWrapping="Wrap">
+                  <Run Text="Min: 0.100, Max: 1.000" FontWeight="Bold" />
+                  <LineBreak />
+                  <Run Text="Try entering values outside this range or use arrows at boundaries." />
+                </TextBlock>
+
+                <controls:BallisticCoefficientControl
+                    x:Name="ValidationBC"
+                    Minimum="0.100"
+                    Maximum="1.000"
+                    Width="300"
+                    HorizontalAlignment="Left" />
+
+                <TextBlock Text="Validation errors will appear below the control (mobile-friendly inline validation)."
+                           FontStyle="Italic" />
+              </StackPanel>
+            </Border>
+
+            <!-- Sizing Test -->
+            <Border BorderBrush="Purple" BorderThickness="1" Padding="15" CornerRadius="5">
+              <StackPanel Spacing="10">
+                <TextBlock Text="Sizing Test" FontWeight="Bold" />
+
+                <TextBlock TextWrapping="Wrap">
+                  <Run Text="TablePartWidth can be configured. Default: 80px" />
+                </TextBlock>
+
+                <TextBlock Text="Default (80px):" />
+                <controls:BallisticCoefficientControl
+                    x:Name="SizingBC1"
+                    Width="300"
+                    HorizontalAlignment="Stretch" />
+
+                <TextBlock Text="Custom (120px):" />
+                <controls:BallisticCoefficientControl
+                    x:Name="SizingBC2"
+                    TablePartWidth="120"
+                    Width="300"
+                    HorizontalAlignment="Stretch" />
+              </StackPanel>
+            </Border>
+
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <!-- Measurement Control Tab -->
+      <TabItem Header="Measurement Control">
+        <ScrollViewer>
+          <StackPanel Margin="20" Spacing="15">
+
+            <!-- Title -->
+            <TextBlock Text="MeasurementControl Test"
+                       FontWeight="Bold"
+                       Margin="0,0,0,10"/>
+
+            <!-- Distance Test -->
+            <Border BorderBrush="Gray" BorderThickness="1" Padding="15" CornerRadius="5">
+              <StackPanel Spacing="10">
+                <TextBlock Text="Distance Measurement" FontWeight="Bold" />
+
+                <TextBlock Text="Distance (meters, feet, yards, etc.):" />
+                <controls:MeasurementControl
+                    x:Name="DistanceControl"
+                    UnitType="{x:Type gehtsoft:DistanceUnit}"
+                    DecimalPoints="2"
+                    Width="300"
+                    HorizontalAlignment="Left" />
+
+                <TextBlock x:Name="DistanceChangeCounter"
+                           Text="Changed events: 0"
+                           FontSize="11"
+                           Foreground="DarkBlue"
+                           FontStyle="Italic" />
+
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <Button Content="Set 100m" Click="OnSetDistance" />
+                  <Button Content="Get Value" Click="OnGetDistance" />
+                  <Button Content="Clear" Click="OnClearDistance" />
+                </StackPanel>
+
+                <Border Background="LightGray" Padding="10" CornerRadius="3">
+                  <TextBlock x:Name="DistanceDisplay"
+                             Text="Value: (none)"
+                             TextWrapping="Wrap" />
+                </Border>
+              </StackPanel>
+            </Border>
+
+            <!-- Velocity Test -->
+            <Border BorderBrush="Blue" BorderThickness="1" Padding="15" CornerRadius="5">
+              <StackPanel Spacing="10">
+                <TextBlock Text="Velocity Measurement" FontWeight="Bold" />
+
+                <TextBlock Text="Velocity (m/s, ft/s, km/h, mph):" />
+                <controls:MeasurementControl
+                    x:Name="VelocityControl"
+                    UnitType="{x:Type gehtsoft:VelocityUnit}"
+                    DecimalPoints="1"
+                    Width="300"
+                    HorizontalAlignment="Left" />
+
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <Button Content="Set 800 m/s" Click="OnSetVelocity" />
+                  <Button Content="Get Value" Click="OnGetVelocity" />
+                </StackPanel>
+
+                <Border Background="LightGray" Padding="10" CornerRadius="3">
+                  <TextBlock x:Name="VelocityDisplay"
+                             Text="Value: (none)"
+                             TextWrapping="Wrap" />
+                </Border>
+              </StackPanel>
+            </Border>
+
+            <!-- Weight Test -->
+            <Border BorderBrush="Green" BorderThickness="1" Padding="15" CornerRadius="5">
+              <StackPanel Spacing="10">
+                <TextBlock Text="Weight Measurement" FontWeight="Bold" />
+
+                <TextBlock Text="Weight (grains, grams, ounces, pounds):" />
+                <controls:MeasurementControl
+                    x:Name="WeightControl"
+                    UnitType="{x:Type gehtsoft:WeightUnit}"
+                    DecimalPoints="1"
+                    Width="300"
+                    HorizontalAlignment="Left" />
+
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <Button Content="Set 150 gr" Click="OnSetWeight" />
+                  <Button Content="Get Value" Click="OnGetWeight" />
+                </StackPanel>
+
+                <Border Background="LightGray" Padding="10" CornerRadius="3">
+                  <TextBlock x:Name="WeightDisplay"
+                             Text="Value: (none)"
+                             TextWrapping="Wrap" />
+                </Border>
+              </StackPanel>
+            </Border>
+
+            <!-- Unit Conversion Test -->
+            <Border BorderBrush="Orange" BorderThickness="2" Padding="15" CornerRadius="5">
+              <StackPanel Spacing="10">
+                <TextBlock Text="⭐ Unit Conversion Test" FontWeight="Bold" Foreground="DarkOrange" />
+
+                <TextBlock TextWrapping="Wrap">
+                  <Run Text="Test ChangeUnit() method: Set 100 meters, convert to feet." />
+                </TextBlock>
+
+                <controls:MeasurementControl
+                    x:Name="ConversionControl"
+                    UnitType="{x:Type gehtsoft:DistanceUnit}"
+                    DecimalPoints="2"
+                    Width="300"
+                    HorizontalAlignment="Left" />
+
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <Button Content="1. Set 100m" Click="OnSetForConversion" />
+                  <Button Content="2. Convert to Feet" Click="OnConvertToFeet" />
+                  <Button Content="3. Get Value" Click="OnGetConverted" />
+                </StackPanel>
+
+                <Border Background="LightYellow" Padding="10" CornerRadius="3">
+                  <TextBlock x:Name="ConversionDisplay"
+                             Text="Result: Click buttons in order"
+                             TextWrapping="Wrap" />
+                </Border>
+              </StackPanel>
+            </Border>
+
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <!-- Font Size Control Tab -->
+      <TabItem Header="Font Size Test">
+        <StackPanel Margin="20" Spacing="15">
+          <TextBlock Text="Programmatic Font Size Control"
+                     FontWeight="Bold"
+                     Margin="0,0,0,10"/>
+
+          <TextBlock Text="Current app-wide font size can be changed programmatically:"
+                     TextWrapping="Wrap" />
+
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <Button Content="Font Size: 10" Click="OnSetFontSize10" />
+            <Button Content="Font Size: 12" Click="OnSetFontSize12" />
+            <Button Content="Font Size: 13 (Default)" Click="OnSetFontSize13" />
+            <Button Content="Font Size: 14" Click="OnSetFontSize14" />
+            <Button Content="Font Size: 16" Click="OnSetFontSize16" />
+          </StackPanel>
+
+          <Border Background="LightGray" Padding="10" CornerRadius="3" Margin="0,10,0,0">
+            <TextBlock x:Name="FontSizeDisplay"
+                       Text="Current font size: 13"
+                       FontWeight="Bold" />
+          </Border>
+
+          <TextBlock Text="Sample Controls:" FontWeight="Bold" Margin="0,20,0,0" />
+
+          <StackPanel Spacing="10">
+            <TextBlock Text="This is sample text that will resize." />
+
+            <controls:BallisticCoefficientControl
+                x:Name="FontTestBC"
+                Width="300"
+                HorizontalAlignment="Left" />
+
+            <Button Content="Sample Button" />
+
+            <TextBox Text="Sample TextBox" Width="200" HorizontalAlignment="Left" />
+          </StackPanel>
+        </StackPanel>
+      </TabItem>
+    </TabControl>
+
+</Window>
