@@ -326,6 +326,59 @@
         </ScrollViewer>
       </TabItem>
 
+      <!-- Reticle Canvas Tab -->
+      <TabItem Header="Reticle Canvas">
+        <ScrollViewer>
+          <StackPanel Margin="20" Spacing="15">
+
+            <!-- Title -->
+            <TextBlock Text="ReticleCanvasControl Test"
+                       FontWeight="Bold"
+                       Margin="0,0,0,10"/>
+
+            <!-- Basic Reticle Test -->
+            <Border BorderBrush="Gray" BorderThickness="1" Padding="15" CornerRadius="5">
+              <StackPanel Spacing="10">
+                <TextBlock Text="Reticle File Viewer" FontWeight="Bold" />
+
+                <TextBlock Text="Reticle Canvas:" />
+                <controls:ReticleCanvasControl
+                    x:Name="ReticleCanvas"
+                    Width="600"
+                    Height="600"
+                    BackgroundColor="White"
+                    HorizontalAlignment="Left" />
+
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <Button Content="Load Reticle..." Click="OnLoadReticle" />
+                  <Button Content="Clear" Click="OnClearReticle" />
+                </StackPanel>
+
+                <Border Background="LightGray" Padding="10" CornerRadius="3">
+                  <TextBlock x:Name="ReticleDisplay"
+                             Text="No reticle loaded"
+                             TextWrapping="Wrap" />
+                </Border>
+              </StackPanel>
+            </Border>
+
+            <!-- Background Color Test -->
+            <Border BorderBrush="Green" BorderThickness="1" Padding="15" CornerRadius="5">
+              <StackPanel Spacing="10">
+                <TextBlock Text="Background Color" FontWeight="Bold" />
+
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <Button Content="White Background" Click="OnSetBgWhite" />
+                  <Button Content="Black Background" Click="OnSetBgBlack" />
+                  <Button Content="Gray Background" Click="OnSetBgGray" />
+                </StackPanel>
+              </StackPanel>
+            </Border>
+
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
       <!-- Font Size Control Tab -->
       <TabItem Header="Font Size Test">
         <StackPanel Margin="20" Spacing="15">

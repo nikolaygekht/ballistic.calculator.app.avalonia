@@ -11,9 +11,13 @@
     <!-- Avalonia Framework -->
     <PackageReference Include="Avalonia" Version="11.3.8" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.8" />
+    <PackageReference Include="Avalonia.Skia" Version="11.3.8" />
 
     <!-- MVVM -->
     <PackageReference Include="ReactiveUI.Avalonia" Version="14.7.1" />
+
+    <!-- Graphics -->
+    <PackageReference Include="SkiaSharp" Version="2.88.9" />
 
     <!-- Business Logic -->
     <PackageReference Include="Gehtsoft.Measurements" Version="1.1.16" />

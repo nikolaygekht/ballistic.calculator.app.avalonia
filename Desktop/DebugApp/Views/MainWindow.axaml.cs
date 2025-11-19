@@ -1,11 +1,17 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using BallisticCalculator;
 using BallisticCalculator.Controls.Models;
+using BallisticCalculator.Reticle.Data;
+using BallisticCalculator.Serialization;
 using Gehtsoft.Measurements;
+using System;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DebugApp.Views;
 
@@ -210,6 +216,93 @@ public partial class MainWindow : Window
         {
             ConversionDisplay.Text = "Value: (none)";
         }
+    }
+
+    #endregion
+
+    #region Reticle Canvas Tests
+
+    private async void OnLoadReticle(object? sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var storageProvider = StorageProvider;
+            if (storageProvider == null)
+            {
+                ReticleDisplay.Text = "Error: Storage provider not available";
+                return;
+            }
+
+            var fileTypeFilter = new FilePickerFileType("Reticle Files")
+            {
+                Patterns = new[] { "*.reticle" },
+                MimeTypes = new[] { "application/xml" }
+            };
+
+            var files = await storageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            {
+                Title = "Open Reticle File",
+                AllowMultiple = false,
+                FileTypeFilter = new[] { fileTypeFilter }
+            });
+
+            if (files.Count == 0)
+            {
+                ReticleDisplay.Text = "No file selected";
+                return;
+            }
+
+            var file = files[0];
+            var path = file.TryGetLocalPath();
+
+            if (string.IsNullOrEmpty(path))
+            {
+                ReticleDisplay.Text = "Error: Could not get file path";
+                return;
+            }
+
+            // Load reticle from file
+            var reticleDefinition = BallisticXmlDeserializer.ReadFromFile<ReticleDefinition>(path);
+
+            if (reticleDefinition == null)
+            {
+                ReticleDisplay.Text = "Error: Could not parse reticle file";
+                return;
+            }
+
+            // Set reticle to canvas
+            ReticleCanvas.Reticle = reticleDefinition;
+
+            ReticleDisplay.Text = $"Loaded: {Path.GetFileName(path)}\n" +
+                                 $"Name: {reticleDefinition.Name ?? "(unnamed)"}\n" +
+                                 $"Size: {reticleDefinition.Size.X} x {reticleDefinition.Size.Y}\n" +
+                                 $"Elements: {reticleDefinition.Elements?.Count ?? 0}";
+        }
+        catch (Exception ex)
+        {
+            ReticleDisplay.Text = $"Error loading reticle:\n{ex.Message}";
+        }
+    }
+
+    private void OnClearReticle(object? sender, RoutedEventArgs e)
+    {
+        ReticleCanvas.Reticle = null;
+        ReticleDisplay.Text = "Reticle cleared";
+    }
+
+    private void OnSetBgWhite(object? sender, RoutedEventArgs e)
+    {
+        ReticleCanvas.BackgroundColor = Colors.White;
+    }
+
+    private void OnSetBgBlack(object? sender, RoutedEventArgs e)
+    {
+        ReticleCanvas.BackgroundColor = Colors.Black;
+    }
+
+    private void OnSetBgGray(object? sender, RoutedEventArgs e)
+    {
+        ReticleCanvas.BackgroundColor = Colors.LightGray;
     }
 
     #endregion
