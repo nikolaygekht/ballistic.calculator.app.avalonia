@@ -1,20 +1,169 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:ReticleEditor.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:controls="using:BallisticCalculator.Controls.Controls"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="800"
         x:Class="ReticleEditor.Views.MainWindow"
-        x:DataType="vm:MainWindowViewModel"
-        Icon="/Assets/avalonia-logo.ico"
-        Title="ReticleEditor">
+        Title="Reticle Editor"
+        Width="1200" Height="800"
+        FontSize="{DynamicResource AppFontSize}"
+        Icon="/Assets/ReticleEditor.ico"
+        KeyDown="OnWindowKeyDown">
 
-    <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainWindowViewModel/>
-    </Design.DataContext>
+    <DockPanel>
+        <!-- Menu Bar -->
+        <Menu DockPanel.Dock="Top" FontSize="{DynamicResource AppFontSize}">
+            <MenuItem Header="_File">
+                <MenuItem Header="_New" Click="OnFileNew" InputGesture="Ctrl+N" />
+                <MenuItem Header="_Open..." Click="OnFileOpen" InputGesture="Ctrl+O" />
+                <MenuItem Header="_Save" Click="OnFileSave" InputGesture="Ctrl+S" />
+                <MenuItem Header="Save _As..." Click="OnFileSaveAs" InputGesture="Ctrl+Shift+S" />
+                <Separator />
+                <MenuItem Header="E_xit" Click="OnFileExit" />
+            </MenuItem>
+            <MenuItem Header="_View">
+                <MenuItem Header="Increase Font Size" Click="OnFontIncrease" InputGesture="Ctrl+OemPlus" />
+                <MenuItem Header="Decrease Font Size" Click="OnFontDecrease" InputGesture="Ctrl+OemMinus" />
+                <Separator />
+                <MenuItem Header="Coordinate Display Units">
+                    <MenuItem Header="Mil" x:Name="MenuUnitMil" Click="OnSelectUnitMil" Foreground="Black" />
+                    <MenuItem Header="MOA" x:Name="MenuUnitMOA" Click="OnSelectUnitMOA" Foreground="Black" />
+                    <MenuItem Header="in/100yd" x:Name="MenuUnitInch100Yd" Click="OnSelectUnitInch100Yd" Foreground="Black" />
+                    <MenuItem Header="cm/100m" x:Name="MenuUnitCm100M" Click="OnSelectUnitCm100M" Foreground="Black" />
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="Highlight Current Item" x:Name="HighlightMenuItem" Click="OnToggleHighlight" />
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="_About" Click="OnHelpAbout" />
+            </MenuItem>
+        </Menu>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <!-- Status Bar -->
+        <Border DockPanel.Dock="Bottom"
+                BorderBrush="Gray"
+                BorderThickness="0,1,0,0"
+                Padding="5,3">
+            <Grid ColumnDefinitions="Auto,10,Auto,10,Auto">
+                <TextBlock Grid.Column="0" FontSize="{DynamicResource AppFontSize}">
+                    <Run Text="X: " />
+                    <Run x:Name="StatusX" Text="0.0" />
+                </TextBlock>
+                <TextBlock Grid.Column="2" FontSize="{DynamicResource AppFontSize}">
+                    <Run Text="Y: " />
+                    <Run x:Name="StatusY" Text="0.0" />
+                </TextBlock>
+                <TextBlock Grid.Column="4" x:Name="StatusArea" Text="" FontSize="{DynamicResource AppFontSize}" />
+            </Grid>
+        </Border>
+
+        <!-- Main Content Area with Splitter -->
+        <Grid x:Name="MainGrid" ColumnDefinitions="*,5,400">
+
+            <!-- Left Panel: Reticle Preview -->
+            <Border Grid.Column="0"
+                    BorderBrush="Gray"
+                    BorderThickness="1"
+                    Padding="5"
+                    PointerMoved="OnCanvasPointerMoved"
+                    PointerPressed="OnCanvasPointerPressed">
+                <controls:ReticleCanvasControl
+                    x:Name="ReticleCanvas"
+                    BackgroundColor="White" />
+            </Border>
+
+            <!-- GridSplitter -->
+            <GridSplitter Grid.Column="1"
+                          Background="LightGray"
+                          ResizeDirection="Columns"
+                          Width="5" />
+
+            <!-- Right Panel: Edit Controls -->
+            <Border Grid.Column="2"
+                    BorderBrush="Gray"
+                    BorderThickness="1"
+                    MinWidth="400">
+                <Grid RowDefinitions="Auto,*,Auto">
+
+                    <!-- Section 1: Reticle Parameters -->
+                    <Border Grid.Row="0"
+                            BorderBrush="LightGray"
+                            BorderThickness="0,0,0,1"
+                            Padding="10">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Reticle Parameters"
+                                       FontWeight="SemiBold"
+                                       FontSize="{DynamicResource AppFontSize}"
+                                       Margin="0,0,0,5"/>
+
+                            <!-- Name -->
+                            <Grid ColumnDefinitions="104,*">
+                                <TextBlock Grid.Column="0" Text="Name:" VerticalAlignment="Center" FontSize="{DynamicResource AppFontSize}"/>
+                                <TextBox Grid.Column="1" x:Name="ReticleName" FontSize="{DynamicResource AppFontSize}"/>
+                            </Grid>
+
+                            <!-- Size (W x H) -->
+                            <Grid ColumnDefinitions="104,*,10,*">
+                                <TextBlock Grid.Column="0" Text="Size (WxH):" VerticalAlignment="Center" FontSize="{DynamicResource AppFontSize}"/>
+                                <controls:MeasurementControl Grid.Column="1" x:Name="ReticleWidth" FontSize="{DynamicResource AppFontSize}"/>
+                                <controls:MeasurementControl Grid.Column="3" x:Name="ReticleHeight" FontSize="{DynamicResource AppFontSize}"/>
+                            </Grid>
+
+                            <!-- Zero (X, Y) -->
+                            <Grid ColumnDefinitions="104,*,10,*">
+                                <TextBlock Grid.Column="0" Text="Zero (X,Y):" VerticalAlignment="Center" FontSize="{DynamicResource AppFontSize}"/>
+                                <controls:MeasurementControl Grid.Column="1" x:Name="ZeroOffsetX" FontSize="{DynamicResource AppFontSize}"/>
+                                <controls:MeasurementControl Grid.Column="3" x:Name="ZeroOffsetY" FontSize="{DynamicResource AppFontSize}"/>
+                            </Grid>
+
+                            <!-- Set Button (aligned with controls, not label) -->
+                            <Grid ColumnDefinitions="104,Auto" Margin="0,5,0,0">
+                                <Button Grid.Column="1" Content="Set" x:Name="ButtonSet" FontSize="{DynamicResource AppFontSize}" MinWidth="70"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Section 2: Elements List -->
+                    <Border Grid.Row="1"
+                            BorderBrush="LightGray"
+                            BorderThickness="0,0,0,1"
+                            Padding="10">
+                        <ListBox x:Name="ReticleItems"
+                                 FontSize="{DynamicResource AppFontSize}"
+                                 SelectionMode="Single"/>
+                    </Border>
+
+                    <!-- Section 3: Element Operations -->
+                    <Border Grid.Row="2"
+                            Padding="10">
+                        <Grid ColumnDefinitions="*,5,Auto,5,Auto,5,Auto,5,Auto">
+                            <!-- Element Type ComboBox -->
+                            <ComboBox Grid.Column="0"
+                                      x:Name="ElementTypeCombo"
+                                      FontSize="{DynamicResource AppFontSize}"
+                                      SelectedIndex="0">
+                                <ComboBoxItem Content="Line"/>
+                                <ComboBoxItem Content="Circle"/>
+                                <ComboBoxItem Content="Rectangle"/>
+                                <ComboBoxItem Content="Path"/>
+                                <ComboBoxItem Content="Text"/>
+                                <ComboBoxItem Content="BDC Point"/>
+                            </ComboBox>
+
+                            <!-- Operation Buttons -->
+                            <Button Grid.Column="2" Content="New" x:Name="ButtonNew" Click="OnNewElement" FontSize="{DynamicResource AppFontSize}" MinWidth="70"/>
+                            <Button Grid.Column="4" Content="Edit" x:Name="ButtonEdit" Click="OnEditElement" FontSize="{DynamicResource AppFontSize}" MinWidth="70"/>
+                            <Button Grid.Column="6" Content="Duplicate" x:Name="ButtonDuplicate" Click="OnDuplicateElement" FontSize="{DynamicResource AppFontSize}" MinWidth="70"/>
+                            <Button Grid.Column="8" Content="Delete" x:Name="ButtonDelete" Click="OnDeleteElement" FontSize="{DynamicResource AppFontSize}" MinWidth="70"/>
+                        </Grid>
+                    </Border>
+
+                </Grid>
+            </Border>
+
+        </Grid>
+
+    </DockPanel>
 
 </Window>

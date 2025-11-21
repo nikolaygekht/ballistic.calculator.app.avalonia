@@ -4,9 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="400"
              x:Class="BallisticCalculator.Controls.Controls.ReticleCanvasControl"
-             ClipToBounds="True">
+             ClipToBounds="True"
+             Background="Transparent">
 
     <Border BorderBrush="Gray"
-            BorderThickness="1" />
+            BorderThickness="1"
+            Background="Transparent" />
 
 </UserControl>

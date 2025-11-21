@@ -1,15 +1,24 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="ReticleEditor.App"
-             xmlns:local="using:ReticleEditor"
-             RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+             xmlns:local="using:ReticleEditor">
 
-    <Application.DataTemplates>
-        <local:ViewLocator/>
-    </Application.DataTemplates>
-  
+    <Application.Resources>
+        <!-- Application-wide font size - can be adjusted by user -->
+        <x:Double x:Key="AppFontSize">13</x:Double>
+    </Application.Resources>
+
+
     <Application.Styles>
-        <FluentTheme />
+        <StyleInclude Source="avares://Classic.Avalonia.Theme/ClassicTheme.axaml"/>
+
+        <!-- Custom styles to make menu scale with font size -->
+        <Style Selector="MenuItem">
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Height" Value="NaN"/> <!-- Auto height -->
+        </Style>
+        <Style Selector="Menu">
+            <Setter Property="Height" Value="NaN"/> <!-- Auto height -->
+        </Style>
     </Application.Styles>
 </Application>
