@@ -1,0 +1,71 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:BallisticCalculator.Controls.Controls"
+        x:Class="ReticleEditor.Views.Dialogs.EditPathDialog"
+        Title="Edit Path"
+        Width="700" Height="550"
+        MinWidth="600" MinHeight="450"
+        FontSize="{DynamicResource AppFontSize}"
+        WindowStartupLocation="CenterOwner"
+        CanResize="true">
+
+    <Grid RowDefinitions="Auto,*,Auto,Auto" Margin="15">
+
+        <!-- Path Parameters Section -->
+        <StackPanel Grid.Row="0" Spacing="8">
+            <TextBlock Text="Path Parameters" FontWeight="SemiBold" FontSize="{DynamicResource AppFontSize}"/>
+
+            <Grid ColumnDefinitions="100,200,20,100,*" RowDefinitions="Auto,Auto">
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Line Width:" VerticalAlignment="Center" FontSize="{DynamicResource AppFontSize}"/>
+                <controls:MeasurementControl Grid.Row="0" Grid.Column="1" x:Name="LineWidthControl" x:FieldModifier="internal" FontSize="{DynamicResource AppFontSize}"/>
+
+                <TextBlock Grid.Row="0" Grid.Column="3" Text="Color:" VerticalAlignment="Center" FontSize="{DynamicResource AppFontSize}"/>
+                <ComboBox Grid.Row="0" Grid.Column="4" x:Name="ColorCombo" x:FieldModifier="internal" FontSize="{DynamicResource AppFontSize}" HorizontalAlignment="Left" MinWidth="150"/>
+            </Grid>
+
+            <Grid ColumnDefinitions="100,*">
+                <CheckBox Grid.Column="1" x:Name="FillCheckBox" x:FieldModifier="internal" Content="Fill" FontSize="{DynamicResource AppFontSize}"/>
+            </Grid>
+        </StackPanel>
+
+        <!-- Elements and Preview Section -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,10,*" Margin="0,15,0,0">
+
+            <!-- Elements List -->
+            <DockPanel Grid.Column="0">
+                <TextBlock DockPanel.Dock="Top" Text="Elements" FontWeight="SemiBold" FontSize="{DynamicResource AppFontSize}" Margin="0,0,0,5"/>
+
+                <!-- Element Operation Buttons -->
+                <WrapPanel DockPanel.Dock="Bottom" Margin="0,8,0,0" HorizontalAlignment="Left">
+                    <Button Content="Move To" Click="OnAddMoveTo" FontSize="{DynamicResource AppFontSize}" MinWidth="70" Margin="0,0,5,0"/>
+                    <Button Content="Line To" Click="OnAddLineTo" FontSize="{DynamicResource AppFontSize}" MinWidth="70" Margin="0,0,5,0"/>
+                    <Button Content="Arc" Click="OnAddArc" FontSize="{DynamicResource AppFontSize}" MinWidth="70" Margin="0,0,5,0"/>
+                    <Button Content="Edit" Click="OnEditElement" FontSize="{DynamicResource AppFontSize}" MinWidth="70" Margin="0,0,5,0"/>
+                    <Button Content="Delete" Click="OnDeleteElement" FontSize="{DynamicResource AppFontSize}" MinWidth="70"/>
+                </WrapPanel>
+
+                <ListBox x:Name="ElementsList" x:FieldModifier="internal"
+                         FontSize="{DynamicResource AppFontSize}"
+                         SelectionMode="Single"/>
+            </DockPanel>
+
+            <!-- Preview -->
+            <DockPanel Grid.Column="2">
+                <TextBlock DockPanel.Dock="Top" Text="Preview" FontWeight="SemiBold" FontSize="{DynamicResource AppFontSize}" Margin="0,0,0,5"/>
+                <Border BorderBrush="Gray" BorderThickness="1" Background="White">
+                    <controls:ReticleCanvasControl x:Name="PreviewCanvas" x:FieldModifier="internal" BackgroundColor="White"/>
+                </Border>
+            </DockPanel>
+        </Grid>
+
+        <!-- Separator -->
+        <Separator Grid.Row="2" Margin="0,15,0,10"/>
+
+        <!-- Bottom Buttons -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+            <Button Content="OK" Click="OnOK" Width="80" FontSize="{DynamicResource AppFontSize}"/>
+            <Button Content="Cancel" Click="OnCancel" Width="80" FontSize="{DynamicResource AppFontSize}"/>
+            <Button Content="Revert" Click="OnRevert" Width="80" FontSize="{DynamicResource AppFontSize}"/>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -13,7 +13,7 @@
         <StackPanel Margin="20" Spacing="10">
         <TextBlock Text="Start Point" FontWeight="SemiBold" FontSize="{DynamicResource AppFontSize}"/>
 
-        <Grid ColumnDefinitions="60,*" RowDefinitions="Auto,Auto">
+        <Grid ColumnDefinitions="100,*" RowDefinitions="Auto,Auto">
             <TextBlock Grid.Row="0" Grid.Column="0" Text="X:" VerticalAlignment="Center" FontSize="{DynamicResource AppFontSize}"/>
             <controls:MeasurementControl Grid.Row="0" Grid.Column="1" x:Name="StartX" x:FieldModifier="internal" FontSize="{DynamicResource AppFontSize}"/>
 
@@ -23,7 +23,7 @@
 
         <TextBlock Text="End Point" FontWeight="SemiBold" FontSize="{DynamicResource AppFontSize}" Margin="0,10,0,0"/>
 
-        <Grid ColumnDefinitions="60,*" RowDefinitions="Auto,Auto">
+        <Grid ColumnDefinitions="100,*" RowDefinitions="Auto,Auto">
             <TextBlock Grid.Row="0" Grid.Column="0" Text="X:" VerticalAlignment="Center" FontSize="{DynamicResource AppFontSize}"/>
             <controls:MeasurementControl Grid.Row="0" Grid.Column="1" x:Name="EndX" x:FieldModifier="internal" FontSize="{DynamicResource AppFontSize}"/>
 

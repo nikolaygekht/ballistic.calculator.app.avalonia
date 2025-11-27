@@ -119,7 +119,7 @@
 
                             <!-- Set Button (aligned with controls, not label) -->
                             <Grid ColumnDefinitions="104,Auto" Margin="0,5,0,0">
-                                <Button Grid.Column="1" Content="Set" x:Name="ButtonSet" FontSize="{DynamicResource AppFontSize}" MinWidth="70"/>
+                                <Button Grid.Column="1" Content="Set" x:Name="ButtonSet" Click="OnSetReticleParameters" FontSize="{DynamicResource AppFontSize}" MinWidth="70"/>
                             </Grid>
                         </StackPanel>
                     </Border>

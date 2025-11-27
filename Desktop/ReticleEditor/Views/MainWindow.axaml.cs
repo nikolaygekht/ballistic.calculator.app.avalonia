@@ -434,6 +434,46 @@ public partial class MainWindow : Window
 
     #region Reticle Management
 
+    private void OnSetReticleParameters(object? sender, RoutedEventArgs e)
+    {
+        if (_currentReticle == null)
+        {
+            _currentReticle = new ReticleDefinition();
+        }
+
+        // Update name
+        _currentReticle.Name = ReticleName.Text;
+
+        // Update size
+        var width = ReticleWidth.GetValue<AngularUnit>();
+        var height = ReticleHeight.GetValue<AngularUnit>();
+
+        if (width.HasValue && height.HasValue)
+        {
+            _currentReticle.Size = new ReticlePosition
+            {
+                X = width.Value,
+                Y = height.Value
+            };
+        }
+
+        // Update zero offset
+        var zeroX = ZeroOffsetX.GetValue<AngularUnit>();
+        var zeroY = ZeroOffsetY.GetValue<AngularUnit>();
+
+        if (zeroX.HasValue && zeroY.HasValue)
+        {
+            _currentReticle.Zero = new ReticlePosition
+            {
+                X = zeroX.Value,
+                Y = zeroY.Value
+            };
+        }
+
+        UpdateReticlePreview();
+        StatusArea.Text = "Reticle parameters updated";
+    }
+
     private void UpdateReticleControls()
     {
         if (_currentReticle == null)
@@ -656,14 +696,8 @@ public partial class MainWindow : Window
             return;
         }
 
-        // Open appropriate editor dialog
-        Window? dialog = newElement switch
-        {
-            ReticleLine line => new Views.Dialogs.EditLineDialog(line),
-            // TODO: Add other dialog types as they are implemented
-            _ => null
-        };
-
+        // Open appropriate editor dialog (pass reticle for path preview)
+        var dialog = Utilities.DialogFactory.CreateDialogForElement(newElement, _currentReticle);
         if (dialog == null)
         {
             StatusArea.Text = $"Editor not implemented for {newElement.GetType().Name}";
@@ -697,14 +731,8 @@ public partial class MainWindow : Window
             return;
         }
 
-        // Open appropriate editor dialog
-        Window? dialog = selectedElement switch
-        {
-            ReticleLine line => new Views.Dialogs.EditLineDialog(line),
-            // TODO: Add other dialog types as they are implemented
-            _ => null
-        };
-
+        // Open appropriate editor dialog (pass reticle for path preview)
+        var dialog = Utilities.DialogFactory.CreateDialogForElement(selectedElement, _currentReticle);
         if (dialog == null)
         {
             StatusArea.Text = $"Editor not implemented for {selectedElement.GetType().Name}";
