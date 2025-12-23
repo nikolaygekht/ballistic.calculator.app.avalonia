@@ -1,0 +1,42 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:models="clr-namespace:BallisticCalculator.Controls.Models"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="400"
+             x:Class="BallisticCalculator.Controls.Controls.TrajectoryTableControl">
+
+  <UserControl.Styles>
+    <Style Selector="DataGridCell.rightAlign">
+      <Setter Property="HorizontalContentAlignment" Value="Right" />
+    </Style>
+  </UserControl.Styles>
+
+  <DataGrid x:Name="DataGrid"
+            x:DataType="models:TrajectoryPointWrapper"
+            AutoGenerateColumns="False"
+            IsReadOnly="True"
+            CanUserReorderColumns="False"
+            CanUserResizeColumns="True"
+            CanUserSortColumns="False"
+            GridLinesVisibility="All"
+            BorderThickness="1"
+            BorderBrush="Gray"
+            HeadersVisibility="Column">
+    <DataGrid.Columns>
+      <DataGridTextColumn Header="Range" Binding="{Binding Range}" Width="80" CellStyleClasses="rightAlign" />
+      <DataGridTextColumn Header="Velocity" Binding="{Binding Velocity}" Width="80" CellStyleClasses="rightAlign" />
+      <DataGridTextColumn Header="Mach" Binding="{Binding Mach}" Width="60" CellStyleClasses="rightAlign" />
+      <DataGridTextColumn Header="Drop" Binding="{Binding Drop}" Width="80" CellStyleClasses="rightAlign" />
+      <DataGridTextColumn Header="Hold" Binding="{Binding DropAdjustment}" Width="70" CellStyleClasses="rightAlign" />
+      <DataGridTextColumn Header="Clicks" Binding="{Binding DropClicks}" Width="60" CellStyleClasses="rightAlign" />
+      <DataGridTextColumn Header="Windage" Binding="{Binding Windage}" Width="80" CellStyleClasses="rightAlign" />
+      <DataGridTextColumn Header="Wnd.Adj." Binding="{Binding WindageAdjustment}" Width="70" CellStyleClasses="rightAlign" />
+      <DataGridTextColumn Header="Clicks" Binding="{Binding WindageClicks}" Width="60" CellStyleClasses="rightAlign" />
+      <DataGridTextColumn Header="Time" Binding="{Binding Time}" Width="80" />
+      <DataGridTextColumn Header="Energy" Binding="{Binding Energy}" Width="80" CellStyleClasses="rightAlign" />
+      <DataGridTextColumn Header="O.G.W." Binding="{Binding OptimalGameWeight}" Width="70" CellStyleClasses="rightAlign" />
+    </DataGrid.Columns>
+  </DataGrid>
+
+</UserControl>

@@ -12,16 +12,12 @@
     <PackageReference Include="Avalonia" Version="11.3.10" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.10" />
     <PackageReference Include="Avalonia.Skia" Version="11.3.10" />
-    <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.10" />
 
     <!-- MVVM -->
     <PackageReference Include="ReactiveUI.Avalonia" Version="14.7.1" />
 
     <!-- Graphics -->
     <PackageReference Include="SkiaSharp" Version="[2.88.9,3)" />
-
-    <!-- Charting -->
-    <PackageReference Include="ScottPlot.Avalonia" Version="[5.0.56,5.1)" />
 
     <!-- Business Logic -->
     <PackageReference Include="Gehtsoft.Measurements" Version="1.1.16" />
@@ -30,6 +26,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BallisticCalculator.Types\BallisticCalculator.Types.csproj" />
+    <ProjectReference Include="..\BallisticCalculator.Controls\BallisticCalculator.Controls.csproj" />
   </ItemGroup>
+
 
 </Project>

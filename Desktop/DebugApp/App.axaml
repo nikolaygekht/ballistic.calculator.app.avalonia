@@ -14,6 +14,7 @@
 
     <Application.Styles>
         <ClassicTheme />
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Simple.xaml"/>
         <Style Selector=":is(TemplatedControl)">
           <Setter Property="FontSize" Value="{DynamicResource AppFontSize}" />
        </Style>

@@ -16,7 +16,7 @@ Create a new version of the BallisticCalculator application using **Avalonia UI*
   - Core ballistics calculation engine
 
 ### Original Implementation
-- **Old WinForms Application**: `/mnt/d/develop/homeapps/BallisticCalculator1/`
+- **Old WinForms Application**: `/mnt/d/develop/homeapps.projects/BallisticCalculator1/`
   - Reference for understanding control behavior patterns
   - Good example of direct UI access pattern (no reactive properties)
   - Use as reference for precision transparency and other WinForms patterns

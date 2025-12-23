@@ -379,6 +379,327 @@
         </ScrollViewer>
       </TabItem>
 
+      <!-- Wind Direction Control Tab -->
+      <TabItem Header="Wind Direction">
+        <ScrollViewer>
+          <StackPanel Margin="20" Spacing="15">
+
+            <!-- Title -->
+            <TextBlock Text="WindDirectionControl Test"
+                       FontWeight="Bold"
+                       Margin="0,0,0,10"/>
+
+            <!-- Basic Test -->
+            <Border BorderBrush="Gray" BorderThickness="1" Padding="15" CornerRadius="5">
+              <StackPanel Spacing="10">
+                <TextBlock Text="Basic Usage" FontWeight="Bold" />
+
+                <TextBlock TextWrapping="Wrap">
+                  <Run Text="Click or drag on the circle to set wind direction." />
+                  <LineBreak />
+                  <Run Text="Arrow shows where wind comes FROM (toward shooter at center)." />
+                </TextBlock>
+
+                <controls:WindDirectionControl
+                    x:Name="WindControl"
+                    Width="150"
+                    Height="150"
+                    StrokeThickness="2"
+                    HorizontalAlignment="Left" />
+
+                <TextBlock x:Name="WindChangeCounter"
+                           Text="Changed events: 0"
+                           FontSize="11"
+                           Foreground="DarkBlue"
+                           FontStyle="Italic" />
+
+                <Border Background="LightGray" Padding="10" CornerRadius="3">
+                  <TextBlock x:Name="WindDisplay"
+                             Text="Direction: 0°"
+                             TextWrapping="Wrap" />
+                </Border>
+              </StackPanel>
+            </Border>
+
+            <!-- Preset Values Test -->
+            <Border BorderBrush="Blue" BorderThickness="1" Padding="15" CornerRadius="5">
+              <StackPanel Spacing="10">
+                <TextBlock Text="Preset Values" FontWeight="Bold" />
+
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <Button Content="0° (Tailwind)" Click="OnSetWind0" />
+                  <Button Content="90° (From Right)" Click="OnSetWind90" />
+                  <Button Content="180° (Headwind)" Click="OnSetWind180" />
+                  <Button Content="270° (From Left)" Click="OnSetWind270" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <Button Content="45°" Click="OnSetWind45" />
+                  <Button Content="135°" Click="OnSetWind135" />
+                  <Button Content="225°" Click="OnSetWind225" />
+                  <Button Content="315°" Click="OnSetWind315" />
+                </StackPanel>
+              </StackPanel>
+            </Border>
+
+            <!-- Styling Test -->
+            <Border BorderBrush="Green" BorderThickness="1" Padding="15" CornerRadius="5">
+              <StackPanel Spacing="10">
+                <TextBlock Text="Styling Test" FontWeight="Bold" />
+
+                <TextBlock Text="Different stroke colors and thickness:" />
+
+                <StackPanel Orientation="Horizontal" Spacing="20">
+                  <StackPanel Spacing="5">
+                    <TextBlock Text="Red, thick (4px)" />
+                    <controls:WindDirectionControl
+                        x:Name="WindControlRed"
+                        Width="100"
+                        Height="100"
+                        StrokeBrush="Red"
+                        StrokeThickness="4" />
+                  </StackPanel>
+
+                  <StackPanel Spacing="5">
+                    <TextBlock Text="Blue, thin (1px)" />
+                    <controls:WindDirectionControl
+                        x:Name="WindControlBlue"
+                        Width="100"
+                        Height="100"
+                        StrokeBrush="Blue"
+                        StrokeThickness="1" />
+                  </StackPanel>
+
+                  <StackPanel Spacing="5">
+                    <TextBlock Text="Green, medium (2px)" />
+                    <controls:WindDirectionControl
+                        x:Name="WindControlGreen"
+                        Width="100"
+                        Height="100"
+                        StrokeBrush="Green"
+                        StrokeThickness="2" />
+                  </StackPanel>
+                </StackPanel>
+              </StackPanel>
+            </Border>
+
+            <!-- Size Test -->
+            <Border BorderBrush="Purple" BorderThickness="1" Padding="15" CornerRadius="5">
+              <StackPanel Spacing="10">
+                <TextBlock Text="Size Test" FontWeight="Bold" />
+
+                <TextBlock Text="Different sizes:" />
+
+                <StackPanel Orientation="Horizontal" Spacing="20" VerticalAlignment="Bottom">
+                  <StackPanel Spacing="5">
+                    <TextBlock Text="50x50" />
+                    <controls:WindDirectionControl
+                        Width="50"
+                        Height="50"
+                        StrokeThickness="1" />
+                  </StackPanel>
+
+                  <StackPanel Spacing="5">
+                    <TextBlock Text="100x100" />
+                    <controls:WindDirectionControl
+                        Width="100"
+                        Height="100"
+                        StrokeThickness="2" />
+                  </StackPanel>
+
+                  <StackPanel Spacing="5">
+                    <TextBlock Text="150x150" />
+                    <controls:WindDirectionControl
+                        Width="150"
+                        Height="150"
+                        StrokeThickness="2" />
+                  </StackPanel>
+                </StackPanel>
+              </StackPanel>
+            </Border>
+
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <!-- Trajectory Chart Tab -->
+      <TabItem Header="Trajectory Chart">
+        <Grid RowDefinitions="Auto,*,Auto">
+          <!-- Controls Row -->
+          <StackPanel Grid.Row="0" Margin="10" Spacing="10">
+            <TextBlock Text="TrajectoryChartControl Test"
+                       FontWeight="Bold"
+                       Margin="0,0,0,5"/>
+
+            <!-- Chart Mode Selection -->
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <TextBlock Text="Chart Mode:" VerticalAlignment="Center" />
+              <ComboBox x:Name="ChartModeCombo"
+                        Width="150"
+                        SelectedIndex="2"
+                        SelectionChanged="OnChartModeChanged">
+                <ComboBoxItem Content="Velocity" />
+                <ComboBoxItem Content="Mach" />
+                <ComboBoxItem Content="Drop" />
+                <ComboBoxItem Content="Drop Adjustment" />
+                <ComboBoxItem Content="Windage" />
+                <ComboBoxItem Content="Windage Adjustment" />
+                <ComboBoxItem Content="Energy" />
+              </ComboBox>
+
+              <TextBlock Text="Units:" VerticalAlignment="Center" Margin="20,0,0,0" />
+              <ComboBox x:Name="MeasurementSystemCombo"
+                        Width="100"
+                        SelectedIndex="0"
+                        SelectionChanged="OnMeasurementSystemChanged">
+                <ComboBoxItem Content="Metric" />
+                <ComboBoxItem Content="Imperial" />
+              </ComboBox>
+
+              <TextBlock Text="Angular:" VerticalAlignment="Center" Margin="20,0,0,0" />
+              <ComboBox x:Name="AngularUnitCombo"
+                        Width="80"
+                        SelectedIndex="0"
+                        SelectionChanged="OnAngularUnitChanged">
+                <ComboBoxItem Content="MOA" />
+                <ComboBoxItem Content="MRad" />
+                <ComboBoxItem Content="Mil" />
+              </ComboBox>
+            </StackPanel>
+
+            <!-- Drop Base Selection (only relevant for Drop mode) -->
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <TextBlock Text="Drop Base:" VerticalAlignment="Center" />
+              <ComboBox x:Name="DropBaseCombo"
+                        Width="120"
+                        SelectedIndex="0"
+                        SelectionChanged="OnDropBaseChanged">
+                <ComboBoxItem Content="Sight Line" />
+                <ComboBoxItem Content="Muzzle Point" />
+              </ComboBox>
+
+              <TextBlock Text="(Only affects Drop mode)"
+                         VerticalAlignment="Center"
+                         FontStyle="Italic"
+                         Foreground="Gray" />
+            </StackPanel>
+
+            <!-- Action Buttons -->
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <Button Content="Load Sample Trajectory" Click="OnLoadSampleTrajectory" />
+              <Button Content="Add Second Trajectory" Click="OnAddSecondTrajectory" />
+              <Button Content="Clear All" Click="OnClearTrajectories" />
+              <TextBlock x:Name="TrajectoryCountDisplay"
+                         Text="Trajectories: 0"
+                         VerticalAlignment="Center"
+                         Margin="20,0,0,0" />
+            </StackPanel>
+          </StackPanel>
+
+          <!-- Chart -->
+          <Border Grid.Row="1" BorderBrush="Gray" BorderThickness="1" Margin="10,0,10,10">
+            <controls:TrajectoryChartControl x:Name="TrajectoryChart" />
+          </Border>
+
+          <!-- Info Panel -->
+          <Border Grid.Row="2" Background="LightGray" Padding="10" Margin="10,0,10,10">
+            <TextBlock x:Name="ChartInfoDisplay"
+                       Text="Click 'Load Sample Trajectory' to display a chart."
+                       TextWrapping="Wrap" />
+          </Border>
+        </Grid>
+      </TabItem>
+
+      <!-- Trajectory Table Tab -->
+      <TabItem Header="Trajectory Table">
+        <Grid RowDefinitions="Auto,*,Auto">
+          <!-- Controls Row -->
+          <StackPanel Grid.Row="0" Margin="10" Spacing="10">
+            <TextBlock Text="TrajectoryTableControl Test"
+                       FontWeight="Bold"
+                       Margin="0,0,0,5"/>
+
+            <!-- Unit Selection -->
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <TextBlock Text="Units:" VerticalAlignment="Center" />
+              <ComboBox x:Name="TableMeasurementSystemCombo"
+                        Width="100"
+                        SelectedIndex="0"
+                        SelectionChanged="OnTableMeasurementSystemChanged">
+                <ComboBoxItem Content="Metric" />
+                <ComboBoxItem Content="Imperial" />
+              </ComboBox>
+
+              <TextBlock Text="Angular:" VerticalAlignment="Center" Margin="20,0,0,0" />
+              <ComboBox x:Name="TableAngularUnitCombo"
+                        Width="80"
+                        SelectedIndex="0"
+                        SelectionChanged="OnTableAngularUnitChanged">
+                <ComboBoxItem Content="MOA" />
+                <ComboBoxItem Content="MRad" />
+                <ComboBoxItem Content="Mil" />
+              </ComboBox>
+
+              <TextBlock Text="Drop Base:" VerticalAlignment="Center" Margin="20,0,0,0" />
+              <ComboBox x:Name="TableDropBaseCombo"
+                        Width="120"
+                        SelectedIndex="0"
+                        SelectionChanged="OnTableDropBaseChanged">
+                <ComboBoxItem Content="Sight Line" />
+                <ComboBoxItem Content="Muzzle Point" />
+              </ComboBox>
+            </StackPanel>
+
+            <!-- Click Size Settings -->
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <TextBlock Text="Vertical Click:" VerticalAlignment="Center" />
+              <ComboBox x:Name="VerticalClickCombo"
+                        Width="100"
+                        SelectedIndex="1"
+                        SelectionChanged="OnVerticalClickChanged">
+                <ComboBoxItem Content="None" />
+                <ComboBoxItem Content="1/4 MOA" />
+                <ComboBoxItem Content="1/8 MOA" />
+                <ComboBoxItem Content="0.1 MRad" />
+              </ComboBox>
+
+              <TextBlock Text="Horizontal Click:" VerticalAlignment="Center" Margin="20,0,0,0" />
+              <ComboBox x:Name="HorizontalClickCombo"
+                        Width="100"
+                        SelectedIndex="1"
+                        SelectionChanged="OnHorizontalClickChanged">
+                <ComboBoxItem Content="None" />
+                <ComboBoxItem Content="1/4 MOA" />
+                <ComboBoxItem Content="1/8 MOA" />
+                <ComboBoxItem Content="0.1 MRad" />
+              </ComboBox>
+            </StackPanel>
+
+            <!-- Action Buttons -->
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <Button Content="Load Sample Trajectory" Click="OnLoadTableTrajectory" />
+              <Button Content="Clear" Click="OnClearTableTrajectory" />
+              <TextBlock x:Name="TableRowCountDisplay"
+                         Text="Rows: 0"
+                         VerticalAlignment="Center"
+                         Margin="20,0,0,0" />
+            </StackPanel>
+          </StackPanel>
+
+          <!-- Table -->
+          <Border Grid.Row="1" BorderBrush="Gray" BorderThickness="1" Margin="10,0,10,10">
+            <controls:TrajectoryTableControl x:Name="TrajectoryTable" />
+          </Border>
+
+          <!-- Info Panel -->
+          <Border Grid.Row="2" Background="LightGray" Padding="10" Margin="10,0,10,10">
+            <TextBlock x:Name="TableInfoDisplay"
+                       Text="Click 'Load Sample Trajectory' to display a table. Change units/angular/click settings to see on-demand formatting in action."
+                       TextWrapping="Wrap" />
+          </Border>
+        </Grid>
+      </TabItem>
+
       <!-- Font Size Control Tab -->
       <TabItem Header="Font Size Test">
         <StackPanel Margin="20" Spacing="15">
