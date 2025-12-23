@@ -7,7 +7,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{7582CD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BallisticCalculator.Controls", "Common\BallisticCalculator.Controls\BallisticCalculator.Controls.csproj", "{D0176181-BFEA-4D0E-9AE2-84D837B9F01D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BallisticCalculator.Panels", "Common\BallisticCalculator.Panels\BallisticCalculator.Panels.csproj", "{7118E348-F16D-4C01-94D3-81D79AF1B644}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BallisticCalculator.Controls.Tests", "Common\BallisticCalculator.Controls.Tests\BallisticCalculator.Controls.Tests.csproj", "{9FE9780C-7801-428D-882A-D6CD2E0053AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BallisticCalculator.Panels.Tests", "Common\BallisticCalculator.Panels.Tests\BallisticCalculator.Panels.Tests.csproj", "{F44DAC9D-B2AC-466A-9846-949F9D346D02}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Desktop", "Desktop", "{0706A038-862D-4E8A-892F-789EF48548FC}"
 EndProject
@@ -17,19 +21,22 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReticleEditor", "Desktop\Re
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReticleEditor.Tests", "Desktop\ReticleEditor.Tests\ReticleEditor.Tests.csproj", "{981419CB-ECA1-4165-86E4-214314591A94}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BallisticCalculator.Types", "Common\BallisticCalculator.Types\BallisticCalculator.Types.csproj", "{0D8C2139-1702-4DBC-B9E5-CD9FC2628A87}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{D0176181-BFEA-4D0E-9AE2-84D837B9F01D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D0176181-BFEA-4D0E-9AE2-84D837B9F01D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D0176181-BFEA-4D0E-9AE2-84D837B9F01D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D0176181-BFEA-4D0E-9AE2-84D837B9F01D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7118E348-F16D-4C01-94D3-81D79AF1B644}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7118E348-F16D-4C01-94D3-81D79AF1B644}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7118E348-F16D-4C01-94D3-81D79AF1B644}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7118E348-F16D-4C01-94D3-81D79AF1B644}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9FE9780C-7801-428D-882A-D6CD2E0053AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9FE9780C-7801-428D-882A-D6CD2E0053AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9FE9780C-7801-428D-882A-D6CD2E0053AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -46,12 +53,26 @@ Global
 		{981419CB-ECA1-4165-86E4-214314591A94}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{981419CB-ECA1-4165-86E4-214314591A94}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{981419CB-ECA1-4165-86E4-214314591A94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F44DAC9D-B2AC-466A-9846-949F9D346D02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F44DAC9D-B2AC-466A-9846-949F9D346D02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F44DAC9D-B2AC-466A-9846-949F9D346D02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F44DAC9D-B2AC-466A-9846-949F9D346D02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D8C2139-1702-4DBC-B9E5-CD9FC2628A87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D8C2139-1702-4DBC-B9E5-CD9FC2628A87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D8C2139-1702-4DBC-B9E5-CD9FC2628A87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D8C2139-1702-4DBC-B9E5-CD9FC2628A87}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{D0176181-BFEA-4D0E-9AE2-84D837B9F01D} = {7582CD89-10D6-4795-9963-51EE828FEC49}
 		{9FE9780C-7801-428D-882A-D6CD2E0053AF} = {7582CD89-10D6-4795-9963-51EE828FEC49}
+		{7118E348-F16D-4C01-94D3-81D79AF1B644} = {7582CD89-10D6-4795-9963-51EE828FEC49}
+		{F44DAC9D-B2AC-466A-9846-949F9D346D02} = {7582CD89-10D6-4795-9963-51EE828FEC49}
 		{C50F8081-5A98-4238-AF0A-4FE66195F3F2} = {0706A038-862D-4E8A-892F-789EF48548FC}
 		{3A68C073-D6AC-4127-AD25-87CA6C95D42B} = {0706A038-862D-4E8A-892F-789EF48548FC}
 		{981419CB-ECA1-4165-86E4-214314591A94} = {0706A038-862D-4E8A-892F-789EF48548FC}
+		{0D8C2139-1702-4DBC-B9E5-CD9FC2628A87} = {7582CD89-10D6-4795-9963-51EE828FEC49}
 	EndGlobalSection
 EndGlobal
