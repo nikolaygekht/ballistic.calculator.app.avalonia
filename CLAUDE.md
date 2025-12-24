@@ -55,7 +55,30 @@ BallisticCalculator2/
   - Larger touch targets
   - Different navigation patterns
 
-- **Shared code**: Common controls, business logic, and data models go in the `Common/` directory
+#### What's Shared vs Platform-Specific
+
+**Shared across ALL platforms** (in `Common/`):
+- **Business logic types**: `Ammunition`, `Atmosphere`, `Rifle`, `Wind`, `ShotParameters`, `TrajectoryPoint`, etc.
+- **Pure logic controllers**: `MeasurementSystemController`, `ChartController`, etc.
+- **Service interfaces**: `IFileDialogService` and similar abstractions
+- **Data models**: `AmmunitionLibraryEntry`, `ChartTrajectory`, etc.
+
+**Platform-specific** (Desktop panels are NOT reused for mobile):
+- **Input Panels**: `AmmoPanel`, `AtmospherePanel`, `RiflePanel`, etc. are desktop-only
+- **Complex Controls**: `TrajectoryTableControl`, `TrajectoryChartControl` are desktop-optimized
+- **Layouts**: Desktop uses dense layouts with labels beside controls; mobile needs stacked/vertical layouts
+
+**Why panels are platform-specific**:
+- Desktop panels are optimized for mouse/keyboard with dense information display
+- Mobile needs completely different UI: larger touch targets, screen-by-screen navigation, stacked layouts
+- Trying to make one panel work for both results in compromised UX on both platforms
+- Mobile apps will create their own UI that uses the shared business logic types directly
+
+**For future mobile development**:
+- Create `Mobile/` projects with platform-native UI
+- Import shared types from `Common/BallisticCalculator.Types/`
+- Reuse controllers and service interfaces
+- Build mobile-optimized views from scratch (not adapted desktop panels)
 
 ### 2. KISS - Keep It Simple, Stupid
 
