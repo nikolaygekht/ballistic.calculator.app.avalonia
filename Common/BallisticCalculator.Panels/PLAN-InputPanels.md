@@ -568,11 +568,21 @@ Tests use `MockFileDialogService`.
 - Test default value initialization
 - Test null/empty handling
 
-### Integration Tests (DebugApp)
-- Add panel test pages to DebugApp
-- Visual verification of layouts
-- Interactive testing of unit switching
-- Verify Changed events fire correctly
+### Manual/Visual Testing (DebugApp1)
+
+**DebugApp1** (`Desktop/DebugApp1/`) is a dedicated panel testing application, separate from the controls DebugApp.
+- Tabbed structure: each panel gets its own tab for isolated testing
+- Font size control: same AppFontSize dynamic resource as DebugApp, allows testing panels at different font sizes
+- Same theme as DebugApp (ClassicTheme)
+- References BallisticCalculator.Panels project
+
+**For each panel implementation, add a test tab to DebugApp1 that covers:**
+- Visual verification of layout and alignment
+- Interactive testing of property get/set (buttons to set values, display retrieved values)
+- Unit switching (Metric/Imperial) with visual confirmation
+- Changed event counting
+- Edge cases (empty/null values, boundary values)
+- Font size impact on layout
 
 ---
 
@@ -629,6 +639,15 @@ Common/BallisticCalculator.Panels.Tests/
 Desktop/DebugApp/
 └── Services/
     └── AvaloniaFileDialogService.cs
+
+Desktop/DebugApp1/                          # Panel testing application
+├── DebugApp1.csproj
+├── Program.cs
+├── App.axaml / App.axaml.cs               # Same ClassicTheme + AppFontSize as DebugApp
+├── Views/
+│   ├── MainWindow.axaml                    # TabControl - one tab per panel + Font Size tab
+│   └── MainWindow.axaml.cs
+└── ViewModels/
 ```
 
 ---

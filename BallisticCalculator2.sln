@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReticleEditor.Tests", "Desk
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BallisticCalculator.Types", "Common\BallisticCalculator.Types\BallisticCalculator.Types.csproj", "{0D8C2139-1702-4DBC-B9E5-CD9FC2628A87}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DebugApp1", "Desktop\DebugApp1\DebugApp1.csproj", "{7D01FBF2-39BA-41BD-99D2-D6B1ECD00692}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,10 @@ Global
 		{0D8C2139-1702-4DBC-B9E5-CD9FC2628A87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D8C2139-1702-4DBC-B9E5-CD9FC2628A87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D8C2139-1702-4DBC-B9E5-CD9FC2628A87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D01FBF2-39BA-41BD-99D2-D6B1ECD00692}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D01FBF2-39BA-41BD-99D2-D6B1ECD00692}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D01FBF2-39BA-41BD-99D2-D6B1ECD00692}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D01FBF2-39BA-41BD-99D2-D6B1ECD00692}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -74,5 +80,6 @@ Global
 		{3A68C073-D6AC-4127-AD25-87CA6C95D42B} = {0706A038-862D-4E8A-892F-789EF48548FC}
 		{981419CB-ECA1-4165-86E4-214314591A94} = {0706A038-862D-4E8A-892F-789EF48548FC}
 		{0D8C2139-1702-4DBC-B9E5-CD9FC2628A87} = {7582CD89-10D6-4795-9963-51EE828FEC49}
+		{7D01FBF2-39BA-41BD-99D2-D6B1ECD00692} = {0706A038-862D-4E8A-892F-789EF48548FC}
 	EndGlobalSection
 EndGlobal
