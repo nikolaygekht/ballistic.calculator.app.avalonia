@@ -179,8 +179,8 @@ public sealed class SkiaReticleCanvas : IReticleCanvas
                 IsAntialias = true,
                 Style = fill ? SKPaintStyle.Fill : SKPaintStyle.Stroke,
                 StrokeWidth = strokeWidth,
-                StrokeCap = SKStrokeCap.Round,
-                StrokeJoin = SKStrokeJoin.Round
+                StrokeCap = SKStrokeCap.Butt,
+                StrokeJoin = SKStrokeJoin.Miter
             };
 
             // Limit cache size

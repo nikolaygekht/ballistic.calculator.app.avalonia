@@ -367,14 +367,25 @@ public partial class MeasurementControl : UserControl
         Value = value;
     }
 
-    public void ChangeUnit<T>(T unit, int? accuracy = null) where T : Enum
+    public void ChangeUnit<T>(T unit, int? accuracy = null, bool convert = true) where T : Enum
     {
         var measurement = GetValue<T>();
-        if (measurement == null) return;
-
-        var converted = measurement.Value.To(unit);
-        DecimalPoints = accuracy;
-        Value = converted;
+        if (measurement != null)
+        {
+            // Value exists: convert or leave untouched based on flag
+            if (convert)
+            {
+                DecimalPoints = accuracy;
+                var converted = measurement.Value.To(unit);
+                Value = converted;
+            }
+        }
+        else
+        {
+            // Empty: always switch to appropriate unit
+            DecimalPoints = accuracy;
+            SelectUnit(unit);
+        }
     }
 
     #endregion

@@ -1,0 +1,73 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="using:BallisticCalculator.Controls.Controls"
+             mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="300"
+             x:Class="BallisticCalculator.Panels.Panels.AmmoPanel">
+
+  <StackPanel Spacing="10">
+
+    <!-- Weight -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="Weight:"
+                 VerticalAlignment="Center"
+                 FontWeight="Bold"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1"
+                 x:Name="WeightControl" x:FieldModifier="internal"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <!-- BC -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="BC:"
+                 VerticalAlignment="Center"
+                 FontWeight="Bold"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:BallisticCoefficientControl Grid.Column="1"
+                 x:Name="BCControl" x:FieldModifier="internal"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <!-- BC is Form Factor checkbox -->
+    <Grid ColumnDefinitions="100,*">
+      <CheckBox Grid.Column="1"
+                x:Name="FormFactorCheckBox" x:FieldModifier="internal"
+                Content="BC is Form Factor"
+                FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <!-- Muzzle Velocity -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="Muzzle Vel.:"
+                 VerticalAlignment="Center"
+                 FontWeight="Bold"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1"
+                 x:Name="MuzzleVelocityControl" x:FieldModifier="internal"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <!-- Bullet Diameter (optional) -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="Diameter:"
+                 VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1"
+                 x:Name="BulletDiameterControl" x:FieldModifier="internal"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <!-- Bullet Length (optional) -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="Length:"
+                 VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1"
+                 x:Name="BulletLengthControl" x:FieldModifier="internal"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+  </StackPanel>
+</UserControl>

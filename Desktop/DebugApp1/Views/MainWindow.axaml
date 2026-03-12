@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:DebugApp1.ViewModels"
+        xmlns:panels="using:BallisticCalculator.Panels.Panels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="700"
@@ -39,13 +40,105 @@
                        FontWeight="Bold" />
           </Border>
 
+          <CheckBox x:Name="ConvertOnSystemChangeCheckBox" x:FieldModifier="internal"
+                    Content="Convert values on measurement system change"
+                    IsCheckedChanged="OnConvertFlagChanged"
+                    FontSize="{DynamicResource AppFontSize}"
+                    Margin="0,10,0,0"/>
+
           <TextBlock Text="Switch to other tabs to test panels at different font sizes."
                      FontStyle="Italic"
                      Margin="0,10,0,0" />
         </StackPanel>
       </TabItem>
 
-      <!-- Placeholder: panels will be added as tabs here -->
+      <!-- AmmoPanel Tab -->
+      <TabItem Header="AmmoPanel">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <StackPanel Margin="20" Spacing="15">
+            <TextBlock Text="AmmoPanel Test" FontWeight="Bold"
+                       FontSize="{DynamicResource AppFontSize}"/>
+
+            <!-- Unit system toggle -->
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <Button Content="Metric" Click="OnAmmoMetric"
+                      FontSize="{DynamicResource AppFontSize}"/>
+              <Button Content="Imperial" Click="OnAmmoImperial"
+                      FontSize="{DynamicResource AppFontSize}"/>
+            </StackPanel>
+
+            <!-- The panel -->
+            <panels:AmmoPanel x:Name="AmmoTestPanel"
+                              FontSize="{DynamicResource AppFontSize}"/>
+
+            <!-- Test buttons -->
+            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,10,0,0">
+              <Button Content="Set Test Data" Click="OnAmmoSetTestData"
+                      FontSize="{DynamicResource AppFontSize}"/>
+              <Button Content="Get Values" Click="OnAmmoGetValues"
+                      FontSize="{DynamicResource AppFontSize}"/>
+              <Button Content="Clear" Click="OnAmmoClear"
+                      FontSize="{DynamicResource AppFontSize}"/>
+            </StackPanel>
+
+            <!-- Output -->
+            <Border Background="LightGray" Padding="10" CornerRadius="3">
+              <TextBlock x:Name="AmmoOutput" TextWrapping="Wrap"
+                         FontSize="{DynamicResource AppFontSize}"
+                         Text="Click 'Get Values' to see current panel values"/>
+            </Border>
+
+            <!-- Change counter -->
+            <TextBlock x:Name="AmmoChangeCount"
+                       FontSize="{DynamicResource AppFontSize}"
+                       Text="Changed events: 0"/>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <!-- AmmoLibraryPanel Tab -->
+      <TabItem Header="AmmoLibraryPanel">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <StackPanel Margin="20" Spacing="15">
+            <TextBlock Text="AmmoLibraryPanel Test" FontWeight="Bold"
+                       FontSize="{DynamicResource AppFontSize}"/>
+
+            <!-- Unit system toggle -->
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <Button Content="Metric" Click="OnAmmoLibMetric"
+                      FontSize="{DynamicResource AppFontSize}"/>
+              <Button Content="Imperial" Click="OnAmmoLibImperial"
+                      FontSize="{DynamicResource AppFontSize}"/>
+            </StackPanel>
+
+            <!-- The panel -->
+            <panels:AmmoLibraryPanel x:Name="AmmoLibTestPanel"
+                                     FontSize="{DynamicResource AppFontSize}"/>
+
+            <!-- Test buttons -->
+            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,10,0,0">
+              <Button Content="Set Test Data" Click="OnAmmoLibSetTestData"
+                      FontSize="{DynamicResource AppFontSize}"/>
+              <Button Content="Get Values" Click="OnAmmoLibGetValues"
+                      FontSize="{DynamicResource AppFontSize}"/>
+              <Button Content="Clear" Click="OnAmmoLibClear"
+                      FontSize="{DynamicResource AppFontSize}"/>
+            </StackPanel>
+
+            <!-- Output -->
+            <Border Background="LightGray" Padding="10" CornerRadius="3">
+              <TextBlock x:Name="AmmoLibOutput" TextWrapping="Wrap"
+                         FontSize="{DynamicResource AppFontSize}"
+                         Text="Click 'Get Values' to see current panel values"/>
+            </Border>
+
+            <!-- Change counter -->
+            <TextBlock x:Name="AmmoLibChangeCount"
+                       FontSize="{DynamicResource AppFontSize}"
+                       Text="Changed events: 0"/>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
 
     </TabControl>
 

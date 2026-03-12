@@ -1,0 +1,1 @@
+.\Desktop\DebugApp\bin\Debug\net8.0\DebugApp.exe

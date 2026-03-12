@@ -1,0 +1,1 @@
+.\Desktop\ReticleEditor\bin\Debug\net8.0\ReticleEditor.exe

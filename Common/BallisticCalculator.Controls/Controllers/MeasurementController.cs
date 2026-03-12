@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("BallisticCalculator.Controls.Tests")]
+[assembly: InternalsVisibleTo("BallisticCalculator.Panels.Tests")]
 
 namespace BallisticCalculator.Controls.Controllers;
 

@@ -1,0 +1,84 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:panels="using:BallisticCalculator.Panels.Panels"
+             xmlns:controls="using:BallisticCalculator.Controls.Controls"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="500"
+             x:Class="BallisticCalculator.Panels.Panels.AmmoLibraryPanel">
+
+  <StackPanel Spacing="10">
+
+    <!-- Name + Load/Save buttons -->
+    <Grid ColumnDefinitions="100,*,Auto,5,Auto">
+      <TextBlock Grid.Column="0" Text="Name:"
+                 VerticalAlignment="Center"
+                 FontWeight="Bold"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <TextBox Grid.Column="1"
+               x:Name="NameTextBox" x:FieldModifier="internal"
+               FontSize="{DynamicResource AppFontSize}"/>
+      <Button Grid.Column="2"
+              x:Name="LoadButton" x:FieldModifier="internal"
+              Content="Load"
+              FontSize="{DynamicResource AppFontSize}"
+              Width="60"/>
+      <Button Grid.Column="4"
+              x:Name="SaveButton" x:FieldModifier="internal"
+              Content="Save"
+              FontSize="{DynamicResource AppFontSize}"
+              Width="60"/>
+    </Grid>
+
+    <!-- Separator -->
+    <Separator/>
+
+    <!-- Embedded AmmoPanel -->
+    <panels:AmmoPanel x:Name="AmmoSubPanel" x:FieldModifier="internal"/>
+
+    <!-- Separator -->
+    <Separator/>
+
+    <!-- Caliber -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="Caliber:"
+                 VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <TextBox Grid.Column="1"
+               x:Name="CaliberTextBox" x:FieldModifier="internal"
+               FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <!-- Bullet Type -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="Bullet Type:"
+                 VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <ComboBox Grid.Column="1"
+                x:Name="BulletTypeCombo" x:FieldModifier="internal"
+                HorizontalAlignment="Stretch"
+                FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <!-- Barrel Length -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="Barrel Len.:"
+                 VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1"
+                 x:Name="BarrelLengthControl" x:FieldModifier="internal"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <!-- Source -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="Source:"
+                 VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <TextBox Grid.Column="1"
+               x:Name="SourceTextBox" x:FieldModifier="internal"
+               FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+  </StackPanel>
+</UserControl>
