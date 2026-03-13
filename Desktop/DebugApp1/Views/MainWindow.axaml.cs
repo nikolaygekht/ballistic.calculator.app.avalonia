@@ -12,6 +12,7 @@ public partial class MainWindow : Window
 {
     private int _ammoChangeCount;
     private int _ammoLibChangeCount;
+    private int _windChangeCount;
 
     public MainWindow()
     {
@@ -27,6 +28,12 @@ public partial class MainWindow : Window
         {
             _ammoLibChangeCount++;
             AmmoLibChangeCount.Text = $"Changed events: {_ammoLibChangeCount}";
+        };
+
+        WindTestPanel.Changed += (s, e) =>
+        {
+            _windChangeCount++;
+            WindChangeCount.Text = $"Changed events: {_windChangeCount}";
         };
 
         AmmoLibTestPanel.FileDialogService = new AvaloniaFileDialogService(this);
@@ -53,6 +60,7 @@ public partial class MainWindow : Window
         var convert = ConvertOnSystemChangeCheckBox.IsChecked == true;
         AmmoTestPanel.ConvertOnSystemChange = convert;
         AmmoLibTestPanel.ConvertOnSystemChange = convert;
+        WindTestPanel.ConvertOnSystemChange = convert;
     }
 
     // AmmoPanel handlers
@@ -93,7 +101,7 @@ public partial class MainWindow : Window
     private void OnAmmoClear(object? sender, RoutedEventArgs e)
         => AmmoTestPanel.Clear();
 
-    // AmmoLibraryPanel handlers
+    // AmmoLibraryRecordPanel handlers
     private void OnAmmoLibMetric(object? sender, RoutedEventArgs e)
         => AmmoLibTestPanel.MeasurementSystem = MeasurementSystem.Metric;
 
@@ -141,4 +149,52 @@ public partial class MainWindow : Window
 
     private void OnAmmoLibClear(object? sender, RoutedEventArgs e)
         => AmmoLibTestPanel.Clear();
+
+    // MultiWindPanel handlers
+    private void OnWindMetric(object? sender, RoutedEventArgs e)
+        => WindTestPanel.MeasurementSystem = MeasurementSystem.Metric;
+
+    private void OnWindImperial(object? sender, RoutedEventArgs e)
+        => WindTestPanel.MeasurementSystem = MeasurementSystem.Imperial;
+
+    private void OnWindSetTestData(object? sender, RoutedEventArgs e)
+    {
+        WindTestPanel.Winds = new Wind[]
+        {
+            new Wind()
+            {
+                Direction = new Measurement<AngularUnit>(90, AngularUnit.Degree),
+                Velocity = new Measurement<VelocityUnit>(5, VelocityUnit.MetersPerSecond),
+                MaximumRange = new Measurement<DistanceUnit>(500, DistanceUnit.Meter),
+            },
+            new Wind()
+            {
+                Direction = new Measurement<AngularUnit>(180, AngularUnit.Degree),
+                Velocity = new Measurement<VelocityUnit>(3, VelocityUnit.MetersPerSecond),
+            },
+        };
+    }
+
+    private void OnWindGetValues(object? sender, RoutedEventArgs e)
+    {
+        var winds = WindTestPanel.Winds;
+        if (winds == null)
+        {
+            WindOutput.Text = "Winds: null (no data)";
+            return;
+        }
+
+        var text = $"Wind count: {winds.Length}\n";
+        for (int i = 0; i < winds.Length; i++)
+        {
+            text += $"\nWind #{i + 1}:\n" +
+                    $"  Direction: {winds[i].Direction}\n" +
+                    $"  Velocity: {winds[i].Velocity}\n" +
+                    $"  Max Range: {winds[i].MaximumRange?.ToString() ?? "unlimited"}";
+        }
+        WindOutput.Text = text;
+    }
+
+    private void OnWindClear(object? sender, RoutedEventArgs e)
+        => WindTestPanel.Clear();
 }

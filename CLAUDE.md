@@ -129,6 +129,24 @@ NumericPart.TextChanged += (s, e) => Changed?.Invoke(this, EventArgs.Empty);
 4. **Direct UI access** - Value getters read from UI controls directly, no intermediate storage
 5. **Simple events** - Controls raise `Changed` events, application decides what to do
 
+#### Value Formatting: Two Paths
+
+MeasurementControl has two distinct formatting paths depending on how data enters the control:
+
+**Programmatic set (`SetValue<T>`)** — loading saved data, setting from library:
+- Uses `ParseValuePreservePrecision` in the controller
+- Preserves the value's own meaningful precision (up to 5 decimal digits)
+- Does NOT pad with trailing zeros: 40gr → "40", not "40.00"
+- Does NOT truncate higher precision: 0.308in on a 2dp control → "0.308", not "0.31"
+- Does NOT convert to the panel's current measurement system unit — shows original unit as-is
+
+**User-driven set (`Value` property / `ChangeUnit`)** — unit conversion, user typing:
+- Uses `ParseValue` in the controller
+- Strictly applies `DecimalPoints` — formats to exactly the configured precision
+- Prevents floating-point noise from accumulating through convert round-trips (e.g., gr→g→gr stays clean)
+
+**Why two paths**: Without this separation, switching metric↔imperial repeatedly would accumulate floating-point noise (168gr → 10.886g → 168.000005gr). Loaded data should never lose precision, but converted data must be clamped to prevent noise.
+
 #### When NOT to Create Abstractions
 
 - **Don't create interfaces** unless you have multiple implementations
@@ -201,6 +219,17 @@ public class MeasurementControl : UserControl
 2. **Logic in Controller** - Complex logic goes in controller classes
 3. **No validation** - Controls accept any parseable input
 4. **Events over properties** - Raise Changed events, let application handle updates
+
+### Spacing and Layout (Desktop)
+
+**Goal**: Match WinForms information density. Avalonia controls have more built-in padding than WinForms, so we use tighter spacing values to compensate.
+
+- **StackPanel Spacing**: Use `Spacing="4"` for form field rows (labels + controls)
+- **Section padding**: Use `Padding="5"` on Border sections, not 10
+- **Section headers**: Use `Margin="0,0,0,2"` below header TextBlocks, not 5
+- **No extra margins** on button rows within form layouts — let StackPanel spacing handle gaps
+- **Horizontal button bars** (OK/Cancel): Keep `Spacing="10"` — buttons need more breathing room than form rows
+- **Separator controls**: Use as-is between logical groups (they add their own minimal spacing)
 
 ### For Testing (TDD Approach)
 

@@ -88,11 +88,11 @@ public partial class EditRectangleDialog : Window
     private void OnOK(object? sender, RoutedEventArgs e)
     {
         Save();
-        Close();
+        Close(true);
     }
 
     private void OnCancel(object? sender, RoutedEventArgs e)
     {
-        Close();
+        Close(false);
     }
 }

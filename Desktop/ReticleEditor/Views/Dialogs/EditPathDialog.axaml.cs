@@ -270,12 +270,12 @@ public partial class EditPathDialog : Window
     private void OnOK(object? sender, RoutedEventArgs e)
     {
         Save();
-        Close();
+        Close(true);
     }
 
     private void OnCancel(object? sender, RoutedEventArgs e)
     {
         Revert();
-        Close();
+        Close(false);
     }
 }

@@ -80,20 +80,20 @@ public partial class AmmoPanel : UserControl
                 return;
             }
 
-            WeightControl.SetValue(ConvertWeight(value.Weight));
+            WeightControl.SetValue(value.Weight);
             BCControl.Value = new BallisticCoefficient(
                 value.BallisticCoefficient.Value,
                 value.BallisticCoefficient.Table);
             FormFactorCheckBox.IsChecked = value.BallisticCoefficient.ValueType == BallisticCoefficientValueType.FormFactor;
-            MuzzleVelocityControl.SetValue(ConvertVelocity(value.MuzzleVelocity));
+            MuzzleVelocityControl.SetValue(value.MuzzleVelocity);
 
             if (value.BulletDiameter.HasValue)
-                BulletDiameterControl.SetValue(ConvertSmallDistance(value.BulletDiameter.Value));
+                BulletDiameterControl.SetValue(value.BulletDiameter.Value);
             else
                 BulletDiameterControl.Value = null;
 
             if (value.BulletLength.HasValue)
-                BulletLengthControl.SetValue(ConvertSmallDistance(value.BulletLength.Value));
+                BulletLengthControl.SetValue(value.BulletLength.Value);
             else
                 BulletLengthControl.Value = null;
         }
@@ -160,28 +160,6 @@ public partial class AmmoPanel : UserControl
             BulletDiameterControl.ChangeUnit(DistanceUnit.Inch, 3, convert);
             BulletLengthControl.ChangeUnit(DistanceUnit.Inch, 3, convert);
         }
-    }
-
-    #endregion
-
-    #region Unit Conversion Helpers
-
-    private Measurement<WeightUnit> ConvertWeight(Measurement<WeightUnit> value)
-    {
-        var targetUnit = _measurementSystem == MeasurementSystem.Metric ? WeightUnit.Gram : WeightUnit.Grain;
-        return value.To(targetUnit);
-    }
-
-    private Measurement<VelocityUnit> ConvertVelocity(Measurement<VelocityUnit> value)
-    {
-        var targetUnit = _measurementSystem == MeasurementSystem.Metric ? VelocityUnit.MetersPerSecond : VelocityUnit.FeetPerSecond;
-        return value.To(targetUnit);
-    }
-
-    private Measurement<DistanceUnit> ConvertSmallDistance(Measurement<DistanceUnit> value)
-    {
-        var targetUnit = _measurementSystem == MeasurementSystem.Metric ? DistanceUnit.Millimeter : DistanceUnit.Inch;
-        return value.To(targetUnit);
     }
 
     #endregion

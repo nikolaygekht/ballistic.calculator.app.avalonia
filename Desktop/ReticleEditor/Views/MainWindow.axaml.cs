@@ -49,6 +49,9 @@ public partial class MainWindow : Window
         // Initialize coordinate unit menu checkmarks (default to Mil)
         UpdateCoordinateUnitMenuCheckmarks();
 
+        // Initialize button states
+        UpdateElementButtonStates();
+
         // Load and apply saved window state
         LoadWindowState();
 
@@ -174,6 +177,7 @@ public partial class MainWindow : Window
         UpdateReticleControls();
         UpdateElementsList();
         UpdateReticlePreview();
+        UpdateElementButtonStates();
         StatusArea.Text = "New reticle created";
         await Task.CompletedTask;
     }
@@ -210,6 +214,7 @@ public partial class MainWindow : Window
                     UpdateReticleControls();
                     UpdateElementsList();
                     UpdateReticlePreview();
+                    UpdateElementButtonStates();
 
                     StatusArea.Text = $"Opened: {System.IO.Path.GetFileName(path)}";
                 }
@@ -344,6 +349,7 @@ public partial class MainWindow : Window
     {
         // Update overlay when selection changes (for highlighting)
         UpdateOverlay();
+        UpdateElementButtonStates();
     }
 
     // Help Menu
@@ -471,6 +477,7 @@ public partial class MainWindow : Window
         }
 
         UpdateReticlePreview();
+        UpdateElementButtonStates();
         StatusArea.Text = "Reticle parameters updated";
     }
 
@@ -643,6 +650,20 @@ public partial class MainWindow : Window
 
     #region Element Operations
 
+    private void UpdateElementButtonStates()
+    {
+        var hasReticle = _currentReticle?.Size != null &&
+                         _currentReticle.Size.X.In(_currentReticle.Size.X.Unit) > 0 &&
+                         _currentReticle.Size.Y.In(_currentReticle.Size.Y.Unit) > 0;
+        var hasSelection = ReticleItems.SelectedItem != null;
+
+        ElementTypeCombo.IsEnabled = hasReticle;
+        ButtonNew.IsEnabled = hasReticle;
+        ButtonEdit.IsEnabled = hasReticle && hasSelection;
+        ButtonDuplicate.IsEnabled = hasReticle && hasSelection;
+        ButtonDelete.IsEnabled = hasReticle && hasSelection;
+    }
+
     private async void OnNewElement(object? sender, RoutedEventArgs e)
     {
         if (_currentReticle == null) return;
@@ -704,7 +725,13 @@ public partial class MainWindow : Window
             return;
         }
 
-        await dialog.ShowDialog(this);
+        var result = await dialog.ShowDialog<bool?>(this);
+
+        if (result != true)
+        {
+            StatusArea.Text = "New element cancelled";
+            return;
+        }
 
         // Add to appropriate collection
         if (newElement is ReticleElement element)
@@ -739,7 +766,13 @@ public partial class MainWindow : Window
             return;
         }
 
-        await dialog.ShowDialog(this);
+        var result = await dialog.ShowDialog<bool?>(this);
+
+        if (result != true)
+        {
+            StatusArea.Text = "Edit cancelled";
+            return;
+        }
 
         RefreshElementsList();
         UpdateReticlePreview();

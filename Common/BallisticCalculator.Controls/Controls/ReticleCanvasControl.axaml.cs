@@ -198,6 +198,12 @@ public partial class ReticleCanvasControl : UserControl
         if (Reticle == null || Bounds.Width <= 0 || Bounds.Height <= 0)
             return;
 
+        // Guard against zero-sized reticle (causes NaN/Infinity in coordinate calculations)
+        if (Reticle.Size == null ||
+            Reticle.Size.X.In(Reticle.Size.X.Unit) <= 0 ||
+            Reticle.Size.Y.In(Reticle.Size.Y.Unit) <= 0)
+            return;
+
         // Create the custom draw operation
         var drawOp = new CustomDrawOp(
             new Rect(0, 0, Bounds.Width, Bounds.Height),

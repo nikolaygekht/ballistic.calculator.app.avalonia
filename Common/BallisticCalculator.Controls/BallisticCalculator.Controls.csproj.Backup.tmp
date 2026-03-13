@@ -14,6 +14,9 @@
     <PackageReference Include="Avalonia.Skia" Version="11.3.12" />
     <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.12" />
 
+    <!-- MVVM -->
+    <PackageReference Include="ReactiveUI.Avalonia" Version="14.7.1" />
+
     <!-- Graphics -->
     <PackageReference Include="SkiaSharp" Version="[2.88.9,3)" />
 

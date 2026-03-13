@@ -68,7 +68,7 @@ public class MeasurementControlTests
         control.SetValue(measurement);
 
         // Assert
-        control.NumericPart.Text.Should().Contain("100.46"); // Rounded to 2 decimal places
+        control.NumericPart.Text.Should().Contain("100.456"); // Preserves precision beyond DecimalPoints
     }
 
 

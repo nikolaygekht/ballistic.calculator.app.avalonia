@@ -1,0 +1,57 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="using:BallisticCalculator.Controls.Controls"
+             mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="200"
+             x:Class="BallisticCalculator.Panels.Panels.WindPanel">
+
+  <Grid ColumnDefinitions="*,Auto">
+
+    <!-- Input fields -->
+    <StackPanel Grid.Column="0" Spacing="4">
+
+      <!-- Direction -->
+      <Grid ColumnDefinitions="100,*">
+        <TextBlock Grid.Column="0" Text="Direction:"
+                   VerticalAlignment="Center"
+                   FontWeight="Bold"
+                   FontSize="{DynamicResource AppFontSize}"/>
+        <controls:MeasurementControl Grid.Column="1"
+                   x:Name="DirectionControl" x:FieldModifier="internal"
+                   FontSize="{DynamicResource AppFontSize}"/>
+      </Grid>
+
+      <!-- Velocity -->
+      <Grid ColumnDefinitions="100,*">
+        <TextBlock Grid.Column="0" Text="Velocity:"
+                   VerticalAlignment="Center"
+                   FontWeight="Bold"
+                   FontSize="{DynamicResource AppFontSize}"/>
+        <controls:MeasurementControl Grid.Column="1"
+                   x:Name="VelocityControl" x:FieldModifier="internal"
+                   FontSize="{DynamicResource AppFontSize}"/>
+      </Grid>
+
+      <!-- Max Distance (optional with checkbox) -->
+      <Grid ColumnDefinitions="100,*">
+        <CheckBox Grid.Column="0"
+                  x:Name="MaxDistanceCheckBox" x:FieldModifier="internal"
+                  Content="Distance:"
+                  FontSize="{DynamicResource AppFontSize}"/>
+        <controls:MeasurementControl Grid.Column="1"
+                   x:Name="MaxDistanceControl" x:FieldModifier="internal"
+                   FontSize="{DynamicResource AppFontSize}"
+                   IsEnabled="False"/>
+      </Grid>
+
+    </StackPanel>
+
+    <!-- Wind direction visual indicator -->
+    <controls:WindDirectionControl Grid.Column="1"
+               x:Name="WindIndicator" x:FieldModifier="internal"
+               Width="80" Height="80"
+               Margin="8,0,0,0"/>
+
+  </Grid>
+</UserControl>

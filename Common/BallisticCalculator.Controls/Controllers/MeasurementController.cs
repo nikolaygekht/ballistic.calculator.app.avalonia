@@ -89,12 +89,52 @@ public class MeasurementController<T> where T : Enum
         culture ??= CultureInfo.InvariantCulture;
         decimalPoints ??= DecimalPoints;
 
-        // Get value and unit from the measurement object
         double numericValue = measurement.Value;
         unit = measurement.Unit;
 
-        // Format the value with specified decimal points and thousands separator
         text = FormatNumber(numericValue, decimalPoints, culture);
+    }
+
+    /// <summary>
+    /// Parses a Measurement for programmatic SetValue - preserves original precision
+    /// even if it exceeds DecimalPoints (e.g., 0.308in displayed on a control with DecimalPoints=2)
+    /// </summary>
+    public void ParseValuePreservePrecision(Measurement<T> measurement, out string text, out T unit, int? decimalPoints = null, CultureInfo? culture = null)
+    {
+        culture ??= CultureInfo.InvariantCulture;
+        decimalPoints ??= DecimalPoints;
+
+        double numericValue = measurement.Value;
+        unit = measurement.Unit;
+
+        // Use the value's own meaningful precision — don't pad with trailing zeros,
+        // but don't truncate if the value has more digits than DecimalPoints
+        int valueDP = CountMeaningfulDecimalDigits(numericValue);
+        int effectiveDP = Math.Max(valueDP, decimalPoints ?? 0);
+
+        text = FormatNumber(numericValue, effectiveDP, culture);
+
+        // Trim trailing zeros after decimal point (e.g. "40.00" → "40", "0.310" → "0.31")
+        string decSep = culture.NumberFormat.NumberDecimalSeparator;
+        if (text.Contains(decSep))
+        {
+            text = text.TrimEnd('0').TrimEnd(decSep.ToCharArray());
+        }
+    }
+
+    /// <summary>
+    /// Counts the number of meaningful decimal digits in a double value (max 5).
+    /// Uses progressively more decimal places until round-tripping produces the same value,
+    /// which filters out floating-point representation noise (e.g., 1.2350000000000001).
+    /// </summary>
+    private static int CountMeaningfulDecimalDigits(double value)
+    {
+        for (int digits = 0; digits <= 5; digits++)
+        {
+            if (Math.Round(value, digits) == value)
+                return digits;
+        }
+        return 5;
     }
 
     /// <summary>

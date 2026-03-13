@@ -22,7 +22,7 @@ public class AvaloniaFileDialogService : IFileDialogService
 
         var fileTypes = options.Filters.Select(f => new FilePickerFileType(f.Name)
         {
-            Patterns = new[] { $"*.{f.Extension}" }
+            Patterns = f.Extensions.Select(ext => $"*.{ext}").ToArray()
         }).ToArray();
 
         var files = await storageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
@@ -42,7 +42,7 @@ public class AvaloniaFileDialogService : IFileDialogService
 
         var fileTypes = options.Filters.Select(f => new FilePickerFileType(f.Name)
         {
-            Patterns = new[] { $"*.{f.Extension}" }
+            Patterns = f.Extensions.Select(ext => $"*.{ext}").ToArray()
         }).ToArray();
 
         var file = await storageProvider.SaveFilePickerAsync(new FilePickerSaveOptions

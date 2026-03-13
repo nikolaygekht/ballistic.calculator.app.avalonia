@@ -167,17 +167,16 @@ public class AmmoPanelTests
         // Default: ConvertOnSystemChange = false
         var ammo = CreateTestAmmunition(); // 168 grain, 2650 fps
         panel.Ammunition = ammo;
-        // In metric mode, weight displays as ~10.89 gram, velocity as ~807.7 m/s
+        // Values are set as-is (grain, fps) - no conversion on property set
 
         panel.MeasurementSystem = MeasurementSystem.Imperial;
 
         // With flag=false, filled controls are not touched at all (value AND unit stay)
         var result = panel.Ammunition;
         result.Should().NotBeNull();
-        result!.Weight.In(WeightUnit.Gram).Should().BeApproximately(
-            new Measurement<WeightUnit>(168, WeightUnit.Grain).In(WeightUnit.Gram), 0.5);
-        GetSelectedUnit(panel.WeightControl).Should().Be(WeightUnit.Gram);
-        GetSelectedUnit(panel.MuzzleVelocityControl).Should().Be(VelocityUnit.MetersPerSecond);
+        result!.Weight.In(WeightUnit.Grain).Should().BeApproximately(168, 0.5);
+        GetSelectedUnit(panel.WeightControl).Should().Be(WeightUnit.Grain);
+        GetSelectedUnit(panel.MuzzleVelocityControl).Should().Be(VelocityUnit.FeetPerSecond);
     }
 
     // Note: Changed event tests removed - Avalonia Headless doesn't fire TextChanged

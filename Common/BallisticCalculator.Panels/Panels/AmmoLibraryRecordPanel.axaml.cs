@@ -12,11 +12,11 @@ using System.Linq;
 
 namespace BallisticCalculator.Panels.Panels;
 
-public partial class AmmoLibraryPanel : UserControl
+public partial class AmmoLibraryRecordPanel : UserControl
 {
     private MeasurementSystem _measurementSystem = MeasurementSystem.Metric;
 
-    public AmmoLibraryPanel()
+    public AmmoLibraryRecordPanel()
     {
         InitializeComponent();
         InitializeControls();
@@ -79,7 +79,7 @@ public partial class AmmoLibraryPanel : UserControl
             SelectBulletType(value.AmmunitionType);
 
             if (value.BarrelLength.HasValue)
-                BarrelLengthControl.SetValue(ConvertBarrelLength(value.BarrelLength.Value));
+                BarrelLengthControl.SetValue(value.BarrelLength.Value);
             else
                 BarrelLengthControl.Value = null;
 
@@ -170,8 +170,7 @@ public partial class AmmoLibraryPanel : UserControl
             DefaultExtension = "ammox",
             Filters =
             {
-                new Services.FileDialogFilter("Ammunition Files", "ammox"),
-                new Services.FileDialogFilter("Legacy Ammunition Files", "ammo"),
+                new Services.FileDialogFilter("Ammunition Files", "ammox", "ammo"),
             }
         };
 
@@ -221,16 +220,6 @@ public partial class AmmoLibraryPanel : UserControl
         {
             // File save failed - silently ignore for now
         }
-    }
-
-    #endregion
-
-    #region Unit Conversion Helpers
-
-    private Measurement<DistanceUnit> ConvertBarrelLength(Measurement<DistanceUnit> value)
-    {
-        var targetUnit = _measurementSystem == MeasurementSystem.Metric ? DistanceUnit.Millimeter : DistanceUnit.Inch;
-        return value.To(targetUnit);
     }
 
     #endregion

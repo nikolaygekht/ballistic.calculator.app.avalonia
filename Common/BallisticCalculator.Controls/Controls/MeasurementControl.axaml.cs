@@ -364,7 +364,19 @@ public partial class MeasurementControl : UserControl
 
     public void SetValue<T>(Measurement<T> value) where T : Enum
     {
-        Value = value;
+        // Programmatic set - preserve original precision beyond DecimalPoints
+        if (NumericPart == null || UnitPart == null || _controller == null)
+            return;
+
+        var method = _controller.GetType().GetMethod("ParseValuePreservePrecision");
+        var parameters = new object?[] { value, null, null, DecimalPoints, Culture };
+        method?.Invoke(_controller, parameters);
+
+        string text = (string)(parameters[1] ?? "");
+        object? unit = parameters[2];
+
+        NumericPart.Text = text;
+        SelectUnit(unit);
     }
 
     public void ChangeUnit<T>(T unit, int? accuracy = null, bool convert = true) where T : Enum

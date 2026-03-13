@@ -6,7 +6,7 @@
              mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="300"
              x:Class="BallisticCalculator.Panels.Panels.AmmoPanel">
 
-  <StackPanel Spacing="10">
+  <StackPanel Spacing="4">
 
     <!-- Weight -->
     <Grid ColumnDefinitions="100,*">

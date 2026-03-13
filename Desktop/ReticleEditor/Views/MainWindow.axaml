@@ -90,12 +90,12 @@
                     <Border Grid.Row="0"
                             BorderBrush="LightGray"
                             BorderThickness="0,0,0,1"
-                            Padding="10">
-                        <StackPanel Spacing="8">
+                            Padding="5">
+                        <StackPanel Spacing="4">
                             <TextBlock Text="Reticle Parameters"
                                        FontWeight="SemiBold"
                                        FontSize="{DynamicResource AppFontSize}"
-                                       Margin="0,0,0,5"/>
+                                       Margin="0,0,0,2"/>
 
                             <!-- Name -->
                             <Grid ColumnDefinitions="104,*">
@@ -118,7 +118,7 @@
                             </Grid>
 
                             <!-- Set Button (aligned with controls, not label) -->
-                            <Grid ColumnDefinitions="104,Auto" Margin="0,5,0,0">
+                            <Grid ColumnDefinitions="104,Auto">
                                 <Button Grid.Column="1" Content="Set" x:Name="ButtonSet" Click="OnSetReticleParameters" FontSize="{DynamicResource AppFontSize}" MinWidth="70"/>
                             </Grid>
                         </StackPanel>
@@ -128,7 +128,7 @@
                     <Border Grid.Row="1"
                             BorderBrush="LightGray"
                             BorderThickness="0,0,0,1"
-                            Padding="10">
+                            Padding="5">
                         <ListBox x:Name="ReticleItems"
                                  FontSize="{DynamicResource AppFontSize}"
                                  SelectionMode="Single"/>
@@ -136,7 +136,7 @@
 
                     <!-- Section 3: Element Operations -->
                     <Border Grid.Row="2"
-                            Padding="10">
+                            Padding="5">
                         <Grid ColumnDefinitions="*,5,Auto,5,Auto,5,Auto,5,Auto">
                             <!-- Element Type ComboBox -->
                             <ComboBox Grid.Column="0"

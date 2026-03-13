@@ -256,7 +256,7 @@ public class MeasurementControllerTests
         controller.ParseValue(measurement, out string text, out DistanceUnit unit, 2, CultureInfo.InvariantCulture);
 
         // Assert
-        text.Should().Be("100.46"); // Rounded to 2 decimal places
+        text.Should().Be("100.46"); // ParseValue rounds to configured DecimalPoints
         unit.Should().Be(DistanceUnit.Meter);
     }
 

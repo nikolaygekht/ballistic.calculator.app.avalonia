@@ -10,7 +10,7 @@
         CanResize="true">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-        <StackPanel Margin="20" Spacing="10">
+        <StackPanel Margin="20" Spacing="4">
             <TextBlock Text="Position" FontWeight="SemiBold" FontSize="{DynamicResource AppFontSize}"/>
 
             <Grid ColumnDefinitions="100,*" RowDefinitions="Auto,Auto">

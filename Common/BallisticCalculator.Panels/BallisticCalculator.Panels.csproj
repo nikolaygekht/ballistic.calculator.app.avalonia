@@ -9,12 +9,9 @@
 
   <ItemGroup>
     <!-- Avalonia Framework -->
-    <PackageReference Include="Avalonia" Version="11.3.10" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.10" />
-    <PackageReference Include="Avalonia.Skia" Version="11.3.10" />
-
-    <!-- MVVM -->
-    <PackageReference Include="ReactiveUI.Avalonia" Version="14.7.1" />
+    <PackageReference Include="Avalonia" Version="11.3.12" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.12" />
+    <PackageReference Include="Avalonia.Skia" Version="11.3.12" />
 
     <!-- Graphics -->
     <PackageReference Include="SkiaSharp" Version="[2.88.9,3)" />

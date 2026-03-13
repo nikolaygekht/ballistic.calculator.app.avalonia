@@ -13,12 +13,12 @@ using System.Linq;
 
 namespace BallisticCalculator.Panels.Tests.Panels;
 
-public class AmmoLibraryPanelTests
+public class AmmoLibraryRecordPanelTests
 {
     [AvaloniaFact]
     public void Panel_ShouldInitialize()
     {
-        var panel = new AmmoLibraryPanel();
+        var panel = new AmmoLibraryRecordPanel();
 
         panel.Should().NotBeNull();
         panel.NameTextBox.Should().NotBeNull();
@@ -34,7 +34,7 @@ public class AmmoLibraryPanelTests
     [AvaloniaFact]
     public void Panel_InitialState_ShouldReturnNullLibraryEntry()
     {
-        var panel = new AmmoLibraryPanel();
+        var panel = new AmmoLibraryRecordPanel();
 
         panel.LibraryEntry.Should().BeNull();
     }
@@ -42,7 +42,7 @@ public class AmmoLibraryPanelTests
     [AvaloniaFact]
     public void BulletTypeCombo_ShouldBePopulated()
     {
-        var panel = new AmmoLibraryPanel();
+        var panel = new AmmoLibraryRecordPanel();
 
         // Empty entry + ammunition types
         panel.BulletTypeCombo.Items.Count.Should().BeGreaterThan(1);
@@ -52,7 +52,7 @@ public class AmmoLibraryPanelTests
     [AvaloniaFact]
     public void LibraryEntry_SetAndGet_ShouldRoundTrip()
     {
-        var panel = new AmmoLibraryPanel();
+        var panel = new AmmoLibraryRecordPanel();
         var entry = CreateTestEntry();
 
         panel.LibraryEntry = entry;
@@ -70,7 +70,7 @@ public class AmmoLibraryPanelTests
     [AvaloniaFact]
     public void LibraryEntry_WithBarrelLength_ShouldRoundTrip()
     {
-        var panel = new AmmoLibraryPanel();
+        var panel = new AmmoLibraryRecordPanel();
         var entry = CreateTestEntry();
         entry.BarrelLength = new Measurement<DistanceUnit>(24, DistanceUnit.Inch);
 
@@ -85,7 +85,7 @@ public class AmmoLibraryPanelTests
     [AvaloniaFact]
     public void LibraryEntry_WithoutOptionalFields_ShouldReturnNull()
     {
-        var panel = new AmmoLibraryPanel();
+        var panel = new AmmoLibraryRecordPanel();
         var entry = new AmmunitionLibraryEntry()
         {
             Name = "Test",
@@ -105,7 +105,7 @@ public class AmmoLibraryPanelTests
     [AvaloniaFact]
     public void LibraryEntry_SetNull_ShouldClear()
     {
-        var panel = new AmmoLibraryPanel();
+        var panel = new AmmoLibraryRecordPanel();
         panel.LibraryEntry = CreateTestEntry();
 
         panel.LibraryEntry = null;
@@ -120,7 +120,7 @@ public class AmmoLibraryPanelTests
     [AvaloniaFact]
     public void Ammunition_Property_ShouldDelegateToSubPanel()
     {
-        var panel = new AmmoLibraryPanel();
+        var panel = new AmmoLibraryRecordPanel();
         var ammo = CreateTestAmmunition();
 
         panel.Ammunition = ammo;
@@ -133,7 +133,7 @@ public class AmmoLibraryPanelTests
     [AvaloniaFact]
     public void MeasurementSystem_SwitchToImperial_WithConvert_ShouldPreserveValues()
     {
-        var panel = new AmmoLibraryPanel();
+        var panel = new AmmoLibraryRecordPanel();
         panel.ConvertOnSystemChange = true;
         var entry = CreateTestEntry();
         entry.BarrelLength = new Measurement<DistanceUnit>(610, DistanceUnit.Millimeter);
@@ -151,7 +151,7 @@ public class AmmoLibraryPanelTests
     [AvaloniaFact]
     public void MeasurementSystem_SwitchToMetric_WithConvert_ShouldPreserveValues()
     {
-        var panel = new AmmoLibraryPanel();
+        var panel = new AmmoLibraryRecordPanel();
         panel.ConvertOnSystemChange = true;
         panel.MeasurementSystem = MeasurementSystem.Imperial;
         var entry = CreateTestEntry();
@@ -169,7 +169,7 @@ public class AmmoLibraryPanelTests
     [AvaloniaFact]
     public void MeasurementSystem_SwitchWithoutConvert_ShouldLeaveValuesUntouched()
     {
-        var panel = new AmmoLibraryPanel();
+        var panel = new AmmoLibraryRecordPanel();
         // Default: ConvertOnSystemChange = false
         var entry = CreateTestEntry();
         entry.BarrelLength = new Measurement<DistanceUnit>(610, DistanceUnit.Millimeter);
@@ -189,7 +189,7 @@ public class AmmoLibraryPanelTests
     [AvaloniaFact]
     public void BulletType_ShouldSelectCorrectType()
     {
-        var panel = new AmmoLibraryPanel();
+        var panel = new AmmoLibraryRecordPanel();
         var entry = CreateTestEntry();
 
         panel.LibraryEntry = entry;
@@ -200,7 +200,7 @@ public class AmmoLibraryPanelTests
     [AvaloniaFact]
     public void Clear_ShouldResetAllFields()
     {
-        var panel = new AmmoLibraryPanel();
+        var panel = new AmmoLibraryRecordPanel();
         var entry = CreateTestEntry();
         entry.BarrelLength = new Measurement<DistanceUnit>(24, DistanceUnit.Inch);
         panel.LibraryEntry = entry;
@@ -219,7 +219,7 @@ public class AmmoLibraryPanelTests
     [AvaloniaFact]
     public void MeasurementSystem_SwitchToImperialWhenEmpty_ShouldChangeBarrelLengthUnit()
     {
-        var panel = new AmmoLibraryPanel();
+        var panel = new AmmoLibraryRecordPanel();
 
         panel.MeasurementSystem = MeasurementSystem.Imperial;
 
@@ -229,7 +229,7 @@ public class AmmoLibraryPanelTests
     [AvaloniaFact]
     public void MeasurementSystem_SwitchToMetricWhenEmpty_ShouldChangeBarrelLengthUnit()
     {
-        var panel = new AmmoLibraryPanel();
+        var panel = new AmmoLibraryRecordPanel();
         panel.MeasurementSystem = MeasurementSystem.Imperial;
 
         panel.MeasurementSystem = MeasurementSystem.Metric;
@@ -241,7 +241,7 @@ public class AmmoLibraryPanelTests
     [AvaloniaFact]
     public void LoadButton_WithFileDialogService_ShouldInvokeOpenDialog()
     {
-        var panel = new AmmoLibraryPanel();
+        var panel = new AmmoLibraryRecordPanel();
         var mockService = new MockFileDialogService();
         panel.FileDialogService = mockService;
 
@@ -249,15 +249,14 @@ public class AmmoLibraryPanelTests
 
         mockService.LastOpenOptions.Should().NotBeNull();
         mockService.LastOpenOptions!.Title.Should().Be("Load Ammunition");
-        mockService.LastOpenOptions.Filters.Should().HaveCount(2);
-        mockService.LastOpenOptions.Filters[0].Extension.Should().Be("ammox");
-        mockService.LastOpenOptions.Filters[1].Extension.Should().Be("ammo");
+        mockService.LastOpenOptions.Filters.Should().HaveCount(1);
+        mockService.LastOpenOptions.Filters[0].Extensions.Should().BeEquivalentTo(new[] { "ammox", "ammo" });
     }
 
     [AvaloniaFact]
     public void SaveButton_WithFileDialogService_ShouldInvokeSaveDialog()
     {
-        var panel = new AmmoLibraryPanel();
+        var panel = new AmmoLibraryRecordPanel();
         var mockService = new MockFileDialogService();
         panel.FileDialogService = mockService;
         // Need data for save to work

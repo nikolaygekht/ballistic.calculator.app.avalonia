@@ -15,11 +15,55 @@ Following CLAUDE.md principles:
 - **Changed events**: Panels raise `Changed` events, application decides what to do
 - **MeasurementSystem support**: All panels support Metric/Imperial switching
 
+### Measurement System Switching Rules
+
+All panels expose `MeasurementSystem` property and `ConvertOnSystemChange` flag. The behavior depends on whether a control has a value and the flag state:
+
+**`ConvertOnSystemChange = true` (convert mode):**
+- **Control has value**: Convert the value to the target unit and update display (e.g., 168gr → 10.89g)
+- **Control is empty**: Switch displayed unit to the system's default (e.g., show "g" instead of "gr")
+
+**`ConvertOnSystemChange = false` (keep mode):**
+- **Control has value**: Leave completely untouched — same numeric value AND same unit stay displayed
+- **Control is empty**: Switch displayed unit to the system's default
+
+**Implementation pattern** — each panel calls `MeasurementControl.ChangeUnit(targetUnit, decimalPoints, convert)`:
+```csharp
+private void ApplyMeasurementSystem()
+{
+    var convert = ConvertOnSystemChange;
+    if (_measurementSystem == MeasurementSystem.Metric)
+    {
+        WeightControl.ChangeUnit(WeightUnit.Gram, 2, convert);
+        MuzzleVelocityControl.ChangeUnit(VelocityUnit.MetersPerSecond, 1, convert);
+    }
+    else
+    {
+        WeightControl.ChangeUnit(WeightUnit.Grain, 1, convert);
+        MuzzleVelocityControl.ChangeUnit(VelocityUnit.FeetPerSecond, 1, convert);
+    }
+}
+```
+
+**`ChangeUnit` behavior in MeasurementControl** (implemented in Controls library):
+- If value exists and `convert=true`: set new accuracy, convert value to target unit, update display
+- If value exists and `convert=false`: do nothing (value and unit stay as-is)
+- If empty (regardless of flag): set new accuracy, switch displayed unit selector
+
+**Setting values via property** (e.g., `panel.Ammunition = ammo`): Do NOT convert incoming values. Pass them as-is to the control, preserving the original unit. The control will display whatever unit the data comes in. The measurement system only affects what happens when the control is empty or when the user explicitly switches systems.
+
+### Spacing Rules (matching WinForms density)
+- `StackPanel Spacing="4"` for form field rows
+- `Padding="5"` on Border sections
+- `Margin="0,0,0,2"` below section header TextBlocks
+- No extra margins on button rows — StackPanel spacing handles gaps
+- Horizontal button bars (OK/Cancel in dialogs): `Spacing="10"`
+
 ## Panel List
 
 ### Core Input Panels
 1. **AmmoPanel** - Ammunition/bullet properties (BC, weight, velocity, dimensions)
-2. **AmmoLibraryPanel** - AmmoPanel + library metadata (name, caliber, type, barrel length, source) + Load/Save
+2. **AmmoLibraryRecordPanel** - AmmoPanel + library metadata (name, caliber, type, barrel length, source) + Load/Save
 3. **AtmospherePanel** - Weather conditions
 4. **WindPanel** - Single wind definition
 5. **WindArrayPanel** - Multiple wind zones
@@ -69,7 +113,7 @@ public event EventHandler CustomTableChanged;
 
 ---
 
-## 2. AmmoLibraryPanel
+## 2. AmmoLibraryRecordPanel
 
 Wrapper around AmmoPanel that adds library/catalog metadata for saving and loading ammunition profiles.
 Used in ShotDataPanel as the main ammunition input.
@@ -339,7 +383,7 @@ Coordinates MeasurementSystem changes across all child panels.
 Provides single ShotData property for get/set of all values.
 
 ### Layout (TabControl or Expanders)
-- **Ammunition Tab**: AmmoLibraryPanel (includes AmmoPanel + metadata)
+- **Ammunition Tab**: AmmoLibraryRecordPanel (includes AmmoPanel + metadata)
 - **Weather Tab**: AtmospherePanel
 - **Wind Tab**: WindArrayPanel
 - **Rifle Tab**: RiflePanel + ZeroAmmoPanel + ZeroAtmospherePanel
@@ -371,7 +415,7 @@ public event EventHandler Changed;  // Any child panel changed
 
 ### Phase 2: Core Panels
 3. **AmmoPanel** - Uses existing BallisticCoefficientControl and MeasurementControl
-4. **AmmoLibraryPanel** - Wrapper around AmmoPanel with metadata
+4. **AmmoLibraryRecordPanel** - Wrapper around AmmoPanel with metadata
 5. **RiflePanel** - Multiple MeasurementControls, conditional enabling
 
 ### Phase 3: Wind Panels
@@ -508,7 +552,7 @@ public class MockFileDialogService : IFileDialogService
 
 ### Usage in Panels
 ```csharp
-public partial class AmmoLibraryPanel : UserControl
+public partial class AmmoLibraryRecordPanel : UserControl
 {
     public IFileDialogService? FileDialogService { get; set; }
 
@@ -594,8 +638,8 @@ Common/BallisticCalculator.Panels/
 ├── Panels/
 │   ├── AmmoPanel.axaml
 │   ├── AmmoPanel.axaml.cs
-│   ├── AmmoLibraryPanel.axaml
-│   ├── AmmoLibraryPanel.axaml.cs
+│   ├── AmmoLibraryRecordPanel.axaml
+│   ├── AmmoLibraryRecordPanel.axaml.cs
 │   ├── AtmospherePanel.axaml
 │   ├── AtmospherePanel.axaml.cs
 │   ├── WindPanel.axaml
@@ -624,7 +668,7 @@ Common/BallisticCalculator.Panels.Tests/
 ├── BallisticCalculator.Panels.Tests.csproj
 ├── Panels/
 │   ├── AmmoPanelTests.cs
-│   ├── AmmoLibraryPanelTests.cs
+│   ├── AmmoLibraryRecordPanelTests.cs
 │   ├── AtmospherePanelTests.cs
 │   ├── WindPanelTests.cs
 │   ├── WindArrayPanelTests.cs
