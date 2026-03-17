@@ -142,6 +142,50 @@
         </ScrollViewer>
       </TabItem>
 
+      <!-- RiflePanel Tab -->
+      <TabItem Header="RiflePanel">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <StackPanel Margin="20" Spacing="15">
+            <TextBlock Text="RiflePanel Test" FontWeight="Bold"
+                       FontSize="{DynamicResource AppFontSize}"/>
+
+            <!-- Unit system toggle -->
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <Button Content="Metric" Click="OnRifleMetric"
+                      FontSize="{DynamicResource AppFontSize}"/>
+              <Button Content="Imperial" Click="OnRifleImperial"
+                      FontSize="{DynamicResource AppFontSize}"/>
+            </StackPanel>
+
+            <!-- The panel -->
+            <panels:RiflePanel x:Name="RifleTestPanel"
+                               FontSize="{DynamicResource AppFontSize}"/>
+
+            <!-- Test buttons -->
+            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,10,0,0">
+              <Button Content="Set Test Data" Click="OnRifleSetTestData"
+                      FontSize="{DynamicResource AppFontSize}"/>
+              <Button Content="Get Values" Click="OnRifleGetValues"
+                      FontSize="{DynamicResource AppFontSize}"/>
+              <Button Content="Clear" Click="OnRifleClear"
+                      FontSize="{DynamicResource AppFontSize}"/>
+            </StackPanel>
+
+            <!-- Output -->
+            <Border Background="LightGray" Padding="10" CornerRadius="3">
+              <TextBlock x:Name="RifleOutput" TextWrapping="Wrap"
+                         FontSize="{DynamicResource AppFontSize}"
+                         Text="Click 'Get Values' to see current panel values"/>
+            </Border>
+
+            <!-- Change counter -->
+            <TextBlock x:Name="RifleChangeCount"
+                       FontSize="{DynamicResource AppFontSize}"
+                       Text="Changed events: 0"/>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
       <!-- AtmospherePanel Tab -->
       <TabItem Header="AtmospherePanel">
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
@@ -186,6 +230,50 @@
         </ScrollViewer>
       </TabItem>
 
+      <!-- ParametersPanel Tab -->
+      <TabItem Header="ParametersPanel">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <StackPanel Margin="20" Spacing="15">
+            <TextBlock Text="ParametersPanel Test" FontWeight="Bold"
+                       FontSize="{DynamicResource AppFontSize}"/>
+
+            <!-- Unit system toggle -->
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <Button Content="Metric" Click="OnParamsMetric"
+                      FontSize="{DynamicResource AppFontSize}"/>
+              <Button Content="Imperial" Click="OnParamsImperial"
+                      FontSize="{DynamicResource AppFontSize}"/>
+            </StackPanel>
+
+            <!-- The panel -->
+            <panels:ParametersPanel x:Name="ParamsTestPanel"
+                                    FontSize="{DynamicResource AppFontSize}"/>
+
+            <!-- Test buttons -->
+            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,10,0,0">
+              <Button Content="Set Test Data" Click="OnParamsSetTestData"
+                      FontSize="{DynamicResource AppFontSize}"/>
+              <Button Content="Get Values" Click="OnParamsGetValues"
+                      FontSize="{DynamicResource AppFontSize}"/>
+              <Button Content="Clear" Click="OnParamsClear"
+                      FontSize="{DynamicResource AppFontSize}"/>
+            </StackPanel>
+
+            <!-- Output -->
+            <Border Background="LightGray" Padding="10" CornerRadius="3">
+              <TextBlock x:Name="ParamsOutput" TextWrapping="Wrap"
+                         FontSize="{DynamicResource AppFontSize}"
+                         Text="Click 'Get Values' to see current panel values"/>
+            </Border>
+
+            <!-- Change counter -->
+            <TextBlock x:Name="ParamsChangeCount"
+                       FontSize="{DynamicResource AppFontSize}"
+                       Text="Changed events: 0"/>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
       <!-- MultiWindPanel Tab -->
       <TabItem Header="MultiWindPanel">
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
@@ -224,6 +312,51 @@
 
             <!-- Change counter -->
             <TextBlock x:Name="WindChangeCount"
+                       FontSize="{DynamicResource AppFontSize}"
+                       Text="Changed events: 0"/>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <!-- ShotDataPanel Tab -->
+      <TabItem Header="ShotDataPanel">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <StackPanel Margin="20" Spacing="15">
+            <TextBlock Text="ShotDataPanel Test" FontWeight="Bold"
+                       FontSize="{DynamicResource AppFontSize}"/>
+
+            <!-- Unit system toggle -->
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <Button Content="Metric" Click="OnShotMetric"
+                      FontSize="{DynamicResource AppFontSize}"/>
+              <Button Content="Imperial" Click="OnShotImperial"
+                      FontSize="{DynamicResource AppFontSize}"/>
+            </StackPanel>
+
+            <!-- The panel -->
+            <panels:ShotDataPanel x:Name="ShotDataTestPanel"
+                                  Height="400"
+                                  FontSize="{DynamicResource AppFontSize}"/>
+
+            <!-- Test buttons -->
+            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,10,0,0">
+              <Button Content="Set Test Data" Click="OnShotSetTestData"
+                      FontSize="{DynamicResource AppFontSize}"/>
+              <Button Content="Get Values" Click="OnShotGetValues"
+                      FontSize="{DynamicResource AppFontSize}"/>
+              <Button Content="Clear" Click="OnShotClear"
+                      FontSize="{DynamicResource AppFontSize}"/>
+            </StackPanel>
+
+            <!-- Output -->
+            <Border Background="LightGray" Padding="10" CornerRadius="3">
+              <TextBlock x:Name="ShotOutput" TextWrapping="Wrap"
+                         FontSize="{DynamicResource AppFontSize}"
+                         Text="Click 'Get Values' to see current panel values"/>
+            </Border>
+
+            <!-- Change counter -->
+            <TextBlock x:Name="ShotChangeCount"
                        FontSize="{DynamicResource AppFontSize}"
                        Text="Changed events: 0"/>
           </StackPanel>

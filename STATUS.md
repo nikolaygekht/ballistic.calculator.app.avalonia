@@ -26,11 +26,11 @@ Last updated: 2026-03-17
 | WindPanel | Done | 15 tests | Direction (degrees), Velocity, optional MaxDistance, WindDirectionControl indicator |
 | MultiWindPanel | Done | 15 tests | Dynamic list of WindPanels, Add/Clear, auto-distance, copy prev values |
 | AtmospherePanel | Done | 16 tests | Altitude, Pressure, Temperature, Humidity (%), Reset to standard |
-| RiflePanel | Not started | — | |
-| ParametersPanel | Not started | — | |
-| ZeroAmmoPanel | Not started | — | |
-| ZeroAtmospherePanel | Not started | — | |
-| ShotDataPanel | Not started | — | Container for all panels |
+| RiflePanel | Done | 25 tests | SightHeight, ZeroDistance, H/V Click, Rifling (direction+step), VerticalOffset |
+| ParametersPanel | Done | 18 tests | MaxRange, Step, Angle, angle-as-clicks (via RiflePanel.VerticalClick) |
+| ZeroAmmoPanel | Done | 12 tests | Checkbox + embedded AmmoPanel, propagates MeasurementSystem/ConvertFlag |
+| ZeroAtmospherePanel | Done | 12 tests | Checkbox + embedded AtmospherePanel, propagates MeasurementSystem/ConvertFlag |
+| ShotDataPanel | Done | 13 tests | TabControl container: Ammo, Weather, Wind, Rifle+Zero, Parameters |
 
 ### Desktop Applications
 
@@ -38,14 +38,14 @@ Last updated: 2026-03-17
 |-----|--------|-------|
 | ReticleEditor | Working | Reduced spacing, dialog fixes (cancel, zero-size guard, button states) |
 | DebugApp | Working | Controls testing (MeasurementControl, BallisticCoefficientControl, etc.) |
-| DebugApp1 | Working | Panels testing: AmmoPanel, AmmoLibraryRecordPanel, AtmospherePanel, MultiWindPanel tabs |
+| DebugApp1 | Working | Panels testing: AmmoPanel, AmmoLibraryRecordPanel, RiflePanel, AtmospherePanel, MultiWindPanel tabs |
 
 ### Test Summary
 
 | Project | Test Count | Status |
 |---------|-----------|--------|
 | BallisticCalculator.Controls.Tests | ~30+ | All passing |
-| BallisticCalculator.Panels.Tests | 78 | All passing |
+| BallisticCalculator.Panels.Tests | 167 | All passing |
 
 ## Key Design Decisions
 
@@ -86,24 +86,20 @@ Common/
 │   ├── Controllers/       (MeasurementControllerTests, WindDirectionControllerTests)
 │   └── UI/                (MeasurementControlTests, BallisticCoefficientControlTests)
 ├── BallisticCalculator.Panels/
-│   ├── Panels/            (AmmoPanel, AmmoLibraryRecordPanel, AtmospherePanel, WindPanel, MultiWindPanel)
+│   ├── Panels/            (AmmoPanel, AmmoLibraryRecordPanel, AtmospherePanel, RiflePanel, WindPanel, MultiWindPanel)
 │   ├── Services/          (IFileDialogService, FileDialogOptions, FileDialogFilter)
 │   └── PLAN-InputPanels.md
 ├── BallisticCalculator.Panels.Tests/
-│   └── Panels/            (AmmoPanelTests, AmmoLibraryRecordPanelTests, AtmospherePanelTests, WindPanelTests, MultiWindPanelTests)
+│   └── Panels/            (AmmoPanelTests, AmmoLibraryRecordPanelTests, AtmospherePanelTests, RiflePanelTests, WindPanelTests, MultiWindPanelTests)
 ├── BallisticCalculator.Types/
 │   └── MeasurementSystem.cs, ChartTrajectory.cs, etc.
 Desktop/
 ├── DebugApp/              (Controls testing app)
-├── DebugApp1/             (Panels testing app — AmmoPanel, AmmoLibraryRecordPanel, AtmospherePanel, MultiWindPanel)
+├── DebugApp1/             (Panels testing app — AmmoPanel, AmmoLibraryRecordPanel, RiflePanel, AtmospherePanel, MultiWindPanel)
 └── ReticleEditor/         (Reticle editor application)
 ```
 
 ## Next Steps
 
 Per PLAN-InputPanels.md, remaining panels in suggested order:
-1. **ParametersPanel** — MaxRange, Step, Angle (+ angle as clicks)
-3. **RiflePanel** — SightHeight, ZeroDistance, Rifling, Clicks, VerticalOffset
-4. **ZeroAmmoPanel** — Checkbox + embedded AmmoPanel
-5. **ZeroAtmospherePanel** — Checkbox + embedded AtmospherePanel
-6. **ShotDataPanel** — Container combining all panels
+All input panels are complete!

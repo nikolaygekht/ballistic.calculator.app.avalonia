@@ -1,0 +1,68 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:panels="using:BallisticCalculator.Panels.Panels"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="500"
+             x:Class="BallisticCalculator.Panels.Panels.ShotDataPanel">
+
+  <TabControl FontSize="{DynamicResource AppFontSize}">
+
+    <!-- Ammunition -->
+    <TabItem Header="Ammunition">
+      <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <panels:AmmoLibraryRecordPanel x:Name="AmmoLibPanel" x:FieldModifier="internal"
+                                       Margin="5"
+                                       FontSize="{DynamicResource AppFontSize}"/>
+      </ScrollViewer>
+    </TabItem>
+
+    <!-- Weather -->
+    <TabItem Header="Weather">
+      <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <panels:AtmospherePanel x:Name="AtmosphereSubPanel" x:FieldModifier="internal"
+                                Margin="5"
+                                FontSize="{DynamicResource AppFontSize}"/>
+      </ScrollViewer>
+    </TabItem>
+
+    <!-- Wind -->
+    <TabItem Header="Wind">
+      <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <panels:MultiWindPanel x:Name="WindSubPanel" x:FieldModifier="internal"
+                               Margin="5"
+                               FontSize="{DynamicResource AppFontSize}"/>
+      </ScrollViewer>
+    </TabItem>
+
+    <!-- Rifle -->
+    <TabItem Header="Rifle">
+      <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="5" Spacing="4">
+          <panels:RiflePanel x:Name="RifleSubPanel" x:FieldModifier="internal"
+                             FontSize="{DynamicResource AppFontSize}"/>
+
+          <Separator Margin="0,4"/>
+
+          <panels:ZeroAmmoPanel x:Name="ZeroAmmoSubPanel" x:FieldModifier="internal"
+                                FontSize="{DynamicResource AppFontSize}"/>
+
+          <Separator Margin="0,4"/>
+
+          <panels:ZeroAtmospherePanel x:Name="ZeroAtmosphereSubPanel" x:FieldModifier="internal"
+                                      FontSize="{DynamicResource AppFontSize}"/>
+        </StackPanel>
+      </ScrollViewer>
+    </TabItem>
+
+    <!-- Parameters -->
+    <TabItem Header="Parameters">
+      <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <panels:ParametersPanel x:Name="ParametersSubPanel" x:FieldModifier="internal"
+                                Margin="5"
+                                FontSize="{DynamicResource AppFontSize}"/>
+      </ScrollViewer>
+    </TabItem>
+
+  </TabControl>
+</UserControl>

@@ -1,0 +1,18 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:panels="using:BallisticCalculator.Panels.Panels"
+             mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="250"
+             x:Class="BallisticCalculator.Panels.Panels.ZeroAtmospherePanel">
+
+  <StackPanel Spacing="4">
+    <CheckBox x:Name="EnableCheckBox" x:FieldModifier="internal"
+              Content="Other atmosphere for zero"
+              FontSize="{DynamicResource AppFontSize}"/>
+
+    <panels:AtmospherePanel x:Name="AtmoSubPanel" x:FieldModifier="internal"
+                            IsEnabled="False"
+                            FontSize="{DynamicResource AppFontSize}"/>
+  </StackPanel>
+</UserControl>

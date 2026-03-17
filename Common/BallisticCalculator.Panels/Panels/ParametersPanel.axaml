@@ -1,0 +1,62 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="using:BallisticCalculator.Controls.Controls"
+             mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="200"
+             x:Class="BallisticCalculator.Panels.Panels.ParametersPanel">
+
+  <StackPanel Spacing="4">
+
+    <!-- Maximum Range -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="Max Range:"
+                 VerticalAlignment="Center"
+                 FontWeight="Bold"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1"
+                 x:Name="MaxRangeControl" x:FieldModifier="internal"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <!-- Step -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="Step:"
+                 VerticalAlignment="Center"
+                 FontWeight="Bold"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1"
+                 x:Name="StepControl" x:FieldModifier="internal"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <Separator/>
+
+    <!-- Shot Angle -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="Angle:"
+                 VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1"
+                 x:Name="AngleControl" x:FieldModifier="internal"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <!-- Angle as clicks -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="As clicks:"
+                 VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+        <TextBox x:Name="ClicksTextBox" x:FieldModifier="internal"
+                 Width="80"
+                 TextAlignment="Right"
+                 FontSize="{DynamicResource AppFontSize}"/>
+        <Button x:Name="ClicksSetButton" x:FieldModifier="internal"
+                Content="Set"
+                FontSize="{DynamicResource AppFontSize}"/>
+      </StackPanel>
+    </Grid>
+
+  </StackPanel>
+</UserControl>

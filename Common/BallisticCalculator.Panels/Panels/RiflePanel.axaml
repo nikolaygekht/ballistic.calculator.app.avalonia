@@ -1,0 +1,100 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="using:BallisticCalculator.Controls.Controls"
+             mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="400"
+             x:Class="BallisticCalculator.Panels.Panels.RiflePanel">
+
+  <StackPanel Spacing="4">
+
+    <!-- Sight Height -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="Sight Height:"
+                 VerticalAlignment="Center"
+                 FontWeight="Bold"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1"
+                 x:Name="SightHeightControl" x:FieldModifier="internal"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <!-- Zero Distance -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="Zero Dist.:"
+                 VerticalAlignment="Center"
+                 FontWeight="Bold"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1"
+                 x:Name="ZeroDistanceControl" x:FieldModifier="internal"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <Separator/>
+
+    <!-- Horizontal Click -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="H Click:"
+                 VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1"
+                 x:Name="HorizontalClickControl" x:FieldModifier="internal"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <!-- Vertical Click -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="V Click:"
+                 VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1"
+                 x:Name="VerticalClickControl" x:FieldModifier="internal"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <Separator/>
+
+    <!-- Rifling Direction -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="Rifling:"
+                 VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <ComboBox Grid.Column="1"
+                x:Name="RiflingDirectionCombo" x:FieldModifier="internal"
+                FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <!-- Rifling Step -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="Twist Rate:"
+                 VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1"
+                 x:Name="RiflingStepControl" x:FieldModifier="internal"
+                 IsEnabled="False"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <Separator/>
+
+    <!-- Vertical Offset checkbox -->
+    <Grid ColumnDefinitions="100,*">
+      <CheckBox Grid.Column="1"
+                x:Name="VerticalOffsetCheckBox" x:FieldModifier="internal"
+                Content="Impact offset at zero"
+                FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <!-- Vertical Offset -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="V Offset:"
+                 VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1"
+                 x:Name="VerticalOffsetControl" x:FieldModifier="internal"
+                 IsEnabled="False"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+  </StackPanel>
+</UserControl>
