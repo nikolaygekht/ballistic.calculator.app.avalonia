@@ -12,6 +12,28 @@ namespace BallisticCalculator.Panels.Tests.Panels;
 public class AmmoPanelTests
 {
     [AvaloniaFact]
+    public void ConvertOnSystemChange_Default_ShouldBeFalse()
+    {
+        var panel = new AmmoPanel();
+
+        panel.ConvertOnSystemChange.Should().BeFalse();
+    }
+
+    [AvaloniaFact]
+    public void ConvertOnSystemChange_Default_ShouldNotConvertOnSwitch()
+    {
+        var panel = new AmmoPanel();
+        // Don't set ConvertOnSystemChange — use default (false)
+        panel.Ammunition = CreateTestAmmunition(); // 168 grain, 2650 fps
+
+        panel.MeasurementSystem = MeasurementSystem.Imperial;
+
+        // Default is false, so values stay in original units
+        GetSelectedUnit(panel.WeightControl).Should().Be(WeightUnit.Grain);
+        GetSelectedUnit(panel.MuzzleVelocityControl).Should().Be(VelocityUnit.FeetPerSecond);
+    }
+
+    [AvaloniaFact]
     public void Panel_ShouldInitialize()
     {
         var panel = new AmmoPanel();

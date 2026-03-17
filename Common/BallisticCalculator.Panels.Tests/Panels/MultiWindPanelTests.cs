@@ -11,6 +11,14 @@ namespace BallisticCalculator.Panels.Tests.Panels;
 public class MultiWindPanelTests
 {
     [AvaloniaFact]
+    public void ConvertOnSystemChange_Default_ShouldBeFalse()
+    {
+        var panel = new MultiWindPanel();
+
+        panel.ConvertOnSystemChange.Should().BeFalse();
+    }
+
+    [AvaloniaFact]
     public void Panel_ShouldInitialize()
     {
         var panel = new MultiWindPanel();

@@ -41,7 +41,9 @@
           </Border>
 
           <CheckBox x:Name="ConvertOnSystemChangeCheckBox" x:FieldModifier="internal"
-                    Content="Convert values on measurement system change"
+                    Content="Convert values on measurement system change (indeterminate = panel default)"
+                    IsThreeState="True"
+                    IsChecked="{x:Null}"
                     IsCheckedChanged="OnConvertFlagChanged"
                     FontSize="{DynamicResource AppFontSize}"
                     Margin="0,10,0,0"/>
@@ -134,6 +136,50 @@
 
             <!-- Change counter -->
             <TextBlock x:Name="AmmoLibChangeCount"
+                       FontSize="{DynamicResource AppFontSize}"
+                       Text="Changed events: 0"/>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <!-- AtmospherePanel Tab -->
+      <TabItem Header="AtmospherePanel">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <StackPanel Margin="20" Spacing="15">
+            <TextBlock Text="AtmospherePanel Test" FontWeight="Bold"
+                       FontSize="{DynamicResource AppFontSize}"/>
+
+            <!-- Unit system toggle -->
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <Button Content="Metric" Click="OnAtmoMetric"
+                      FontSize="{DynamicResource AppFontSize}"/>
+              <Button Content="Imperial" Click="OnAtmoImperial"
+                      FontSize="{DynamicResource AppFontSize}"/>
+            </StackPanel>
+
+            <!-- The panel -->
+            <panels:AtmospherePanel x:Name="AtmoTestPanel"
+                                    FontSize="{DynamicResource AppFontSize}"/>
+
+            <!-- Test buttons -->
+            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,10,0,0">
+              <Button Content="Set Test Data" Click="OnAtmoSetTestData"
+                      FontSize="{DynamicResource AppFontSize}"/>
+              <Button Content="Get Values" Click="OnAtmoGetValues"
+                      FontSize="{DynamicResource AppFontSize}"/>
+              <Button Content="Clear" Click="OnAtmoClear"
+                      FontSize="{DynamicResource AppFontSize}"/>
+            </StackPanel>
+
+            <!-- Output -->
+            <Border Background="LightGray" Padding="10" CornerRadius="3">
+              <TextBlock x:Name="AtmoOutput" TextWrapping="Wrap"
+                         FontSize="{DynamicResource AppFontSize}"
+                         Text="Click 'Get Values' to see current panel values"/>
+            </Border>
+
+            <!-- Change counter -->
+            <TextBlock x:Name="AtmoChangeCount"
                        FontSize="{DynamicResource AppFontSize}"
                        Text="Changed events: 0"/>
           </StackPanel>

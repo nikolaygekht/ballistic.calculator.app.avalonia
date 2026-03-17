@@ -1,0 +1,1 @@
+dotnet test BallisticCalculator2.sln --configuration Debug

@@ -220,25 +220,27 @@ public event EventHandler Changed;
 - 0 = wind from behind (tailwind), 90 = from right, 180 = headwind, 270 = from left
 
 ### Unit Switching (MeasurementSystem)
-- **Metric**: Distance=m, Velocity=m/s
-- **Imperial**: Distance=ft, Velocity=ft/s
+- **Metric**: Distance=m(0dp), Velocity=m/s(1dp)
+- **Imperial**: Distance=yd(0dp), Velocity=mph(1dp)
+- **Direction**: Always degrees (0dp), not affected by system switch
 
 ---
 
-## 5. WindArrayPanel
+## 5. MultiWindPanel (was WindArrayPanel)
 
 ### Fields (from old MultiWindControl)
 | Control | Notes |
 |---------|-------|
-| WindPanel (first) | Always visible, distance enabled |
-| Add button | Add another wind zone |
-| Clear button | Remove all except first |
-| Dynamic WindPanel list | Additional wind zones |
+| Add Wind button | Add another wind zone |
+| Clear All button | Remove all except first |
+| WindPanel (first) | Always visible, X button disabled, distance initially disabled |
+| Dynamic WindPanel list | Additional wind zones with X (remove) button |
 
 ### Properties
 ```csharp
 public MeasurementSystem MeasurementSystem { get; set; }
-public WindCollection Winds { get; set; }  // Get/Set all wind zones
+public Wind[]? Winds { get; set; }  // Get/Set all wind zones (null if all empty)
+public int WindPanelCount { get; }
 ```
 
 ### Events
@@ -247,9 +249,14 @@ public event EventHandler Changed;
 ```
 
 ### Behavior
-- First WindPanel always has distance checkbox enabled
-- "Add" creates new WindPanel with distance = previous + 100m/yd
-- Each wind zone applies up to its MaximumRange
+- Initially: single WindPanel with distance disabled ("just wind everywhere")
+- All panels have X button (disabled for first, enabled for others) — consistent layout
+- On "Add Wind":
+  1. If first panel's distance is disabled → enable it, set to 0
+  2. New panel gets distance = last panel's distance + 100
+  3. New panel copies direction and velocity from previous panel
+- "Clear All" resets to single empty panel with distance disabled
+- Getting `Winds` skips empty panels; returns null if all empty
 
 ---
 

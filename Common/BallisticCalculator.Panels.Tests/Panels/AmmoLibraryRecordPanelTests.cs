@@ -16,6 +16,29 @@ namespace BallisticCalculator.Panels.Tests.Panels;
 public class AmmoLibraryRecordPanelTests
 {
     [AvaloniaFact]
+    public void ConvertOnSystemChange_Default_ShouldBeFalse()
+    {
+        var panel = new AmmoLibraryRecordPanel();
+
+        panel.ConvertOnSystemChange.Should().BeFalse();
+    }
+
+    [AvaloniaFact]
+    public void ConvertOnSystemChange_Default_ShouldNotConvertOnSwitch()
+    {
+        var panel = new AmmoLibraryRecordPanel();
+        // Don't set ConvertOnSystemChange — use default (false)
+        var entry = CreateTestEntry();
+        entry.BarrelLength = new Measurement<DistanceUnit>(610, DistanceUnit.Millimeter);
+        panel.LibraryEntry = entry;
+
+        panel.MeasurementSystem = MeasurementSystem.Imperial;
+
+        // Default is false, so barrel length stays in original unit
+        GetSelectedUnit(panel.BarrelLengthControl).Should().Be(DistanceUnit.Millimeter);
+    }
+
+    [AvaloniaFact]
     public void Panel_ShouldInitialize()
     {
         var panel = new AmmoLibraryRecordPanel();

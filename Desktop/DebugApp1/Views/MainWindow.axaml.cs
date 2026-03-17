@@ -12,6 +12,7 @@ public partial class MainWindow : Window
 {
     private int _ammoChangeCount;
     private int _ammoLibChangeCount;
+    private int _atmoChangeCount;
     private int _windChangeCount;
 
     public MainWindow()
@@ -28,6 +29,12 @@ public partial class MainWindow : Window
         {
             _ammoLibChangeCount++;
             AmmoLibChangeCount.Text = $"Changed events: {_ammoLibChangeCount}";
+        };
+
+        AtmoTestPanel.Changed += (s, e) =>
+        {
+            _atmoChangeCount++;
+            AtmoChangeCount.Text = $"Changed events: {_atmoChangeCount}";
         };
 
         WindTestPanel.Changed += (s, e) =>
@@ -57,10 +64,23 @@ public partial class MainWindow : Window
 
     private void OnConvertFlagChanged(object? sender, RoutedEventArgs e)
     {
-        var convert = ConvertOnSystemChangeCheckBox.IsChecked == true;
-        AmmoTestPanel.ConvertOnSystemChange = convert;
-        AmmoLibTestPanel.ConvertOnSystemChange = convert;
-        WindTestPanel.ConvertOnSystemChange = convert;
+        var state = ConvertOnSystemChangeCheckBox.IsChecked;
+        if (state == null)
+        {
+            // Indeterminate: restore each panel's default
+            AmmoTestPanel.ConvertOnSystemChange = false;
+            AmmoLibTestPanel.ConvertOnSystemChange = false;
+            AtmoTestPanel.ConvertOnSystemChange = true;
+            WindTestPanel.ConvertOnSystemChange = false;
+        }
+        else
+        {
+            var convert = state.Value;
+            AmmoTestPanel.ConvertOnSystemChange = convert;
+            AmmoLibTestPanel.ConvertOnSystemChange = convert;
+            AtmoTestPanel.ConvertOnSystemChange = convert;
+            WindTestPanel.ConvertOnSystemChange = convert;
+        }
     }
 
     // AmmoPanel handlers
@@ -149,6 +169,40 @@ public partial class MainWindow : Window
 
     private void OnAmmoLibClear(object? sender, RoutedEventArgs e)
         => AmmoLibTestPanel.Clear();
+
+    // AtmospherePanel handlers
+    private void OnAtmoMetric(object? sender, RoutedEventArgs e)
+        => AtmoTestPanel.MeasurementSystem = MeasurementSystem.Metric;
+
+    private void OnAtmoImperial(object? sender, RoutedEventArgs e)
+        => AtmoTestPanel.MeasurementSystem = MeasurementSystem.Imperial;
+
+    private void OnAtmoSetTestData(object? sender, RoutedEventArgs e)
+    {
+        AtmoTestPanel.Atmosphere = new Atmosphere(
+            new Measurement<DistanceUnit>(500, DistanceUnit.Meter),
+            new Measurement<PressureUnit>(720, PressureUnit.MillimetersOfMercury),
+            new Measurement<TemperatureUnit>(20, TemperatureUnit.Celsius),
+            0.65);
+    }
+
+    private void OnAtmoGetValues(object? sender, RoutedEventArgs e)
+    {
+        var atmo = AtmoTestPanel.Atmosphere;
+        if (atmo == null)
+        {
+            AtmoOutput.Text = "Atmosphere: null (incomplete data)";
+            return;
+        }
+
+        AtmoOutput.Text = $"Altitude: {atmo.Altitude}\n" +
+                          $"Pressure: {atmo.Pressure}\n" +
+                          $"Temperature: {atmo.Temperature}\n" +
+                          $"Humidity: {atmo.Humidity * 100:F0}%";
+    }
+
+    private void OnAtmoClear(object? sender, RoutedEventArgs e)
+        => AtmoTestPanel.Clear();
 
     // MultiWindPanel handlers
     private void OnWindMetric(object? sender, RoutedEventArgs e)

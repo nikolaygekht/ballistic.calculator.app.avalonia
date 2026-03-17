@@ -1,0 +1,70 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="using:BallisticCalculator.Controls.Controls"
+             mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="200"
+             x:Class="BallisticCalculator.Panels.Panels.AtmospherePanel">
+
+  <StackPanel Spacing="4">
+
+    <!-- Altitude -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="Altitude:"
+                 VerticalAlignment="Center"
+                 FontWeight="Bold"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1"
+                 x:Name="AltitudeControl" x:FieldModifier="internal"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <!-- Pressure -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="Pressure:"
+                 VerticalAlignment="Center"
+                 FontWeight="Bold"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1"
+                 x:Name="PressureControl" x:FieldModifier="internal"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <!-- Temperature -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="Temperature:"
+                 VerticalAlignment="Center"
+                 FontWeight="Bold"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1"
+                 x:Name="TemperatureControl" x:FieldModifier="internal"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <!-- Humidity -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="Humidity:"
+                 VerticalAlignment="Center"
+                 FontWeight="Bold"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+        <TextBox x:Name="HumidityTextBox" x:FieldModifier="internal"
+                 Width="80"
+                 TextAlignment="Right"
+                 FontSize="{DynamicResource AppFontSize}"/>
+        <TextBlock Text="%"
+                   VerticalAlignment="Center"
+                   FontSize="{DynamicResource AppFontSize}"/>
+      </StackPanel>
+    </Grid>
+
+    <!-- Reset button -->
+    <Grid ColumnDefinitions="100,*">
+      <Button Grid.Column="1"
+              x:Name="ResetButton" x:FieldModifier="internal"
+              Content="Reset to Standard"
+              FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+  </StackPanel>
+</UserControl>

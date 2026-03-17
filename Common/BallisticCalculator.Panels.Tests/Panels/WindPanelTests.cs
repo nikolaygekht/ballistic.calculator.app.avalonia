@@ -12,6 +12,31 @@ namespace BallisticCalculator.Panels.Tests.Panels;
 public class WindPanelTests
 {
     [AvaloniaFact]
+    public void ConvertOnSystemChange_Default_ShouldBeFalse()
+    {
+        var panel = new WindPanel();
+
+        panel.ConvertOnSystemChange.Should().BeFalse();
+    }
+
+    [AvaloniaFact]
+    public void ConvertOnSystemChange_Default_ShouldNotConvertOnSwitch()
+    {
+        var panel = new WindPanel();
+        // Don't set ConvertOnSystemChange — use default (false)
+        panel.Wind = new Wind()
+        {
+            Direction = new Measurement<AngularUnit>(90, AngularUnit.Degree),
+            Velocity = new Measurement<VelocityUnit>(10, VelocityUnit.MetersPerSecond),
+        };
+
+        panel.MeasurementSystem = MeasurementSystem.Imperial;
+
+        // Default is false, so velocity stays in original unit
+        GetSelectedUnit(panel.VelocityControl).Should().Be(VelocityUnit.MetersPerSecond);
+    }
+
+    [AvaloniaFact]
     public void Panel_ShouldInitialize()
     {
         var panel = new WindPanel();
