@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <AssemblyName>BallisticCalculator2</AssemblyName>
+    <RootNamespace>BallisticCalculator</RootNamespace>
+    <ApplicationIcon>Assets\Shooting.ico</ApplicationIcon>
+    <!-- Suppress AVLN3001: Dialogs use parameterized constructors by design -->
+    <NoWarn>$(NoWarn);AVLN3001</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.12" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.12" />
+    <PackageReference Include="Classic.Avalonia.Theme" Version="[11.3.0.3,12)" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.3.12">
+      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="iciclecreek.Avalonia.WindowManager" Version="4.0.0" />
+    <PackageReference Include="BallisticCalculator" Version="1.1.7.1" />
+    <PackageReference Include="Gehtsoft.Measurements" Version="1.1.16" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\BallisticCalculator.Controls\BallisticCalculator.Controls.csproj" />
+    <ProjectReference Include="..\..\Common\BallisticCalculator.Panels\BallisticCalculator.Panels.csproj" />
+    <ProjectReference Include="..\..\Common\BallisticCalculator.Types\BallisticCalculator.Types.csproj" />
+  </ItemGroup>
+</Project>

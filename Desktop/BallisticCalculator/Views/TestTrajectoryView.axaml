@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="BallisticCalculator.Views.TestTrajectoryView"
+             FontSize="{DynamicResource AppFontSize}">
+
+    <StackPanel Margin="10" Spacing="6">
+        <TextBlock Text="Test Trajectory Window" FontWeight="Bold" />
+        <Separator />
+        <StackPanel Orientation="Horizontal" Spacing="6">
+            <TextBlock Text="Measurement System:" FontWeight="Bold" />
+            <TextBlock x:Name="LabelSystem" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="6">
+            <TextBlock Text="Angular Units:" FontWeight="Bold" />
+            <TextBlock x:Name="LabelAngular" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="6">
+            <TextBlock Text="Drop Base:" FontWeight="Bold" />
+            <TextBlock x:Name="LabelDrop" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="6">
+            <TextBlock Text="Chart Mode:" FontWeight="Bold" />
+            <TextBlock x:Name="LabelChart" />
+        </StackPanel>
+    </StackPanel>
+</UserControl>

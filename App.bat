@@ -1,0 +1,1 @@
+.\Desktop\BallisticCalculator\bin\Debug\net8.0\BallisticCalculator2.exe

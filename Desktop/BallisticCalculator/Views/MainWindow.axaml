@@ -1,0 +1,120 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:wm="using:Iciclecreek.Avalonia.WindowManager"
+        x:Class="BallisticCalculator.Views.MainWindow"
+        Title="Ballistic Calculator"
+        Icon="/Assets/Shooting.ico"
+        Width="900" Height="650"
+        FontSize="{DynamicResource AppFontSize}">
+
+    <DockPanel>
+        <!-- Menu Bar -->
+        <Menu DockPanel.Dock="Top" FontSize="{DynamicResource AppFontSize}">
+
+            <!-- Trajectory (File) Menu -->
+            <MenuItem Header="_Trajectory">
+                <MenuItem Header="_New">
+                    <MenuItem Header="Imperial" x:Name="MenuFileNewImperial"
+                              InputGesture="Ctrl+I" />
+                    <MenuItem Header="Metric" x:Name="MenuFileNewMetric"
+                              InputGesture="Ctrl+M" />
+                </MenuItem>
+                <MenuItem Header="_Open" x:Name="MenuFileOpen"
+                          InputGesture="Ctrl+O" />
+                <MenuItem Header="_Save" x:Name="MenuFileSave"
+                          InputGesture="Ctrl+S" IsEnabled="False" />
+                <MenuItem Header="Save _As" x:Name="MenuFileSaveAs"
+                          IsEnabled="False" />
+                <MenuItem Header="Export As _CSV" x:Name="MenuFileExportCsv"
+                          IsEnabled="False" />
+                <Separator />
+                <MenuItem Header="E_xit" x:Name="MenuFileExit"
+                          InputGesture="Ctrl+X" />
+            </MenuItem>
+
+            <!-- View Menu -->
+            <MenuItem Header="_View">
+                <MenuItem Header="_Edit Parameters" x:Name="MenuViewEditParameters"
+                          InputGesture="Ctrl+E" IsEnabled="False" />
+                <Separator />
+                <MenuItem Header="_Measurement System">
+                    <MenuItem Header="Imperial" x:Name="MenuViewSystemImperial"
+                              InputGesture="Ctrl+Shift+I" IsEnabled="False" />
+                    <MenuItem Header="Metric" x:Name="MenuViewSystemMetric"
+                              InputGesture="Ctrl+Shift+M" IsEnabled="False" />
+                </MenuItem>
+                <MenuItem Header="_Angular Units">
+                    <MenuItem Header="Minutes of Angle" x:Name="MenuViewAngularMOA"
+                              InputGesture="Ctrl+Alt+A" IsEnabled="False" />
+                    <MenuItem Header="Mils" x:Name="MenuViewAngularMils"
+                              InputGesture="Ctrl+Alt+M" IsEnabled="False" />
+                    <MenuItem Header="Thousands" x:Name="MenuViewAngularThousands"
+                              InputGesture="Ctrl+Alt+T" IsEnabled="False" />
+                    <MenuItem Header="Milliradians" x:Name="MenuViewAngularMRads"
+                              InputGesture="Ctrl+Alt+R" IsEnabled="False" />
+                    <MenuItem Header="Inches/100 yards" x:Name="MenuViewAngularInches"
+                              IsEnabled="False" />
+                    <MenuItem Header="Centimeters/100 meters" x:Name="MenuViewAngularCentimeters"
+                              IsEnabled="False" />
+                </MenuItem>
+                <MenuItem Header="_Drop">
+                    <MenuItem Header="Over Line of Sight" x:Name="MenuViewDropLineOfSight"
+                              IsEnabled="False" />
+                    <MenuItem Header="Over Muzzle Level" x:Name="MenuViewDropMuzzleLevel"
+                              IsEnabled="False" />
+                </MenuItem>
+                <MenuItem Header="_Chart">
+                    <MenuItem Header="Velocity" x:Name="MenuViewChartVelocity"
+                              InputGesture="Ctrl+Alt+V" IsEnabled="False" />
+                    <MenuItem Header="Mach" x:Name="MenuViewChartMach"
+                              IsEnabled="False" />
+                    <MenuItem Header="Drop" x:Name="MenuViewChartDrop"
+                              InputGesture="Ctrl+Alt+D" IsEnabled="False" />
+                    <MenuItem Header="Windage" x:Name="MenuViewChartWindage"
+                              InputGesture="Ctrl+Alt+W" IsEnabled="False" />
+                    <MenuItem Header="Energy" x:Name="MenuViewChartEnergy"
+                              IsEnabled="False" />
+                    <Separator />
+                    <MenuItem Header="Zoom Y Axis to Visible Range" x:Name="MenuViewChartZoomY"
+                              InputGesture="Ctrl+Shift+Z" IsEnabled="False" />
+                </MenuItem>
+                <MenuItem Header="_Show">
+                    <MenuItem Header="Table" x:Name="MenuViewShowTable"
+                              InputGesture="Ctrl+T" IsEnabled="False" />
+                    <MenuItem Header="Chart" x:Name="MenuViewShowChart"
+                              InputGesture="Ctrl+C" IsEnabled="False" />
+                    <MenuItem Header="Reticle" x:Name="MenuViewShowReticle"
+                              InputGesture="Ctrl+R" IsEnabled="False" />
+                </MenuItem>
+                <MenuItem Header="C_ompare">
+                    <MenuItem Header="Add" x:Name="MenuViewCompareAdd"
+                              IsEnabled="False" />
+                    <MenuItem Header="Remove Last Added" x:Name="MenuViewCompareRemoveLast"
+                              IsEnabled="False" />
+                </MenuItem>
+            </MenuItem>
+
+            <!-- Windows Menu -->
+            <MenuItem Header="_Windows" x:Name="MenuWindows">
+                <MenuItem Header="_Cascade" x:Name="MenuWindowsCascade"
+                          IsEnabled="False" />
+                <Separator x:Name="MenuWindowsSeparator" IsVisible="False" />
+            </MenuItem>
+
+            <!-- Help Menu -->
+            <MenuItem Header="_Help">
+                <MenuItem Header="_About" x:Name="MenuHelpAbout"
+                          InputGesture="Ctrl+F1" />
+            </MenuItem>
+        </Menu>
+
+        <!-- Status Bar -->
+        <Border DockPanel.Dock="Bottom" BorderThickness="0,1,0,0" BorderBrush="Gray"
+                Padding="5,2">
+            <TextBlock x:Name="StatusBar" Text="Ready" FontSize="{DynamicResource AppFontSize}" />
+        </Border>
+
+        <!-- MDI Area -->
+        <wm:WindowsPanel x:Name="WindowsPanel" Background="#E0E0E0" />
+    </DockPanel>
+</Window>
