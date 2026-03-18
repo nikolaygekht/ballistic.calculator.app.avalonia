@@ -34,6 +34,8 @@ public partial class RiflePanel : UserControl
         }
     }
 
+    public bool IsEmpty => SightHeightControl.IsEmpty && ZeroDistanceControl.IsEmpty;
+
     public Rifle? Rifle
     {
         get

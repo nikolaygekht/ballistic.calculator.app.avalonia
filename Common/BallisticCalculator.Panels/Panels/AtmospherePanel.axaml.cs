@@ -35,6 +35,10 @@ public partial class AtmospherePanel : UserControl
         }
     }
 
+    public bool IsEmpty => AltitudeControl.IsEmpty && PressureControl.IsEmpty
+                           && TemperatureControl.IsEmpty
+                           && string.IsNullOrWhiteSpace(HumidityTextBox.Text);
+
     public Atmosphere? Atmosphere
     {
         get

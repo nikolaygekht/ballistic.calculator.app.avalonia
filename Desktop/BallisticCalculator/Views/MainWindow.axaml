@@ -4,7 +4,6 @@
         x:Class="BallisticCalculator.Views.MainWindow"
         Title="Ballistic Calculator"
         Icon="/Assets/Shooting.ico"
-        Width="900" Height="650"
         FontSize="{DynamicResource AppFontSize}">
 
     <DockPanel>

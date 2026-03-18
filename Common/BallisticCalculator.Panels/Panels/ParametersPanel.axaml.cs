@@ -39,6 +39,8 @@ public partial class ParametersPanel : UserControl
     /// </summary>
     public RiflePanel? RiflePanel { get; set; }
 
+    public bool IsEmpty => MaxRangeControl.IsEmpty && StepControl.IsEmpty;
+
     public ShotParameters? Parameters
     {
         get

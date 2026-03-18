@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
+using BallisticCalculator.Models;
 using BallisticCalculator.Types;
 using Gehtsoft.Measurements;
+using BallisticCalculator.Utilities;
+using BallisticCalculator.Views.Dialogs;
 using Iciclecreek.Avalonia.WindowManager;
 
 namespace BallisticCalculator.Views;
@@ -13,12 +17,89 @@ public partial class MainWindow : Window
 {
     private IAppChildWindow? _activeChild;
     private int _windowCounter;
+    private int _newWindowSlot;
     private readonly List<ManagedWindow> _managedWindows = new();
+    private readonly AppState _appState;
+    private const int WindowOffset = 30;
+    private const int MaxNewWindowSlots = 10;
 
     public MainWindow()
     {
         InitializeComponent();
+        _appState = AppStateManager.Load();
+        RestoreMainWindowState();
         SetupMenuHandlers();
+        KeyDown += OnKeyDown;
+        Closing += (_, _) => SaveState();
+    }
+
+    private void RestoreMainWindowState()
+    {
+        Width = _appState.MainWindowWidth;
+        Height = _appState.MainWindowHeight;
+        Position = new PixelPoint((int)_appState.MainWindowX, (int)_appState.MainWindowY);
+        WindowState = _appState.MainWindowIsMaximized ? WindowState.Maximized : WindowState.Normal;
+    }
+
+    private void SaveState()
+    {
+        if (WindowState == WindowState.Normal)
+        {
+            _appState.MainWindowWidth = Width;
+            _appState.MainWindowHeight = Height;
+            _appState.MainWindowX = Position.X;
+            _appState.MainWindowY = Position.Y;
+        }
+        _appState.MainWindowIsMaximized = WindowState == WindowState.Maximized;
+        AppStateManager.Save(_appState);
+    }
+
+    private void OnKeyDown(object? sender, KeyEventArgs e)
+    {
+        var ctrl = e.KeyModifiers.HasFlag(KeyModifiers.Control);
+        var shift = e.KeyModifiers.HasFlag(KeyModifiers.Shift);
+        var alt = e.KeyModifiers.HasFlag(KeyModifiers.Alt);
+
+        if (!ctrl) return;
+
+        if (!shift && !alt)
+        {
+            switch (e.Key)
+            {
+                case Key.I: OpenNewTrajectory(MeasurementSystem.Imperial); e.Handled = true; break;
+                case Key.M: OpenNewTrajectory(MeasurementSystem.Metric); e.Handled = true; break;
+                case Key.O: MenuFileOpen.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(MenuItem.ClickEvent)); e.Handled = true; break;
+                case Key.S: if (MenuFileSave.IsEnabled) MenuFileSave.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(MenuItem.ClickEvent)); e.Handled = true; break;
+                case Key.E: if (MenuViewEditParameters.IsEnabled) EditParameters(); e.Handled = true; break;
+                case Key.X: Close(); e.Handled = true; break;
+                case Key.T: if (MenuViewShowTable.IsEnabled) (_activeChild as ITrajectoryChildWindow)?.ShowTable(); e.Handled = true; break;
+                case Key.C: if (MenuViewShowChart.IsEnabled) (_activeChild as ITrajectoryChildWindow)?.ShowChart(); e.Handled = true; break;
+                case Key.R: if (MenuViewShowReticle.IsEnabled) (_activeChild as ITrajectoryChildWindow)?.ShowReticle(); e.Handled = true; break;
+                case Key.F1: MenuHelpAbout.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(MenuItem.ClickEvent)); e.Handled = true; break;
+            }
+        }
+        else if (shift && !alt)
+        {
+            switch (e.Key)
+            {
+                case Key.I: if (_activeChild != null) SetAndUpdate(w => w.MeasurementSystem = MeasurementSystem.Imperial); e.Handled = true; break;
+                case Key.M: if (_activeChild != null) SetAndUpdate(w => w.MeasurementSystem = MeasurementSystem.Metric); e.Handled = true; break;
+                case Key.Z: if (_activeChild is ITrajectoryChildWindow t) t.ZoomYToVisibleRange(); e.Handled = true; break;
+            }
+        }
+        else if (alt && !shift)
+        {
+            switch (e.Key)
+            {
+                case Key.A: if (_activeChild != null) SetAndUpdate(w => w.AngularUnits = AngularUnit.MOA); e.Handled = true; break;
+                case Key.M: if (_activeChild != null) SetAndUpdate(w => w.AngularUnits = AngularUnit.Mil); e.Handled = true; break;
+                case Key.T: if (_activeChild != null) SetAndUpdate(w => w.AngularUnits = AngularUnit.Thousand); e.Handled = true; break;
+                case Key.R: if (_activeChild != null) SetAndUpdate(w => w.AngularUnits = AngularUnit.MRad); e.Handled = true; break;
+                case Key.V: if (_activeChild != null) SetAndUpdate(w => w.ChartMode = TrajectoryChartMode.Velocity); e.Handled = true; break;
+                case Key.D: if (_activeChild != null) SetAndUpdate(w => w.ChartMode = TrajectoryChartMode.Drop); e.Handled = true; break;
+                case Key.W: if (_activeChild != null) SetAndUpdate(w => w.ChartMode = TrajectoryChartMode.Windage); e.Handled = true; break;
+            }
+        }
     }
 
     internal IAppChildWindow? ActiveChild
@@ -31,22 +112,37 @@ public partial class MainWindow : Window
         }
     }
 
-    private void OpenNewTrajectory(MeasurementSystem system)
+    private async void OpenNewTrajectory(MeasurementSystem system)
     {
+        var dialog = new ShotParametersDialog(system);
+        var result = await dialog.ShowDialog<bool?>(this);
+        if (result != true || dialog.Result == null)
+            return;
+
         _windowCounter++;
-        var view = new TestTrajectoryView
+        var shotData = dialog.Result;
+        var trajectory = ShotCalculator.Calculate(shotData, system);
+
+        var view = new TrajectoryView
         {
             MeasurementSystem = system,
+            ShotData = shotData,
+            Trajectory = trajectory,
         };
-        view.UpdateDisplay();
 
+        if (_appState.TableColumnWidths != null)
+            view.SetColumnWidths(_appState.TableColumnWidths);
+
+        var title = shotData.Ammunition?.Name ?? $"Trajectory {_windowCounter}";
         var window = new ManagedWindow
         {
-            Title = $"Trajectory {_windowCounter} ({system})",
+            Title = title,
             Content = view,
-            Width = 400,
-            Height = 300,
-            WindowStartupLocation = WindowStartupLocation.CenterScreen,
+            Width = _appState.ChildWindowWidth,
+            Height = _appState.ChildWindowHeight,
+            SizeToContent = SizeToContent.Manual,
+            WindowStartupLocation = WindowStartupLocation.Manual,
+            Position = new PixelPoint(WindowOffset * _newWindowSlot, WindowOffset * _newWindowSlot),
         };
 
         window.Activated += (_, _) => ActiveChild = window.Content as IAppChildWindow;
@@ -57,6 +153,10 @@ public partial class MainWindow : Window
         };
         window.Closed += (_, _) =>
         {
+            _appState.ChildWindowWidth = window.Width;
+            _appState.ChildWindowHeight = window.Height;
+            if (window.Content is TrajectoryView tv)
+                _appState.TableColumnWidths = tv.GetColumnWidths();
             _managedWindows.Remove(window);
             UpdateWindowsMenu();
             if (_activeChild == window.Content as IAppChildWindow)
@@ -64,8 +164,32 @@ public partial class MainWindow : Window
         };
 
         _managedWindows.Add(window);
+        _newWindowSlot = (_newWindowSlot + 1) % MaxNewWindowSlots;
         UpdateWindowsMenu();
         WindowsPanel.Show(window);
+    }
+
+    private async void EditParameters()
+    {
+        if (_activeChild is not ITrajectoryChildWindow trajectoryChild)
+            return;
+
+        var dialog = new ShotParametersDialog(trajectoryChild.MeasurementSystem, trajectoryChild.ShotData);
+        var result = await dialog.ShowDialog<bool?>(this);
+        if (result != true || dialog.Result == null)
+            return;
+
+        trajectoryChild.ShotData = dialog.Result;
+        trajectoryChild.Trajectory = ShotCalculator.Calculate(dialog.Result, trajectoryChild.MeasurementSystem);
+
+        // Update the ManagedWindow title
+        var title = dialog.Result.Ammunition?.Name ?? "Trajectory";
+        var managedWindow = _managedWindows.FirstOrDefault(w => w.Content == trajectoryChild);
+        if (managedWindow != null)
+        {
+            managedWindow.Title = title;
+            UpdateWindowsMenu();
+        }
     }
 
     private void UpdateWindowsMenu()
@@ -107,17 +231,12 @@ public partial class MainWindow : Window
         if (_managedWindows.Count == 0)
             return;
 
-        const int offsetX = 30;
-        const int offsetY = 30;
-
         var panelWidth = WindowsPanel.Bounds.Width;
         var panelHeight = WindowsPanel.Bounds.Height;
 
-        // The last window's origin is at (offset * (count-1), offset * (count-1))
-        // and it must fit within the panel, so:
-        var totalOffset = (_managedWindows.Count - 1);
-        var windowWidth = Math.Max(200, panelWidth - offsetX * totalOffset);
-        var windowHeight = Math.Max(150, panelHeight - offsetY * totalOffset);
+        var totalOffset = _managedWindows.Count - 1;
+        var windowWidth = Math.Max(200, panelWidth - WindowOffset * totalOffset);
+        var windowHeight = Math.Max(150, panelHeight - WindowOffset * totalOffset);
 
         for (var i = 0; i < _managedWindows.Count; i++)
         {
@@ -125,7 +244,7 @@ public partial class MainWindow : Window
             w.WindowState = WindowState.Normal;
             w.Width = windowWidth;
             w.Height = windowHeight;
-            w.Position = new PixelPoint(offsetX * i, offsetY * i);
+            w.Position = new PixelPoint(WindowOffset * i, WindowOffset * i);
         }
 
         _managedWindows[^1].Activate();
@@ -143,7 +262,7 @@ public partial class MainWindow : Window
         MenuFileExit.Click += (_, _) => Close();
 
         // View menu
-        MenuViewEditParameters.Click += (_, _) => { /* TODO: EditParams() */ };
+        MenuViewEditParameters.Click += (_, _) => EditParameters();
 
         // Measurement system
         MenuViewSystemImperial.Click += (_, _) => SetAndUpdate(w => w.MeasurementSystem = MeasurementSystem.Imperial);

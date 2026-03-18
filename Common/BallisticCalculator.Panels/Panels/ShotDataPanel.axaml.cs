@@ -111,6 +111,60 @@ public partial class ShotDataPanel : UserControl
 
     #region Public Methods
 
+    /// <summary>
+    /// Validates the panel state and builds a ShotData allowing null fields for empty panels.
+    /// Returns (shotData, emptyPanels, incompletePanels).
+    /// shotData is null only when ammunition is not filled.
+    /// emptyPanels lists panels left completely empty (defaults can be applied).
+    /// incompletePanels lists panels partially filled (user error).
+    /// </summary>
+    public (ShotData? ShotData, List<string> EmptyPanels, List<string> IncompletePanels) Validate()
+    {
+        var emptyPanels = new List<string>();
+        var incompletePanels = new List<string>();
+
+        var ammoEntry = AmmoLibPanel.LibraryEntry;
+        if (ammoEntry == null)
+            return (null, emptyPanels, incompletePanels);
+
+        var atmosphere = AtmosphereSubPanel.Atmosphere;
+        if (atmosphere == null)
+        {
+            if (AtmosphereSubPanel.IsEmpty) emptyPanels.Add("Weather");
+            else incompletePanels.Add("Weather");
+        }
+
+        var rifle = RifleSubPanel.Rifle;
+        if (rifle == null)
+        {
+            if (RifleSubPanel.IsEmpty) emptyPanels.Add("Rifle");
+            else incompletePanels.Add("Rifle");
+        }
+        else
+        {
+            rifle.Zero.Ammunition = ZeroAmmoSubPanel.Ammunition;
+            rifle.Zero.Atmosphere = ZeroAtmosphereSubPanel.Atmosphere;
+        }
+
+        var parameters = ParametersSubPanel.Parameters;
+        if (parameters == null)
+        {
+            if (ParametersSubPanel.IsEmpty) emptyPanels.Add("Parameters");
+            else incompletePanels.Add("Parameters");
+        }
+
+        var shotData = new ShotData()
+        {
+            Ammunition = ammoEntry,
+            Weapon = rifle,
+            Atmosphere = atmosphere,
+            Winds = WindSubPanel.Winds,
+            Parameters = parameters,
+        };
+
+        return (shotData, emptyPanels, incompletePanels);
+    }
+
     public void Clear()
     {
         AmmoLibPanel.Clear();

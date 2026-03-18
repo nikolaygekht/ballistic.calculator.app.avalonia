@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using Avalonia.Controls;
 using BallisticCalculator;
 using BallisticCalculator.Controls.Controllers;
@@ -146,6 +148,20 @@ public partial class TrajectoryTableControl : UserControl
     /// Gets the number of rows in the table.
     /// </summary>
     public int RowCount => _wrappers?.Count ?? 0;
+
+    public double[] GetColumnWidths()
+    {
+        if (_dataGrid == null) return [];
+        return _dataGrid.Columns.Select(c => c.ActualWidth).ToArray();
+    }
+
+    public void SetColumnWidths(double[] widths)
+    {
+        if (_dataGrid == null || widths.Length == 0) return;
+        var count = Math.Min(widths.Length, _dataGrid.Columns.Count);
+        for (var i = 0; i < count; i++)
+            _dataGrid.Columns[i].Width = new DataGridLength(widths[i]);
+    }
 
     #endregion
 
