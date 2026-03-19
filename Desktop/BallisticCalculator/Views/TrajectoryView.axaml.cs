@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using BallisticCalculator.Panels.Services;
 using BallisticCalculator.Types;
 using Gehtsoft.Measurements;
 
@@ -18,6 +19,12 @@ public partial class TrajectoryView : UserControl, ITrajectoryChildWindow
         InitializeComponent();
     }
 
+    public IFileDialogService? FileDialogService
+    {
+        get => ReticleControl.FileDialogService;
+        set => ReticleControl.FileDialogService = value;
+    }
+
     public MeasurementSystem MeasurementSystem
     {
         get => _measurementSystem;
@@ -26,6 +33,7 @@ public partial class TrajectoryView : UserControl, ITrajectoryChildWindow
             _measurementSystem = value;
             TableControl.MeasurementSystem = value;
             ChartControl.MeasurementSystem = value;
+            ReticleControl.MeasurementSystem = value;
         }
     }
 
@@ -68,6 +76,7 @@ public partial class TrajectoryView : UserControl, ITrajectoryChildWindow
         {
             _shotData = value;
             UpdateClickValues();
+            ReticleControl.ShotData = value;
         }
     }
 

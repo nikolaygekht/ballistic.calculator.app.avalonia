@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="using:BallisticCalculator.Controls.Controls"
+             xmlns:panels="using:BallisticCalculator.Panels.Panels"
              x:Class="BallisticCalculator.Views.TrajectoryView"
              FontSize="{DynamicResource AppFontSize}">
 
@@ -12,9 +13,7 @@
             <controls:TrajectoryChartControl x:Name="ChartControl" />
         </TabItem>
         <TabItem Header="Reticle">
-            <TextBlock Text="Reticle view — not yet implemented"
-                       HorizontalAlignment="Center" VerticalAlignment="Center"
-                       Foreground="Gray" />
+            <panels:ReticlePanel x:Name="ReticleControl" />
         </TabItem>
     </TabControl>
 </UserControl>

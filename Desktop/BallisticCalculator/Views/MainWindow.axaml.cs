@@ -7,6 +7,7 @@ using Avalonia.Input;
 using BallisticCalculator.Models;
 using BallisticCalculator.Types;
 using Gehtsoft.Measurements;
+using BallisticCalculator.Services;
 using BallisticCalculator.Utilities;
 using BallisticCalculator.Views.Dialogs;
 using Iciclecreek.Avalonia.WindowManager;
@@ -125,6 +126,7 @@ public partial class MainWindow : Window
 
         var view = new TrajectoryView
         {
+            FileDialogService = new FileDialogService(this),
             MeasurementSystem = system,
             ShotData = shotData,
             Trajectory = trajectory,
