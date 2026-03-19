@@ -247,7 +247,11 @@ public partial class ReticleCanvasControl : UserControl
 
         public bool Equals(ICustomDrawOperation? other)
         {
-            return other is CustomDrawOp op && op._reticle == _reticle && op._bounds == _bounds;
+            return other is CustomDrawOp op &&
+                   op._reticle == _reticle &&
+                   op._bounds == _bounds &&
+                   op._underlay == _underlay &&
+                   op._overlay == _overlay;
         }
 
         public void Render(ImmediateDrawingContext context)

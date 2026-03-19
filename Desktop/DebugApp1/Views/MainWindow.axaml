@@ -363,6 +363,34 @@
         </ScrollViewer>
       </TabItem>
 
+      <!-- ReticlePanel Tab -->
+      <TabItem Header="ReticlePanel">
+        <DockPanel Margin="10">
+          <!-- Top: controls -->
+          <StackPanel DockPanel.Dock="Top" Spacing="10" Margin="0,0,0,10">
+            <TextBlock Text="ReticlePanel Test" FontWeight="Bold"
+                       FontSize="{DynamicResource AppFontSize}"/>
+
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <Button Content="Metric" Click="OnReticleMetric"
+                      FontSize="{DynamicResource AppFontSize}"/>
+              <Button Content="Imperial" Click="OnReticleImperial"
+                      FontSize="{DynamicResource AppFontSize}"/>
+              <Button Content="Load Test Trajectory" Click="OnReticleLoadTestData"
+                      FontSize="{DynamicResource AppFontSize}"/>
+            </StackPanel>
+
+            <TextBlock x:Name="ReticleChangeCount"
+                       FontSize="{DynamicResource AppFontSize}"
+                       Text="Changed events: 0"/>
+          </StackPanel>
+
+          <!-- Fill: the panel -->
+          <panels:ReticlePanel x:Name="ReticleTestPanel"
+                               FontSize="{DynamicResource AppFontSize}"/>
+        </DockPanel>
+      </TabItem>
+
     </TabControl>
 
 </Window>

@@ -1,6 +1,6 @@
 # BallisticCalculator2 — Project Status
 
-Last updated: 2026-03-18
+Last updated: 2026-03-19
 
 ## Completed
 
@@ -13,9 +13,11 @@ Last updated: 2026-03-18
 | BallisticCoefficientControl | Done | BC value + drag table selector |
 | WindDirectionControl | Done | Canvas-based visual wind direction indicator with click/drag |
 | WindDirectionController | Done | Geometry logic for arrow rendering and click-to-angle |
-| ReticleCanvasControl | Done | Reticle rendering with zero-size guard |
+| ReticleCanvasControl | Done | Reticle rendering with zero-size guard, Underlay/Overlay collections |
 | TrajectoryChartControl | Done | ScottPlot-based trajectory chart |
 | TrajectoryTableControl | Done | DataGrid-based trajectory table, GetColumnWidths/SetColumnWidths for persistence |
+| TrajectoryToReticleCalculator | Done | Maps BDC points to distances by interpolating trajectory, Near/Far classification |
+| ReticleOverlayController | Done | Creates BDC text labels and target rectangle overlays for reticle display |
 
 ### Panels Library (`Common/BallisticCalculator.Panels/`)
 
@@ -31,6 +33,7 @@ Last updated: 2026-03-18
 | ZeroAmmoPanel | Done | 12 tests | Checkbox + embedded AmmoPanel, propagates MeasurementSystem/ConvertFlag |
 | ZeroAtmospherePanel | Done | 12 tests | Checkbox + embedded AtmospherePanel, propagates MeasurementSystem/ConvertFlag |
 | ShotDataPanel | Done | 13 tests | TabControl container, Validate() method for partial data handling |
+| ReticlePanel | Done | — | Reticle display with BDC (near/far) and target overlay, accepts ShotData |
 
 ### Main Desktop Application (`Desktop/BallisticCalculator/`) — Phase 1 Complete
 
@@ -52,7 +55,7 @@ Last updated: 2026-03-18
 | Persistent state | Done | appstate.json: main window geometry, child window size, table column widths, dialog size |
 | ShotParametersDialog | Done | Modal wrapping ShotDataPanel, FileDialogService, smart validation (see below) |
 | ShotCalculator | Done | Wraps ballistic engine, ApplyDefaults for empty panels |
-| TrajectoryView | Done | TabControl: Table (DataGrid), Chart (ScottPlot), Reticle (placeholder) |
+| TrajectoryView | Done | TabControl: Table (DataGrid), Chart (ScottPlot), Reticle (placeholder — see integration note) |
 | FileDialogService | Done | Avalonia StorageProvider implementation of IFileDialogService |
 
 ### Other Desktop Applications
@@ -61,13 +64,13 @@ Last updated: 2026-03-18
 |-----|--------|-------|
 | ReticleEditor | Working | Reduced spacing, dialog fixes (cancel, zero-size guard, button states) |
 | DebugApp | Working | Controls testing (MeasurementControl, BallisticCoefficientControl, etc.) |
-| DebugApp1 | Working | Panels testing: AmmoPanel, AmmoLibraryRecordPanel, RiflePanel, AtmospherePanel, MultiWindPanel tabs |
+| DebugApp1 | Working | Panels testing: all input panels + ReticlePanel tab with test ShotData |
 
 ### Test Summary
 
 | Project | Test Count | Status |
 |---------|-----------|--------|
-| BallisticCalculator.Controls.Tests | ~30+ | All passing |
+| BallisticCalculator.Controls.Tests | 265 | All passing |
 | BallisticCalculator.Panels.Tests | 167 | All passing |
 
 ## Key Design Decisions
@@ -117,19 +120,27 @@ Default values applied by `ShotCalculator.ApplyDefaults`:
 - Rifle: 3" sight height, 100 yd/m zero distance (based on measurement system)
 - Parameters: 1000 yd/m max range, 100 yd/m step (based on measurement system)
 
+### ReticlePanel — Fine-Grained Trajectory for BDC
+
+The ReticlePanel accepts `ShotData` and internally recalculates trajectory at 2.5m steps (up to 1500m). This is necessary because the display trajectory (50-100yd steps) is too coarse for BDC matching — at close range the bullet is well below the sight line (e.g., 2.5in sight height = ~2 mil at 3yd), and these steep angular drops are missed by coarse steps. The old WinForms app used the same approach.
+
+### ReticleCanvasControl — Overlay Equality Fix
+
+`CustomDrawOp.Equals()` must compare `_underlay` and `_overlay` references in addition to `_reticle` and `_bounds`. Without this, Avalonia skips re-rendering when only the overlay changes (same reticle, same bounds = "equal" draw op).
+
 ## File Structure (Current)
 
 ```
 Common/
 ├── BallisticCalculator.Controls/
-│   ├── Controls/          (MeasurementControl, BallisticCoefficientControl, WindDirectionControl, ...)
-│   ├── Controllers/       (MeasurementController, WindDirectionController)
+│   ├── Controls/          (MeasurementControl, BallisticCoefficientControl, WindDirectionControl, ReticleCanvasControl, ...)
+│   ├── Controllers/       (MeasurementController, WindDirectionController, ChartController, TrajectoryToReticleCalculator, ReticleOverlayController)
 │   └── Models/            (UnitItem, DragTableInfo, WindArrow)
 ├── BallisticCalculator.Controls.Tests/
-│   ├── Controllers/       (MeasurementControllerTests, WindDirectionControllerTests)
+│   ├── Controllers/       (MeasurementControllerTests, WindDirectionControllerTests, ChartControllerTests, TrajectoryToReticleCalculatorTests, ReticleOverlayControllerTests)
 │   └── UI/                (MeasurementControlTests, BallisticCoefficientControlTests)
 ├── BallisticCalculator.Panels/
-│   ├── Panels/            (AmmoPanel, AmmoLibraryRecordPanel, AtmospherePanel, RiflePanel, WindPanel, MultiWindPanel)
+│   ├── Panels/            (AmmoPanel, AmmoLibraryRecordPanel, AtmospherePanel, RiflePanel, WindPanel, MultiWindPanel, ReticlePanel)
 │   ├── Services/          (IFileDialogService, FileDialogOptions, FileDialogFilter)
 │   └── PLAN-InputPanels.md
 ├── BallisticCalculator.Panels.Tests/
@@ -151,6 +162,11 @@ Desktop/
 ```
 
 ## Next Steps — APP_PLAN.md Phases 2-5
+
+### Integration: Wire ReticlePanel into TrajectoryView
+- Replace placeholder TextBlock in TrajectoryView Reticle tab with ReticlePanel
+- Pass ShotData from TrajectoryView to ReticlePanel
+- Forward MeasurementSystem changes
 
 ### Phase 2: File I/O
 - TrajectoryFormState with BXml serialization (file format compat with old app)

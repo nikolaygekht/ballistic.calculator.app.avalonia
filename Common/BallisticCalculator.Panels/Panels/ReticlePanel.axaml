@@ -1,0 +1,129 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="using:BallisticCalculator.Controls.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
+             x:Class="BallisticCalculator.Panels.Panels.ReticlePanel">
+
+  <Grid ColumnDefinitions="*,Auto">
+
+    <!-- Left: Reticle canvas -->
+    <controls:ReticleCanvasControl Grid.Column="0"
+               x:Name="ReticleCanvas" x:FieldModifier="internal"
+               Margin="0,0,4,0"/>
+
+    <!-- Right: Controls -->
+    <Border Grid.Column="1" Width="260" Padding="5">
+      <StackPanel Spacing="4">
+
+        <!-- Reticle loading -->
+        <TextBlock Text="Reticle:"
+                   FontWeight="Bold"
+                   FontSize="{DynamicResource AppFontSize}"/>
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <Button x:Name="LoadReticleButton" x:FieldModifier="internal"
+                  Content="Load..."
+                  Click="OnLoadReticle"
+                  FontSize="{DynamicResource AppFontSize}"/>
+          <Button x:Name="MilDotButton" x:FieldModifier="internal"
+                  Content="Mil-Dot"
+                  Click="OnMilDot"
+                  FontSize="{DynamicResource AppFontSize}"/>
+        </StackPanel>
+
+        <TextBlock x:Name="ReticleNameText" x:FieldModifier="internal"
+                   Text="(none)"
+                   FontSize="{DynamicResource AppFontSize}"
+                   Foreground="Gray"/>
+
+        <Separator Margin="0,4"/>
+
+        <!-- Display mode -->
+        <TextBlock Text="Display:"
+                   FontWeight="Bold"
+                   FontSize="{DynamicResource AppFontSize}"/>
+        <RadioButton x:Name="RadioNone" x:FieldModifier="internal"
+                     Content="None"
+                     GroupName="DisplayMode"
+                     IsChecked="True"
+                     IsCheckedChanged="OnDisplayModeChanged"
+                     FontSize="{DynamicResource AppFontSize}"/>
+        <RadioButton x:Name="RadioFarBdc" x:FieldModifier="internal"
+                     Content="Far BDC"
+                     GroupName="DisplayMode"
+                     IsCheckedChanged="OnDisplayModeChanged"
+                     FontSize="{DynamicResource AppFontSize}"/>
+        <RadioButton x:Name="RadioNearBdc" x:FieldModifier="internal"
+                     Content="Near BDC"
+                     GroupName="DisplayMode"
+                     IsCheckedChanged="OnDisplayModeChanged"
+                     FontSize="{DynamicResource AppFontSize}"/>
+        <RadioButton x:Name="RadioTarget" x:FieldModifier="internal"
+                     Content="Target"
+                     GroupName="DisplayMode"
+                     IsCheckedChanged="OnDisplayModeChanged"
+                     FontSize="{DynamicResource AppFontSize}"/>
+
+        <Separator Margin="0,4"/>
+
+        <!-- Target controls -->
+        <StackPanel x:Name="TargetControlsPanel" x:FieldModifier="internal"
+                    Spacing="4" IsEnabled="False">
+
+          <TextBlock Text="Target:"
+                     FontWeight="Bold"
+                     FontSize="{DynamicResource AppFontSize}"/>
+
+          <!-- Size -->
+          <Grid ColumnDefinitions="70,*,Auto,*">
+            <TextBlock Grid.Column="0" Text="Size:"
+                       VerticalAlignment="Center"
+                       FontSize="{DynamicResource AppFontSize}"/>
+            <NumericUpDown Grid.Column="1"
+                           x:Name="TargetWidthControl" x:FieldModifier="internal"
+                           Value="6" Minimum="0.1" Maximum="100" Increment="1"
+                           FormatString="F1"
+                           FontSize="{DynamicResource AppFontSize}"/>
+            <TextBlock Grid.Column="2" Text=" x "
+                       VerticalAlignment="Center"
+                       FontSize="{DynamicResource AppFontSize}"/>
+            <NumericUpDown Grid.Column="3"
+                           x:Name="TargetHeightControl" x:FieldModifier="internal"
+                           Value="6" Minimum="0.1" Maximum="100" Increment="1"
+                           FormatString="F1"
+                           FontSize="{DynamicResource AppFontSize}"/>
+          </Grid>
+
+          <!-- Size units -->
+          <Grid ColumnDefinitions="70,*">
+            <TextBlock Grid.Column="0" Text="Units:"
+                       VerticalAlignment="Center"
+                       FontSize="{DynamicResource AppFontSize}"/>
+            <ComboBox Grid.Column="1"
+                      x:Name="TargetSizeUnitsCombo" x:FieldModifier="internal"
+                      SelectedIndex="0"
+                      FontSize="{DynamicResource AppFontSize}"
+                      HorizontalAlignment="Stretch">
+              <ComboBoxItem Content="Inch"/>
+              <ComboBoxItem Content="Centimeter"/>
+            </ComboBox>
+          </Grid>
+
+          <!-- Distance -->
+          <Grid ColumnDefinitions="70,*">
+            <TextBlock Grid.Column="0" Text="Distance:"
+                       VerticalAlignment="Center"
+                       FontSize="{DynamicResource AppFontSize}"/>
+            <controls:MeasurementControl Grid.Column="1"
+                       x:Name="TargetDistanceControl" x:FieldModifier="internal"
+                       FontSize="{DynamicResource AppFontSize}"/>
+          </Grid>
+
+        </StackPanel>
+
+      </StackPanel>
+    </Border>
+
+  </Grid>
+</UserControl>

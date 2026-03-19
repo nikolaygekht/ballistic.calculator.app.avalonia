@@ -17,6 +17,7 @@ public partial class MainWindow : Window
     private int _paramsChangeCount;
     private int _windChangeCount;
     private int _shotChangeCount;
+    private int _reticleChangeCount;
 
     public MainWindow()
     {
@@ -65,9 +66,16 @@ public partial class MainWindow : Window
             ShotChangeCount.Text = $"Changed events: {_shotChangeCount}";
         };
 
+        ReticleTestPanel.Changed += (s, e) =>
+        {
+            _reticleChangeCount++;
+            ReticleChangeCount.Text = $"Changed events: {_reticleChangeCount}";
+        };
+
         var fileDialogService = new AvaloniaFileDialogService(this);
         AmmoLibTestPanel.FileDialogService = fileDialogService;
         ShotDataTestPanel.FileDialogService = fileDialogService;
+        ReticleTestPanel.FileDialogService = fileDialogService;
     }
 
     // Font Size Control
@@ -435,4 +443,49 @@ public partial class MainWindow : Window
 
     private void OnShotClear(object? sender, RoutedEventArgs e)
         => ShotDataTestPanel.Clear();
+
+    // ReticlePanel handlers
+    private void OnReticleMetric(object? sender, RoutedEventArgs e)
+        => ReticleTestPanel.MeasurementSystem = MeasurementSystem.Metric;
+
+    private void OnReticleImperial(object? sender, RoutedEventArgs e)
+        => ReticleTestPanel.MeasurementSystem = MeasurementSystem.Imperial;
+
+    private void OnReticleLoadTestData(object? sender, RoutedEventArgs e)
+    {
+        // g1_nowind.txt: 0.365 G1, 65gr, 2600 ft/s, 2.5in sight height, zero at 100yd
+        var shotData = new ShotData
+        {
+            Ammunition = new AmmunitionLibraryEntry
+            {
+                Name = "Test G1 65gr",
+                Ammunition = new Ammunition(
+                    ballisticCoefficient: new BallisticCoefficient(0.365, DragTableId.G1),
+                    weight: new Measurement<WeightUnit>(65, WeightUnit.Grain),
+                    muzzleVelocity: new Measurement<VelocityUnit>(2600, VelocityUnit.FeetPerSecond)),
+            },
+            Weapon = new Rifle(
+                new Sight(
+                    new Measurement<DistanceUnit>(2.5, DistanceUnit.Inch),
+                    Measurement<AngularUnit>.ZERO,
+                    Measurement<AngularUnit>.ZERO),
+                new ZeroingParameters(
+                    new Measurement<DistanceUnit>(100, DistanceUnit.Yard),
+                    null, null),
+                null),
+            Atmosphere = new Atmosphere(
+                new Measurement<DistanceUnit>(0, DistanceUnit.Foot),
+                new Measurement<PressureUnit>(29.92, PressureUnit.InchesOfMercury),
+                new Measurement<TemperatureUnit>(59, TemperatureUnit.Fahrenheit),
+                0),
+            Parameters = new ShotParameters
+            {
+                MaximumDistance = new Measurement<DistanceUnit>(1000, DistanceUnit.Yard),
+                Step = new Measurement<DistanceUnit>(50, DistanceUnit.Yard),
+            },
+        };
+
+        ReticleTestPanel.Reticle = new BallisticCalculator.Reticle.MilDotReticle();
+        ReticleTestPanel.ShotData = shotData;
+    }
 }

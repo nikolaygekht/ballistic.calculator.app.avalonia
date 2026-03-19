@@ -6,7 +6,12 @@
       "WebFetch(domain:github.com)",
       "WebSearch",
       "Bash(ls:*)",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(grep -E \"\\\\.\\(cs|axaml\\)$\")",
+      "Bash(grep -E \"\\\\.\\(cs|xaml\\)$\")",
+      "Bash(grep -E \"\\\\.\\(cs\\)$\")",
+      "Bash(find /mnt/d/develop/homeapps.projects/BallisticCalculator1 -type f -name *TrajectoryView* -o -name *Reticle*)",
+      "Bash(xargs grep:*)"
     ],
     "deny": [],
     "ask": []
