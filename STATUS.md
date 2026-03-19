@@ -35,7 +35,7 @@ Last updated: 2026-03-19
 | ShotDataPanel | Done | 13 tests | TabControl container, Validate() method for partial data handling |
 | ReticlePanel | Done | — | Reticle display with BDC (near/far) and target overlay, accepts ShotData |
 
-### Main Desktop Application (`Desktop/BallisticCalculator/`) — Phase 1 Complete
+### Main Desktop Application (`Desktop/BallisticCalculator/`) — Phases 1-2 Complete
 
 | Component | Status | Notes |
 |-----------|--------|-------|
@@ -55,8 +55,13 @@ Last updated: 2026-03-19
 | Persistent state | Done | appstate.json: main window geometry, child window size, table column widths, dialog size |
 | ShotParametersDialog | Done | Modal wrapping ShotDataPanel, FileDialogService, smart validation (see below) |
 | ShotCalculator | Done | Wraps ballistic engine, ApplyDefaults for empty panels |
-| TrajectoryView | Done | TabControl: Table (DataGrid), Chart (ScottPlot), Reticle (placeholder — see integration note) |
+| TrajectoryView | Done | TabControl: Table (DataGrid), Chart (ScottPlot), Reticle (ReticlePanel) |
 | FileDialogService | Done | Avalonia StorageProvider implementation of IFileDialogService |
+| TrajectoryFormState | Done | BXml serialization model for .trajectory files, compatible with old app |
+| Open / Save / Save As | Done | BXml XML serialization, restores MeasurementSystem/AngularUnits/ChartMode |
+| Edit Parameters | Done | Reopens ShotParametersDialog with current data, recalculates trajectory |
+| Export CSV | Done | Two formats: Local (locale numbers + list separator for Excel) and Invariant (portable) |
+| CsvExportController | Done | Range, Velocity, Mach, Path, Hold, Clicks, Windage, Win.Adj, Clicks, Time, Energy, OGW |
 
 ### Other Desktop Applications
 
@@ -128,6 +133,16 @@ The ReticlePanel accepts `ShotData` and internally recalculates trajectory at 2.
 
 `CustomDrawOp.Equals()` must compare `_underlay` and `_overlay` references in addition to `_reticle` and `_bounds`. Without this, Avalonia skips re-rendering when only the overlay changes (same reticle, same bounds = "equal" draw op).
 
+### File Format — .trajectory
+
+`TrajectoryFormState` wraps `TrajectoryFormShotData` (BXml-serializable analog of `ShotData`) plus display state (MeasurementSystem, AngularUnits, ChartMode). Uses `WindCollection` wrapper because BXml collection deserialization requires a type with `Add` method. `FromShotData()`/`ToShotData()` methods convert between the serializable and runtime types. Format is compatible with the old WinForms app.
+
+### CSV Export — Locale Option
+
+Two export modes via submenu:
+- **Local Format**: uses `CultureInfo.CurrentCulture` for numbers and `TextInfo.ListSeparator` as delimiter (e.g. semicolon in comma-decimal locales). Opens correctly in Excel on the same machine.
+- **Invariant Format**: uses `CultureInfo.InvariantCulture` with comma delimiter. Portable across systems and programmatic parsers.
+
 ## File Structure (Current)
 
 ```
@@ -149,11 +164,11 @@ Common/
 │   └── MeasurementSystem.cs, ChartTrajectory.cs, DropBase.cs, TrajectoryChartMode.cs, ShotData.cs
 Desktop/
 ├── BallisticCalculator/       (Main desktop application)
-│   ├── Models/                (AppState, AppStateManager)
+│   ├── Models/                (AppState, AppStateManager, TrajectoryFormState)
 │   ├── Views/                 (MainWindow, TrajectoryView, TestTrajectoryView)
 │   │   ├── Dialogs/           (ShotParametersDialog)
 │   │   └── Interfaces/        (IAppChildWindow, ITrajectoryChildWindow, IComparisonChartChildWindow)
-│   ├── Utilities/             (ShotCalculator)
+│   ├── Utilities/             (ShotCalculator, CsvExportController)
 │   ├── Services/              (FileDialogService)
 │   └── Assets/                (Shooting.ico)
 ├── DebugApp/                  (Controls testing app)
@@ -161,18 +176,7 @@ Desktop/
 └── ReticleEditor/             (Reticle editor application)
 ```
 
-## Next Steps — APP_PLAN.md Phases 2-5
-
-### Integration: Wire ReticlePanel into TrajectoryView
-- Replace placeholder TextBlock in TrajectoryView Reticle tab with ReticlePanel
-- Pass ShotData from TrajectoryView to ReticlePanel
-- Forward MeasurementSystem changes
-
-### Phase 2: File I/O
-- TrajectoryFormState with BXml serialization (file format compat with old app)
-- Open, Save, Save As
-- Edit Parameters (reopen dialog with current data) — handler exists, needs file association
-- ManagedWindow titles with file names
+## Next Steps — APP_PLAN.md Phases 3-5
 
 ### Phase 3: Display Settings
 - Measurement system switching via menu → active window (wired, needs TrajectoryView refresh)
@@ -186,6 +190,5 @@ Desktop/
 - CompareView implements IComparisonChartChildWindow (interface exists)
 
 ### Phase 5: Polish
-- CSV Export
 - About dialog
 - Tests: ShotCalculator, CsvExport

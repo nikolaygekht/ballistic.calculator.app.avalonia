@@ -25,7 +25,10 @@
                 <MenuItem Header="Save _As" x:Name="MenuFileSaveAs"
                           IsEnabled="False" />
                 <MenuItem Header="Export As _CSV" x:Name="MenuFileExportCsv"
-                          IsEnabled="False" />
+                          IsEnabled="False">
+                    <MenuItem Header="Local Format (for Excel)" x:Name="MenuFileExportCsvLocal" />
+                    <MenuItem Header="Invariant Format (portable)" x:Name="MenuFileExportCsvInvariant" />
+                </MenuItem>
                 <Separator />
                 <MenuItem Header="E_xit" x:Name="MenuFileExit"
                           InputGesture="Ctrl+X" />

@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Xml;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using BallisticCalculator.Models;
+using BallisticCalculator.Serialization;
 using BallisticCalculator.Types;
 using Gehtsoft.Measurements;
 using BallisticCalculator.Services;
@@ -28,6 +32,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         _appState = AppStateManager.Load();
+        _fileDialogService = new FileDialogService(this);
         RestoreMainWindowState();
         SetupMenuHandlers();
         KeyDown += OnKeyDown;
@@ -126,7 +131,7 @@ public partial class MainWindow : Window
 
         var view = new TrajectoryView
         {
-            FileDialogService = new FileDialogService(this),
+            FileDialogService = _fileDialogService,
             MeasurementSystem = system,
             ShotData = shotData,
             Trajectory = trajectory,
@@ -136,10 +141,15 @@ public partial class MainWindow : Window
             view.SetColumnWidths(_appState.TableColumnWidths);
 
         var title = shotData.Ammunition?.Name ?? $"Trajectory {_windowCounter}";
+        AddChildWindow(view, title);
+    }
+
+    private void AddChildWindow(IAppChildWindow content, string title)
+    {
         var window = new ManagedWindow
         {
             Title = title,
-            Content = view,
+            Content = content as Avalonia.Controls.Control,
             Width = _appState.ChildWindowWidth,
             Height = _appState.ChildWindowHeight,
             SizeToContent = SizeToContent.Manual,
@@ -257,10 +267,11 @@ public partial class MainWindow : Window
         // File menu
         MenuFileNewImperial.Click += (_, _) => OpenNewTrajectory(MeasurementSystem.Imperial);
         MenuFileNewMetric.Click += (_, _) => OpenNewTrajectory(MeasurementSystem.Metric);
-        MenuFileOpen.Click += (_, _) => { /* TODO: Open() */ };
-        MenuFileSave.Click += (_, _) => { /* TODO: Save() */ };
-        MenuFileSaveAs.Click += (_, _) => { /* TODO: SaveAs() */ };
-        MenuFileExportCsv.Click += (_, _) => { /* TODO: ExportCsv() */ };
+        MenuFileOpen.Click += async (_, _) => await Open();
+        MenuFileSave.Click += async (_, _) => await Save();
+        MenuFileSaveAs.Click += async (_, _) => await SaveAs();
+        MenuFileExportCsvLocal.Click += async (_, _) => await ExportCsv(useLocalCulture: true);
+        MenuFileExportCsvInvariant.Click += async (_, _) => await ExportCsv(useLocalCulture: false);
         MenuFileExit.Click += (_, _) => Close();
 
         // View menu
@@ -430,4 +441,170 @@ public partial class MainWindow : Window
     {
         item.Icon = isChecked ? "\u2713" : null;
     }
+
+    #region File I/O
+
+    private readonly FileDialogService _fileDialogService;
+
+    private async Task Open()
+    {
+        var path = await _fileDialogService.OpenFileAsync(new Panels.Services.FileDialogOptions
+        {
+            Title = "Open Trajectory",
+            DefaultExtension = ".trajectory",
+            Filters = { new Panels.Services.FileDialogFilter("Ballistic Calculator files", "trajectory") },
+        });
+
+        if (path == null)
+            return;
+
+        try
+        {
+            var document = new XmlDocument();
+            document.Load(path);
+            var serializer = new BallisticXmlDeserializer();
+            var data = serializer.Deserialize<TrajectoryFormState>(document.DocumentElement!);
+
+            var shotData = data.ShotData?.ToShotData();
+            if (shotData == null)
+                return;
+
+            var system = data.MeasurementSystem;
+            var trajectory = ShotCalculator.Calculate(shotData, system);
+
+            _windowCounter++;
+            var view = new TrajectoryView
+            {
+                FileDialogService = new FileDialogService(this),
+                MeasurementSystem = system,
+                AngularUnits = data.AngularUnits,
+                ShotData = shotData,
+                Trajectory = trajectory,
+                FileName = path,
+            };
+
+            if (data.ChartMode.HasValue)
+                view.ChartMode = data.ChartMode.Value;
+
+            if (_appState.TableColumnWidths != null)
+                view.SetColumnWidths(_appState.TableColumnWidths);
+
+            var title = shotData.Ammunition?.Name ?? Path.GetFileNameWithoutExtension(path);
+            AddChildWindow(view, title);
+        }
+        catch (Exception ex)
+        {
+            // Show error in a simple way — no MessageBox in Avalonia without TopLevel
+            Console.Error.WriteLine($"Error opening file: {ex.Message}");
+        }
+    }
+
+    private async Task Save()
+    {
+        if (_activeChild is not ITrajectoryChildWindow trajectoryChild)
+            return;
+
+        if (string.IsNullOrEmpty(trajectoryChild.FileName))
+        {
+            await SaveAs();
+            return;
+        }
+
+        DoSave(trajectoryChild);
+    }
+
+    private async Task SaveAs()
+    {
+        if (_activeChild is not ITrajectoryChildWindow trajectoryChild)
+            return;
+
+        var path = await _fileDialogService.SaveFileAsync(new Panels.Services.FileDialogOptions
+        {
+            Title = "Save Trajectory",
+            DefaultExtension = ".trajectory",
+            InitialFileName = trajectoryChild.FileName,
+            Filters = { new Panels.Services.FileDialogFilter("Ballistic Calculator files", "trajectory") },
+        });
+
+        if (path == null)
+            return;
+
+        trajectoryChild.FileName = path;
+        DoSave(trajectoryChild);
+
+        // Update title with file name
+        var managedWindow = _managedWindows.FirstOrDefault(w => w.Content == trajectoryChild);
+        if (managedWindow != null)
+        {
+            managedWindow.Title = Path.GetFileNameWithoutExtension(path);
+            UpdateWindowsMenu();
+        }
+    }
+
+    private void DoSave(ITrajectoryChildWindow child)
+    {
+        if (child.ShotData == null || string.IsNullOrEmpty(child.FileName))
+            return;
+
+        try
+        {
+            var state = new TrajectoryFormState
+            {
+                ShotData = TrajectoryFormShotData.FromShotData(child.ShotData),
+                MeasurementSystem = child.MeasurementSystem,
+                AngularUnits = child.AngularUnits,
+                ChartMode = child.ChartMode,
+            };
+
+            var serializer = new BallisticXmlSerializer();
+            var root = serializer.Serialize(state);
+            var document = root.OwnerDocument!;
+            document.AppendChild(root);
+            document.Save(child.FileName);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error saving file: {ex.Message}");
+        }
+    }
+
+    private async Task ExportCsv(bool useLocalCulture)
+    {
+        if (_activeChild is not ITrajectoryChildWindow trajectoryChild)
+            return;
+
+        if (trajectoryChild.Trajectory == null)
+            return;
+
+        var path = await _fileDialogService.SaveFileAsync(new Panels.Services.FileDialogOptions
+        {
+            Title = "Export CSV",
+            DefaultExtension = ".csv",
+            Filters = { new Panels.Services.FileDialogFilter("CSV files", "csv") },
+        });
+
+        if (path == null)
+            return;
+
+        try
+        {
+            using var fs = new FileStream(path, FileMode.Create, FileAccess.Write);
+            using var writer = new StreamWriter(fs);
+            var controller = new CsvExportController(
+                trajectoryChild.Trajectory,
+                trajectoryChild.MeasurementSystem,
+                trajectoryChild.ShotData?.Weapon?.Sight,
+                trajectoryChild.AngularUnits,
+                useLocalCulture);
+
+            foreach (var line in controller.Prepare())
+                writer.WriteLine(line);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error exporting CSV: {ex.Message}");
+        }
+    }
+
+    #endregion
 }
