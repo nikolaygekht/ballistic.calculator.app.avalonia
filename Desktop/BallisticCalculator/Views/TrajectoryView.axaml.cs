@@ -8,9 +8,9 @@ namespace BallisticCalculator.Views;
 public partial class TrajectoryView : UserControl, ITrajectoryChildWindow
 {
     private MeasurementSystem _measurementSystem;
-    private AngularUnit _angularUnits = AngularUnit.MOA;
+    private AngularUnit _angularUnits = AngularUnit.Mil;
     private DropBase _dropBase = DropBase.SightLine;
-    private TrajectoryChartMode _chartMode = TrajectoryChartMode.Velocity;
+    private TrajectoryChartMode _chartMode = TrajectoryChartMode.Drop;
     private ShotData? _shotData;
     private TrajectoryPoint[]? _trajectory;
 
@@ -109,6 +109,28 @@ public partial class TrajectoryView : UserControl, ITrajectoryChildWindow
 
     public double[] GetColumnWidths() => TableControl.GetColumnWidths();
     public void SetColumnWidths(double[] widths) => TableControl.SetColumnWidths(widths);
+
+    public void ApplyDefaults()
+    {
+        if (_shotData?.Weapon?.Sight?.VerticalClick != null)
+            _angularUnits = _shotData.Weapon.Sight.VerticalClick.Value.Unit;
+        else
+            _angularUnits = AngularUnit.Mil;
+
+        _chartMode = TrajectoryChartMode.Drop;
+        _dropBase = DropBase.SightLine;
+
+        TableControl.MeasurementSystem = _measurementSystem;
+        TableControl.AngularUnits = _angularUnits;
+        TableControl.DropBase = _dropBase;
+
+        ChartControl.MeasurementSystem = _measurementSystem;
+        ChartControl.AngularUnits = _angularUnits;
+        ChartControl.ChartMode = _chartMode;
+        ChartControl.DropBase = _dropBase;
+
+        ReticleControl.MeasurementSystem = _measurementSystem;
+    }
 
     private void UpdateClickValues()
     {

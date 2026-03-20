@@ -90,7 +90,7 @@ public partial class MainWindow : Window
             {
                 case Key.I: if (_activeChild != null) SetAndUpdate(w => w.MeasurementSystem = MeasurementSystem.Imperial); e.Handled = true; break;
                 case Key.M: if (_activeChild != null) SetAndUpdate(w => w.MeasurementSystem = MeasurementSystem.Metric); e.Handled = true; break;
-                case Key.Z: if (_activeChild is ITrajectoryChildWindow t) t.ZoomYToVisibleRange(); e.Handled = true; break;
+                case Key.Z: ZoomY(); e.Handled = true; break;
             }
         }
         else if (alt && !shift)
@@ -132,10 +132,11 @@ public partial class MainWindow : Window
         var view = new TrajectoryView
         {
             FileDialogService = _fileDialogService,
-            MeasurementSystem = system,
             ShotData = shotData,
-            Trajectory = trajectory,
         };
+        view.MeasurementSystem = system;
+        view.ApplyDefaults();
+        view.Trajectory = trajectory;
 
         if (_appState.TableColumnWidths != null)
             view.SetColumnWidths(_appState.TableColumnWidths);
@@ -201,6 +202,61 @@ public partial class MainWindow : Window
         {
             managedWindow.Title = title;
             UpdateWindowsMenu();
+        }
+    }
+
+    private void ZoomY()
+    {
+        if (_activeChild is ITrajectoryChildWindow t)
+            t.ZoomYToVisibleRange();
+        else if (_activeChild is CompareView c)
+            c.ZoomYToVisibleRange();
+    }
+
+    private void AddToCompare()
+    {
+        if (_activeChild is not ITrajectoryChildWindow trajectoryChild)
+            return;
+
+        if (trajectoryChild.Trajectory == null)
+            return;
+
+        var name = trajectoryChild.ShotData?.Ammunition?.Name ?? "Trajectory";
+        var chartTrajectory = new ChartTrajectory(name, trajectoryChild.Trajectory);
+
+        // Find existing CompareView or create a new one
+        var compareWindow = _managedWindows.FirstOrDefault(w => w.Content is CompareView);
+        if (compareWindow != null)
+        {
+            var compareView = (CompareView)compareWindow.Content!;
+            compareView.AddTrajectory(chartTrajectory);
+            compareWindow.Activate();
+        }
+        else
+        {
+            var compareView = new CompareView
+            {
+                MeasurementSystem = trajectoryChild.MeasurementSystem,
+                AngularUnits = trajectoryChild.AngularUnits,
+                DropBase = trajectoryChild.DropBase,
+                ChartMode = trajectoryChild.ChartMode,
+            };
+            compareView.AddTrajectory(chartTrajectory);
+            AddChildWindow(compareView, "Compare");
+        }
+    }
+
+    private void RemoveLastFromCompare()
+    {
+        if (_activeChild is not IComparisonChartChildWindow compareChild)
+            return;
+
+        compareChild.RemoveLastTrajectory();
+
+        if (compareChild.TrajectoryCount == 0)
+        {
+            var compareWindow = _managedWindows.FirstOrDefault(w => w.Content == compareChild);
+            compareWindow?.Close();
         }
     }
 
@@ -299,7 +355,7 @@ public partial class MainWindow : Window
         MenuViewChartDrop.Click += (_, _) => SetAndUpdate(w => w.ChartMode = TrajectoryChartMode.Drop);
         MenuViewChartWindage.Click += (_, _) => SetAndUpdate(w => w.ChartMode = TrajectoryChartMode.Windage);
         MenuViewChartEnergy.Click += (_, _) => SetAndUpdate(w => w.ChartMode = TrajectoryChartMode.Energy);
-        MenuViewChartZoomY.Click += (_, _) => (_activeChild as ITrajectoryChildWindow)?.ZoomYToVisibleRange();
+        MenuViewChartZoomY.Click += (_, _) => ZoomY();
 
         // Show
         MenuViewShowTable.Click += (_, _) => (_activeChild as ITrajectoryChildWindow)?.ShowTable();
@@ -307,8 +363,8 @@ public partial class MainWindow : Window
         MenuViewShowReticle.Click += (_, _) => (_activeChild as ITrajectoryChildWindow)?.ShowReticle();
 
         // Compare
-        MenuViewCompareAdd.Click += (_, _) => { /* TODO: AddToCompare() */ };
-        MenuViewCompareRemoveLast.Click += (_, _) => (_activeChild as IComparisonChartChildWindow)?.RemoveLastTrajectory();
+        MenuViewCompareAdd.Click += (_, _) => AddToCompare();
+        MenuViewCompareRemoveLast.Click += (_, _) => RemoveLastFromCompare();
 
         // Windows
         MenuWindowsCascade.Click += (_, _) => CascadeWindows();
@@ -476,15 +532,15 @@ public partial class MainWindow : Window
             var view = new TrajectoryView
             {
                 FileDialogService = new FileDialogService(this),
-                MeasurementSystem = system,
-                AngularUnits = data.AngularUnits,
                 ShotData = shotData,
-                Trajectory = trajectory,
                 FileName = path,
             };
-
+            view.MeasurementSystem = system;
+            view.ApplyDefaults();
+            view.AngularUnits = data.AngularUnits;
             if (data.ChartMode.HasValue)
                 view.ChartMode = data.ChartMode.Value;
+            view.Trajectory = trajectory;
 
             if (_appState.TableColumnWidths != null)
                 view.SetColumnWidths(_appState.TableColumnWidths);

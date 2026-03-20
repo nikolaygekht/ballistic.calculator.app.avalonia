@@ -1,6 +1,6 @@
 # BallisticCalculator2 — Project Status
 
-Last updated: 2026-03-19
+Last updated: 2026-03-20
 
 ## Completed
 
@@ -35,7 +35,7 @@ Last updated: 2026-03-19
 | ShotDataPanel | Done | 13 tests | TabControl container, Validate() method for partial data handling |
 | ReticlePanel | Done | — | Reticle display with BDC (near/far) and target overlay, accepts ShotData |
 
-### Main Desktop Application (`Desktop/BallisticCalculator/`) — Phases 1-2 Complete
+### Main Desktop Application (`Desktop/BallisticCalculator/`) — Phases 1-4 Complete
 
 | Component | Status | Notes |
 |-----------|--------|-------|
@@ -62,6 +62,9 @@ Last updated: 2026-03-19
 | Edit Parameters | Done | Reopens ShotParametersDialog with current data, recalculates trajectory |
 | Export CSV | Done | Two formats: Local (locale numbers + list separator for Excel) and Invariant (portable) |
 | CsvExportController | Done | Range, Velocity, Mach, Path, Hold, Clicks, Windage, Win.Adj, Clicks, Time, Energy, OGW |
+| CompareView | Done | Single TrajectoryChartControl, implements IComparisonChartChildWindow |
+| Add to Compare | Done | Copies trajectory + all display settings from source window; reuses existing CompareView |
+| Remove Last / auto-close | Done | Removes last trajectory; closes CompareView when empty |
 
 ### Other Desktop Applications
 
@@ -137,6 +140,21 @@ The ReticlePanel accepts `ShotData` and internally recalculates trajectory at 2.
 
 `TrajectoryFormState` wraps `TrajectoryFormShotData` (BXml-serializable analog of `ShotData`) plus display state (MeasurementSystem, AngularUnits, ChartMode). Uses `WindCollection` wrapper because BXml collection deserialization requires a type with `Add` method. `FromShotData()`/`ToShotData()` methods convert between the serializable and runtime types. Format is compatible with the old WinForms app.
 
+### TrajectoryView — Display State Initialization
+
+TrajectoryView has backing fields for display state (syncs 3 child controls: Table, Chart, Reticle). `ApplyDefaults()` pushes all defaults to all controls:
+- **MeasurementSystem**: from creation (New Imperial/Metric)
+- **ChartMode**: always `Drop`
+- **DropBase**: always `SightLine`
+- **AngularUnits**: derived from `ShotData.Weapon.Sight.VerticalClick` unit; falls back to `Mil`
+
+For **new trajectories**: ShotData → MeasurementSystem → ApplyDefaults() → Trajectory
+For **opened files**: same flow, then overrides with saved AngularUnits/ChartMode from file
+
+### CompareView — No Backing Fields
+
+CompareView wraps a single TrajectoryChartControl, so properties read/write directly from the control (no backing fields, no sync issues). On creation, all 4 display settings are copied from the source trajectory window.
+
 ### CSV Export — Locale Option
 
 Two export modes via submenu:
@@ -165,7 +183,7 @@ Common/
 Desktop/
 ├── BallisticCalculator/       (Main desktop application)
 │   ├── Models/                (AppState, AppStateManager, TrajectoryFormState)
-│   ├── Views/                 (MainWindow, TrajectoryView, TestTrajectoryView)
+│   ├── Views/                 (MainWindow, TrajectoryView, CompareView, TestTrajectoryView)
 │   │   ├── Dialogs/           (ShotParametersDialog)
 │   │   └── Interfaces/        (IAppChildWindow, ITrajectoryChildWindow, IComparisonChartChildWindow)
 │   ├── Utilities/             (ShotCalculator, CsvExportController)
@@ -176,18 +194,7 @@ Desktop/
 └── ReticleEditor/             (Reticle editor application)
 ```
 
-## Next Steps — APP_PLAN.md Phases 3-5
-
-### Phase 3: Display Settings
-- Measurement system switching via menu → active window (wired, needs TrajectoryView refresh)
-- Chart mode switching (wired)
-- Show Table/Chart/Reticle tab switching (wired)
-- Chart Zoom Y axis (wired)
-
-### Phase 4: Compare
-- CompareView with TrajectoryChartControl
-- Add to Compare / Remove Last
-- CompareView implements IComparisonChartChildWindow (interface exists)
+## Next Steps — APP_PLAN.md Phase 5
 
 ### Phase 5: Polish
 - About dialog
