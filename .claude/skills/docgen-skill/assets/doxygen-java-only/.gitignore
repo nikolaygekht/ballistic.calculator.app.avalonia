@@ -1,0 +1,5 @@
+dst/
+obj/
+bin/
+prepare/java/doxygen/
+prepare/java/dst/

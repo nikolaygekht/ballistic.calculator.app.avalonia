@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<dg:help-project xmlns:dg="http://www.gehtsoft.com/docgen/project">
+ <dg:source>
+  <dg:file name="./src/null.ds" encoding="utf-8" />
+ </dg:source>
+ <dg:output template="%docgen%/template/doxygen2ds/main.xsl" file="./null-file" encoding="utf-8">
+  <dg:define name="xml-path" value="./doxygen/xml/" />
+  <dg:define name="ds-path"  value="./dst/" />
+  <dg:define name="codepage" value="65001" />
+  <dg:define name="group"    value="cpp" />
+  <dg:define name="language" value="cpp" />
+  <dg:define name="file-list" value="files.xml" />
+ </dg:output>
+</dg:help-project>

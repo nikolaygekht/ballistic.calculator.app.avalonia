@@ -1,0 +1,5 @@
+dst/
+obj/
+bin/
+prepare/cpp/doxygen/
+prepare/cpp/dst/

@@ -1,0 +1,32 @@
+@group
+    @key=main
+    @title=REPLACE_WITH_PROJECT_TITLE
+    @ingroup=
+    @brief=
+
+    Top-level introduction. The library is documented for multiple
+    languages; pick the one you use:
+
+    @list
+        @list-item
+            [link=cpp]C++ API[/link]
+        @end
+        @list-item
+            [link=java]Java API[/link]
+        @end
+    @end
+@end
+
+@group
+    @key=cpp
+    @title=C++ API
+    @ingroup=main
+    @brief=Native client library.
+@end
+
+@group
+    @key=java
+    @title=Java API
+    @ingroup=main
+    @brief=Java client library.
+@end

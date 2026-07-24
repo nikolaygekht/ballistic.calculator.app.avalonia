@@ -1,0 +1,29 @@
+@group
+    @key=main
+    @title=REPLACE_WITH_PROJECT_TITLE
+    @ingroup=
+    @brief=
+
+    Top-level introduction goes here. One paragraph describing what the
+    project is and who should read these docs.
+
+    Use [link=getting-started]Getting Started[/link] for a tour.
+@end
+
+@article
+    @key=getting-started
+    @title=Getting Started
+    @ingroup=main
+    @brief=A short tour of REPLACE_WITH_PROJECT_TITLE.
+
+    Replace this with the actual content of the article.
+
+    @list
+        @list-item
+            First step.
+        @end
+        @list-item
+            Second step.
+        @end
+    @end
+@end

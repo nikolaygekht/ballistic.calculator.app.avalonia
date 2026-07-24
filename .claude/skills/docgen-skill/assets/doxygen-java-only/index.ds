@@ -1,0 +1,18 @@
+@group
+    @key=main
+    @title=REPLACE_WITH_PROJECT_TITLE
+    @ingroup=
+    @brief=
+
+    Top-level introduction. Describe what the library is and who it's for.
+
+    The auto-generated package and class pages are grouped under
+    [link=java]Java API[/link].
+@end
+
+@group
+    @key=java
+    @title=Java API
+    @ingroup=main
+    @brief=Java client library.
+@end

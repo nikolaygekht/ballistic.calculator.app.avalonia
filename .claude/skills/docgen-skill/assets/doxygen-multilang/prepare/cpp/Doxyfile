@@ -1,0 +1,30 @@
+# Minimal Doxyfile for docgen integration.
+# Generated from `doxygen -g` and trimmed; uncomment additional options as needed.
+
+DOXYFILE_ENCODING      = UTF-8
+PROJECT_NAME           = REPLACE_WITH_PROJECT_NAME
+OUTPUT_DIRECTORY       = ./doxygen
+OUTPUT_LANGUAGE        = English
+BRIEF_MEMBER_DESC      = YES
+REPEAT_BRIEF           = YES
+JAVADOC_AUTOBRIEF      = NO
+
+# Source paths to scan, relative to this Doxyfile's directory:
+INPUT                  = REPLACE_WITH_INCLUDE_PATH
+RECURSIVE              = YES
+FILE_PATTERNS          = *.h *.hpp *.cpp
+
+# Required: docgen consumes the XML output.
+GENERATE_HTML          = NO
+GENERATE_LATEX         = NO
+GENERATE_XML           = YES
+XML_OUTPUT             = xml
+XML_PROGRAMLISTING     = NO
+
+# Pull comments from headers AND .cpp files.
+EXTRACT_ALL            = NO
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = NO
+
+QUIET                  = YES
+WARN_IF_UNDOCUMENTED   = YES

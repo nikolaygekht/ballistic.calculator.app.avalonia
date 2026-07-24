@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<settings>
+ <!-- name = assembly name (no .dll); xmldoc = relative path to the C# compiler's XML doc output -->
+ <assembly name="REPLACE_WITH_PROJECT_NAME"
+           xmldoc="../REPLACE_WITH_PROJECT_NAME/bin/Debug/netstandard2.0/REPLACE_WITH_PROJECT_NAME.xml" />
+
+ <!-- System namespaces: appear as cross-refs but no pages of their own -->
+ <strip-namespace name="System" />
+ <strip-namespace name="System.Collections" />
+ <strip-namespace name="System.Collections.Generic" />
+ <strip-namespace name="System.Linq" />
+ <strip-namespace name="System.Threading" />
+ <strip-namespace name="System.Threading.Tasks" />
+ <strip-namespace name="System.IO" />
+
+ <!-- Add additional <strip-namespace> entries for third-party dependencies -->
+</settings>

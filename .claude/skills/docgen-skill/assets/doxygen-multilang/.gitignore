@@ -1,0 +1,5 @@
+dst/
+obj/
+bin/
+prepare/*/doxygen/
+prepare/*/dst/

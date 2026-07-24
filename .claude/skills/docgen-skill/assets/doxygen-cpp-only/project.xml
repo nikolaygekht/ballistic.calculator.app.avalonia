@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dg:help-project xmlns:dg="http://www.gehtsoft.com/docgen/project">
+ <dg:common>
+  <dg:define name="simplified-text-syntax" value="yes" />
+ </dg:common>
+ <dg:source>
+  <dg:file name="src/index.ds" encoding="utf-8" />
+  <!-- Hand-written C++ overviews + auto-generated .ds copied here from prepare/cpp/dst/ -->
+  <dg:folder name="src/cpp" encoding="utf-8" />
+ </dg:source>
+ <dg:output template="%docgen%/template/html/main.xsl" file="dst/null-file" encoding="utf-8">
+  <dg:define name="text-language" value="en" />
+  <dg:define name="help-title" value="REPLACE_WITH_PROJECT_TITLE" />
+  <dg:define name="advanced-web-content" value="yes" />
+  <dg:define name="default-transform" value="yes" />
+  <dg:define name="enable-highlighter" value="yes" />
+  <dg:define name="external-resources" value="yes" />
+  <dg:define name="web-content-file-name" value="index" />
+ </dg:output>
+</dg:help-project>

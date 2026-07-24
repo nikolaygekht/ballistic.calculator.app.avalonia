@@ -7,3 +7,4 @@ TestResults/
 TBD.txt
 *.trajectory
 *.csv
+.claude/settings.local.json

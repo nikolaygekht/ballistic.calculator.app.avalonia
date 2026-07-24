@@ -1,0 +1,30 @@
+@group
+    @key=main
+    @title=REPLACE_WITH_PROJECT_TITLE
+    @ingroup=
+    @brief=
+
+    Top-level introduction. Describe what the project is, who it's for,
+    and how to start.
+
+    See [link=getting-started]Getting Started[/link] for a tour.
+@end
+
+@article
+    @key=getting-started
+    @title=Getting Started
+    @ingroup=main
+    @brief=A short tour of REPLACE_WITH_PROJECT_TITLE.
+
+    Replace this with the actual content of the article. Use BBCode for
+    formatting: [b]bold[/b], [c]inline code[/c], and
+    [clink=REPLACE_WITH_PROJECT_NAMESPACE.MyClass]API references[/clink].
+
+    @example
+        @title=Quick example
+        @highlight=cs
+
+        var foo = new Foo();
+        var result = foo.Bar();
+    @end
+@end
