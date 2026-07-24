@@ -96,5 +96,28 @@
                  FontSize="{DynamicResource AppFontSize}"/>
     </Grid>
 
+    <!-- Horizontal Offset -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="H Offset:"
+                 VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1"
+                 x:Name="HorizontalOffsetControl" x:FieldModifier="internal"
+                 IsEnabled="False"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <Separator/>
+
+    <!-- Shot Angle at zero -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="Shot Angle:"
+                 VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1"
+                 x:Name="ZeroShotAngleControl" x:FieldModifier="internal"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
   </StackPanel>
 </UserControl>

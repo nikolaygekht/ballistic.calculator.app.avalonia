@@ -299,11 +299,8 @@ public partial class MeasurementControl : UserControl
             DoIncrement(false);
             e.Handled = true;
         }
-        else if (e.Key == Key.Tab && e.KeyModifiers == KeyModifiers.None)
-        {
-            UnitPart.Focus();
-            e.Handled = true;
-        }
+        // Tab is intentionally left to Avalonia's default keyboard navigation, which walks
+        // value (NumericPart) -> unit (UnitPart) -> next field in declaration order.
     }
 
     private void DoIncrement(bool increment)

@@ -487,5 +487,6 @@ public partial class MainWindow : Window
 
         ReticleTestPanel.Reticle = new BallisticCalculator.Reticle.MilDotReticle();
         ReticleTestPanel.ShotData = shotData;
+        ReticleTestPanel.FineTrajectory = ShotTrajectoryCalculator.CalculateFine(shotData);
     }
 }

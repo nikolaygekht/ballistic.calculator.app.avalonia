@@ -39,44 +39,6 @@ public static class ShotCalculator
     public static TrajectoryPoint[] Calculate(ShotData shotData, MeasurementSystem system)
     {
         ApplyDefaults(shotData, system);
-
-        var calc = new global::BallisticCalculator.TrajectoryCalculator();
-        var ammo = shotData.Ammunition!.Ammunition;
-        var weapon = shotData.Weapon!;
-        var atmosphere = shotData.Atmosphere!;
-        var parameters = shotData.Parameters!;
-
-        var zeroAmmo = weapon.Zero?.Ammunition ?? ammo;
-        var zeroAtmosphere = weapon.Zero?.Atmosphere ?? atmosphere;
-
-        var shotParameters = new ShotParameters()
-        {
-            BarrelAzimuth = parameters.BarrelAzimuth,
-            CantAngle = parameters.CantAngle,
-            MaximumDistance = parameters.MaximumDistance,
-            ShotAngle = parameters.ShotAngle,
-            Step = parameters.Step,
-            SightAngle = calc.SightAngle(zeroAmmo, weapon, zeroAtmosphere),
-        };
-
-        var trajectory = calc.Calculate(ammo, weapon, atmosphere, shotParameters, shotData.Winds);
-
-        // Trim trailing nulls (if trajectory goes beyond effective range)
-        var count = 0;
-        for (var i = 0; i < trajectory.Length; i++)
-        {
-            if (trajectory[i] == null)
-                break;
-            count++;
-        }
-
-        if (count < trajectory.Length)
-        {
-            var trimmed = new TrajectoryPoint[count];
-            System.Array.Copy(trajectory, trimmed, count);
-            return trimmed;
-        }
-
-        return trajectory;
+        return ShotTrajectoryCalculator.Calculate(shotData) ?? System.Array.Empty<TrajectoryPoint>();
     }
 }

@@ -140,6 +140,93 @@ public class RiflePanelTests
     }
 
     [AvaloniaFact]
+    public void Rifle_SetWithHorizontalOffset_ShouldRoundTrip()
+    {
+        var panel = new RiflePanel();
+        var rifle = new Rifle(
+            new Sight() { SightHeight = new Measurement<DistanceUnit>(50, DistanceUnit.Millimeter) },
+            new ZeroingParameters(
+                new Measurement<DistanceUnit>(100, DistanceUnit.Meter),
+                null, null)
+            {
+                HorizontalOffset = new Measurement<DistanceUnit>(15, DistanceUnit.Millimeter)
+            });
+
+        panel.Rifle = rifle;
+
+        panel.VerticalOffsetCheckBox.IsChecked.Should().BeTrue();
+        panel.HorizontalOffsetControl.IsEnabled.Should().BeTrue();
+
+        var result = panel.Rifle;
+        result.Should().NotBeNull();
+        result!.Zero.HorizontalOffset.Should().NotBeNull();
+        result.Zero.HorizontalOffset!.Value.In(DistanceUnit.Millimeter).Should().BeApproximately(15, 0.5);
+    }
+
+    [AvaloniaFact]
+    public void OffsetCheckBox_WhenChecked_ShouldEnableBothOffsetControls()
+    {
+        var panel = new RiflePanel();
+
+        panel.VerticalOffsetCheckBox.IsChecked = true;
+
+        panel.VerticalOffsetControl.IsEnabled.Should().BeTrue();
+        panel.HorizontalOffsetControl.IsEnabled.Should().BeTrue();
+    }
+
+    [AvaloniaFact]
+    public void HorizontalOffset_WhenUnchecked_ShouldReturnNull()
+    {
+        var panel = new RiflePanel();
+        var rifle = new Rifle(
+            new Sight() { SightHeight = new Measurement<DistanceUnit>(50, DistanceUnit.Millimeter) },
+            new ZeroingParameters(
+                new Measurement<DistanceUnit>(100, DistanceUnit.Meter),
+                null, null)
+            {
+                HorizontalOffset = new Measurement<DistanceUnit>(15, DistanceUnit.Millimeter)
+            });
+        panel.Rifle = rifle;
+
+        panel.VerticalOffsetCheckBox.IsChecked = false;
+
+        var result = panel.Rifle;
+        result.Should().NotBeNull();
+        result!.Zero.HorizontalOffset.Should().BeNull();
+    }
+
+    [AvaloniaFact]
+    public void ZeroShotAngle_SetAndGet_ShouldRoundTrip()
+    {
+        var panel = new RiflePanel();
+
+        panel.ZeroShotAngle = new Measurement<AngularUnit>(3, AngularUnit.Mil);
+
+        var result = panel.ZeroShotAngle;
+        result.Should().NotBeNull();
+        result!.Value.In(AngularUnit.Mil).Should().BeApproximately(3, 0.01);
+    }
+
+    [AvaloniaFact]
+    public void ZeroShotAngle_WhenEmpty_ShouldReturnNull()
+    {
+        var panel = new RiflePanel();
+
+        panel.ZeroShotAngle.Should().BeNull();
+    }
+
+    [AvaloniaFact]
+    public void ZeroShotAngle_ClearedBySettingNull_ShouldReturnNull()
+    {
+        var panel = new RiflePanel();
+        panel.ZeroShotAngle = new Measurement<AngularUnit>(3, AngularUnit.Mil);
+
+        panel.ZeroShotAngle = null;
+
+        panel.ZeroShotAngle.Should().BeNull();
+    }
+
+    [AvaloniaFact]
     public void Rifle_SetNull_ShouldClear()
     {
         var panel = new RiflePanel();
@@ -354,6 +441,9 @@ public class RiflePanelTests
         panel.RiflingStepControl.IsEnabled.Should().BeFalse();
         panel.VerticalOffsetCheckBox.IsChecked.Should().BeFalse();
         panel.VerticalOffsetControl.IsEnabled.Should().BeFalse();
+        panel.HorizontalOffsetControl.IsEmpty.Should().BeTrue();
+        panel.HorizontalOffsetControl.IsEnabled.Should().BeFalse();
+        panel.ZeroShotAngle.Should().BeNull();
     }
 
     [AvaloniaFact]

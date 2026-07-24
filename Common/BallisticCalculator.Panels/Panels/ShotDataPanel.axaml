@@ -51,6 +51,11 @@
 
           <panels:ZeroAtmospherePanel x:Name="ZeroAtmosphereSubPanel" x:FieldModifier="internal"
                                       FontSize="{DynamicResource AppFontSize}"/>
+
+          <Separator Margin="0,4"/>
+
+          <panels:ZeroWindPanel x:Name="ZeroWindSubPanel" x:FieldModifier="internal"
+                                FontSize="{DynamicResource AppFontSize}"/>
         </StackPanel>
       </ScrollViewer>
     </TabItem>

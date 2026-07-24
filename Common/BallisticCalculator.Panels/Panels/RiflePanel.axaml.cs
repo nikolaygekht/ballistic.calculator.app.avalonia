@@ -60,12 +60,19 @@ public partial class RiflePanel : UserControl
             // Zero parameters
             var zero = new ZeroingParameters(zeroDistance.Value, null, null);
 
-            // Vertical offset only when checkbox is checked
+            // Offsets only when checkbox is checked
             if (VerticalOffsetCheckBox.IsChecked == true && !VerticalOffsetControl.IsEmpty)
             {
                 var offset = VerticalOffsetControl.GetValue<DistanceUnit>();
                 if (offset != null)
                     zero.VerticalOffset = offset.Value;
+            }
+
+            if (VerticalOffsetCheckBox.IsChecked == true && !HorizontalOffsetControl.IsEmpty)
+            {
+                var hoffset = HorizontalOffsetControl.GetValue<DistanceUnit>();
+                if (hoffset != null)
+                    zero.HorizontalOffset = hoffset.Value;
             }
 
             // Rifling only when direction is set
@@ -115,21 +122,39 @@ public partial class RiflePanel : UserControl
                 RiflingStepControl.Value = null;
             }
 
+            VerticalOffsetCheckBox.IsChecked =
+                value.Zero.VerticalOffset.HasValue || value.Zero.HorizontalOffset.HasValue;
+
             if (value.Zero.VerticalOffset.HasValue)
-            {
-                VerticalOffsetCheckBox.IsChecked = true;
                 VerticalOffsetControl.SetValue(value.Zero.VerticalOffset.Value);
-            }
             else
-            {
-                VerticalOffsetCheckBox.IsChecked = false;
                 VerticalOffsetControl.Value = null;
-            }
+
+            if (value.Zero.HorizontalOffset.HasValue)
+                HorizontalOffsetControl.SetValue(value.Zero.HorizontalOffset.Value);
+            else
+                HorizontalOffsetControl.Value = null;
         }
     }
 
     /// <summary>
-    /// Quick access to vertical click value for ParametersPanel angle-as-clicks feature.
+    /// Zeroing shot (incline) angle. Not part of the library <see cref="Rifle"/>; assembled into
+    /// <c>ZeroingData</c> by the host panel.
+    /// </summary>
+    public Measurement<AngularUnit>? ZeroShotAngle
+    {
+        get => ZeroShotAngleControl.IsEmpty ? null : ZeroShotAngleControl.GetValue<AngularUnit>();
+        set
+        {
+            if (value.HasValue)
+                ZeroShotAngleControl.SetValue(value.Value);
+            else
+                ZeroShotAngleControl.Value = null;
+        }
+    }
+
+    /// <summary>
+    /// Quick access to the vertical click size, used to convert elevation clicks to an angle.
     /// </summary>
     public Measurement<AngularUnit>? VerticalClick
     {
@@ -137,6 +162,18 @@ public partial class RiflePanel : UserControl
         {
             if (VerticalClickControl.IsEmpty) return null;
             return VerticalClickControl.GetValue<AngularUnit>();
+        }
+    }
+
+    /// <summary>
+    /// Quick access to the horizontal click size, used to convert windage clicks to an angle.
+    /// </summary>
+    public Measurement<AngularUnit>? HorizontalClick
+    {
+        get
+        {
+            if (HorizontalClickControl.IsEmpty) return null;
+            return HorizontalClickControl.GetValue<AngularUnit>();
         }
     }
 
@@ -177,6 +214,13 @@ public partial class RiflePanel : UserControl
         VerticalOffsetControl.UnitType = typeof(DistanceUnit);
         VerticalOffsetControl.Increment = 1;
 
+        HorizontalOffsetControl.UnitType = typeof(DistanceUnit);
+        HorizontalOffsetControl.Increment = 1;
+
+        ZeroShotAngleControl.UnitType = typeof(AngularUnit);
+        ZeroShotAngleControl.Increment = 1;
+        ZeroShotAngleControl.ChangeUnit(AngularUnit.Degree, 1, false);
+
         // Populate rifling direction combo
         RiflingDirectionCombo.Items.Add("Not Set");
         RiflingDirectionCombo.Items.Add("Left");
@@ -192,6 +236,8 @@ public partial class RiflePanel : UserControl
         VerticalClickControl.Changed += (s, e) => Changed?.Invoke(this, EventArgs.Empty);
         RiflingStepControl.Changed += (s, e) => Changed?.Invoke(this, EventArgs.Empty);
         VerticalOffsetControl.Changed += (s, e) => Changed?.Invoke(this, EventArgs.Empty);
+        HorizontalOffsetControl.Changed += (s, e) => Changed?.Invoke(this, EventArgs.Empty);
+        ZeroShotAngleControl.Changed += (s, e) => Changed?.Invoke(this, EventArgs.Empty);
 
         RiflingDirectionCombo.SelectionChanged += OnRiflingDirectionChanged;
         VerticalOffsetCheckBox.IsCheckedChanged += OnVerticalOffsetCheckChanged;
@@ -210,6 +256,7 @@ public partial class RiflePanel : UserControl
             ZeroDistanceControl.ChangeUnit(DistanceUnit.Meter, 0, convert);
             RiflingStepControl.ChangeUnit(DistanceUnit.Millimeter, 0, convert);
             VerticalOffsetControl.ChangeUnit(DistanceUnit.Millimeter, 0, convert);
+            HorizontalOffsetControl.ChangeUnit(DistanceUnit.Millimeter, 0, convert);
         }
         else
         {
@@ -217,6 +264,7 @@ public partial class RiflePanel : UserControl
             ZeroDistanceControl.ChangeUnit(DistanceUnit.Yard, 0, convert);
             RiflingStepControl.ChangeUnit(DistanceUnit.Inch, 1, convert);
             VerticalOffsetControl.ChangeUnit(DistanceUnit.Inch, 1, convert);
+            HorizontalOffsetControl.ChangeUnit(DistanceUnit.Inch, 1, convert);
         }
         // Click units (Angular) are NOT affected by measurement system switch
     }
@@ -235,6 +283,8 @@ public partial class RiflePanel : UserControl
         RiflingStepControl.Value = null;
         VerticalOffsetCheckBox.IsChecked = false;
         VerticalOffsetControl.Value = null;
+        HorizontalOffsetControl.Value = null;
+        ZeroShotAngleControl.Value = null;
     }
 
     #endregion
@@ -249,7 +299,9 @@ public partial class RiflePanel : UserControl
 
     private void OnVerticalOffsetCheckChanged(object? sender, RoutedEventArgs e)
     {
-        VerticalOffsetControl.IsEnabled = VerticalOffsetCheckBox.IsChecked == true;
+        var enabled = VerticalOffsetCheckBox.IsChecked == true;
+        VerticalOffsetControl.IsEnabled = enabled;
+        HorizontalOffsetControl.IsEnabled = enabled;
         Changed?.Invoke(this, EventArgs.Empty);
     }
 

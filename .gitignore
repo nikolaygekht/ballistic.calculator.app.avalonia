@@ -8,3 +8,5 @@ TBD.txt
 *.trajectory
 *.csv
 .claude/settings.local.json
+Setup/content/
+*.zip

@@ -18,14 +18,6 @@ namespace BallisticCalculator.Panels.Panels;
 
 public partial class ReticlePanel : UserControl
 {
-    /// <summary>
-    /// Fine step size for BDC/target trajectory recalculation (same as old WinForms app).
-    /// At close range, 50yd steps miss the steep drop where bullet is well below sight line.
-    /// 2.5m (~2.7yd) captures the near-BDC points correctly.
-    /// </summary>
-    private static readonly Measurement<DistanceUnit> FineStep = new(2.5, DistanceUnit.Meter);
-    private static readonly Measurement<DistanceUnit> FineMaxDistance = new(1500, DistanceUnit.Meter);
-
     private MeasurementSystem _measurementSystem = MeasurementSystem.Imperial;
     private ReticleDefinition? _reticle;
     private ShotData? _shotData;
@@ -73,7 +65,22 @@ public partial class ReticlePanel : UserControl
         set
         {
             _shotData = value;
-            RecalculateFineTrajectory();
+            _zeroDistance = value?.Zeroing?.Distance ?? value?.Weapon?.Zero?.Distance
+                ?? new Measurement<DistanceUnit>(100, DistanceUnit.Yard);
+            UpdateReticle();
+        }
+    }
+
+    /// <summary>
+    /// The fine trajectory used for BDC placement. Provided by the host (built once via
+    /// <see cref="ShotTrajectoryCalculator.CalculateFine"/> and shared with the summary analysis).
+    /// </summary>
+    public TrajectoryPoint[]? FineTrajectory
+    {
+        get => _fineTrajectory;
+        set
+        {
+            _fineTrajectory = value;
             UpdateReticle();
         }
     }
@@ -159,71 +166,6 @@ public partial class ReticlePanel : UserControl
         TargetControlsPanel.IsEnabled = RadioTarget.IsChecked == true;
         UpdateReticle();
         Changed?.Invoke(this, EventArgs.Empty);
-    }
-
-    #endregion
-
-    #region Trajectory Calculation
-
-    private void RecalculateFineTrajectory()
-    {
-        if (_shotData?.Ammunition?.Ammunition == null ||
-            _shotData?.Weapon == null ||
-            _shotData?.Parameters == null)
-        {
-            _fineTrajectory = null;
-            _zeroDistance = default;
-            return;
-        }
-
-        _zeroDistance = _shotData.Weapon.Zero?.Distance ??
-            new Measurement<DistanceUnit>(100, DistanceUnit.Yard);
-
-        try
-        {
-            var calc = new TrajectoryCalculator();
-            var ammo = _shotData.Ammunition.Ammunition;
-            var weapon = _shotData.Weapon;
-            var atmosphere = _shotData.Atmosphere ?? new Atmosphere();
-            var zeroAmmo = weapon.Zero?.Ammunition ?? ammo;
-            var zeroAtmosphere = weapon.Zero?.Atmosphere ?? atmosphere;
-
-            var shotParameters = new ShotParameters
-            {
-                BarrelAzimuth = _shotData.Parameters.BarrelAzimuth,
-                CantAngle = _shotData.Parameters.CantAngle,
-                MaximumDistance = FineMaxDistance,
-                ShotAngle = _shotData.Parameters.ShotAngle,
-                Step = FineStep,
-                SightAngle = calc.SightAngle(zeroAmmo, weapon, zeroAtmosphere),
-            };
-
-            var trajectory = calc.Calculate(ammo, weapon, atmosphere,
-                shotParameters, _shotData.Winds);
-
-            // Trim trailing nulls
-            var count = 0;
-            for (var i = 0; i < trajectory.Length; i++)
-            {
-                if (trajectory[i] == null) break;
-                count++;
-            }
-
-            if (count < trajectory.Length)
-            {
-                var trimmed = new TrajectoryPoint[count];
-                Array.Copy(trajectory, trimmed, count);
-                _fineTrajectory = trimmed;
-            }
-            else
-            {
-                _fineTrajectory = trajectory;
-            }
-        }
-        catch
-        {
-            _fineTrajectory = null;
-        }
     }
 
     #endregion

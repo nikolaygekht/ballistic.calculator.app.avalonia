@@ -45,8 +45,11 @@ public class ParametersPanelTests
         panel.MaxRangeControl.Should().NotBeNull();
         panel.StepControl.Should().NotBeNull();
         panel.AngleControl.Should().NotBeNull();
-        panel.ClicksTextBox.Should().NotBeNull();
-        panel.ClicksSetButton.Should().NotBeNull();
+        panel.VClicksControl.Should().NotBeNull();
+        panel.HClicksControl.Should().NotBeNull();
+        panel.CoriolisCheckBox.Should().NotBeNull();
+        panel.AzimuthControl.Should().NotBeNull();
+        panel.LatitudeControl.Should().NotBeNull();
     }
 
     [AvaloniaFact]
@@ -224,14 +227,166 @@ public class ParametersPanelTests
         panel.MaxRangeControl.IsEmpty.Should().BeTrue();
         panel.StepControl.IsEmpty.Should().BeTrue();
         panel.AngleControl.IsEmpty.Should().BeTrue();
-        panel.ClicksTextBox.Text.Should().BeNullOrEmpty();
+        panel.VClicksControl.Value.Should().Be(0m);
+        panel.HClicksControl.Value.Should().Be(0m);
+        panel.CoriolisCheckBox.IsChecked.Should().BeFalse();
     }
 
     [AvaloniaFact]
-    public void ClicksSet_WithRiflePanel_ShouldCalculateAngle()
+    public void VClicks_WithClickSize_ShouldProduceShotDropAdjustment()
+    {
+        var panel = new ParametersPanel { RiflePanel = CreateRiflePanelWithClicks() };
+        panel.Parameters = CreateTestParameters();
+        panel.VClicksControl.Value = 20m;
+
+        var result = panel.Parameters;
+        result.Should().NotBeNull();
+        result!.ShotDropAdjustment.Should().NotBeNull();
+        // 20 clicks * 0.25 MOA = 5 MOA
+        result.ShotDropAdjustment!.Value.In(AngularUnit.MOA).Should().BeApproximately(5, 0.1);
+        // Shot angle is separate and left untouched.
+        result.ShotAngle.Should().BeNull();
+    }
+
+    [AvaloniaFact]
+    public void HClicks_WithClickSize_ShouldProduceShotWindageAdjustment()
+    {
+        var panel = new ParametersPanel { RiflePanel = CreateRiflePanelWithClicks() };
+        panel.Parameters = CreateTestParameters();
+        panel.HClicksControl.Value = -8m;
+
+        var result = panel.Parameters;
+        result!.ShotWindageAdjustment.Should().NotBeNull();
+        // -8 clicks * 0.25 MOA = -2 MOA
+        result.ShotWindageAdjustment!.Value.In(AngularUnit.MOA).Should().BeApproximately(-2, 0.1);
+    }
+
+    [AvaloniaFact]
+    public void Clicks_WithoutClickSize_ShouldProduceNoAdjustment()
+    {
+        var panel = new ParametersPanel(); // no RiflePanel -> no click size
+        panel.Parameters = CreateTestParameters();
+        panel.VClicksControl.Value = 20m;
+        panel.HClicksControl.Value = 5m;
+
+        var result = panel.Parameters;
+        result!.ShotDropAdjustment.Should().BeNull();
+        result.ShotWindageAdjustment.Should().BeNull();
+    }
+
+    [AvaloniaFact]
+    public void ZeroClicks_ShouldProduceNoAdjustment()
+    {
+        var panel = new ParametersPanel { RiflePanel = CreateRiflePanelWithClicks() };
+        panel.Parameters = CreateTestParameters(); // clicks default 0
+
+        var result = panel.Parameters;
+        result!.ShotDropAdjustment.Should().BeNull();
+        result.ShotWindageAdjustment.Should().BeNull();
+    }
+
+    [AvaloniaFact]
+    public void ShotDropAdjustment_ShouldRoundTripToVClicks()
+    {
+        var panel = new ParametersPanel { RiflePanel = CreateRiflePanelWithClicks() };
+        var parms = CreateTestParameters();
+        parms.ShotDropAdjustment = new Measurement<AngularUnit>(5, AngularUnit.MOA); // 5 / 0.25 = 20 clicks
+        panel.Parameters = parms;
+
+        panel.VClicksControl.Value.Should().Be(20m);
+        var result = panel.Parameters;
+        result!.ShotDropAdjustment!.Value.In(AngularUnit.MOA).Should().BeApproximately(5, 0.1);
+    }
+
+    [AvaloniaFact]
+    public void Coriolis_WhenUnchecked_ShouldDisableAndReturnNull()
     {
         var panel = new ParametersPanel();
-        // Set up a rifle panel with 0.25 MOA vertical click
+        panel.Parameters = CreateTestParameters();
+
+        panel.CoriolisCheckBox.IsChecked.Should().BeFalse();
+        panel.AzimuthControl.IsEnabled.Should().BeFalse();
+        panel.LatitudeControl.IsEnabled.Should().BeFalse();
+
+        var result = panel.Parameters;
+        result!.BarrelAzimuth.Should().BeNull();
+        result.Latitude.Should().BeNull();
+    }
+
+    [AvaloniaFact]
+    public void Coriolis_Checkbox_ShouldEnableAzimuthAndLatitude()
+    {
+        var panel = new ParametersPanel();
+
+        panel.CoriolisCheckBox.IsChecked = true;
+
+        panel.AzimuthControl.IsEnabled.Should().BeTrue();
+        panel.LatitudeControl.IsEnabled.Should().BeTrue();
+    }
+
+    [AvaloniaFact]
+    public void Coriolis_WithAzimuthAndLatitude_ShouldRoundTrip()
+    {
+        var panel = new ParametersPanel();
+        var parms = CreateTestParameters();
+        parms.BarrelAzimuth = new Measurement<AngularUnit>(135, AngularUnit.Degree);
+        parms.Latitude = new Measurement<AngularUnit>(45, AngularUnit.Degree);
+
+        panel.Parameters = parms;
+
+        panel.CoriolisCheckBox.IsChecked.Should().BeTrue();
+        var result = panel.Parameters;
+        result!.BarrelAzimuth.Should().NotBeNull();
+        result.BarrelAzimuth!.Value.In(AngularUnit.Degree).Should().BeApproximately(135, 0.5);
+        result.Latitude.Should().NotBeNull();
+        result.Latitude!.Value.In(AngularUnit.Degree).Should().BeApproximately(45, 0.5);
+    }
+
+    [AvaloniaFact]
+    public void Latitude_South_ShouldRoundTripAsNegative()
+    {
+        var panel = new ParametersPanel();
+        var parms = CreateTestParameters();
+        parms.Latitude = new Measurement<AngularUnit>(-33.5, AngularUnit.Degree);
+
+        panel.Parameters = parms;
+
+        panel.CoriolisCheckBox.IsChecked.Should().BeTrue();
+        panel.LatitudeControl.GetValue<AngularUnit>()!.Value.In(AngularUnit.Degree)
+            .Should().BeApproximately(33.5, 0.1);               // magnitude only
+        panel.LatitudeHemisphere.SelectedIndex.Should().Be(1);  // S
+
+        var result = panel.Parameters;
+        result!.Latitude.Should().NotBeNull();
+        result.Latitude!.Value.In(AngularUnit.Degree).Should().BeApproximately(-33.5, 0.1);
+    }
+
+    [AvaloniaFact]
+    public void Latitude_HemisphereSelector_ShouldControlSign()
+    {
+        var panel = new ParametersPanel();
+        panel.Parameters = CreateTestParameters(); // provides max range + step
+        panel.CoriolisCheckBox.IsChecked = true;
+        panel.LatitudeControl.SetValue(new Measurement<AngularUnit>(20, AngularUnit.Degree));
+        panel.LatitudeHemisphere.SelectedIndex = 1; // S
+
+        var result = panel.Parameters;
+        result!.Latitude!.Value.In(AngularUnit.Degree).Should().BeApproximately(-20, 0.1);
+    }
+
+    [AvaloniaFact]
+    public void Coriolis_Checkbox_ShouldEnableAzimuthDialAndHemisphere()
+    {
+        var panel = new ParametersPanel();
+
+        panel.CoriolisCheckBox.IsChecked = true;
+
+        panel.AzimuthIndicator.IsEnabled.Should().BeTrue();
+        panel.LatitudeHemisphere.IsEnabled.Should().BeTrue();
+    }
+
+    private static RiflePanel CreateRiflePanelWithClicks()
+    {
         var riflePanel = new RiflePanel();
         riflePanel.Rifle = new Rifle(
             new Sight(
@@ -241,38 +396,7 @@ public class ParametersPanelTests
             new ZeroingParameters(
                 new Measurement<DistanceUnit>(100, DistanceUnit.Meter),
                 null, null));
-
-        panel.RiflePanel = riflePanel;
-        panel.ClicksTextBox.Text = "20";
-        panel.SetAngleFromClicks();
-
-        // 20 clicks * 0.25 MOA = 5 MOA
-        var angle = panel.AngleControl.GetValue<AngularUnit>();
-        angle.Should().NotBeNull();
-        angle!.Value.In(AngularUnit.MOA).Should().BeApproximately(5, 0.1);
-    }
-
-    [AvaloniaFact]
-    public void ClicksSet_WithoutRiflePanel_ShouldDoNothing()
-    {
-        var panel = new ParametersPanel();
-        panel.ClicksTextBox.Text = "20";
-
-        panel.SetAngleFromClicks();
-
-        panel.AngleControl.IsEmpty.Should().BeTrue();
-    }
-
-    [AvaloniaFact]
-    public void ClicksSet_WithEmptyClicks_ShouldDoNothing()
-    {
-        var panel = new ParametersPanel();
-        var riflePanel = new RiflePanel();
-        panel.RiflePanel = riflePanel;
-
-        panel.SetAngleFromClicks();
-
-        panel.AngleControl.IsEmpty.Should().BeTrue();
+        return riflePanel;
     }
 
     private static object? GetSelectedUnit(BallisticCalculator.Controls.Controls.MeasurementControl control)

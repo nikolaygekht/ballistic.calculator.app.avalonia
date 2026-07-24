@@ -213,8 +213,10 @@ public class TrajectoryToReticleCalculatorTests
         {
             Step = new Measurement<DistanceUnit>(2.5, DistanceUnit.Meter),
             MaximumDistance = new Measurement<DistanceUnit>(1500, DistanceUnit.Meter),
-            SightAngle = calc.SightAngle(ammo, weapon, atmosphere),
         };
+
+        var zeroParams = calc.CalculateZeroParameters(ammo, atmosphere, weapon, weapon.Zero);
+        shotParams.Apply(zeroParams);
 
         var trajectory = calc.Calculate(ammo, weapon, atmosphere, shotParams);
         // Trim nulls

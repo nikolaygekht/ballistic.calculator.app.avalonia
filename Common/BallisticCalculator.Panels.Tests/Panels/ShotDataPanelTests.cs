@@ -93,8 +93,8 @@ public class ShotDataPanelTests
         var result = panel.ShotData;
 
         result.Should().NotBeNull();
-        result!.Weapon!.Zero.Ammunition.Should().NotBeNull();
-        result.Weapon.Zero.Ammunition!.Weight.In(WeightUnit.Grain).Should().BeApproximately(150, 0.5);
+        result!.Zeroing!.Ammunition.Should().NotBeNull();
+        result.Zeroing.Ammunition!.Weight.In(WeightUnit.Grain).Should().BeApproximately(150, 0.5);
     }
 
     [AvaloniaFact]
@@ -112,8 +112,44 @@ public class ShotDataPanelTests
         var result = panel.ShotData;
 
         result.Should().NotBeNull();
-        result!.Weapon!.Zero.Atmosphere.Should().NotBeNull();
-        result.Weapon.Zero.Atmosphere!.Temperature.In(TemperatureUnit.Celsius).Should().BeApproximately(25, 0.5);
+        result!.Zeroing!.Atmosphere.Should().NotBeNull();
+        result.Zeroing.Atmosphere!.Temperature.In(TemperatureUnit.Celsius).Should().BeApproximately(25, 0.5);
+    }
+
+    [AvaloniaFact]
+    public void ShotData_SetAndGet_WithFullZeroing_ShouldRoundTrip()
+    {
+        var panel = new ShotDataPanel();
+        var data = CreateMinimalShotData();
+        // Offsets are entered on the Rifle panel and carried in Weapon.Zero.
+        data.Weapon!.Zero.VerticalOffset = new Measurement<DistanceUnit>(20, DistanceUnit.Millimeter);
+        data.Weapon.Zero.HorizontalOffset = new Measurement<DistanceUnit>(10, DistanceUnit.Millimeter);
+        data.Zeroing = new ZeroingData
+        {
+            Distance = data.Weapon.Zero.Distance,
+            VerticalOffset = data.Weapon.Zero.VerticalOffset,
+            HorizontalOffset = data.Weapon.Zero.HorizontalOffset,
+            Wind = new Wind()
+            {
+                Velocity = new Measurement<VelocityUnit>(4, VelocityUnit.MetersPerSecond),
+                Direction = new Measurement<AngularUnit>(90, AngularUnit.Degree),
+            },
+            ShotAngle = new Measurement<AngularUnit>(2, AngularUnit.Mil),
+        };
+
+        panel.ShotData = data;
+        var result = panel.ShotData;
+
+        result.Should().NotBeNull();
+        result!.Zeroing.Should().NotBeNull();
+        result.Zeroing!.HorizontalOffset!.Value.In(DistanceUnit.Millimeter).Should().BeApproximately(10, 0.5);
+        result.Zeroing.VerticalOffset!.Value.In(DistanceUnit.Millimeter).Should().BeApproximately(20, 0.5);
+        result.Zeroing.Wind.Should().NotBeNull();
+        result.Zeroing.Wind!.Velocity.In(VelocityUnit.MetersPerSecond).Should().BeApproximately(4, 0.5);
+        result.Zeroing.ShotAngle.Should().NotBeNull();
+        result.Zeroing.ShotAngle!.Value.In(AngularUnit.Mil).Should().BeApproximately(2, 0.05);
+        // Weapon carries sight + rifling, not the zeroing wind / shot angle.
+        result.Weapon.Should().NotBeNull();
     }
 
     [AvaloniaFact]

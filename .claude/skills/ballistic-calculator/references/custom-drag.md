@@ -3,8 +3,8 @@
 For anything beyond the standard `G1..RA4` curves — a measured/custom drag table, a radar `.drg`
 file, or a multi-BC (BC-vs-Mach) profile. Standard curves come from `DragTable.Get(DragTableId.G7)`
 and are applied automatically when the BC names a standard table; the techniques here all use table
-id **`GC`** and require passing the `DragTable` instance to **both** `SightAngle` and `Calculate`
-(there is no `DragTable.Get(GC)` — it throws).
+id **`GC`** and require passing the `DragTable` instance to **both** `CalculateZeroParameters` and
+`Calculate` (there is no `DragTable.Get(GC)` — it throws).
 
 ## A. A custom drag table in code
 ```csharp
@@ -22,14 +22,14 @@ class MyDrag : DragTable
 
 var table = new MyDrag();
 var ammo  = new Ammunition(weight, new BallisticCoefficient(0.5, DragTableId.GC), muzzleVelocity);
-shot.SightAngle = calc.SightAngle(ammo, rifle, atmosphere, table);
+shot.Apply(calc.CalculateZeroParameters(ammo, atmosphere, rifle, rifle.Zero, dragTable: table));
 var traj = calc.Calculate(ammo, rifle, atmosphere, shot, null, table);
 ```
 
 ## B. A radar `.drg` file
 ```csharp
 DrgDragTable table = DrgDragTable.Open("308-168gr.drg");   // also Open(Stream)
-// use `table` exactly like the custom table above (pass to SightAngle and Calculate)
+// use `table` exactly like the custom table above (pass to CalculateZeroParameters and Calculate)
 table.Save("copy.drg");                                    // also Save(Stream)
 ```
 
@@ -70,7 +70,7 @@ var ammo = new Ammunition(
     weight: new Measurement<WeightUnit>(220, WeightUnit.Grain),
     ballisticCoefficient: new BallisticCoefficient(1.0, DragTableId.GC),
     muzzleVelocity: new Measurement<VelocityUnit>(2600, VelocityUnit.FeetPerSecond));
-shot.SightAngle = calc.SightAngle(ammo, rifle, atmosphere, table);
+shot.Apply(calc.CalculateZeroParameters(ammo, atmosphere, rifle, rifle.Zero, dragTable: table));
 var traj = calc.Calculate(ammo, rifle, atmosphere, shot, null, table);
 ```
 

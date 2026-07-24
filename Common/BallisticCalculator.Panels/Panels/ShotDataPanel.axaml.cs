@@ -43,6 +43,7 @@ public partial class ShotDataPanel : UserControl
             RifleSubPanel.MeasurementSystem = value;
             ZeroAmmoSubPanel.MeasurementSystem = value;
             ZeroAtmosphereSubPanel.MeasurementSystem = value;
+            ZeroWindSubPanel.MeasurementSystem = value;
             ParametersSubPanel.MeasurementSystem = value;
         }
     }
@@ -59,10 +60,6 @@ public partial class ShotDataPanel : UserControl
             if (ammoEntry == null || atmosphere == null || rifle == null || parameters == null)
                 return null;
 
-            // Combine zero ammo/atmosphere into rifle's zeroing parameters
-            rifle.Zero.Ammunition = ZeroAmmoSubPanel.Ammunition;
-            rifle.Zero.Atmosphere = ZeroAtmosphereSubPanel.Atmosphere;
-
             return new ShotData()
             {
                 Ammunition = ammoEntry,
@@ -70,6 +67,7 @@ public partial class ShotDataPanel : UserControl
                 Atmosphere = atmosphere,
                 Winds = WindSubPanel.Winds,
                 Parameters = parameters,
+                Zeroing = BuildZeroing(rifle),
             };
         }
         set
@@ -83,23 +81,46 @@ public partial class ShotDataPanel : UserControl
             AmmoLibPanel.LibraryEntry = value.Ammunition;
             AtmosphereSubPanel.Atmosphere = value.Atmosphere;
             WindSubPanel.Winds = value.Winds;
-            ParametersSubPanel.Parameters = value.Parameters;
 
             if (value.Weapon != null)
             {
-                // Extract zero ammo/atmosphere before setting rifle
-                ZeroAmmoSubPanel.Ammunition = value.Weapon.Zero?.Ammunition;
-                ZeroAtmosphereSubPanel.Atmosphere = value.Weapon.Zero?.Atmosphere;
-                RifleSubPanel.Rifle = value.Weapon;
+                // Zeroing is the source of truth; fall back to Weapon.Zero for older data.
+                var zeroing = value.Zeroing;
+                ZeroAmmoSubPanel.Ammunition = zeroing?.Ammunition ?? value.Weapon.Zero?.Ammunition;
+                ZeroAtmosphereSubPanel.Atmosphere = zeroing?.Atmosphere ?? value.Weapon.Zero?.Atmosphere;
+                ZeroWindSubPanel.Wind = zeroing?.Wind;
+                RifleSubPanel.Rifle = value.Weapon;           // distance + V/H offsets from Weapon.Zero
+                RifleSubPanel.ZeroShotAngle = zeroing?.ShotAngle;
             }
             else
             {
                 RifleSubPanel.Rifle = null;
                 ZeroAmmoSubPanel.Ammunition = null;
                 ZeroAtmosphereSubPanel.Atmosphere = null;
+                ZeroWindSubPanel.Clear();
             }
+
+            // Parameters must be set AFTER the rifle: V/H clicks are converted to angles using
+            // the sight's click sizes, which come from the RiflePanel.
+            ParametersSubPanel.Parameters = value.Parameters;
         }
     }
+
+    /// <summary>
+    /// Assemble the full <see cref="ZeroingData"/> from the zeroing-related sub-panels. Distance and
+    /// V/H offsets come from the rifle's zero (entered on the Rifle panel); ammo/atmosphere/wind/shot
+    /// angle from their dedicated panels.
+    /// </summary>
+    private ZeroingData BuildZeroing(Rifle rifle) => new()
+    {
+        Distance = rifle.Zero.Distance,
+        Ammunition = ZeroAmmoSubPanel.Ammunition,
+        Atmosphere = ZeroAtmosphereSubPanel.Atmosphere,
+        VerticalOffset = rifle.Zero.VerticalOffset,
+        HorizontalOffset = rifle.Zero.HorizontalOffset,
+        Wind = ZeroWindSubPanel.Wind,
+        ShotAngle = RifleSubPanel.ZeroShotAngle,
+    };
 
     #endregion
 
@@ -140,11 +161,6 @@ public partial class ShotDataPanel : UserControl
             if (RifleSubPanel.IsEmpty) emptyPanels.Add("Rifle");
             else incompletePanels.Add("Rifle");
         }
-        else
-        {
-            rifle.Zero.Ammunition = ZeroAmmoSubPanel.Ammunition;
-            rifle.Zero.Atmosphere = ZeroAtmosphereSubPanel.Atmosphere;
-        }
 
         var parameters = ParametersSubPanel.Parameters;
         if (parameters == null)
@@ -160,6 +176,7 @@ public partial class ShotDataPanel : UserControl
             Atmosphere = atmosphere,
             Winds = WindSubPanel.Winds,
             Parameters = parameters,
+            Zeroing = rifle == null ? null : BuildZeroing(rifle),
         };
 
         return (shotData, emptyPanels, incompletePanels);
@@ -173,6 +190,7 @@ public partial class ShotDataPanel : UserControl
         RifleSubPanel.Clear();
         ZeroAmmoSubPanel.Clear();
         ZeroAtmosphereSubPanel.Clear();
+        ZeroWindSubPanel.Clear();
         ParametersSubPanel.Clear();
     }
 
@@ -193,6 +211,7 @@ public partial class ShotDataPanel : UserControl
         RifleSubPanel.Changed += OnChildChanged;
         ZeroAmmoSubPanel.Changed += OnChildChanged;
         ZeroAtmosphereSubPanel.Changed += OnChildChanged;
+        ZeroWindSubPanel.Changed += OnChildChanged;
         ParametersSubPanel.Changed += OnChildChanged;
     }
 

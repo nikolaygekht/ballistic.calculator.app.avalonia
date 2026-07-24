@@ -15,5 +15,8 @@
         <TabItem Header="Reticle">
             <panels:ReticlePanel x:Name="ReticleControl" />
         </TabItem>
+        <TabItem Header="Summary">
+            <panels:SummaryPanel x:Name="SummaryControl" />
+        </TabItem>
     </TabControl>
 </UserControl>

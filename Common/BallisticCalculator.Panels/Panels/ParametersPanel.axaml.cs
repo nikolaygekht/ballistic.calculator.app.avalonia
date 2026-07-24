@@ -3,7 +3,6 @@ using Avalonia.Interactivity;
 using BallisticCalculator.Types;
 using Gehtsoft.Measurements;
 using System;
-using System.Globalization;
 
 namespace BallisticCalculator.Panels.Panels;
 
@@ -35,7 +34,7 @@ public partial class ParametersPanel : UserControl
     }
 
     /// <summary>
-    /// Reference to the RiflePanel for angle-as-clicks calculation.
+    /// Reference to the RiflePanel, used to convert V/H clicks to an angle via the sight's click sizes.
     /// </summary>
     public RiflePanel? RiflePanel { get; set; }
 
@@ -64,6 +63,33 @@ public partial class ParametersPanel : UserControl
                     parms.ShotAngle = angle.Value;
             }
 
+            // Dialed clicks -> angular adjustment (needs the sight's click size). These are
+            // passed separately from the shot angle and accumulate on top of the zero.
+            parms.ShotDropAdjustment = ClicksToAngle((double)(VClicksControl.Value ?? 0), RiflePanel?.VerticalClick);
+            parms.ShotWindageAdjustment = ClicksToAngle((double)(HClicksControl.Value ?? 0), RiflePanel?.HorizontalClick);
+
+            // Coriolis / Eötvös inputs, only when enabled.
+            if (CoriolisCheckBox.IsChecked == true)
+            {
+                if (!AzimuthControl.IsEmpty)
+                {
+                    var azimuth = AzimuthControl.GetValue<AngularUnit>();
+                    if (azimuth != null)
+                        parms.BarrelAzimuth = azimuth.Value;
+                }
+
+                // Latitude magnitude (0-90) + N/S hemisphere -> signed degrees (North +, South -).
+                double latMagnitude = 0;
+                if (!LatitudeControl.IsEmpty)
+                {
+                    var latitude = LatitudeControl.GetValue<AngularUnit>();
+                    if (latitude != null)
+                        latMagnitude = latitude.Value.In(AngularUnit.Degree);
+                }
+                var south = LatitudeHemisphere.SelectedIndex == 1;
+                parms.Latitude = new Measurement<AngularUnit>(south ? -latMagnitude : latMagnitude, AngularUnit.Degree);
+            }
+
             return parms;
         }
         set
@@ -81,6 +107,45 @@ public partial class ParametersPanel : UserControl
                 AngleControl.SetValue(value.ShotAngle.Value);
             else
                 AngleControl.Value = null;
+
+            VClicksControl.Value = AngleToClicks(value.ShotDropAdjustment, RiflePanel?.VerticalClick);
+            HClicksControl.Value = AngleToClicks(value.ShotWindageAdjustment, RiflePanel?.HorizontalClick);
+
+            if (value.BarrelAzimuth.HasValue || value.Latitude.HasValue)
+            {
+                CoriolisCheckBox.IsChecked = true;
+
+                if (value.BarrelAzimuth.HasValue)
+                {
+                    AzimuthControl.SetValue(value.BarrelAzimuth.Value);
+                    AzimuthIndicator.Direction = value.BarrelAzimuth.Value.In(AngularUnit.Degree);
+                }
+                else
+                {
+                    AzimuthControl.Value = null;
+                    AzimuthIndicator.Direction = 0;
+                }
+
+                if (value.Latitude.HasValue)
+                {
+                    var latDegrees = value.Latitude.Value.In(AngularUnit.Degree);
+                    LatitudeControl.SetValue(new Measurement<AngularUnit>(Math.Abs(latDegrees), AngularUnit.Degree));
+                    LatitudeHemisphere.SelectedIndex = latDegrees < 0 ? 1 : 0;
+                }
+                else
+                {
+                    LatitudeControl.Value = null;
+                    LatitudeHemisphere.SelectedIndex = 0;
+                }
+            }
+            else
+            {
+                CoriolisCheckBox.IsChecked = false;
+                AzimuthControl.Value = null;
+                AzimuthIndicator.Direction = 0;
+                LatitudeControl.Value = null;
+                LatitudeHemisphere.SelectedIndex = 0;
+            }
         }
     }
 
@@ -105,8 +170,21 @@ public partial class ParametersPanel : UserControl
         StepControl.Increment = 10;
 
         AngleControl.UnitType = typeof(AngularUnit);
-        AngleControl.Increment = 0.1;
-        AngleControl.ChangeUnit(AngularUnit.Mil, 2, false);
+        AngleControl.Increment = 1;
+        AngleControl.ChangeUnit(AngularUnit.Degree, 1, false);
+
+        AzimuthControl.UnitType = typeof(AngularUnit);
+        AzimuthControl.Minimum = 0;
+        AzimuthControl.Maximum = 360;
+        AzimuthControl.Increment = 1;
+        AzimuthControl.ChangeUnit(AngularUnit.Degree, 1, false);
+
+        LatitudeControl.UnitType = typeof(AngularUnit);
+        LatitudeControl.Minimum = 0;
+        LatitudeControl.Maximum = 90;
+        LatitudeControl.Increment = 1;
+        LatitudeControl.ChangeUnit(AngularUnit.Degree, 1, false);
+        // LatitudeHemisphere (N/S ComboBox) is configured in XAML.
     }
 
     private void WireEvents()
@@ -114,7 +192,25 @@ public partial class ParametersPanel : UserControl
         MaxRangeControl.Changed += (s, e) => Changed?.Invoke(this, EventArgs.Empty);
         StepControl.Changed += (s, e) => Changed?.Invoke(this, EventArgs.Empty);
         AngleControl.Changed += (s, e) => Changed?.Invoke(this, EventArgs.Empty);
-        ClicksSetButton.Click += OnClicksSetClick;
+        VClicksControl.ValueChanged += (s, e) => Changed?.Invoke(this, EventArgs.Empty);
+        HClicksControl.ValueChanged += (s, e) => Changed?.Invoke(this, EventArgs.Empty);
+
+        AzimuthControl.Changed += (s, e) =>
+        {
+            var az = AzimuthControl.IsEmpty ? null : AzimuthControl.GetValue<AngularUnit>();
+            if (az != null)
+                AzimuthIndicator.Direction = az.Value.In(AngularUnit.Degree);
+            Changed?.Invoke(this, EventArgs.Empty);
+        };
+        AzimuthIndicator.Changed += (s, e) =>
+        {
+            AzimuthControl.SetValue(new Measurement<AngularUnit>(AzimuthIndicator.Direction, AngularUnit.Degree));
+            Changed?.Invoke(this, EventArgs.Empty);
+        };
+
+        LatitudeControl.Changed += (s, e) => Changed?.Invoke(this, EventArgs.Empty);
+        LatitudeHemisphere.SelectionChanged += (s, e) => Changed?.Invoke(this, EventArgs.Empty);
+        CoriolisCheckBox.IsCheckedChanged += OnCoriolisChanged;
     }
 
     #endregion
@@ -134,7 +230,7 @@ public partial class ParametersPanel : UserControl
             MaxRangeControl.ChangeUnit(DistanceUnit.Yard, 0, convert);
             StepControl.ChangeUnit(DistanceUnit.Yard, 0, convert);
         }
-        // Angle units are NOT affected by measurement system switch
+        // Angle units (shot angle, azimuth, latitude) are NOT affected by measurement system switch
     }
 
     #endregion
@@ -146,38 +242,48 @@ public partial class ParametersPanel : UserControl
         MaxRangeControl.Value = null;
         StepControl.Value = null;
         AngleControl.Value = null;
-        ClicksTextBox.Text = "";
+        VClicksControl.Value = 0;
+        HClicksControl.Value = 0;
+        CoriolisCheckBox.IsChecked = false;
+        AzimuthControl.Value = null;
+        AzimuthIndicator.Direction = 0;
+        LatitudeControl.Value = null;
+        LatitudeHemisphere.SelectedIndex = 0;
     }
 
-    /// <summary>
-    /// Calculate shot angle from clicks using RiflePanel's vertical click value.
-    /// </summary>
-    public void SetAngleFromClicks()
+    #endregion
+
+    #region Private Methods
+
+    /// <summary>Convert a click count to an angular adjustment using the sight's click size.</summary>
+    private static Measurement<AngularUnit>? ClicksToAngle(double clicks, Measurement<AngularUnit>? clickSize)
     {
-        var vClick = RiflePanel?.VerticalClick;
-        if (vClick == null)
-            return;
+        if (clicks == 0 || clickSize == null)
+            return null;
+        return new Measurement<AngularUnit>(clickSize.Value.Value * clicks, clickSize.Value.Unit);
+    }
 
-        var text = ClicksTextBox.Text?.Trim();
-        if (string.IsNullOrEmpty(text))
-            return;
-
-        if (!double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var clicks))
-            return;
-
-        var angle = new Measurement<AngularUnit>(
-            vClick.Value.Value * clicks,
-            vClick.Value.Unit);
-        AngleControl.SetValue(angle);
+    /// <summary>Convert an angular adjustment back to a (rounded) click count using the sight's click size.</summary>
+    private static decimal AngleToClicks(Measurement<AngularUnit>? adjustment, Measurement<AngularUnit>? clickSize)
+    {
+        if (adjustment == null || clickSize == null || clickSize.Value.Value == 0)
+            return 0;
+        var clicks = Math.Round(adjustment.Value.In(clickSize.Value.Unit) / clickSize.Value.Value);
+        return (decimal)clicks;
     }
 
     #endregion
 
     #region Event Handlers
 
-    private void OnClicksSetClick(object? sender, RoutedEventArgs e)
+    private void OnCoriolisChanged(object? sender, RoutedEventArgs e)
     {
-        SetAngleFromClicks();
+        var enabled = CoriolisCheckBox.IsChecked == true;
+        AzimuthControl.IsEnabled = enabled;
+        AzimuthIndicator.IsEnabled = enabled;
+        LatitudeControl.IsEnabled = enabled;
+        LatitudeHemisphere.IsEnabled = enabled;
+        Changed?.Invoke(this, EventArgs.Empty);
     }
 
     #endregion

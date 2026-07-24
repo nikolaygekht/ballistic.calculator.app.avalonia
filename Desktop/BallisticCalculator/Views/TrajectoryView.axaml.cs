@@ -34,6 +34,7 @@ public partial class TrajectoryView : UserControl, ITrajectoryChildWindow
             TableControl.MeasurementSystem = value;
             ChartControl.MeasurementSystem = value;
             ReticleControl.MeasurementSystem = value;
+            SummaryControl.MeasurementSystem = value;
         }
     }
 
@@ -45,6 +46,7 @@ public partial class TrajectoryView : UserControl, ITrajectoryChildWindow
             _angularUnits = value;
             TableControl.AngularUnits = value;
             ChartControl.AngularUnits = value;
+            SummaryControl.AngularUnits = value;
         }
     }
 
@@ -77,6 +79,7 @@ public partial class TrajectoryView : UserControl, ITrajectoryChildWindow
             _shotData = value;
             UpdateClickValues();
             ReticleControl.ShotData = value;
+            SummaryControl.ShotData = value;
         }
     }
 
@@ -97,6 +100,12 @@ public partial class TrajectoryView : UserControl, ITrajectoryChildWindow
                 TableControl.Clear();
                 ChartControl.ClearTrajectories();
             }
+
+            // Build the shared fine trajectory once (ShotData is complete by now) and hand it to
+            // both the reticle (BDC marks) and the summary analysis (dead zone / subsonic).
+            var fine = ShotTrajectoryCalculator.CalculateFine(_shotData);
+            ReticleControl.FineTrajectory = fine;
+            SummaryControl.Trajectory = fine;
         }
     }
 
@@ -130,6 +139,9 @@ public partial class TrajectoryView : UserControl, ITrajectoryChildWindow
         ChartControl.DropBase = _dropBase;
 
         ReticleControl.MeasurementSystem = _measurementSystem;
+
+        SummaryControl.MeasurementSystem = _measurementSystem;
+        SummaryControl.AngularUnits = _angularUnits;
     }
 
     private void UpdateClickValues()

@@ -33,7 +33,19 @@ public class TrajectoryFormShotData
     [BXmlProperty(Name = "ammunition", ChildElement = true)]
     public AmmunitionLibraryEntry? Ammunition { get; set; }
 
-    [BXmlProperty(Name = "weapon", ChildElement = true)]
+    // The rifle is now stored as sight + rifling only; all zeroing lives in the <zeroing> element.
+    [BXmlProperty(Name = "sight", ChildElement = true, Optional = true)]
+    public Sight? Sight { get; set; }
+
+    [BXmlProperty(Name = "rifling", ChildElement = true, Optional = true)]
+    public Rifling? Rifling { get; set; }
+
+    [BXmlProperty(Name = "zeroing", ChildElement = true, Optional = true)]
+    public ZeroingData? Zeroing { get; set; }
+
+    // Legacy: older files stored the full rifle (incl. zeroing) in <weapon>. Read-only migration
+    // path — never written on save (see FromShotData).
+    [BXmlProperty(Name = "weapon", ChildElement = true, Optional = true)]
     public Rifle? Weapon { get; set; }
 
     [BXmlProperty(Name = "atmosphere", ChildElement = true)]
@@ -57,7 +69,9 @@ public class TrajectoryFormShotData
         return new TrajectoryFormShotData
         {
             Ammunition = data.Ammunition,
-            Weapon = data.Weapon,
+            Sight = data.Weapon?.Sight,
+            Rifling = data.Weapon?.Rifling,
+            Zeroing = data.Zeroing,
             Atmosphere = data.Atmosphere,
             Wind = winds,
             Parameters = data.Parameters,
@@ -66,13 +80,48 @@ public class TrajectoryFormShotData
 
     public ShotData ToShotData()
     {
+        Rifle? weapon;
+        ZeroingData? zeroing;
+
+        if (Zeroing != null)
+        {
+            zeroing = Zeroing;
+            var zeroParams = new ZeroingParameters(
+                    Zeroing.Distance ?? Measurement<DistanceUnit>.ZERO,
+                    Zeroing.Ammunition, Zeroing.Atmosphere)
+            {
+                VerticalOffset = Zeroing.VerticalOffset,
+                HorizontalOffset = Zeroing.HorizontalOffset,
+            };
+            weapon = Sight == null ? null : new Rifle(Sight, zeroParams, Rifling);
+        }
+        else if (Weapon != null)
+        {
+            // Legacy file: zeroing was stored inside <weapon> (no wind / shot angle existed).
+            weapon = Weapon;
+            zeroing = new ZeroingData
+            {
+                Distance = Weapon.Zero.Distance,
+                Ammunition = Weapon.Zero.Ammunition,
+                Atmosphere = Weapon.Zero.Atmosphere,
+                VerticalOffset = Weapon.Zero.VerticalOffset,
+                HorizontalOffset = Weapon.Zero.HorizontalOffset,
+            };
+        }
+        else
+        {
+            weapon = null;
+            zeroing = null;
+        }
+
         return new ShotData
         {
             Ammunition = Ammunition,
-            Weapon = Weapon,
+            Weapon = weapon,
             Atmosphere = Atmosphere,
             Winds = Wind?.ToArray(),
             Parameters = Parameters,
+            Zeroing = zeroing,
         };
     }
 }

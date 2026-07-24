@@ -32,8 +32,9 @@ using BallisticCalculator;
 using Gehtsoft.Measurements;
 ```
 
-The workflow is always: **(1)** describe the ammunition, rifle, and atmosphere → **(2)** compute
-the sight (zero) angle → **(3)** call `Calculate` → **(4)** read the returned `TrajectoryPoint[]`.
+The workflow is always: **(1)** describe the ammunition, rifle, and atmosphere → **(2)** compute the
+zero (sight) correction with `CalculateZeroParameters` and `Apply` it to the `ShotParameters` →
+**(3)** call `Calculate` → **(4)** read the returned `TrajectoryPoint[]`.
 
 ---
 
@@ -149,12 +150,18 @@ var shot = new ShotParameters
 {
     Step            = new Measurement<DistanceUnit>(100, DistanceUnit.Yard),  // row spacing
     MaximumDistance = new Measurement<DistanceUnit>(1000, DistanceUnit.Yard), // extent
-    SightAngle      = /* from TrajectoryCalculator.SightAngle — REQUIRED */,
     ShotAngle       = null,   // Measurement<AngularUnit>? line-of-sight incline, + up / - down
     CantAngle       = null,   // Measurement<AngularUnit>?
     BarrelAzimuth   = null,   // Measurement<AngularUnit>?
+    Latitude        = null,   // Measurement<AngularUnit>? shooter latitude (Coriolis); optional
 };
+// The zero (sight) correction is REQUIRED but not set by hand — compute it and copy it in
+// (see §3). Apply fills ZeroDropAdjustment / ZeroWindageAdjustment on the shot:
+shot.Apply(calc.CalculateZeroParameters(ammo, atmosphere, rifle, rifle.Zero));
 ```
+`Apply` sets the `ZeroDropAdjustment` / `ZeroWindageAdjustment` properties; the incline-adjusted
+`ShotDropAdjustment` / `ShotWindageAdjustment` are also exposed. There is no longer a `SightAngle`
+property.
 
 ---
 
@@ -163,21 +170,39 @@ var shot = new ShotParameters
 ```csharp
 public class TrajectoryCalculator
 {
-    // Zero angle for the rifle's zero distance. Pass dragTable only when the BC uses table GC.
-    Measurement<AngularUnit> SightAngle(Ammunition ammunition, Rifle rifle, Atmosphere atmosphere,
-                                        DragTable dragTable = null,
-                                        Measurement<DistanceUnit>? accuracy = null); // default 0.1 mm
+    // Compute the zero (sight) correction for the rifle's zero distance. `zero` is usually
+    // rifle.Zero. Pass dragTable only when the BC uses table GC. NOTE the argument order:
+    // atmosphere comes BEFORE rifle here (the opposite of Calculate).
+    ZeroCalculatedParameters CalculateZeroParameters(
+        Ammunition ammunition, Atmosphere atmosphere, Rifle rifle, ZeroingParameters zero,
+        ShotParameters shot = null, Wind[] wind = null, DragTable dragTable = null,
+        Measurement<DistanceUnit>? accuracy = null);   // accuracy default 0.1 mm
 
     TrajectoryPoint[] Calculate(Ammunition ammunition, Rifle rifle, Atmosphere atmosphere,
                                 ShotParameters shot, Wind[] wind = null, DragTable dragTable = null);
 
     Measurement<DistanceUnit> MaximumCalculationStepSize { get; set; } // default 10 cm
+    IntegrationMethod Integrator { get; set; }                         // Euler | MidpointRK2 (default)
     static Measurement<DistanceUnit> MaximumDrop  { get; }             // 10000 ft — stop condition
     static Measurement<VelocityUnit> MinimumVelocity { get; }          // 50 ft/s — stop condition
 }
+
+// Returned by CalculateZeroParameters; copy it into the shot with ShotParameters.Apply.
+public class ZeroCalculatedParameters
+{
+    Measurement<AngularUnit>  ZeroDropAdjustment    { get; }  // vertical sight correction
+    Measurement<AngularUnit>? ZeroWindageAdjustment { get; }  // horizontal, when computed
+}
 ```
 
-Always compute `SightAngle` first and assign it to `ShotParameters.SightAngle` before `Calculate`.
+Compute the zero correction first, `Apply` it to the `ShotParameters`, then call `Calculate`:
+
+```csharp
+var zero = calc.CalculateZeroParameters(ammo, atmosphere, rifle, rifle.Zero);
+shot.Apply(zero);   // sets shot.ZeroDropAdjustment (+ windage) — REQUIRED before Calculate
+var trajectory = calc.Calculate(ammo, rifle, atmosphere, shot);
+```
+
 `ShotAngle`, if set, is added to the barrel elevation inside `Calculate`.
 
 The result array can be **shorter** than `MaximumDistance/Step + 1`: the run stops early if velocity
@@ -235,8 +260,8 @@ var shot = new ShotParameters
 {
     MaximumDistance = new Measurement<DistanceUnit>(1000, DistanceUnit.Yard),
     Step = new Measurement<DistanceUnit>(100, DistanceUnit.Yard),
-    SightAngle = calc.SightAngle(ammo, rifle, atmosphere),
 };
+shot.Apply(calc.CalculateZeroParameters(ammo, atmosphere, rifle, rifle.Zero));
 
 TrajectoryPoint[] trajectory = calc.Calculate(ammo, rifle, atmosphere, shot);
 ```
@@ -278,8 +303,8 @@ var shot = new ShotParameters
 {
     MaximumDistance = new Measurement<DistanceUnit>(1000, DistanceUnit.Yard),
     Step = new Measurement<DistanceUnit>(100, DistanceUnit.Yard),
-    SightAngle = calc.SightAngle(ammo, rifle, atmosphere),
 };
+shot.Apply(calc.CalculateZeroParameters(ammo, atmosphere, rifle, rifle.Zero));
 var trajectory = calc.Calculate(ammo, rifle, atmosphere, shot, wind);
 ```
 
@@ -296,7 +321,7 @@ copy-pasteable recipes for all three (`DragTable` subclass, `DrgDragTable.Open`,
 this API from memory or hand-roll a drag table — the helpers exist and the reference has them.
 
 All three techniques use table id **`GC`** and require passing the `DragTable` instance to **both**
-`SightAngle` and `Calculate` (`DragTable.Get(GC)` throws — you supply the instance).
+`CalculateZeroParameters` and `Calculate` (`DragTable.Get(GC)` throws — you supply the instance).
 
 ---
 
@@ -305,12 +330,16 @@ All three techniques use table id **`GC`** and require passing the `DragTable` i
 - **Humidity is a fraction 0..1**, not a percentage (0.5 = 50 %).
 - **Pressure** in the 4-argument `Atmosphere` constructor is the station pressure *at that altitude*;
   use the 5-argument overload with `pressureAtSeaLevel: true` to pass a sea-level value.
-- **`SightAngle` must be computed and assigned to `ShotParameters.SightAngle`** before `Calculate`.
+- **The zero correction must be applied before `Calculate`:** compute it with `CalculateZeroParameters`
+  and copy it into the shot via `ShotParameters.Apply(...)`. There is no `SightAngle` property anymore.
+- **Argument order differs between the two calls:** `CalculateZeroParameters(ammunition, atmosphere,
+  rifle, zero)` puts atmosphere before rifle, whereas `Calculate(ammunition, rifle, atmosphere, shot)`
+  puts rifle before atmosphere. Easy to transpose.
 - **Windage sign:** left is positive, right is negative. **`Drop` at the muzzle = −sight height.**
 - **Spin drift** needs `Rifling` **and** `BulletDiameter` **and** `BulletLength`; otherwise windage is
   wind-only. It is folded into `Windage` (no separate value). Right twist drifts right, left drifts left.
-- **`GC` (custom) drag** requires passing the `DragTable` to **both** `SightAngle` and `Calculate`;
-  `DragTable.Get(DragTableId.GC)` throws — you must supply the instance.
+- **`GC` (custom) drag** requires passing the `DragTable` to **both** `CalculateZeroParameters` and
+  `Calculate`; `DragTable.Get(DragTableId.GC)` throws — you must supply the instance.
 - The returned array may contain **fewer rows** than requested (subsonic/steep runs stop early).
 - No aerodynamic (vertical wind) jump term is modelled; a pure crosswind affects windage, not drop.
 

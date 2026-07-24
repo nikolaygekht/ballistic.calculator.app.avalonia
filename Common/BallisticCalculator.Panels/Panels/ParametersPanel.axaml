@@ -32,9 +32,9 @@
 
     <Separator/>
 
-    <!-- Shot Angle -->
+    <!-- Shot Angle (line-of-sight incline) -->
     <Grid ColumnDefinitions="100,*">
-      <TextBlock Grid.Column="0" Text="Angle:"
+      <TextBlock Grid.Column="0" Text="Shot Angle:"
                  VerticalAlignment="Center"
                  FontSize="{DynamicResource AppFontSize}"/>
       <controls:MeasurementControl Grid.Column="1"
@@ -42,20 +42,78 @@
                  FontSize="{DynamicResource AppFontSize}"/>
     </Grid>
 
-    <!-- Angle as clicks -->
+    <!-- Vertical clicks dialed for the shot -->
     <Grid ColumnDefinitions="100,*">
-      <TextBlock Grid.Column="0" Text="As clicks:"
+      <TextBlock Grid.Column="0" Text="V-Clicks:"
                  VerticalAlignment="Center"
                  FontSize="{DynamicResource AppFontSize}"/>
-      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
-        <TextBox x:Name="ClicksTextBox" x:FieldModifier="internal"
-                 Width="80"
-                 TextAlignment="Right"
+      <NumericUpDown Grid.Column="1"
+                 x:Name="VClicksControl" x:FieldModifier="internal"
+                 HorizontalAlignment="Left" Width="120"
+                 Minimum="-200" Maximum="200" Increment="1" FormatString="0" Value="0"
                  FontSize="{DynamicResource AppFontSize}"/>
-        <Button x:Name="ClicksSetButton" x:FieldModifier="internal"
-                Content="Set"
-                FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <!-- Horizontal clicks dialed for the shot -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="H-Clicks:"
+                 VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <NumericUpDown Grid.Column="1"
+                 x:Name="HClicksControl" x:FieldModifier="internal"
+                 HorizontalAlignment="Left" Width="120"
+                 Minimum="-200" Maximum="200" Increment="1" FormatString="0" Value="0"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <Separator/>
+
+    <!-- Coriolis / Eötvös -->
+    <CheckBox x:Name="CoriolisCheckBox" x:FieldModifier="internal"
+              Content="Calculate Coriolis Effect"
+              FontSize="{DynamicResource AppFontSize}"/>
+
+    <Grid ColumnDefinitions="*,Auto">
+      <StackPanel Grid.Column="0" Spacing="4">
+
+        <!-- Azimuth (compass bearing of the line of fire, 0 = North) -->
+        <Grid ColumnDefinitions="100,*">
+          <TextBlock Grid.Column="0" Text="Azimuth:"
+                     VerticalAlignment="Center"
+                     FontSize="{DynamicResource AppFontSize}"/>
+          <controls:MeasurementControl Grid.Column="1"
+                     x:Name="AzimuthControl" x:FieldModifier="internal"
+                     IsEnabled="False"
+                     FontSize="{DynamicResource AppFontSize}"/>
+        </Grid>
+
+        <!-- Latitude (magnitude) with N/S hemisphere selector -->
+        <Grid ColumnDefinitions="100,*">
+          <TextBlock Grid.Column="0" Text="Latitude:"
+                     VerticalAlignment="Center"
+                     FontSize="{DynamicResource AppFontSize}"/>
+          <Grid Grid.Column="1" ColumnDefinitions="*,Auto">
+            <controls:MeasurementControl Grid.Column="0"
+                       x:Name="LatitudeControl" x:FieldModifier="internal"
+                       IsEnabled="False"
+                       FontSize="{DynamicResource AppFontSize}"/>
+            <ComboBox Grid.Column="1"
+                      x:Name="LatitudeHemisphere" x:FieldModifier="internal"
+                      Width="60" SelectedIndex="0" IsEnabled="False" Margin="4,0,0,0"
+                      FontSize="{DynamicResource AppFontSize}">
+              <ComboBoxItem>N</ComboBoxItem>
+              <ComboBoxItem>S</ComboBoxItem>
+            </ComboBox>
+          </Grid>
+        </Grid>
+
       </StackPanel>
+
+      <!-- Azimuth dial: arrow points shooter -> target, 0 = North (up) -->
+      <controls:AzimuthDirectionControl Grid.Column="1"
+                 x:Name="AzimuthIndicator" x:FieldModifier="internal"
+                 Width="80" Height="80" Margin="8,0,0,0"
+                 IsEnabled="False"/>
     </Grid>
 
   </StackPanel>
