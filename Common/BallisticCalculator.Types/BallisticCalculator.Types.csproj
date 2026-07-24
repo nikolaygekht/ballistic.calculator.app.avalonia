@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Gehtsoft.Measurements" Version="1.1.16" />
-    <PackageReference Include="BallisticCalculator" Version="1.1.7.1" />
+    <PackageReference Include="Gehtsoft.Measurements" Version="1.1.17" />
+    <PackageReference Include="BallisticCalculator" Version="1.1.11" />
   </ItemGroup>
 
 </Project>

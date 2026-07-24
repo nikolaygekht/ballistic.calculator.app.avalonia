@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RollForward>LatestMajor</RollForward>
+    <AssemblyName>depupdate</AssemblyName>
+    <RootNamespace>DependencyUpdater</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Official NuGet client libraries (bounded below the next major, per this tool's own policy). -->
+    <PackageReference Include="NuGet.Protocol" Version="[6.14.3,7)" />
+    <PackageReference Include="NuGet.Configuration" Version="[6.14.3,7)" />
+    <PackageReference Include="NuGet.Versioning" Version="[6.14.3,7)" />
+  </ItemGroup>
+
+</Project>
