@@ -11,9 +11,15 @@ Create a new version of the BallisticCalculator application using **Avalonia UI*
   - Provides generic `Measurement<T>` struct where T is a unit enum (DistanceUnit, VelocityUnit, WeightUnit, etc.)
   - Static method: `Measurement<T>.GetUnitNames()` returns `Tuple<T, string>[]` for populating unit lists
 
-- **BallisticCalculator**: Core ballistic calculation library located at `/mnt/d/develop/components/BusinessSpecificComponents/BallisticCalculator.Net/`
-  - Provides `BallisticCoefficient` struct and `DragTableId` enum
-  - Core ballistics calculation engine
+- **BallisticCalculator** (NuGet **1.1.11**, capped `[1.1.x,2)`): Core ballistic calculation library.
+  Source at `/mnt/d/develop/components/BusinessSpecificComponents/BallisticCalculator.Net/`.
+  - Provides `BallisticCoefficient` struct, `DragTableId` enum, and the calculation engine.
+  - **Zeroing API (1.1.11):** `SightAngle` was removed — compute the zero with
+    `TrajectoryCalculator.CalculateZeroParameters(...)` then `ShotParameters.Apply(zero)`. `ShotParameters`
+    also has `ShotDropAdjustment`/`ShotWindageAdjustment` (dialed clicks), `BarrelAzimuth`, `Latitude`.
+  - **`BallisticCalculator.Tools`** namespace: `PointBlankRange`, `MovingTargetLead`, `HitProbability`,
+    `RadarDragTableFactory`, `BallisticCoefficientConverter` (see the `ballistic-calculator` skill).
+  - Consult the `ballistic-calculator` skill before using this API; it reflects the 1.1.11 surface.
 
 ### Original Implementation
 - **Old WinForms Application**: `/mnt/d/develop/homeapps.projects/BallisticCalculator1/`
@@ -26,16 +32,34 @@ Create a new version of the BallisticCalculator application using **Avalonia UI*
 ```
 BallisticCalculator2/
 ├── Common/
-│   ├── BallisticCalculator.Controls/        # Shared UI controls library
-│   │   ├── Controls/                         # Custom controls (MeasurementControl, BallisticCoefficientControl)
-│   │   ├── Controllers/                      # Pure logic controllers (no UI dependencies)
-│   │   └── Models/                           # Data models (UnitItem, DragTableInfo)
-│   └── BallisticCalculator.Controls.Tests/  # xUnit tests for controls
+│   ├── BallisticCalculator.Types/            # Shared models + domain helpers (no UI)
+│   │   ├── ShotData, ZeroingData             # data models
+│   │   ├── ZeroingCalculator                 # ShotData -> library zeroing inputs / zero
+│   │   └── ShotTrajectoryCalculator          # single source of truth: ShotData -> trajectory
+│   ├── BallisticCalculator.Controls/         # Shared UI controls
+│   │   ├── Controls/                         # MeasurementControl, ReticleCanvasControl, AzimuthDirectionControl, ...
+│   │   ├── Controllers/                      # Pure logic (MeasurementController, SummaryController, ReticleOverlayController, ...)
+│   │   ├── Canvas/                           # SkiaReticleCanvas
+│   │   └── Models/                           # UnitItem, DragTableInfo, WindArrow
+│   ├── BallisticCalculator.Panels/           # Input/output panels (RiflePanel, ParametersPanel, SummaryPanel, ...)
+│   └── *.Tests/                              # xUnit + Avalonia.Headless
 ├── Desktop/
-│   ├── DebugApp/                             # Test/debug application for controls
-│   └── ReticleEditor/                        # Desktop-specific features
+│   ├── BallisticCalculator/                  # Main app (MDI, TrajectoryView, dialogs)
+│   ├── DebugApp/, DebugApp1/                 # Controls / panels test harnesses
+│   └── ReticleEditor/                        # Reticle editor
+├── Tools/
+│   └── DependencyUpdater/                     # `depupdate` CLI (bumps deps within version bounds)
 └── Mobile/                                    # (Future) Mobile-specific apps
 ```
+
+### Core domain helpers (`Common/BallisticCalculator.Types/`)
+
+- **`ShotTrajectoryCalculator`** — the ONLY place that turns a `ShotData` into a trajectory. `Calculate`
+  (display, uses configured step/max) and `CalculateFine` (2.5 m step, ≥1500 m). Table/chart use the
+  coarse trajectory; reticle + summary share one fine trajectory. Add new consumers here, don't
+  re-implement the calc.
+- **`ZeroingData`** owns all zeroing inputs (distance, zero ammo/atmosphere, V/H offsets, wind, shot
+  angle); `ZeroingCalculator.BuildInputs` converts it to the library `Rifle`/`ZeroingParameters`.
 
 ## Development Approach
 
