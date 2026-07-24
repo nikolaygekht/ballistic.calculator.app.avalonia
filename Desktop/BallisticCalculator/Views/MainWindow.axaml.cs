@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml;
 using Avalonia;
@@ -370,7 +371,7 @@ public partial class MainWindow : Window
         MenuWindowsCascade.Click += (_, _) => CascadeWindows();
 
         // Help
-        MenuHelpAbout.Click += (_, _) => { /* TODO: show About dialog */ };
+        MenuHelpAbout.Click += async (_, _) => await ShowAboutDialog();
     }
 
     private void SetAndUpdate(Action<IAppChildWindow> action)
@@ -496,6 +497,106 @@ public partial class MainWindow : Window
     private static void SetChecked(MenuItem item, bool isChecked)
     {
         item.Icon = isChecked ? "\u2713" : null;
+    }
+
+    private async Task ShowAboutDialog()
+    {
+        var assembly = typeof(MainWindow).Assembly;
+        var version = assembly.GetName().Version;
+        var versionText = version != null ? $"Version {version.Major}.{version.Minor}" : "Version 3.0";
+
+        var buildDate = assembly.GetCustomAttributes<System.Reflection.AssemblyMetadataAttribute>()
+            .FirstOrDefault(a => a.Key == "AssemblyDate")?.Value;
+        if (buildDate != null)
+            versionText += $" Build: {buildDate}";
+
+        var linkStyle = new Action<TextBlock>(tb =>
+        {
+            tb.Foreground = Avalonia.Media.Brushes.Blue;
+            tb.Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.Hand);
+            tb.TextDecorations = Avalonia.Media.TextDecorations.Underline;
+        });
+
+        var githubOldLink = new TextBlock { Text = "Github: Old Windows calculator" };
+        linkStyle(githubOldLink);
+        githubOldLink.PointerPressed += (_, _) => OpenUrl("https://github.com/nikolaygekht/ballistic.calculator.app");
+
+        var githubLink = new TextBlock { Text = "Github: Avalonia calculator" };
+        linkStyle(githubLink);
+        githubLink.PointerPressed += (_, _) => OpenUrl("https://github.com/nikolaygekht/ballistic.calculator.app.avalonia");
+
+        var gplLink = new TextBlock { Text = "GNU GPL 3.0 License" };
+        linkStyle(gplLink);
+        gplLink.PointerPressed += (_, _) => OpenUrl("https://www.gnu.org/licenses/gpl-3.0.html");
+
+        var gehtsoftLink = new TextBlock { Text = "gehtsoftusa.com" };
+        linkStyle(gehtsoftLink);
+        gehtsoftLink.PointerPressed += (_, _) => OpenUrl("https://gehtsoftusa.com/");
+
+        var trofimovLink = new TextBlock { Text = "Special thanks to Alexandre Trofimov (geladen.ch)" };
+        linkStyle(trofimovLink);
+        trofimovLink.PointerPressed += (_, _) => OpenUrl("https://geladen.ch/en/");
+
+        var libraryLink = new TextBlock { Text = "Github: Ballistic calculator library" };
+        linkStyle(libraryLink);
+        libraryLink.PointerPressed += (_, _) => OpenUrl("https://github.com/gehtsoft-usa/BallisticCalculator1");
+
+        var panel = new StackPanel
+        {
+            Margin = new Thickness(20),
+            Spacing = 6,
+            Children =
+            {
+                new TextBlock { Text = "Ballistic Calculator", FontSize = 18, FontWeight = Avalonia.Media.FontWeight.Bold },
+                new TextBlock { Text = versionText },
+                new Separator(),
+                new TextBlock { Text = "Copyright \u00a9 Nikolay Gekht" },
+                gplLink,
+                new Separator(),
+                new TextBlock { Text = "Based on Gehtsoft Ballistic Calculator package" },
+                gehtsoftLink,
+                libraryLink,
+                githubLink,
+                githubOldLink,
+                new Separator(),
+                trofimovLink,
+                new TextBlock { Text = "Special thanks to Gehtsoft USA LLC" },
+                new StackPanel
+                {
+                    Orientation = Avalonia.Layout.Orientation.Horizontal,
+                    HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+                    Margin = new Thickness(0, 10, 0, 0),
+                    Children =
+                    {
+                        new Button { Content = "OK", Width = 80 }
+                    }
+                }
+            }
+        };
+
+        var dialog = new Window
+        {
+            Title = "About Ballistic Calculator",
+            SizeToContent = SizeToContent.Height,
+            Width = 380,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            CanResize = false,
+            Content = panel,
+        };
+
+        var okButton = (Button)((StackPanel)panel.Children[^1]).Children[0];
+        okButton.Click += (_, _) => dialog.Close();
+
+        await dialog.ShowDialog(this);
+    }
+
+    private static void OpenUrl(string url)
+    {
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = url,
+            UseShellExecute = true,
+        });
     }
 
     #region File I/O
