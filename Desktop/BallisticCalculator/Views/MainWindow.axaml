@@ -96,6 +96,12 @@
                 </MenuItem>
             </MenuItem>
 
+            <!-- Tools Menu -->
+            <MenuItem Header="_Tools">
+                <MenuItem Header="Edit _Sights..." x:Name="MenuToolsEditSights" />
+                <MenuItem Header="Edit _Barrels..." x:Name="MenuToolsEditBarrels" />
+            </MenuItem>
+
             <!-- Windows Menu -->
             <MenuItem Header="_Windows" x:Name="MenuWindows">
                 <MenuItem Header="_Cascade" x:Name="MenuWindowsCascade"

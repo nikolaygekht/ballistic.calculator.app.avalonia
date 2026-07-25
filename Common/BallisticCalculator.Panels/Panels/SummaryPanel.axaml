@@ -7,8 +7,14 @@
              x:Class="BallisticCalculator.Panels.Panels.SummaryPanel">
 
   <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-    <Grid Margin="10" ColumnDefinitions="Auto,*"
-          RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+    <!-- Left-aligned compact block: the value column stays next to the labels no matter how wide
+         the tab is, instead of stretching the value to the far edge of the window. -->
+    <Grid Margin="10" HorizontalAlignment="Left"
+          RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="Auto" MinWidth="90"/>
+      </Grid.ColumnDefinitions>
 
       <SelectableTextBlock Grid.Row="0" Grid.Column="0" Text="Zero adjustment (vertical):" Margin="0,2,20,2"/>
       <SelectableTextBlock Grid.Row="0" Grid.Column="1" x:Name="ZeroVValue" x:FieldModifier="internal"
@@ -18,20 +24,28 @@
       <SelectableTextBlock Grid.Row="1" Grid.Column="1" x:Name="ZeroHValue" x:FieldModifier="internal"
                            HorizontalAlignment="Right" Margin="0,2" Text="n/a"/>
 
-      <SelectableTextBlock Grid.Row="2" Grid.Column="0" Text="Dead zone (bottom-aimed):" Margin="0,2,20,2"/>
-      <SelectableTextBlock Grid.Row="2" Grid.Column="1" x:Name="DeadZoneValue" x:FieldModifier="internal"
+      <SelectableTextBlock Grid.Row="2" Grid.Column="0" Text="Target size:" Margin="0,2,20,2"/>
+      <SelectableTextBlock Grid.Row="2" Grid.Column="1" x:Name="TargetSizeValue" x:FieldModifier="internal"
                            HorizontalAlignment="Right" Margin="0,2" Text="n/a"/>
 
-      <SelectableTextBlock Grid.Row="3" Grid.Column="0" Text="Near zero:" Margin="0,2,20,2"/>
-      <SelectableTextBlock Grid.Row="3" Grid.Column="1" x:Name="NearZeroValue" x:FieldModifier="internal"
+      <SelectableTextBlock Grid.Row="3" Grid.Column="0" Text="Dead zone (bottom-aimed):" Margin="0,2,20,2"/>
+      <SelectableTextBlock Grid.Row="3" Grid.Column="1" x:Name="DeadZoneValue" x:FieldModifier="internal"
                            HorizontalAlignment="Right" Margin="0,2" Text="n/a"/>
 
-      <SelectableTextBlock Grid.Row="4" Grid.Column="0" Text="Far zero:" Margin="0,2,20,2"/>
-      <SelectableTextBlock Grid.Row="4" Grid.Column="1" x:Name="FarZeroValue" x:FieldModifier="internal"
+      <SelectableTextBlock Grid.Row="4" Grid.Column="0" Text="Dead zone (center-aimed):" Margin="0,2,20,2"/>
+      <SelectableTextBlock Grid.Row="4" Grid.Column="1" x:Name="DeadZoneCenterValue" x:FieldModifier="internal"
                            HorizontalAlignment="Right" Margin="0,2" Text="n/a"/>
 
-      <SelectableTextBlock Grid.Row="5" Grid.Column="0" Text="Subsonic distance:" Margin="0,2,20,2"/>
-      <SelectableTextBlock Grid.Row="5" Grid.Column="1" x:Name="SubsonicValue" x:FieldModifier="internal"
+      <SelectableTextBlock Grid.Row="5" Grid.Column="0" Text="Near zero:" Margin="0,2,20,2"/>
+      <SelectableTextBlock Grid.Row="5" Grid.Column="1" x:Name="NearZeroValue" x:FieldModifier="internal"
+                           HorizontalAlignment="Right" Margin="0,2" Text="n/a"/>
+
+      <SelectableTextBlock Grid.Row="6" Grid.Column="0" Text="Far zero:" Margin="0,2,20,2"/>
+      <SelectableTextBlock Grid.Row="6" Grid.Column="1" x:Name="FarZeroValue" x:FieldModifier="internal"
+                           HorizontalAlignment="Right" Margin="0,2" Text="n/a"/>
+
+      <SelectableTextBlock Grid.Row="7" Grid.Column="0" Text="Subsonic distance:" Margin="0,2,20,2"/>
+      <SelectableTextBlock Grid.Row="7" Grid.Column="1" x:Name="SubsonicValue" x:FieldModifier="internal"
                            HorizontalAlignment="Right" Margin="0,2" Text="n/a"/>
 
     </Grid>

@@ -38,25 +38,18 @@
     <!-- Rifle -->
     <TabItem Header="Rifle">
       <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-        <StackPanel Margin="5" Spacing="4">
-          <panels:RiflePanel x:Name="RifleSubPanel" x:FieldModifier="internal"
-                             FontSize="{DynamicResource AppFontSize}"/>
+        <panels:RiflePanel x:Name="RifleSubPanel" x:FieldModifier="internal"
+                           Margin="5"
+                           FontSize="{DynamicResource AppFontSize}"/>
+      </ScrollViewer>
+    </TabItem>
 
-          <Separator Margin="0,4"/>
-
-          <panels:ZeroAmmoPanel x:Name="ZeroAmmoSubPanel" x:FieldModifier="internal"
-                                FontSize="{DynamicResource AppFontSize}"/>
-
-          <Separator Margin="0,4"/>
-
-          <panels:ZeroAtmospherePanel x:Name="ZeroAtmosphereSubPanel" x:FieldModifier="internal"
-                                      FontSize="{DynamicResource AppFontSize}"/>
-
-          <Separator Margin="0,4"/>
-
-          <panels:ZeroWindPanel x:Name="ZeroWindSubPanel" x:FieldModifier="internal"
-                                FontSize="{DynamicResource AppFontSize}"/>
-        </StackPanel>
+    <!-- Zero -->
+    <TabItem Header="Zero">
+      <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <panels:ZeroPanel x:Name="ZeroSubPanel" x:FieldModifier="internal"
+                          Margin="5"
+                          FontSize="{DynamicResource AppFontSize}"/>
       </ScrollViewer>
     </TabItem>
 

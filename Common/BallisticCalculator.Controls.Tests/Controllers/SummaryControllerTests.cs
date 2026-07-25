@@ -28,9 +28,13 @@ public class SummaryControllerTests
         var subYd = result.SubsonicDistance!.Value.In(DistanceUnit.Yard);
         subYd.Should().BeInRange(800, 1500);
 
-        // Point-blank corridor for a bottom-aimed 20" target.
-        result.DeadZone.Should().NotBeNull();
-        result.DeadZone!.Value.In(DistanceUnit.Yard).Should().BeGreaterThan(0);
+        // Point-blank corridor (dead zone) for a bottom-aimed 20" target, reported as a span.
+        result.TargetSize.Should().NotBeNull();
+        result.TargetSize!.Value.In(DistanceUnit.Inch).Should().BeApproximately(20, 0.01);
+        result.DeadZoneMin.Should().NotBeNull();
+        result.DeadZoneMax.Should().NotBeNull();
+        result.DeadZoneMax!.Value.In(DistanceUnit.Yard)
+            .Should().BeGreaterThan(result.DeadZoneMin!.Value.In(DistanceUnit.Yard));
         result.NearZero.Should().NotBeNull();
         result.FarZero.Should().NotBeNull();
         // Far zero is beyond near zero.
@@ -55,7 +59,8 @@ public class SummaryControllerTests
         var result = _controller.Compute(null, null, MeasurementSystem.Metric);
 
         result.ZeroVertical.Should().BeNull();
-        result.DeadZone.Should().BeNull();
+        result.DeadZoneMin.Should().BeNull();
+        result.DeadZoneMax.Should().BeNull();
         result.SubsonicDistance.Should().BeNull();
     }
 
@@ -74,6 +79,45 @@ public class SummaryControllerTests
         var firstSub = trajectory.Where(p => p != null && p.Mach < 1.0).Min(p => p!.Distance.In(DistanceUnit.Yard));
         distYd.Should().BeInRange(lastSuper, firstSub);
     }
+
+    [Fact]
+    public void FindLineOfSightCrossings_InterpolatesAscendingAndDescending()
+    {
+        // Drop (m) vs range (m): rises through 0 between 0 and 50, falls through 0 between 150 and 200.
+        var traj = new[]
+        {
+            Point(0, -0.05), Point(50, 0.03), Point(100, 0.05), Point(150, 0.02), Point(200, -0.04),
+        };
+
+        var (near, far) = SummaryController.FindLineOfSightCrossings(traj);
+
+        near.Should().NotBeNull();
+        near!.Value.In(DistanceUnit.Meter).Should().BeApproximately(31.25, 0.01);
+        far.Should().NotBeNull();
+        far!.Value.In(DistanceUnit.Meter).Should().BeApproximately(166.67, 0.01);
+    }
+
+    [Fact]
+    public void FindLineOfSightCrossings_NoDescentWithinPath_LeavesFarNull()
+    {
+        // The path rises through the line of sight but never comes back down within the given points.
+        var traj = new[] { Point(0, -0.05), Point(50, 0.03), Point(100, 0.10) };
+
+        var (near, far) = SummaryController.FindLineOfSightCrossings(traj);
+
+        near.Should().NotBeNull();
+        far.Should().BeNull();
+    }
+
+    private static TrajectoryPoint Point(double rangeMeters, double dropMeters) => new(
+        time: System.TimeSpan.FromSeconds(rangeMeters / 800.0),
+        distance: new Measurement<DistanceUnit>(rangeMeters, DistanceUnit.Meter),
+        velocity: new Measurement<VelocityUnit>(800, VelocityUnit.MetersPerSecond),
+        mach: 2.0,
+        drop: new Measurement<DistanceUnit>(dropMeters, DistanceUnit.Meter),
+        windage: Measurement<DistanceUnit>.ZERO,
+        energy: new Measurement<EnergyUnit>(1000, EnergyUnit.Joule),
+        optimalGameWeight: Measurement<WeightUnit>.ZERO);
 
     private static (ShotData, TrajectoryPoint[]) BuildScenario(double maxYards)
     {

@@ -60,7 +60,9 @@ public partial class SummaryPanel : UserControl
 
         ZeroVValue.Text = FormatAngular(result.ZeroVertical, units);
         ZeroHValue.Text = FormatAngular(result.ZeroHorizontal, units);
-        DeadZoneValue.Text = FormatRange(result.DeadZone, units);
+        TargetSizeValue.Text = FormatTargetSize(result.TargetSize);
+        DeadZoneValue.Text = FormatRangeSpan(result.DeadZoneMin, result.DeadZoneMax, units);
+        DeadZoneCenterValue.Text = FormatRangeSpan(result.DeadZoneCenterMin, result.DeadZoneCenterMax, units);
         NearZeroValue.Text = FormatRange(result.NearZero, units);
         FarZeroValue.Text = FormatRange(result.FarZero, units);
         SubsonicValue.Text = FormatRange(result.SubsonicDistance, units);
@@ -71,4 +73,21 @@ public partial class SummaryPanel : UserControl
 
     private static string FormatRange(Measurement<DistanceUnit>? value, MeasurementSystemController units)
         => value == null ? "n/a" : $"{units.FormatRange(value.Value)} {units.RangeUnitName}";
+
+    /// <summary>Formats the dead-zone corridor as a "near–far unit" span.</summary>
+    private static string FormatRangeSpan(Measurement<DistanceUnit>? min, Measurement<DistanceUnit>? max,
+        MeasurementSystemController units)
+        => min == null || max == null
+            ? "n/a"
+            : $"{units.FormatRange(min.Value)}–{units.FormatRange(max.Value)} {units.RangeUnitName}";
+
+    /// <summary>Formats the vital-zone target height in its own unit (in / mm).</summary>
+    private string FormatTargetSize(Measurement<DistanceUnit>? size)
+    {
+        if (size == null)
+            return "n/a";
+        return _measurementSystem == MeasurementSystem.Metric
+            ? $"{size.Value.In(DistanceUnit.Millimeter):0} mm"
+            : $"{size.Value.In(DistanceUnit.Inch):0.#} in";
+    }
 }

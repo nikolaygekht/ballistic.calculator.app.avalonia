@@ -215,34 +215,29 @@ public partial class MainWindow : Window
 
     private void OnRifleSetTestData(object? sender, RoutedEventArgs e)
     {
-        RifleTestPanel.Rifle = new Rifle(
-            new Sight(
-                new Measurement<DistanceUnit>(50, DistanceUnit.Millimeter),
-                new Measurement<AngularUnit>(0.25, AngularUnit.MOA),
-                new Measurement<AngularUnit>(0.25, AngularUnit.MOA)),
-            new ZeroingParameters(
-                new Measurement<DistanceUnit>(100, DistanceUnit.Meter),
-                null, null),
-            new Rifling(
-                new Measurement<DistanceUnit>(12, DistanceUnit.Inch),
-                TwistDirection.Right));
+        RifleTestPanel.Sight = new Sight(
+            new Measurement<DistanceUnit>(50, DistanceUnit.Millimeter),
+            new Measurement<AngularUnit>(0.25, AngularUnit.MOA),
+            new Measurement<AngularUnit>(0.25, AngularUnit.MOA));
+        RifleTestPanel.Rifling = new Rifling(
+            new Measurement<DistanceUnit>(12, DistanceUnit.Inch),
+            TwistDirection.Right);
     }
 
     private void OnRifleGetValues(object? sender, RoutedEventArgs e)
     {
-        var rifle = RifleTestPanel.Rifle;
-        if (rifle == null)
+        var sight = RifleTestPanel.Sight;
+        if (sight == null)
         {
-            RifleOutput.Text = "Rifle: null (incomplete data)";
+            RifleOutput.Text = "Sight: null (incomplete data)";
             return;
         }
 
-        RifleOutput.Text = $"Sight Height: {rifle.Sight.SightHeight}\n" +
-                           $"Zero Distance: {rifle.Zero.Distance}\n" +
-                           $"V Click: {rifle.Sight.VerticalClick?.ToString() ?? "not set"}\n" +
-                           $"H Click: {rifle.Sight.HorizontalClick?.ToString() ?? "not set"}\n" +
-                           $"Rifling: {(rifle.Rifling != null ? $"{rifle.Rifling.Direction} 1:{rifle.Rifling.RiflingStep}" : "not set")}\n" +
-                           $"V Offset: {rifle.Zero.VerticalOffset?.ToString() ?? "not set"}";
+        var rifling = RifleTestPanel.Rifling;
+        RifleOutput.Text = $"Sight Height: {sight.SightHeight}\n" +
+                           $"V Click: {sight.VerticalClick?.ToString() ?? "not set"}\n" +
+                           $"H Click: {sight.HorizontalClick?.ToString() ?? "not set"}\n" +
+                           $"Rifling: {(rifling != null ? $"{rifling.Direction} 1:{rifling.RiflingStep}" : "not set")}";
     }
 
     private void OnRifleClear(object? sender, RoutedEventArgs e)

@@ -388,14 +388,10 @@ public class ParametersPanelTests
     private static RiflePanel CreateRiflePanelWithClicks()
     {
         var riflePanel = new RiflePanel();
-        riflePanel.Rifle = new Rifle(
-            new Sight(
-                new Measurement<DistanceUnit>(50, DistanceUnit.Millimeter),
-                new Measurement<AngularUnit>(0.25, AngularUnit.MOA),
-                new Measurement<AngularUnit>(0.25, AngularUnit.MOA)),
-            new ZeroingParameters(
-                new Measurement<DistanceUnit>(100, DistanceUnit.Meter),
-                null, null));
+        riflePanel.Sight = new Sight(
+            new Measurement<DistanceUnit>(50, DistanceUnit.Millimeter),
+            new Measurement<AngularUnit>(0.25, AngularUnit.MOA),
+            new Measurement<AngularUnit>(0.25, AngularUnit.MOA));
         return riflePanel;
     }
 

@@ -367,11 +367,25 @@ public partial class MainWindow : Window
         MenuViewCompareAdd.Click += (_, _) => AddToCompare();
         MenuViewCompareRemoveLast.Click += (_, _) => RemoveLastFromCompare();
 
+        // Tools
+        MenuToolsEditSights.Click += async (_, _) => await ShowDictionaryEditor(isSights: true);
+        MenuToolsEditBarrels.Click += async (_, _) => await ShowDictionaryEditor(isSights: false);
+
         // Windows
         MenuWindowsCascade.Click += (_, _) => CascadeWindows();
 
         // Help
         MenuHelpAbout.Click += async (_, _) => await ShowAboutDialog();
+    }
+
+    /// <summary>Opens the sight or barrel dictionary editor, using the active window's units if any.</summary>
+    private async Task ShowDictionaryEditor(bool isSights)
+    {
+        var system = (_activeChild as ITrajectoryChildWindow)?.MeasurementSystem ?? MeasurementSystem.Imperial;
+        Window dialog = isSights
+            ? new Dialogs.SightListEditorDialog(system)
+            : new Dialogs.BarrelListEditorDialog(system);
+        await dialog.ShowDialog<bool?>(this);
     }
 
     private void SetAndUpdate(Action<IAppChildWindow> action)

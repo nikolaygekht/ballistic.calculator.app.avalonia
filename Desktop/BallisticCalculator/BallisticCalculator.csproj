@@ -25,6 +25,16 @@
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
 
+  <!-- Copy the repository-root ./data folder (reticles, legacy ammo, drg tables, dictionaries)
+       into a ./data subfolder next to the built binaries, preserving its structure. -->
+  <ItemGroup>
+    <Content Include="..\..\data\**\*">
+      <Link>data\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </Content>
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="[11.3.18,12)" />
     <PackageReference Include="Avalonia.Desktop" Version="[11.3.18,12)" />

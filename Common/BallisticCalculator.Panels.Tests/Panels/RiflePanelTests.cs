@@ -23,13 +23,12 @@ public class RiflePanelTests
     public void ConvertOnSystemChange_Default_ShouldNotConvertOnSwitch()
     {
         var panel = new RiflePanel();
-        panel.Rifle = CreateTestRifle();
+        panel.Sight = CreateTestSight();
 
         panel.MeasurementSystem = MeasurementSystem.Imperial;
 
         // Default is false, so values stay in original units
         GetSelectedUnit(panel.SightHeightControl).Should().Be(DistanceUnit.Millimeter);
-        GetSelectedUnit(panel.ZeroDistanceControl).Should().Be(DistanceUnit.Meter);
     }
 
     [AvaloniaFact]
@@ -38,22 +37,22 @@ public class RiflePanelTests
         var panel = new RiflePanel();
 
         panel.Should().NotBeNull();
+        panel.SightPresetCombo.Should().NotBeNull();
         panel.SightHeightControl.Should().NotBeNull();
-        panel.ZeroDistanceControl.Should().NotBeNull();
+        panel.BarrelPresetCombo.Should().NotBeNull();
         panel.RiflingDirectionCombo.Should().NotBeNull();
         panel.RiflingStepControl.Should().NotBeNull();
         panel.HorizontalClickControl.Should().NotBeNull();
         panel.VerticalClickControl.Should().NotBeNull();
-        panel.VerticalOffsetCheckBox.Should().NotBeNull();
-        panel.VerticalOffsetControl.Should().NotBeNull();
     }
 
     [AvaloniaFact]
-    public void Panel_InitialState_ShouldReturnNullRifle()
+    public void Panel_InitialState_ShouldReturnNullSight()
     {
         var panel = new RiflePanel();
 
-        panel.Rifle.Should().BeNull();
+        panel.Sight.Should().BeNull();
+        panel.Rifling.Should().BeNull();
     }
 
     [AvaloniaFact]
@@ -65,183 +64,77 @@ public class RiflePanelTests
     }
 
     [AvaloniaFact]
-    public void Panel_InitialState_VerticalOffsetShouldBeDisabled()
+    public void Sight_SetAndGet_MinimalSight_ShouldRoundTrip()
     {
         var panel = new RiflePanel();
 
-        panel.VerticalOffsetControl.IsEnabled.Should().BeFalse();
-        panel.VerticalOffsetCheckBox.IsChecked.Should().BeFalse();
-    }
-
-    [AvaloniaFact]
-    public void Rifle_SetAndGet_MinimalRifle_ShouldRoundTrip()
-    {
-        var panel = new RiflePanel();
-        var rifle = CreateMinimalRifle();
-
-        panel.Rifle = rifle;
-        var result = panel.Rifle;
+        panel.Sight = new Sight() { SightHeight = new Measurement<DistanceUnit>(50, DistanceUnit.Millimeter) };
+        var result = panel.Sight;
 
         result.Should().NotBeNull();
-        result!.Sight.SightHeight.In(DistanceUnit.Millimeter).Should().BeApproximately(50, 0.5);
-        result.Zero.Distance.In(DistanceUnit.Meter).Should().BeApproximately(100, 0.5);
-        result.Sight.VerticalClick.Should().BeNull();
-        result.Sight.HorizontalClick.Should().BeNull();
-        result.Rifling.Should().BeNull();
-        result.Zero.VerticalOffset.Should().BeNull();
+        result!.SightHeight.In(DistanceUnit.Millimeter).Should().BeApproximately(50, 0.5);
+        result.VerticalClick.Should().BeNull();
+        result.HorizontalClick.Should().BeNull();
+        panel.Rifling.Should().BeNull();
     }
 
     [AvaloniaFact]
-    public void Rifle_SetAndGet_FullRifle_ShouldRoundTrip()
+    public void Sight_SetAndGet_WithClicks_ShouldRoundTrip()
     {
         var panel = new RiflePanel();
-        var rifle = CreateTestRifle();
 
-        panel.Rifle = rifle;
-        var result = panel.Rifle;
+        panel.Sight = CreateTestSight();
+        var result = panel.Sight;
 
         result.Should().NotBeNull();
-        result!.Sight.SightHeight.In(DistanceUnit.Millimeter).Should().BeApproximately(50, 0.5);
-        result.Zero.Distance.In(DistanceUnit.Meter).Should().BeApproximately(100, 0.5);
-        result.Sight.VerticalClick.Should().NotBeNull();
-        result.Sight.VerticalClick!.Value.In(AngularUnit.MOA).Should().BeApproximately(0.25, 0.01);
-        result.Sight.HorizontalClick.Should().NotBeNull();
-        result.Sight.HorizontalClick!.Value.In(AngularUnit.MOA).Should().BeApproximately(0.25, 0.01);
-        result.Rifling.Should().NotBeNull();
-        result.Rifling!.RiflingStep.In(DistanceUnit.Inch).Should().BeApproximately(12, 0.5);
-        result.Rifling.Direction.Should().Be(TwistDirection.Right);
+        result!.SightHeight.In(DistanceUnit.Millimeter).Should().BeApproximately(50, 0.5);
+        result.VerticalClick.Should().NotBeNull();
+        result.VerticalClick!.Value.In(AngularUnit.MOA).Should().BeApproximately(0.25, 0.01);
+        result.HorizontalClick.Should().NotBeNull();
+        result.HorizontalClick!.Value.In(AngularUnit.MOA).Should().BeApproximately(0.25, 0.01);
     }
 
     [AvaloniaFact]
-    public void Rifle_SetWithVerticalOffset_ShouldRoundTrip()
+    public void Sight_SetNull_ShouldClearFields()
     {
         var panel = new RiflePanel();
-        var rifle = new Rifle(
-            new Sight(
-                new Measurement<DistanceUnit>(50, DistanceUnit.Millimeter),
-                new Measurement<AngularUnit>(0.25, AngularUnit.MOA),
-                new Measurement<AngularUnit>(0.25, AngularUnit.MOA)),
-            new ZeroingParameters(
-                new Measurement<DistanceUnit>(100, DistanceUnit.Meter),
-                null, null)
-            {
-                VerticalOffset = new Measurement<DistanceUnit>(25, DistanceUnit.Millimeter)
-            });
+        panel.Sight = CreateTestSight();
 
-        panel.Rifle = rifle;
+        panel.Sight = null;
 
-        panel.VerticalOffsetCheckBox.IsChecked.Should().BeTrue();
-        panel.VerticalOffsetControl.IsEnabled.Should().BeTrue();
-
-        var result = panel.Rifle;
-        result.Should().NotBeNull();
-        result!.Zero.VerticalOffset.Should().NotBeNull();
-        result.Zero.VerticalOffset!.Value.In(DistanceUnit.Millimeter).Should().BeApproximately(25, 0.5);
-    }
-
-    [AvaloniaFact]
-    public void Rifle_SetWithHorizontalOffset_ShouldRoundTrip()
-    {
-        var panel = new RiflePanel();
-        var rifle = new Rifle(
-            new Sight() { SightHeight = new Measurement<DistanceUnit>(50, DistanceUnit.Millimeter) },
-            new ZeroingParameters(
-                new Measurement<DistanceUnit>(100, DistanceUnit.Meter),
-                null, null)
-            {
-                HorizontalOffset = new Measurement<DistanceUnit>(15, DistanceUnit.Millimeter)
-            });
-
-        panel.Rifle = rifle;
-
-        panel.VerticalOffsetCheckBox.IsChecked.Should().BeTrue();
-        panel.HorizontalOffsetControl.IsEnabled.Should().BeTrue();
-
-        var result = panel.Rifle;
-        result.Should().NotBeNull();
-        result!.Zero.HorizontalOffset.Should().NotBeNull();
-        result.Zero.HorizontalOffset!.Value.In(DistanceUnit.Millimeter).Should().BeApproximately(15, 0.5);
-    }
-
-    [AvaloniaFact]
-    public void OffsetCheckBox_WhenChecked_ShouldEnableBothOffsetControls()
-    {
-        var panel = new RiflePanel();
-
-        panel.VerticalOffsetCheckBox.IsChecked = true;
-
-        panel.VerticalOffsetControl.IsEnabled.Should().BeTrue();
-        panel.HorizontalOffsetControl.IsEnabled.Should().BeTrue();
-    }
-
-    [AvaloniaFact]
-    public void HorizontalOffset_WhenUnchecked_ShouldReturnNull()
-    {
-        var panel = new RiflePanel();
-        var rifle = new Rifle(
-            new Sight() { SightHeight = new Measurement<DistanceUnit>(50, DistanceUnit.Millimeter) },
-            new ZeroingParameters(
-                new Measurement<DistanceUnit>(100, DistanceUnit.Meter),
-                null, null)
-            {
-                HorizontalOffset = new Measurement<DistanceUnit>(15, DistanceUnit.Millimeter)
-            });
-        panel.Rifle = rifle;
-
-        panel.VerticalOffsetCheckBox.IsChecked = false;
-
-        var result = panel.Rifle;
-        result.Should().NotBeNull();
-        result!.Zero.HorizontalOffset.Should().BeNull();
-    }
-
-    [AvaloniaFact]
-    public void ZeroShotAngle_SetAndGet_ShouldRoundTrip()
-    {
-        var panel = new RiflePanel();
-
-        panel.ZeroShotAngle = new Measurement<AngularUnit>(3, AngularUnit.Mil);
-
-        var result = panel.ZeroShotAngle;
-        result.Should().NotBeNull();
-        result!.Value.In(AngularUnit.Mil).Should().BeApproximately(3, 0.01);
-    }
-
-    [AvaloniaFact]
-    public void ZeroShotAngle_WhenEmpty_ShouldReturnNull()
-    {
-        var panel = new RiflePanel();
-
-        panel.ZeroShotAngle.Should().BeNull();
-    }
-
-    [AvaloniaFact]
-    public void ZeroShotAngle_ClearedBySettingNull_ShouldReturnNull()
-    {
-        var panel = new RiflePanel();
-        panel.ZeroShotAngle = new Measurement<AngularUnit>(3, AngularUnit.Mil);
-
-        panel.ZeroShotAngle = null;
-
-        panel.ZeroShotAngle.Should().BeNull();
-    }
-
-    [AvaloniaFact]
-    public void Rifle_SetNull_ShouldClear()
-    {
-        var panel = new RiflePanel();
-        panel.Rifle = CreateTestRifle();
-
-        panel.Rifle = null;
-
-        panel.Rifle.Should().BeNull();
+        panel.Sight.Should().BeNull();
         panel.SightHeightControl.IsEmpty.Should().BeTrue();
-        panel.ZeroDistanceControl.IsEmpty.Should().BeTrue();
-        panel.RiflingDirectionCombo.SelectedIndex.Should().Be(0); // "Not Set"
-        panel.RiflingStepControl.IsEmpty.Should().BeTrue();
-        panel.RiflingStepControl.IsEnabled.Should().BeFalse();
-        panel.VerticalOffsetCheckBox.IsChecked.Should().BeFalse();
-        panel.VerticalOffsetControl.IsEnabled.Should().BeFalse();
+        panel.VerticalClickControl.IsEmpty.Should().BeTrue();
+        panel.HorizontalClickControl.IsEmpty.Should().BeTrue();
+    }
+
+    [AvaloniaFact]
+    public void Rifling_SetAndGet_Right_ShouldRoundTrip()
+    {
+        var panel = new RiflePanel();
+
+        panel.Rifling = new Rifling(new Measurement<DistanceUnit>(12, DistanceUnit.Inch), TwistDirection.Right);
+        var result = panel.Rifling;
+
+        result.Should().NotBeNull();
+        result!.Direction.Should().Be(TwistDirection.Right);
+        result.RiflingStep.In(DistanceUnit.Inch).Should().BeApproximately(12, 0.5);
+        panel.RiflingDirectionCombo.SelectedIndex.Should().Be(2);
+        panel.RiflingStepControl.IsEnabled.Should().BeTrue();
+    }
+
+    [AvaloniaFact]
+    public void Rifling_SetAndGet_Left_ShouldRoundTrip()
+    {
+        var panel = new RiflePanel();
+
+        panel.Rifling = new Rifling(new Measurement<DistanceUnit>(9, DistanceUnit.Inch), TwistDirection.Left);
+        var result = panel.Rifling;
+
+        result.Should().NotBeNull();
+        result!.Direction.Should().Be(TwistDirection.Left);
+        result.RiflingStep.In(DistanceUnit.Inch).Should().BeApproximately(9, 0.5);
+        panel.RiflingDirectionCombo.SelectedIndex.Should().Be(1);
     }
 
     [AvaloniaFact]
@@ -266,146 +159,10 @@ public class RiflePanelTests
     }
 
     [AvaloniaFact]
-    public void RiflingDirection_SetFromRifle_ShouldSelectCorrectItem()
-    {
-        var panel = new RiflePanel();
-        var rifle = CreateTestRifle(); // Has Right twist
-
-        panel.Rifle = rifle;
-
-        panel.RiflingDirectionCombo.SelectedIndex.Should().Be(2); // "Right"
-        panel.RiflingStepControl.IsEnabled.Should().BeTrue();
-    }
-
-    [AvaloniaFact]
-    public void RiflingDirection_Left_ShouldRoundTrip()
-    {
-        var panel = new RiflePanel();
-        var rifle = new Rifle(
-            new Sight() { SightHeight = new Measurement<DistanceUnit>(50, DistanceUnit.Millimeter) },
-            new ZeroingParameters(
-                new Measurement<DistanceUnit>(100, DistanceUnit.Meter),
-                null, null),
-            new Rifling(
-                new Measurement<DistanceUnit>(9, DistanceUnit.Inch),
-                TwistDirection.Left));
-
-        panel.Rifle = rifle;
-        var result = panel.Rifle;
-
-        result.Should().NotBeNull();
-        result!.Rifling.Should().NotBeNull();
-        result.Rifling!.Direction.Should().Be(TwistDirection.Left);
-        result.Rifling.RiflingStep.In(DistanceUnit.Inch).Should().BeApproximately(9, 0.5);
-    }
-
-    [AvaloniaFact]
-    public void VerticalOffsetCheckBox_WhenChecked_ShouldEnableControl()
-    {
-        var panel = new RiflePanel();
-
-        panel.VerticalOffsetCheckBox.IsChecked = true;
-
-        panel.VerticalOffsetControl.IsEnabled.Should().BeTrue();
-    }
-
-    [AvaloniaFact]
-    public void VerticalOffsetCheckBox_WhenUnchecked_ShouldDisableControl()
-    {
-        var panel = new RiflePanel();
-        panel.VerticalOffsetCheckBox.IsChecked = true;
-
-        panel.VerticalOffsetCheckBox.IsChecked = false;
-
-        panel.VerticalOffsetControl.IsEnabled.Should().BeFalse();
-    }
-
-    [AvaloniaFact]
-    public void VerticalOffset_WhenUnchecked_ShouldReturnNull()
-    {
-        var panel = new RiflePanel();
-        var rifle = new Rifle(
-            new Sight() { SightHeight = new Measurement<DistanceUnit>(50, DistanceUnit.Millimeter) },
-            new ZeroingParameters(
-                new Measurement<DistanceUnit>(100, DistanceUnit.Meter),
-                null, null)
-            {
-                VerticalOffset = new Measurement<DistanceUnit>(25, DistanceUnit.Millimeter)
-            });
-        panel.Rifle = rifle;
-
-        // Uncheck the offset
-        panel.VerticalOffsetCheckBox.IsChecked = false;
-
-        var result = panel.Rifle;
-        result.Should().NotBeNull();
-        result!.Zero.VerticalOffset.Should().BeNull();
-    }
-
-    [AvaloniaFact]
-    public void MeasurementSystem_SwitchToImperial_WithConvert_ShouldPreserveValues()
-    {
-        var panel = new RiflePanel();
-        panel.ConvertOnSystemChange = true;
-        panel.Rifle = CreateTestRifle();
-
-        panel.MeasurementSystem = MeasurementSystem.Imperial;
-
-        var result = panel.Rifle;
-        result.Should().NotBeNull();
-        result!.Sight.SightHeight.In(DistanceUnit.Millimeter).Should().BeApproximately(50, 1);
-        result.Zero.Distance.In(DistanceUnit.Meter).Should().BeApproximately(100, 1);
-        GetSelectedUnit(panel.SightHeightControl).Should().Be(DistanceUnit.Inch);
-        GetSelectedUnit(panel.ZeroDistanceControl).Should().Be(DistanceUnit.Yard);
-    }
-
-    [AvaloniaFact]
-    public void MeasurementSystem_SwitchToImperialWhenEmpty_ShouldChangeUnits()
-    {
-        var panel = new RiflePanel();
-
-        panel.MeasurementSystem = MeasurementSystem.Imperial;
-
-        GetSelectedUnit(panel.SightHeightControl).Should().Be(DistanceUnit.Inch);
-        GetSelectedUnit(panel.ZeroDistanceControl).Should().Be(DistanceUnit.Yard);
-        GetSelectedUnit(panel.RiflingStepControl).Should().Be(DistanceUnit.Inch);
-        GetSelectedUnit(panel.VerticalOffsetControl).Should().Be(DistanceUnit.Inch);
-    }
-
-    [AvaloniaFact]
-    public void MeasurementSystem_SwitchToMetricWhenEmpty_ShouldChangeUnits()
-    {
-        var panel = new RiflePanel();
-        panel.MeasurementSystem = MeasurementSystem.Imperial;
-
-        panel.MeasurementSystem = MeasurementSystem.Metric;
-
-        GetSelectedUnit(panel.SightHeightControl).Should().Be(DistanceUnit.Millimeter);
-        GetSelectedUnit(panel.ZeroDistanceControl).Should().Be(DistanceUnit.Meter);
-        GetSelectedUnit(panel.RiflingStepControl).Should().Be(DistanceUnit.Millimeter);
-        GetSelectedUnit(panel.VerticalOffsetControl).Should().Be(DistanceUnit.Millimeter);
-    }
-
-    [AvaloniaFact]
-    public void MeasurementSystem_ClickUnits_ShouldNotBeAffected()
-    {
-        var panel = new RiflePanel();
-        var rifle = CreateTestRifle(); // clicks in MOA
-        panel.Rifle = rifle;
-
-        panel.MeasurementSystem = MeasurementSystem.Imperial;
-
-        // Angular units should not change on system switch
-        var result = panel.Rifle;
-        result.Should().NotBeNull();
-        result!.Sight.VerticalClick!.Value.In(AngularUnit.MOA).Should().BeApproximately(0.25, 0.01);
-    }
-
-    [AvaloniaFact]
     public void VerticalClick_QuickAccess_ShouldReturnValue()
     {
         var panel = new RiflePanel();
-        panel.Rifle = CreateTestRifle();
+        panel.Sight = CreateTestSight();
 
         var click = panel.VerticalClick;
 
@@ -422,72 +179,143 @@ public class RiflePanelTests
     }
 
     [AvaloniaFact]
+    public void MeasurementSystem_SwitchToImperialWhenEmpty_ShouldChangeUnits()
+    {
+        var panel = new RiflePanel();
+
+        panel.MeasurementSystem = MeasurementSystem.Imperial;
+
+        GetSelectedUnit(panel.SightHeightControl).Should().Be(DistanceUnit.Inch);
+        GetSelectedUnit(panel.RiflingStepControl).Should().Be(DistanceUnit.Inch);
+    }
+
+    [AvaloniaFact]
+    public void MeasurementSystem_ClickUnits_ShouldNotBeAffected()
+    {
+        var panel = new RiflePanel();
+        panel.Sight = CreateTestSight(); // clicks in MOA
+
+        panel.MeasurementSystem = MeasurementSystem.Imperial;
+
+        var result = panel.Sight;
+        result.Should().NotBeNull();
+        result!.VerticalClick!.Value.In(AngularUnit.MOA).Should().BeApproximately(0.25, 0.01);
+    }
+
+    [AvaloniaFact]
     public void Clear_ShouldResetAllFields()
     {
         var panel = new RiflePanel();
-        var rifle = CreateTestRifle();
-        panel.Rifle = rifle;
-        panel.VerticalOffsetCheckBox.IsChecked = true;
+        panel.Sight = CreateTestSight();
+        panel.Rifling = new Rifling(new Measurement<DistanceUnit>(12, DistanceUnit.Inch), TwistDirection.Right);
 
         panel.Clear();
 
-        panel.Rifle.Should().BeNull();
+        panel.Sight.Should().BeNull();
+        panel.Rifling.Should().BeNull();
         panel.SightHeightControl.IsEmpty.Should().BeTrue();
-        panel.ZeroDistanceControl.IsEmpty.Should().BeTrue();
         panel.HorizontalClickControl.IsEmpty.Should().BeTrue();
         panel.VerticalClickControl.IsEmpty.Should().BeTrue();
         panel.RiflingDirectionCombo.SelectedIndex.Should().Be(0);
         panel.RiflingStepControl.IsEmpty.Should().BeTrue();
         panel.RiflingStepControl.IsEnabled.Should().BeFalse();
-        panel.VerticalOffsetCheckBox.IsChecked.Should().BeFalse();
-        panel.VerticalOffsetControl.IsEnabled.Should().BeFalse();
-        panel.HorizontalOffsetControl.IsEmpty.Should().BeTrue();
-        panel.HorizontalOffsetControl.IsEnabled.Should().BeFalse();
-        panel.ZeroShotAngle.Should().BeNull();
+    }
+
+    #region Presets
+
+    private static BallisticDictionary TestDictionary() => new(
+        new[]
+        {
+            new SightDictionaryEntry
+            {
+                Name = "Test Optic",
+                SightHeight = new Measurement<DistanceUnit>(3, DistanceUnit.Inch),
+                DefaultZero = new Measurement<DistanceUnit>(100, DistanceUnit.Yard),
+                HorizontalClick = new Measurement<AngularUnit>(0.1, AngularUnit.Mil),
+                VerticalClick = new Measurement<AngularUnit>(0.1, AngularUnit.Mil),
+            },
+        },
+        new[]
+        {
+            new BarrelDictionaryEntry
+            {
+                Name = "Test Barrel",
+                Step = new Measurement<DistanceUnit>(7, DistanceUnit.Inch),
+                Direction = TwistDirection.Right,
+            },
+        });
+
+    [AvaloniaFact]
+    public void SightPreset_WhenSelected_FillsHeightAndClicks()
+    {
+        var panel = new RiflePanel();
+        panel.SetDictionary(TestDictionary());
+
+        panel.SightPresetCombo.SelectedIndex = 1; // "Test Optic"
+
+        var sight = panel.Sight;
+        sight.Should().NotBeNull();
+        sight!.SightHeight.In(DistanceUnit.Inch).Should().BeApproximately(3, 0.01);
+        sight.VerticalClick!.Value.In(AngularUnit.Mil).Should().BeApproximately(0.1, 0.001);
+        sight.HorizontalClick!.Value.In(AngularUnit.Mil).Should().BeApproximately(0.1, 0.001);
+        // The selection must stick after applying (it should not snap back to "(custom)").
+        panel.SightPresetCombo.SelectedIndex.Should().Be(1);
     }
 
     [AvaloniaFact]
-    public void Rifle_ClicksOptional_ShouldReturnNullWhenEmpty()
+    public void SightPreset_WhenSelected_RaisesZeroDistanceSuggested()
     {
         var panel = new RiflePanel();
-        var rifle = CreateMinimalRifle();
+        panel.SetDictionary(TestDictionary());
+        Measurement<DistanceUnit>? suggested = null;
+        panel.ZeroDistanceSuggested += (_, d) => suggested = d;
 
-        panel.Rifle = rifle;
-        var result = panel.Rifle;
+        panel.SightPresetCombo.SelectedIndex = 1; // "Test Optic" (default-zero 100yd)
 
-        result.Should().NotBeNull();
-        result!.Sight.VerticalClick.Should().BeNull();
-        result.Sight.HorizontalClick.Should().BeNull();
-        panel.HorizontalClickControl.IsEmpty.Should().BeTrue();
-        panel.VerticalClickControl.IsEmpty.Should().BeTrue();
+        suggested.Should().NotBeNull();
+        suggested!.Value.In(DistanceUnit.Yard).Should().BeApproximately(100, 0.01);
     }
+
+    [AvaloniaFact]
+    public void BarrelPreset_WhenSelected_FillsRifling()
+    {
+        var panel = new RiflePanel();
+        panel.SetDictionary(TestDictionary());
+
+        panel.BarrelPresetCombo.SelectedIndex = 1; // "Test Barrel"
+
+        var rifling = panel.Rifling;
+        rifling.Should().NotBeNull();
+        rifling!.Direction.Should().Be(TwistDirection.Right);
+        rifling.RiflingStep.In(DistanceUnit.Inch).Should().BeApproximately(7, 0.01);
+        panel.BarrelPresetCombo.SelectedIndex.Should().Be(1);
+    }
+
+    [AvaloniaFact]
+    public void SightPreset_KeepsSelection_WhenFieldReSetToSameValue()
+    {
+        // Re-applying values that still match the preset must NOT revert the combo to "(custom)".
+        var panel = new RiflePanel();
+        panel.SetDictionary(TestDictionary());
+        panel.SightPresetCombo.SelectedIndex = 1;
+
+        panel.SightHeightControl.SetValue(new Measurement<DistanceUnit>(3, DistanceUnit.Inch));
+
+        panel.SightPresetCombo.SelectedIndex.Should().Be(1);
+    }
+
+    #endregion
 
     private static object? GetSelectedUnit(BallisticCalculator.Controls.Controls.MeasurementControl control)
     {
         return (control.UnitPart?.SelectedItem as UnitItem)?.Unit;
     }
 
-    private static Rifle CreateMinimalRifle()
+    private static Sight CreateTestSight()
     {
-        return new Rifle(
-            new Sight() { SightHeight = new Measurement<DistanceUnit>(50, DistanceUnit.Millimeter) },
-            new ZeroingParameters(
-                new Measurement<DistanceUnit>(100, DistanceUnit.Meter),
-                null, null));
-    }
-
-    private static Rifle CreateTestRifle()
-    {
-        return new Rifle(
-            new Sight(
-                new Measurement<DistanceUnit>(50, DistanceUnit.Millimeter),
-                new Measurement<AngularUnit>(0.25, AngularUnit.MOA),
-                new Measurement<AngularUnit>(0.25, AngularUnit.MOA)),
-            new ZeroingParameters(
-                new Measurement<DistanceUnit>(100, DistanceUnit.Meter),
-                null, null),
-            new Rifling(
-                new Measurement<DistanceUnit>(12, DistanceUnit.Inch),
-                TwistDirection.Right));
+        return new Sight(
+            new Measurement<DistanceUnit>(50, DistanceUnit.Millimeter),
+            new Measurement<AngularUnit>(0.25, AngularUnit.MOA),
+            new Measurement<AngularUnit>(0.25, AngularUnit.MOA));
     }
 }

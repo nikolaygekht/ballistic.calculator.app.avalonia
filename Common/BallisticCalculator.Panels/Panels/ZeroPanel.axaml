@@ -1,0 +1,82 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="using:BallisticCalculator.Controls.Controls"
+             xmlns:panels="using:BallisticCalculator.Panels.Panels"
+             mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="500"
+             x:Class="BallisticCalculator.Panels.Panels.ZeroPanel">
+
+  <StackPanel Spacing="4">
+
+    <!-- Zero Distance -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="Zero Dist.:"
+                 VerticalAlignment="Center"
+                 FontWeight="Bold"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1"
+                 x:Name="ZeroDistanceControl" x:FieldModifier="internal"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <!-- Shot Angle at zero -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="Shot Angle:"
+                 VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1"
+                 x:Name="ZeroShotAngleControl" x:FieldModifier="internal"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <Separator/>
+
+    <!-- Impact offset at zero -->
+    <Grid ColumnDefinitions="100,*">
+      <CheckBox Grid.Column="1"
+                x:Name="VerticalOffsetCheckBox" x:FieldModifier="internal"
+                Content="Impact offset at zero"
+                FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="V Offset:"
+                 VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1"
+                 x:Name="VerticalOffsetControl" x:FieldModifier="internal"
+                 IsEnabled="False"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="H Offset:"
+                 VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1"
+                 x:Name="HorizontalOffsetControl" x:FieldModifier="internal"
+                 IsEnabled="False"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <Separator Margin="0,4"/>
+
+    <!-- Zero ammunition override -->
+    <panels:ZeroAmmoPanel x:Name="ZeroAmmoSubPanel" x:FieldModifier="internal"
+                          FontSize="{DynamicResource AppFontSize}"/>
+
+    <Separator Margin="0,4"/>
+
+    <!-- Zero atmosphere override -->
+    <panels:ZeroAtmospherePanel x:Name="ZeroAtmosphereSubPanel" x:FieldModifier="internal"
+                                FontSize="{DynamicResource AppFontSize}"/>
+
+    <Separator Margin="0,4"/>
+
+    <!-- Zero wind -->
+    <panels:ZeroWindPanel x:Name="ZeroWindSubPanel" x:FieldModifier="internal"
+                          FontSize="{DynamicResource AppFontSize}"/>
+
+  </StackPanel>
+</UserControl>

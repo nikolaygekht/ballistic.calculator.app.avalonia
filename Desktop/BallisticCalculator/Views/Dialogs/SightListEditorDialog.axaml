@@ -1,0 +1,94 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:BallisticCalculator.Controls.Controls"
+        xmlns:models="using:BallisticCalculator.Models"
+        x:Class="BallisticCalculator.Views.Dialogs.SightListEditorDialog"
+        Title="Edit Sights"
+        Width="640" Height="470"
+        MinWidth="540" MinHeight="360"
+        FontSize="{DynamicResource AppFontSize}"
+        WindowStartupLocation="CenterOwner"
+        CanResize="true">
+
+  <DockPanel Margin="12">
+
+    <!-- OK / Cancel -->
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal"
+                HorizontalAlignment="Center" Spacing="10" Margin="0,12,0,0">
+      <Button Content="OK" Click="OnOK" Width="80"
+              FontSize="{DynamicResource AppFontSize}"/>
+      <Button Content="Cancel" Click="OnCancel" Width="80"
+              FontSize="{DynamicResource AppFontSize}"/>
+    </StackPanel>
+
+    <Grid ColumnDefinitions="210,*">
+
+      <!-- Left: list + add/delete -->
+      <DockPanel Grid.Column="0" Margin="0,0,12,0">
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="6" Margin="0,6,0,0">
+          <Button Content="Add" Click="OnAdd" Width="70"
+                  FontSize="{DynamicResource AppFontSize}"/>
+          <Button Content="Delete" Click="OnDelete" Width="70"
+                  FontSize="{DynamicResource AppFontSize}"/>
+        </StackPanel>
+        <ListBox x:Name="EntriesList" x:FieldModifier="internal"
+                 SelectionChanged="OnSelectionChanged"
+                 FontSize="{DynamicResource AppFontSize}">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="models:SightEditModel">
+              <TextBlock Text="{Binding Name}" FontSize="{DynamicResource AppFontSize}"/>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </DockPanel>
+
+      <!-- Right: detail editor for the selected sight -->
+      <StackPanel Grid.Column="1" x:Name="DetailPanel" x:FieldModifier="internal"
+                  Spacing="8" IsEnabled="False">
+        <TextBlock Text="Sight" FontWeight="SemiBold"
+                   FontSize="{DynamicResource AppFontSize}"/>
+
+        <Grid ColumnDefinitions="100,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+          <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:"
+                     VerticalAlignment="Center"
+                     FontSize="{DynamicResource AppFontSize}"/>
+          <TextBox Grid.Row="0" Grid.Column="1" x:Name="NameBox" x:FieldModifier="internal"
+                   FontSize="{DynamicResource AppFontSize}"/>
+
+          <TextBlock Grid.Row="1" Grid.Column="0" Text="Sight Height:"
+                     VerticalAlignment="Center" Margin="0,8,0,0"
+                     FontSize="{DynamicResource AppFontSize}"/>
+          <controls:MeasurementControl Grid.Row="1" Grid.Column="1"
+                     x:Name="SightHeightControl" x:FieldModifier="internal" Margin="0,8,0,0"
+                     FontSize="{DynamicResource AppFontSize}"/>
+
+          <TextBlock Grid.Row="2" Grid.Column="0" Text="Default Zero:"
+                     VerticalAlignment="Center" Margin="0,8,0,0"
+                     FontSize="{DynamicResource AppFontSize}"/>
+          <controls:MeasurementControl Grid.Row="2" Grid.Column="1"
+                     x:Name="DefaultZeroControl" x:FieldModifier="internal" Margin="0,8,0,0"
+                     FontSize="{DynamicResource AppFontSize}"/>
+
+          <TextBlock Grid.Row="3" Grid.Column="0" Text="H Click:"
+                     VerticalAlignment="Center" Margin="0,8,0,0"
+                     FontSize="{DynamicResource AppFontSize}"/>
+          <controls:MeasurementControl Grid.Row="3" Grid.Column="1"
+                     x:Name="HClickControl" x:FieldModifier="internal" Margin="0,8,0,0"
+                     FontSize="{DynamicResource AppFontSize}"/>
+
+          <TextBlock Grid.Row="4" Grid.Column="0" Text="V Click:"
+                     VerticalAlignment="Center" Margin="0,8,0,0"
+                     FontSize="{DynamicResource AppFontSize}"/>
+          <controls:MeasurementControl Grid.Row="4" Grid.Column="1"
+                     x:Name="VClickControl" x:FieldModifier="internal" Margin="0,8,0,0"
+                     FontSize="{DynamicResource AppFontSize}"/>
+        </Grid>
+
+        <TextBlock Text="Default zero and clicks are optional."
+                   Foreground="Gray"
+                   FontSize="{DynamicResource AppFontSize}"/>
+      </StackPanel>
+
+    </Grid>
+  </DockPanel>
+</Window>

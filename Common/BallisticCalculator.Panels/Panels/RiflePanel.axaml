@@ -3,34 +3,32 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="using:BallisticCalculator.Controls.Controls"
-             mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="400"
+             mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="300"
              x:Class="BallisticCalculator.Panels.Panels.RiflePanel">
 
   <StackPanel Spacing="4">
+
+    <!-- Sight preset (from data/dictionaries.xml) -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="Sight:"
+                 VerticalAlignment="Center"
+                 FontWeight="Bold"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <ComboBox Grid.Column="1"
+                x:Name="SightPresetCombo" x:FieldModifier="internal"
+                HorizontalAlignment="Stretch"
+                FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
 
     <!-- Sight Height -->
     <Grid ColumnDefinitions="100,*">
       <TextBlock Grid.Column="0" Text="Sight Height:"
                  VerticalAlignment="Center"
-                 FontWeight="Bold"
                  FontSize="{DynamicResource AppFontSize}"/>
       <controls:MeasurementControl Grid.Column="1"
                  x:Name="SightHeightControl" x:FieldModifier="internal"
                  FontSize="{DynamicResource AppFontSize}"/>
     </Grid>
-
-    <!-- Zero Distance -->
-    <Grid ColumnDefinitions="100,*">
-      <TextBlock Grid.Column="0" Text="Zero Dist.:"
-                 VerticalAlignment="Center"
-                 FontWeight="Bold"
-                 FontSize="{DynamicResource AppFontSize}"/>
-      <controls:MeasurementControl Grid.Column="1"
-                 x:Name="ZeroDistanceControl" x:FieldModifier="internal"
-                 FontSize="{DynamicResource AppFontSize}"/>
-    </Grid>
-
-    <Separator/>
 
     <!-- Horizontal Click -->
     <Grid ColumnDefinitions="100,*">
@@ -54,6 +52,18 @@
 
     <Separator/>
 
+    <!-- Barrel preset (from data/dictionaries.xml) -->
+    <Grid ColumnDefinitions="100,*">
+      <TextBlock Grid.Column="0" Text="Barrel:"
+                 VerticalAlignment="Center"
+                 FontWeight="Bold"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <ComboBox Grid.Column="1"
+                x:Name="BarrelPresetCombo" x:FieldModifier="internal"
+                HorizontalAlignment="Stretch"
+                FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
     <!-- Rifling Direction -->
     <Grid ColumnDefinitions="100,*">
       <TextBlock Grid.Column="0" Text="Rifling:"
@@ -72,50 +82,6 @@
       <controls:MeasurementControl Grid.Column="1"
                  x:Name="RiflingStepControl" x:FieldModifier="internal"
                  IsEnabled="False"
-                 FontSize="{DynamicResource AppFontSize}"/>
-    </Grid>
-
-    <Separator/>
-
-    <!-- Vertical Offset checkbox -->
-    <Grid ColumnDefinitions="100,*">
-      <CheckBox Grid.Column="1"
-                x:Name="VerticalOffsetCheckBox" x:FieldModifier="internal"
-                Content="Impact offset at zero"
-                FontSize="{DynamicResource AppFontSize}"/>
-    </Grid>
-
-    <!-- Vertical Offset -->
-    <Grid ColumnDefinitions="100,*">
-      <TextBlock Grid.Column="0" Text="V Offset:"
-                 VerticalAlignment="Center"
-                 FontSize="{DynamicResource AppFontSize}"/>
-      <controls:MeasurementControl Grid.Column="1"
-                 x:Name="VerticalOffsetControl" x:FieldModifier="internal"
-                 IsEnabled="False"
-                 FontSize="{DynamicResource AppFontSize}"/>
-    </Grid>
-
-    <!-- Horizontal Offset -->
-    <Grid ColumnDefinitions="100,*">
-      <TextBlock Grid.Column="0" Text="H Offset:"
-                 VerticalAlignment="Center"
-                 FontSize="{DynamicResource AppFontSize}"/>
-      <controls:MeasurementControl Grid.Column="1"
-                 x:Name="HorizontalOffsetControl" x:FieldModifier="internal"
-                 IsEnabled="False"
-                 FontSize="{DynamicResource AppFontSize}"/>
-    </Grid>
-
-    <Separator/>
-
-    <!-- Shot Angle at zero -->
-    <Grid ColumnDefinitions="100,*">
-      <TextBlock Grid.Column="0" Text="Shot Angle:"
-                 VerticalAlignment="Center"
-                 FontSize="{DynamicResource AppFontSize}"/>
-      <controls:MeasurementControl Grid.Column="1"
-                 x:Name="ZeroShotAngleControl" x:FieldModifier="internal"
                  FontSize="{DynamicResource AppFontSize}"/>
     </Grid>
 

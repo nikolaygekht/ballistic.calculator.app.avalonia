@@ -21,8 +21,7 @@ public class ShotDataPanelTests
         panel.AtmosphereSubPanel.Should().NotBeNull();
         panel.WindSubPanel.Should().NotBeNull();
         panel.RifleSubPanel.Should().NotBeNull();
-        panel.ZeroAmmoSubPanel.Should().NotBeNull();
-        panel.ZeroAtmosphereSubPanel.Should().NotBeNull();
+        panel.ZeroSubPanel.Should().NotBeNull();
         panel.ParametersSubPanel.Should().NotBeNull();
     }
 
@@ -163,7 +162,7 @@ public class ShotDataPanelTests
         panel.ShotData.Should().BeNull();
         panel.AmmoLibPanel.LibraryEntry.Should().BeNull();
         panel.AtmosphereSubPanel.Atmosphere.Should().BeNull();
-        panel.RifleSubPanel.Rifle.Should().BeNull();
+        panel.RifleSubPanel.Sight.Should().BeNull();
         panel.ParametersSubPanel.Parameters.Should().BeNull();
     }
 
@@ -178,8 +177,7 @@ public class ShotDataPanelTests
         panel.AtmosphereSubPanel.MeasurementSystem.Should().Be(MeasurementSystem.Imperial);
         panel.WindSubPanel.MeasurementSystem.Should().Be(MeasurementSystem.Imperial);
         panel.RifleSubPanel.MeasurementSystem.Should().Be(MeasurementSystem.Imperial);
-        panel.ZeroAmmoSubPanel.MeasurementSystem.Should().Be(MeasurementSystem.Imperial);
-        panel.ZeroAtmosphereSubPanel.MeasurementSystem.Should().Be(MeasurementSystem.Imperial);
+        panel.ZeroSubPanel.MeasurementSystem.Should().Be(MeasurementSystem.Imperial);
         panel.ParametersSubPanel.MeasurementSystem.Should().Be(MeasurementSystem.Imperial);
     }
 

@@ -1,0 +1,79 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:BallisticCalculator.Controls.Controls"
+        xmlns:models="using:BallisticCalculator.Models"
+        x:Class="BallisticCalculator.Views.Dialogs.BarrelListEditorDialog"
+        Title="Edit Barrels"
+        Width="600" Height="400"
+        MinWidth="520" MinHeight="320"
+        FontSize="{DynamicResource AppFontSize}"
+        WindowStartupLocation="CenterOwner"
+        CanResize="true">
+
+  <DockPanel Margin="12">
+
+    <!-- OK / Cancel -->
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal"
+                HorizontalAlignment="Center" Spacing="10" Margin="0,12,0,0">
+      <Button Content="OK" Click="OnOK" Width="80"
+              FontSize="{DynamicResource AppFontSize}"/>
+      <Button Content="Cancel" Click="OnCancel" Width="80"
+              FontSize="{DynamicResource AppFontSize}"/>
+    </StackPanel>
+
+    <Grid ColumnDefinitions="210,*">
+
+      <!-- Left: list + add/delete -->
+      <DockPanel Grid.Column="0" Margin="0,0,12,0">
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="6" Margin="0,6,0,0">
+          <Button Content="Add" Click="OnAdd" Width="70"
+                  FontSize="{DynamicResource AppFontSize}"/>
+          <Button Content="Delete" Click="OnDelete" Width="70"
+                  FontSize="{DynamicResource AppFontSize}"/>
+        </StackPanel>
+        <ListBox x:Name="EntriesList" x:FieldModifier="internal"
+                 SelectionChanged="OnSelectionChanged"
+                 FontSize="{DynamicResource AppFontSize}">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="models:BarrelEditModel">
+              <TextBlock Text="{Binding Name}" FontSize="{DynamicResource AppFontSize}"/>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </DockPanel>
+
+      <!-- Right: detail editor for the selected barrel -->
+      <StackPanel Grid.Column="1" x:Name="DetailPanel" x:FieldModifier="internal"
+                  Spacing="8" IsEnabled="False">
+        <TextBlock Text="Barrel" FontWeight="SemiBold"
+                   FontSize="{DynamicResource AppFontSize}"/>
+
+        <Grid ColumnDefinitions="100,*" RowDefinitions="Auto,Auto,Auto">
+          <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:"
+                     VerticalAlignment="Center"
+                     FontSize="{DynamicResource AppFontSize}"/>
+          <TextBox Grid.Row="0" Grid.Column="1" x:Name="NameBox" x:FieldModifier="internal"
+                   FontSize="{DynamicResource AppFontSize}"/>
+
+          <TextBlock Grid.Row="1" Grid.Column="0" Text="Twist Rate:"
+                     VerticalAlignment="Center" Margin="0,8,0,0"
+                     FontSize="{DynamicResource AppFontSize}"/>
+          <controls:MeasurementControl Grid.Row="1" Grid.Column="1"
+                     x:Name="StepControl" x:FieldModifier="internal" Margin="0,8,0,0"
+                     FontSize="{DynamicResource AppFontSize}"/>
+
+          <TextBlock Grid.Row="2" Grid.Column="0" Text="Direction:"
+                     VerticalAlignment="Center" Margin="0,8,0,0"
+                     FontSize="{DynamicResource AppFontSize}"/>
+          <ComboBox Grid.Row="2" Grid.Column="1" x:Name="DirectionCombo" x:FieldModifier="internal"
+                    Margin="0,8,0,0" HorizontalAlignment="Stretch"
+                    FontSize="{DynamicResource AppFontSize}">
+            <ComboBoxItem Content="Right"/>
+            <ComboBoxItem Content="Left"/>
+          </ComboBox>
+        </Grid>
+      </StackPanel>
+
+    </Grid>
+  </DockPanel>
+</Window>
