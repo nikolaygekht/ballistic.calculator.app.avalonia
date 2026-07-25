@@ -38,6 +38,26 @@
                 FontSize="{DynamicResource AppFontSize}"/>
     </Grid>
 
+    <!-- Custom drag table (.drg) — used when the drag table is GC (custom) -->
+    <Grid ColumnDefinitions="100,*,Auto,Auto">
+      <TextBlock Grid.Column="0" Text="Drag table:"
+                 VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <TextBox Grid.Column="1"
+               x:Name="CustomTableBox" x:FieldModifier="internal"
+               IsReadOnly="True"
+               Watermark="(standard table)"
+               FontSize="{DynamicResource AppFontSize}"/>
+      <Button Grid.Column="2"
+              x:Name="BrowseTableButton" x:FieldModifier="internal"
+              Content="Browse..." Click="OnBrowseCustomTable" Margin="4,0,0,0"
+              FontSize="{DynamicResource AppFontSize}"/>
+      <Button Grid.Column="3"
+              x:Name="ClearTableButton" x:FieldModifier="internal"
+              Content="Clear" Click="OnClearCustomTable" Margin="4,0,0,0"
+              FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
     <!-- Muzzle Velocity -->
     <Grid ColumnDefinitions="100,*">
       <TextBlock Grid.Column="0" Text="Muzzle Vel.:"

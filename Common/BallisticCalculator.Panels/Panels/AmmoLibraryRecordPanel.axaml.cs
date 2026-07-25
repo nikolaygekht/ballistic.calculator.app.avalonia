@@ -26,7 +26,16 @@ public partial class AmmoLibraryRecordPanel : UserControl
 
     #region Properties
 
-    public IFileDialogService? FileDialogService { get; set; }
+    private IFileDialogService? _fileDialogService;
+    public IFileDialogService? FileDialogService
+    {
+        get => _fileDialogService;
+        set
+        {
+            _fileDialogService = value;
+            AmmoSubPanel.FileDialogService = value;
+        }
+    }
 
     public bool ConvertOnSystemChange
     {
@@ -168,6 +177,7 @@ public partial class AmmoLibraryRecordPanel : UserControl
         {
             Title = "Load Ammunition",
             DefaultExtension = "ammox",
+            InitialDirectory = DataFolders.LegacyAmmo,
             Filters =
             {
                 new Services.FileDialogFilter("Ammunition Files", "ammox", "ammo"),
@@ -205,6 +215,7 @@ public partial class AmmoLibraryRecordPanel : UserControl
         {
             Title = "Save Ammunition",
             DefaultExtension = "ammox",
+            InitialDirectory = DataFolders.LegacyAmmo,
             InitialFileName = string.IsNullOrWhiteSpace(entry.Name) ? "ammunition" : entry.Name,
             Filters = { new Services.FileDialogFilter("Ammunition Files", "ammox") }
         };

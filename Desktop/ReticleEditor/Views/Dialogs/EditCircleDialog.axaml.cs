@@ -54,6 +54,9 @@ public partial class EditCircleDialog : Window
         ColorCombo.PopulateWithColors();
         ColorCombo.SelectedItem = _element.Color ?? "black";
 
+        StyleCombo.PopulateWithLineStyles();
+        StyleCombo.SelectLineStyle(_element.LineStyle);
+
         // Populate fill checkbox
         FillCheckBox.IsChecked = _element.Fill == true;
     }
@@ -76,6 +79,7 @@ public partial class EditCircleDialog : Window
             _element.LineWidth = null;
 
         _element.Color = ColorCombo.SelectedItem?.ToString();
+        _element.LineStyle = StyleCombo.SelectedLineStyle();
         _element.Fill = FillCheckBox.IsChecked == true;
     }
 

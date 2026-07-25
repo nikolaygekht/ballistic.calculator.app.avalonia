@@ -21,6 +21,9 @@
 
                 <TextBlock Grid.Row="0" Grid.Column="3" Text="Color:" VerticalAlignment="Center" FontSize="{DynamicResource AppFontSize}"/>
                 <ComboBox Grid.Row="0" Grid.Column="4" x:Name="ColorCombo" x:FieldModifier="internal" FontSize="{DynamicResource AppFontSize}" HorizontalAlignment="Left" MinWidth="150"/>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Style:" VerticalAlignment="Center" Margin="0,8,0,0" FontSize="{DynamicResource AppFontSize}"/>
+                <ComboBox Grid.Row="1" Grid.Column="1" x:Name="StyleCombo" x:FieldModifier="internal" Margin="0,8,0,0" FontSize="{DynamicResource AppFontSize}"/>
             </Grid>
 
             <Grid ColumnDefinitions="100,*">
@@ -41,7 +44,9 @@
                     <Button Content="Line To" Click="OnAddLineTo" FontSize="{DynamicResource AppFontSize}" MinWidth="70" Margin="0,0,5,0"/>
                     <Button Content="Arc" Click="OnAddArc" FontSize="{DynamicResource AppFontSize}" MinWidth="70" Margin="0,0,5,0"/>
                     <Button Content="Edit" Click="OnEditElement" FontSize="{DynamicResource AppFontSize}" MinWidth="70" Margin="0,0,5,0"/>
-                    <Button Content="Delete" Click="OnDeleteElement" FontSize="{DynamicResource AppFontSize}" MinWidth="70"/>
+                    <Button Content="Delete" Click="OnDeleteElement" FontSize="{DynamicResource AppFontSize}" MinWidth="70" Margin="0,0,5,0"/>
+                    <Button Content="Up" Click="OnMoveUp" FontSize="{DynamicResource AppFontSize}" MinWidth="60" Margin="0,0,5,0"/>
+                    <Button Content="Down" Click="OnMoveDown" FontSize="{DynamicResource AppFontSize}" MinWidth="60"/>
                 </WrapPanel>
 
                 <ListBox x:Name="ElementsList" x:FieldModifier="internal"

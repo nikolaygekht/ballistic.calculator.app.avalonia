@@ -137,10 +137,10 @@
                     <!-- Section 3: Element Operations -->
                     <Border Grid.Row="2"
                             Padding="5">
-                        <Grid ColumnDefinitions="*,5,Auto,5,Auto,5,Auto,5,Auto">
+                        <StackPanel Spacing="5">
                             <!-- Element Type ComboBox -->
-                            <ComboBox Grid.Column="0"
-                                      x:Name="ElementTypeCombo"
+                            <ComboBox x:Name="ElementTypeCombo"
+                                      HorizontalAlignment="Stretch"
                                       FontSize="{DynamicResource AppFontSize}"
                                       SelectedIndex="0">
                                 <ComboBoxItem Content="Line"/>
@@ -152,11 +152,15 @@
                             </ComboBox>
 
                             <!-- Operation Buttons -->
-                            <Button Grid.Column="2" Content="New" x:Name="ButtonNew" Click="OnNewElement" FontSize="{DynamicResource AppFontSize}" MinWidth="70"/>
-                            <Button Grid.Column="4" Content="Edit" x:Name="ButtonEdit" Click="OnEditElement" FontSize="{DynamicResource AppFontSize}" MinWidth="70"/>
-                            <Button Grid.Column="6" Content="Duplicate" x:Name="ButtonDuplicate" Click="OnDuplicateElement" FontSize="{DynamicResource AppFontSize}" MinWidth="70"/>
-                            <Button Grid.Column="8" Content="Delete" x:Name="ButtonDelete" Click="OnDeleteElement" FontSize="{DynamicResource AppFontSize}" MinWidth="70"/>
-                        </Grid>
+                            <WrapPanel HorizontalAlignment="Left">
+                                <Button Content="New" x:Name="ButtonNew" Click="OnNewElement" FontSize="{DynamicResource AppFontSize}" MinWidth="70" Margin="0,0,5,5"/>
+                                <Button Content="Edit" x:Name="ButtonEdit" Click="OnEditElement" FontSize="{DynamicResource AppFontSize}" MinWidth="70" Margin="0,0,5,5"/>
+                                <Button Content="Duplicate" x:Name="ButtonDuplicate" Click="OnDuplicateElement" FontSize="{DynamicResource AppFontSize}" MinWidth="70" Margin="0,0,5,5"/>
+                                <Button Content="Delete" x:Name="ButtonDelete" Click="OnDeleteElement" FontSize="{DynamicResource AppFontSize}" MinWidth="70" Margin="0,0,5,5"/>
+                                <Button Content="Up" x:Name="ButtonMoveUp" Click="OnMoveElementUp" FontSize="{DynamicResource AppFontSize}" MinWidth="60" Margin="0,0,5,5"/>
+                                <Button Content="Down" x:Name="ButtonMoveDown" Click="OnMoveElementDown" FontSize="{DynamicResource AppFontSize}" MinWidth="60" Margin="0,0,0,5"/>
+                            </WrapPanel>
+                        </StackPanel>
                     </Border>
 
                 </Grid>

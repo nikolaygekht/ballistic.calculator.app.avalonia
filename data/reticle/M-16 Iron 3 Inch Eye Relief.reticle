@@ -1,0 +1,19 @@
+<reticle name="M-16 Iron Sight 2&quot; Eye Relief" size-x="350moa" size-y="350moa" zero-x="175moa" zero-y="175moa">
+  <elements>
+    <reticle-rectangle position-x="-5.5moa" position-y="0moa" size-x="11moa" size-y="175moa" fill="true" color="black" />
+    <reticle-path fill="true" color="black">
+      <elements>
+        <reticle-path-move-to position-x="-175moa" position-y="-175moa" />
+        <reticle-path-line-to position-x="-175moa" position-y="175moa" />
+        <reticle-path-line-to position-x="175moa" position-y="175moa" />
+        <reticle-path-line-to position-x="175moa" position-y="-175moa" />
+        <reticle-path-line-to position-x="-175moa" position-y="-175moa" />
+        <reticle-path-move-to position-x="0moa" position-y="-172moa" />
+        <reticle-path-arc radius="172moa" clockwise="false" major-arc="true" position-x="-0moa" position-y="172moa" />
+        <reticle-path-arc radius="172moa" clockwise="false" major-arc="false" position-x="0moa" position-y="-172moa" />
+      </elements>
+    </reticle-path>
+    <reticle-circle center-x="0moa" center-y="0moa" radius="60moa" fill="false" line-width="0.5moa" color="black" line-style="Dotted" />
+  </elements>
+  <bdc />
+</reticle>

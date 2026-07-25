@@ -43,22 +43,25 @@ public sealed class SkiaReticleCanvas : IReticleCanvas
         _canvas.Clear(_backgroundColor);
     }
 
-    public void Circle(float x, float y, float radius, float width, bool fill, string color)
+    public void Circle(float x, float y, float radius, float width, bool fill, string color,
+        ReticleLineStyle style = ReticleLineStyle.Solid)
     {
-        var paint = GetPaint(color, width, fill);
+        var paint = GetPaint(color, width, fill, style);
         _canvas.DrawCircle(x, y, radius, paint);
     }
 
-    public void Line(float x1, float y1, float x2, float y2, float width, string color)
+    public void Line(float x1, float y1, float x2, float y2, float width, string color,
+        ReticleLineStyle style = ReticleLineStyle.Solid)
     {
-        var paint = GetPaint(color, width, false);
+        var paint = GetPaint(color, width, false, style);
         _canvas.DrawLine(x1, y1, x2, y2, paint);
     }
 
-    public void Rectangle(float x1, float y1, float x2, float y2, float width, bool fill, string color)
+    public void Rectangle(float x1, float y1, float x2, float y2, float width, bool fill, string color,
+        ReticleLineStyle style = ReticleLineStyle.Solid)
     {
         var rect = new SKRect(x1, y1, x2, y2);
-        var paint = GetPaint(color, width, fill);
+        var paint = GetPaint(color, width, fill, style);
         _canvas.DrawRect(rect, paint);
     }
 
@@ -92,12 +95,13 @@ public sealed class SkiaReticleCanvas : IReticleCanvas
         return new SkiaReticlePath();
     }
 
-    public void Path(IReticleCanvasPath path, float width, bool fill, string color)
+    public void Path(IReticleCanvasPath path, float width, bool fill, string color,
+        ReticleLineStyle style = ReticleLineStyle.Solid)
     {
         if (path is not SkiaReticlePath skiaPath)
             throw new ArgumentException($"Path object is not created by {nameof(SkiaReticleCanvas)} class", nameof(path));
 
-        var paint = GetPaint(color, width, fill);
+        var paint = GetPaint(color, width, fill, style);
         _canvas.DrawPath(skiaPath.Path, paint);
     }
 
@@ -166,22 +170,37 @@ public sealed class SkiaReticleCanvas : IReticleCanvas
         return SKColors.Black;
     }
 
-    private static SKPaint GetPaint(string color, float width, bool fill)
+    private static SKPaint GetPaint(string color, float width, bool fill,
+        ReticleLineStyle style = ReticleLineStyle.Solid)
     {
         int strokeWidth = width < 0.5f ? 1 : (int)Math.Round(width);
-        string cacheKey = $"{color ?? "black"}_{strokeWidth}_{fill}";
+        string cacheKey = $"{color ?? "black"}_{strokeWidth}_{fill}_{style}";
 
         if (!PaintCache.TryGetValue(cacheKey, out var paint))
         {
+            // Dashed/dotted apply only to strokes; a filled shape ignores the line style.
+            bool dashed = !fill && style != ReticleLineStyle.Solid;
+
             paint = new SKPaint
             {
                 Color = TranslateColor(color),
                 IsAntialias = true,
                 Style = fill ? SKPaintStyle.Fill : SKPaintStyle.Stroke,
                 StrokeWidth = strokeWidth,
-                StrokeCap = SKStrokeCap.Butt,
-                StrokeJoin = SKStrokeJoin.Miter
+                StrokeCap = dashed && style == ReticleLineStyle.Dotted
+                    ? SKStrokeCap.Round
+                    : SKStrokeCap.Butt,
+                StrokeJoin = SKStrokeJoin.Miter,
             };
+
+            if (dashed)
+            {
+                float w = strokeWidth;
+                var intervals = style == ReticleLineStyle.Dotted
+                    ? new[] { w, w * 2f }        // dot, gap
+                    : new[] { w * 4f, w * 3f };  // dash, gap
+                paint.PathEffect = SKPathEffect.CreateDash(intervals, 0);
+            }
 
             // Limit cache size
             if (PaintCache.Count > 1000)

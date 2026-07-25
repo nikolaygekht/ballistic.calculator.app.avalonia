@@ -208,6 +208,7 @@ public partial class ReticlePanel : UserControl
         {
             Title = "Open Reticle",
             DefaultExtension = ".reticle",
+            InitialDirectory = DataFolders.Reticles,
             Filters = { new Services.FileDialogFilter("Reticles", "reticle") },
         });
 

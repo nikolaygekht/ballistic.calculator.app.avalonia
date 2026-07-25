@@ -37,6 +37,11 @@
             </Grid>
 
             <Grid ColumnDefinitions="100,*">
+                <TextBlock Grid.Column="0" Text="Style:" VerticalAlignment="Center" FontSize="{DynamicResource AppFontSize}"/>
+                <ComboBox Grid.Column="1" x:Name="StyleCombo" x:FieldModifier="internal" FontSize="{DynamicResource AppFontSize}"/>
+            </Grid>
+
+            <Grid ColumnDefinitions="100,*">
                 <CheckBox Grid.Column="1" x:Name="FillCheckBox" x:FieldModifier="internal" Content="Fill" FontSize="{DynamicResource AppFontSize}"/>
             </Grid>
 

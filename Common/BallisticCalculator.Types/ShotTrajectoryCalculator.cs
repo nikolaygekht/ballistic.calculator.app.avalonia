@@ -58,12 +58,16 @@ public static class ShotTrajectoryCalculator
             Step = stepOverride ?? p.Step,
         };
 
+        // GC ballistic coefficients need their custom .drg table supplied to both calls.
+        var zeroTable = CustomDragTableLoader.ForAmmunition(inputs.ZeroAmmunition);
+        var shotTable = CustomDragTableLoader.ForAmmunition(ammo);
+
         var calc = new TrajectoryCalculator();
         shot.Apply(calc.CalculateZeroParameters(
             inputs.ZeroAmmunition, inputs.ZeroAtmosphere, inputs.Rifle, inputs.ZeroParameters,
-            shot: inputs.ZeroShot, wind: inputs.ZeroWind));
+            shot: inputs.ZeroShot, wind: inputs.ZeroWind, dragTable: zeroTable));
 
-        return TrimTrailingNulls(calc.Calculate(ammo, inputs.Rifle, atmosphere, shot, shotData.Winds));
+        return TrimTrailingNulls(calc.Calculate(ammo, inputs.Rifle, atmosphere, shot, shotData.Winds, shotTable));
     }
 
     /// <summary>Trim trailing nulls the calculator pads when the run stops early (subsonic/steep).</summary>

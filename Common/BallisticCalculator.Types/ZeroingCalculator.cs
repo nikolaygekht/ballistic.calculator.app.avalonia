@@ -51,7 +51,8 @@ public static class ZeroingCalculator
         var calc = new TrajectoryCalculator();
         return calc.CalculateZeroParameters(
             inputs.ZeroAmmunition, inputs.ZeroAtmosphere, inputs.Rifle, inputs.ZeroParameters,
-            shot: inputs.ZeroShot, wind: inputs.ZeroWind);
+            shot: inputs.ZeroShot, wind: inputs.ZeroWind,
+            dragTable: CustomDragTableLoader.ForAmmunition(inputs.ZeroAmmunition));
     }
 
     public sealed class ZeroingInputs

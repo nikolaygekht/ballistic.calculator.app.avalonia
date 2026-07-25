@@ -35,6 +35,7 @@ public partial class EditPathDialog : Window
         // Hook up change events for auto-preview
         LineWidthControl.Changed += OnParameterChanged;
         ColorCombo.SelectionChanged += OnParameterChanged;
+        StyleCombo.SelectionChanged += OnParameterChanged;
         FillCheckBox.IsCheckedChanged += OnParameterChanged;
 
         UpdatePreview();
@@ -52,7 +53,8 @@ public partial class EditPathDialog : Window
         {
             Color = source.Color,
             LineWidth = source.LineWidth,
-            Fill = source.Fill
+            Fill = source.Fill,
+            LineStyle = source.LineStyle
         };
 
         foreach (var element in source.Elements)
@@ -72,6 +74,10 @@ public partial class EditPathDialog : Window
         // Populate color combo
         ColorCombo.PopulateWithColors();
         ColorCombo.SelectedItem = _element.Color ?? "black";
+
+        // Populate line style (legacy null => Solid)
+        StyleCombo.PopulateWithLineStyles();
+        StyleCombo.SelectLineStyle(_element.LineStyle);
 
         // Populate fill checkbox
         FillCheckBox.IsChecked = _element.Fill == true;
@@ -98,6 +104,7 @@ public partial class EditPathDialog : Window
 
         _element.Color = ColorCombo.SelectedItem?.ToString();
         _element.Fill = FillCheckBox.IsChecked == true;
+        _element.LineStyle = StyleCombo.SelectedLineStyle();
     }
 
     public void Revert()
@@ -105,6 +112,7 @@ public partial class EditPathDialog : Window
         _element.Color = _copy.Color;
         _element.LineWidth = _copy.LineWidth;
         _element.Fill = _copy.Fill;
+        _element.LineStyle = _copy.LineStyle;
 
         _element.Elements.Clear();
         foreach (var element in _copy.Elements)
@@ -135,6 +143,7 @@ public partial class EditPathDialog : Window
 
         previewPath.Color = ColorCombo.SelectedItem?.ToString();
         previewPath.Fill = FillCheckBox.IsChecked == true;
+        previewPath.LineStyle = StyleCombo.SelectedLineStyle();
 
         // Copy elements from the actual path
         foreach (var element in _element.Elements)
@@ -253,7 +262,37 @@ public partial class EditPathDialog : Window
         UpdatePreview();
     }
 
+    /// <summary>Moves the selected path element up (-1) or down (+1) within the path.</summary>
+    public void MoveSelectedElement(int delta)
+    {
+        if (ElementsList.SelectedItem is not ReticlePathElement selected)
+            return;
+
+        int index = -1;
+        for (int i = 0; i < _element.Elements.Count; i++)
+        {
+            if (ReferenceEquals(_element.Elements[i], selected))
+            {
+                index = i;
+                break;
+            }
+        }
+
+        int target = index + delta;
+        if (index < 0 || target < 0 || target >= _element.Elements.Count)
+            return;
+
+        _element.Elements.RemoveAt(index);
+        _element.Elements.Insert(target, selected);
+
+        RefreshElementsList();
+        ElementsList.SelectedIndex = target;
+        UpdatePreview();
+    }
+
     // Event handlers
+    private void OnMoveUp(object? sender, RoutedEventArgs e) => MoveSelectedElement(-1);
+    private void OnMoveDown(object? sender, RoutedEventArgs e) => MoveSelectedElement(1);
     private void OnAddMoveTo(object? sender, RoutedEventArgs e) => AddMoveTo();
     private void OnAddLineTo(object? sender, RoutedEventArgs e) => AddLineTo();
     private void OnAddArc(object? sender, RoutedEventArgs e) => AddArc();

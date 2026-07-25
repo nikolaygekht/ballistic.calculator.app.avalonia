@@ -42,6 +42,7 @@ public partial class MainWindow : Window
 
         // Create empty reticle by default
         _currentReticle = new ReticleDefinition();
+        UpdateElementsList();
 
         // Hook up selection changed event
         ReticleItems.SelectionChanged += OnReticleItemsSelectionChanged;
@@ -197,7 +198,8 @@ public partial class MainWindow : Window
         {
             Title = "Open Reticle File",
             AllowMultiple = false,
-            FileTypeFilter = new[] { fileTypeFilter }
+            FileTypeFilter = new[] { fileTypeFilter },
+            SuggestedStartLocation = await GetReticleFolderAsync(),
         });
 
         if (files.Count > 0)
@@ -226,15 +228,30 @@ public partial class MainWindow : Window
         }
     }
 
-    private async void OnFileSave(object? sender, RoutedEventArgs e)
+    private async void OnFileSave(object? sender, RoutedEventArgs e) => await SaveAsync();
+
+    private async void OnFileSaveAs(object? sender, RoutedEventArgs e) => await SaveAsAsync();
+
+    /// <summary>Saves to the current file, or falls back to Save As when there is no file name yet.</summary>
+    private async Task SaveAsync()
     {
-        // TODO: Implement save
-        StatusArea.Text = "Save (not implemented yet)";
-        await Task.CompletedTask;
+        if (_currentReticle == null)
+            return;
+
+        if (string.IsNullOrEmpty(_currentFileName))
+        {
+            await SaveAsAsync();
+            return;
+        }
+
+        SaveToFile(_currentFileName);
     }
 
-    private async void OnFileSaveAs(object? sender, RoutedEventArgs e)
+    private async Task SaveAsAsync()
     {
+        if (_currentReticle == null)
+            return;
+
         var storageProvider = StorageProvider;
         if (storageProvider == null) return;
 
@@ -248,14 +265,60 @@ public partial class MainWindow : Window
         {
             Title = "Save Reticle File",
             FileTypeChoices = new[] { fileTypeFilter },
-            SuggestedFileName = "reticle.reticle"
+            SuggestedFileName = string.IsNullOrEmpty(_currentFileName)
+                ? "reticle.reticle"
+                : System.IO.Path.GetFileName(_currentFileName),
+            SuggestedStartLocation = await GetReticleFolderAsync(),
         });
 
-        if (file != null)
+        if (file == null)
+            return;
+
+        var path = file.TryGetLocalPath();
+        if (path == null)
         {
-            // TODO: Save reticle to file
-            var path = file.TryGetLocalPath();
+            StatusArea.Text = "Save failed: unsupported location.";
+            return;
+        }
+
+        _currentFileName = path;
+        SaveToFile(path);
+    }
+
+    /// <summary>The default reticle folder next to the executable (data/reticle), created if missing.</summary>
+    private async Task<Avalonia.Platform.Storage.IStorageFolder?> GetReticleFolderAsync()
+    {
+        var provider = StorageProvider;
+        if (provider == null)
+            return null;
+        try
+        {
+            var dir = BallisticCalculator.Types.DataFolders.Reticles;
+            System.IO.Directory.CreateDirectory(dir);
+            return await provider.TryGetFolderFromPathAsync(dir);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private void SaveToFile(string path)
+    {
+        if (_currentReticle == null)
+            return;
+
+        // Commit the current reticle parameter fields (name / size / zero) before writing.
+        CommitReticleParameters();
+
+        try
+        {
+            BallisticXmlSerializer.SerializeToFile(_currentReticle, path);
             StatusArea.Text = $"Saved: {System.IO.Path.GetFileName(path)}";
+        }
+        catch (System.Exception ex)
+        {
+            StatusArea.Text = $"Save failed: {ex.Message}";
         }
     }
 
@@ -442,10 +505,16 @@ public partial class MainWindow : Window
 
     private void OnSetReticleParameters(object? sender, RoutedEventArgs e)
     {
-        if (_currentReticle == null)
-        {
-            _currentReticle = new ReticleDefinition();
-        }
+        CommitReticleParameters();
+        UpdateReticlePreview();
+        UpdateElementButtonStates();
+        StatusArea.Text = "Reticle parameters updated";
+    }
+
+    /// <summary>Copies the reticle parameter fields (name / size / zero) into the current reticle.</summary>
+    private void CommitReticleParameters()
+    {
+        _currentReticle ??= new ReticleDefinition();
 
         // Update name
         _currentReticle.Name = ReticleName.Text;
@@ -475,10 +544,6 @@ public partial class MainWindow : Window
                 Y = zeroY.Value
             };
         }
-
-        UpdateReticlePreview();
-        UpdateElementButtonStates();
-        StatusArea.Text = "Reticle parameters updated";
     }
 
     private void UpdateReticleControls()
@@ -628,14 +693,17 @@ public partial class MainWindow : Window
 
     private void RefreshElementsList()
     {
-        if (_currentReticle == null || _elementsView == null)
+        if (_currentReticle == null)
+        {
+            ReticleItems.ItemsSource = null;
+            _elementsView = null;
             return;
+        }
 
-        // Save current selection and scroll position
-        var selectedItem = ReticleItems.SelectedItem;
+        // Save current selection to restore after rebuild
         var selectedIndex = ReticleItems.SelectedIndex;
 
-        // Recreate the view to force refresh
+        // Recreate the view to force refresh (also initializes it if not yet built)
         _elementsView = new Models.CombinedElementsView(_currentReticle);
         ReticleItems.ItemsSource = _elementsView;
 
@@ -662,6 +730,8 @@ public partial class MainWindow : Window
         ButtonEdit.IsEnabled = hasReticle && hasSelection;
         ButtonDuplicate.IsEnabled = hasReticle && hasSelection;
         ButtonDelete.IsEnabled = hasReticle && hasSelection;
+        ButtonMoveUp.IsEnabled = hasReticle && hasSelection;
+        ButtonMoveDown.IsEnabled = hasReticle && hasSelection;
     }
 
     private async void OnNewElement(object? sender, RoutedEventArgs e)
@@ -863,6 +933,60 @@ public partial class MainWindow : Window
             ReticleItems.SelectedIndex = _elementsView.Count - 1;
 
         StatusArea.Text = $"Duplicated {selectedElement.GetType().Name}";
+    }
+
+    private void OnMoveElementUp(object? sender, RoutedEventArgs e) => MoveSelectedElement(-1);
+    private void OnMoveElementDown(object? sender, RoutedEventArgs e) => MoveSelectedElement(1);
+
+    /// <summary>
+    /// Reorders the selected item within its own collection (elements or BDC points) by the given
+    /// delta. Moves stay within a collection — the combined list shows elements first, then BDC points.
+    /// </summary>
+    private void MoveSelectedElement(int delta)
+    {
+        if (_currentReticle == null) return;
+
+        var selected = ReticleItems.SelectedItem;
+        if (selected == null) return;
+
+        if (selected is ReticleElement element)
+        {
+            var coll = _currentReticle.Elements;
+            int index = -1;
+            for (int i = 0; i < coll.Count; i++)
+                if (ReferenceEquals(coll[i], element)) { index = i; break; }
+
+            int target = index + delta;
+            if (index < 0 || target < 0 || target >= coll.Count) return;
+
+            coll.RemoveAt(index);
+            coll.Insert(target, element);
+            RefreshElementsList();
+            ReticleItems.SelectedIndex = target; // element combined index == element index
+        }
+        else if (selected is ReticleBulletDropCompensatorPoint bdc)
+        {
+            var coll = _currentReticle.BulletDropCompensator;
+            int index = -1;
+            for (int i = 0; i < coll.Count; i++)
+                if (ReferenceEquals(coll[i], bdc)) { index = i; break; }
+
+            int target = index + delta;
+            if (index < 0 || target < 0 || target >= coll.Count) return;
+
+            coll.RemoveAt(index);
+            coll.Insert(target, bdc);
+            RefreshElementsList();
+            // BDC points follow the elements in the combined list.
+            ReticleItems.SelectedIndex = _currentReticle.Elements.Count + target;
+        }
+        else
+        {
+            return;
+        }
+
+        UpdateReticlePreview();
+        StatusArea.Text = $"Moved {selected.GetType().Name} {(delta < 0 ? "up" : "down")}";
     }
 
     #endregion

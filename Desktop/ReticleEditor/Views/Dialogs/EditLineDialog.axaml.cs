@@ -57,6 +57,10 @@ public partial class EditLineDialog : Window
         // Populate color combo
         ColorCombo.PopulateWithColors();
         ColorCombo.SelectedItem = _element.Color ?? "black";
+
+        // Populate line style (legacy null => Solid)
+        StyleCombo.PopulateWithLineStyles();
+        StyleCombo.SelectLineStyle(_element.LineStyle);
     }
 
     public void Save()
@@ -79,6 +83,7 @@ public partial class EditLineDialog : Window
             _element.LineWidth = null;
 
         _element.Color = ColorCombo.SelectedItem?.ToString();
+        _element.LineStyle = StyleCombo.SelectedLineStyle();
     }
 
     private void OnOK(object? sender, RoutedEventArgs e)

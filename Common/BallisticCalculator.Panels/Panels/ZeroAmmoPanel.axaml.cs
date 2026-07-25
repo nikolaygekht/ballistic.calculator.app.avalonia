@@ -20,7 +20,16 @@ public partial class ZeroAmmoPanel : UserControl
 
     #region Properties
 
-    public IFileDialogService? FileDialogService { get; set; }
+    private IFileDialogService? _fileDialogService;
+    public IFileDialogService? FileDialogService
+    {
+        get => _fileDialogService;
+        set
+        {
+            _fileDialogService = value;
+            AmmoSubPanel.FileDialogService = value;
+        }
+    }
 
     public bool ConvertOnSystemChange
     {
@@ -104,6 +113,7 @@ public partial class ZeroAmmoPanel : UserControl
         {
             Title = "Load Ammunition for Zero",
             DefaultExtension = "ammox",
+            InitialDirectory = DataFolders.LegacyAmmo,
             Filters =
             {
                 new Services.FileDialogFilter("Ammunition Files", "ammox", "ammo"),

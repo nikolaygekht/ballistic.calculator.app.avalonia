@@ -3,9 +3,11 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using BallisticCalculator;
 using BallisticCalculator.Controls.Controls;
+using BallisticCalculator.Panels.Services;
 using BallisticCalculator.Types;
 using Gehtsoft.Measurements;
 using System;
+using System.IO;
 
 [assembly: InternalsVisibleTo("BallisticCalculator.Panels.Tests")]
 
@@ -14,6 +16,7 @@ namespace BallisticCalculator.Panels.Panels;
 public partial class AmmoPanel : UserControl
 {
     private MeasurementSystem _measurementSystem = MeasurementSystem.Metric;
+    private string? _customTableFileName;
 
     public AmmoPanel()
     {
@@ -26,6 +29,9 @@ public partial class AmmoPanel : UserControl
     #region Properties
 
     public bool ConvertOnSystemChange { get; set; }
+
+    /// <summary>Service used by the "Browse..." button to pick a custom drag table (.drg).</summary>
+    public IFileDialogService? FileDialogService { get; set; }
 
     public MeasurementSystem MeasurementSystem
     {
@@ -70,6 +76,9 @@ public partial class AmmoPanel : UserControl
             if (length != null && !BulletLengthControl.IsEmpty)
                 ammo.BulletLength = length.Value;
 
+            if (!string.IsNullOrEmpty(_customTableFileName))
+                ammo.CustomTableFileName = _customTableFileName;
+
             return ammo;
         }
         set
@@ -96,6 +105,9 @@ public partial class AmmoPanel : UserControl
                 BulletLengthControl.SetValue(value.BulletLength.Value);
             else
                 BulletLengthControl.Value = null;
+
+            _customTableFileName = value.CustomTableFileName;
+            UpdateCustomTableDisplay();
         }
     }
 
@@ -174,6 +186,78 @@ public partial class AmmoPanel : UserControl
         MuzzleVelocityControl.Value = null;
         BulletDiameterControl.Value = null;
         BulletLengthControl.Value = null;
+        _customTableFileName = null;
+        UpdateCustomTableDisplay();
+    }
+
+    #endregion
+
+    #region Custom Drag Table
+
+    private void UpdateCustomTableDisplay()
+    {
+        CustomTableBox.Text = string.IsNullOrEmpty(_customTableFileName)
+            ? ""
+            : Path.GetFileName(_customTableFileName);
+    }
+
+    private async void OnBrowseCustomTable(object? sender, RoutedEventArgs e)
+    {
+        if (FileDialogService == null)
+            return;
+
+        var path = await FileDialogService.OpenFileAsync(new FileDialogOptions
+        {
+            Title = "Open Custom Drag Table",
+            DefaultExtension = "drg",
+            InitialDirectory = DataFolders.Drg,
+            Filters = { new Services.FileDialogFilter("Custom Drag Table", "drg") },
+        });
+
+        if (path == null)
+            return;
+
+        DrgDragTable table;
+        try
+        {
+            table = DrgDragTable.Open(path);
+        }
+        catch (Exception ex)
+        {
+            CustomTableBox.Text = $"Error: {ex.Message}";
+            return;
+        }
+
+        // A GC table has no built-in curve; the table itself carries it (used with a form-factor BC of 1).
+        BCControl.Value = new BallisticCoefficient(1, DragTableId.GC);
+        FormFactorCheckBox.IsChecked = true;
+
+        var tableAmmo = table.Ammunition?.Ammunition;
+        if (tableAmmo != null)
+        {
+            WeightControl.SetValue(tableAmmo.Weight);
+            if (tableAmmo.BulletDiameter.HasValue)
+                BulletDiameterControl.SetValue(tableAmmo.BulletDiameter.Value);
+        }
+
+        _customTableFileName = path;
+        UpdateCustomTableDisplay();
+        Changed?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void OnClearCustomTable(object? sender, RoutedEventArgs e)
+    {
+        _customTableFileName = null;
+        UpdateCustomTableDisplay();
+
+        // A cleared custom table with a GC coefficient can't be calculated; fall back to a standard table.
+        if (BCControl.Value?.Table == DragTableId.GC)
+        {
+            BCControl.Value = new BallisticCoefficient(0.5, DragTableId.G1);
+            FormFactorCheckBox.IsChecked = false;
+        }
+
+        Changed?.Invoke(this, EventArgs.Empty);
     }
 
     #endregion
