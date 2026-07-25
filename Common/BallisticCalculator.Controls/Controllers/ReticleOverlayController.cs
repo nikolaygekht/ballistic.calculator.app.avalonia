@@ -1,5 +1,6 @@
 using BallisticCalculator;
 using BallisticCalculator.Reticle.Data;
+using BallisticCalculator.Tools;
 using BallisticCalculator.Types;
 using Gehtsoft.Measurements;
 
@@ -85,6 +86,82 @@ public static class ReticleOverlayController
             Size = new ReticlePosition(angularWidth, angularHeight),
             Color = "red",
         };
+    }
+
+    /// <summary>
+    /// Creates a dotted "aim here" overlay for a moving target: the target box shifted
+    /// horizontally by the computed lead for the given crossing motion.
+    /// </summary>
+    /// <param name="calculator">Calculator with trajectory data</param>
+    /// <param name="targetWidth">Physical width of target</param>
+    /// <param name="targetHeight">Physical height of target</param>
+    /// <param name="targetDistance">Distance to target</param>
+    /// <param name="targetSpeed">Target speed</param>
+    /// <param name="movingDirection">
+    /// Target motion direction (wind convention: 0 = toward the shooter's line of sight/no lead,
+    /// 90 = crossing from the right, 270 = crossing from the left).
+    /// </param>
+    /// <param name="reticleScale">1.0 for FFP, MaxZoom/CurrentZoom for SFP</param>
+    public static ReticleRectangle? CreateMovingTargetOverlay(
+        TrajectoryToReticleCalculator calculator,
+        Measurement<DistanceUnit> targetWidth,
+        Measurement<DistanceUnit> targetHeight,
+        Measurement<DistanceUnit> targetDistance,
+        Measurement<VelocityUnit> targetSpeed,
+        Measurement<AngularUnit> movingDirection,
+        double reticleScale = 1.0)
+    {
+        if (targetWidth.Value < 0.01 || targetHeight.Value < 0.01 ||
+            targetDistance.Value < 0.01)
+            return null;
+
+        var item = calculator.FindDistance(targetDistance);
+        if (item == null)
+            return null;
+
+        var angularWidth = CalculateAngularSize(targetWidth, targetDistance, reticleScale);
+        var angularHeight = CalculateAngularSize(targetHeight, targetDistance, reticleScale);
+
+        // Angular lead follows the trajectory windage sign (left +, right -).
+        var lead = MovingTargetLead.LeadAngle(targetSpeed, movingDirection, item);
+
+        // The box is a hold-over mark: where to place the reticle relative to the target to hit it.
+        // The static target box centers at reticle-X = -WindageAdjustment (the windage hold-off).
+        // Lead is another hold-off the shooter applies in the direction of the target's motion, so
+        // it composes with the same sign: a target crossing to the left (positive lead) means hold
+        // left of the target (reticle-left, negative X). Drop is unchanged (lead is horizontal only).
+        var centerX = -item.WindageAdjustment / reticleScale - lead / reticleScale;
+        var centerY = item.DropAdjustment / reticleScale;
+
+        return new ReticleRectangle
+        {
+            TopLeft = new ReticlePosition(
+                centerX - angularWidth / 2,
+                centerY + angularHeight / 2),
+            Size = new ReticlePosition(angularWidth, angularHeight),
+            Color = "red",
+        };
+    }
+
+    /// <summary>
+    /// Calculates the angular lead (hold-off) for a moving target at the given distance, or null
+    /// if the distance is invalid or outside the trajectory. Sign follows the trajectory windage
+    /// convention (left +, right -).
+    /// </summary>
+    public static Measurement<AngularUnit>? CalculateMovingTargetLead(
+        TrajectoryToReticleCalculator calculator,
+        Measurement<DistanceUnit> targetDistance,
+        Measurement<VelocityUnit> targetSpeed,
+        Measurement<AngularUnit> movingDirection)
+    {
+        if (targetDistance.Value < 0.01)
+            return null;
+
+        var item = calculator.FindDistance(targetDistance);
+        if (item == null)
+            return null;
+
+        return MovingTargetLead.LeadAngle(targetSpeed, movingDirection, item);
     }
 
     /// <summary>

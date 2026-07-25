@@ -47,6 +47,7 @@ public partial class TrajectoryView : UserControl, ITrajectoryChildWindow
             TableControl.AngularUnits = value;
             ChartControl.AngularUnits = value;
             SummaryControl.AngularUnits = value;
+            ReticleControl.AngularUnits = value;
         }
     }
 
@@ -139,6 +140,7 @@ public partial class TrajectoryView : UserControl, ITrajectoryChildWindow
         ChartControl.DropBase = _dropBase;
 
         ReticleControl.MeasurementSystem = _measurementSystem;
+        ReticleControl.AngularUnits = _angularUnits;
 
         SummaryControl.MeasurementSystem = _measurementSystem;
         SummaryControl.AngularUnits = _angularUnits;

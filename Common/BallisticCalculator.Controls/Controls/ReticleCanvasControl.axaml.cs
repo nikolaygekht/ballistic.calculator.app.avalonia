@@ -50,6 +50,13 @@ public partial class ReticleCanvasControl : UserControl
     /// </summary>
     public ReticleElementsCollection? Overlay { get; set; }
 
+    /// <summary>
+    /// Gets or sets an optional dashed "aim here" box for a moving target. Unlike the element
+    /// collections, this box is drawn directly with a dashed stroke (the reticle element pipeline
+    /// has no per-element dash support). Its angular position/size use the reticle coordinate system.
+    /// </summary>
+    public ReticleRectangle? MovingTargetBox { get; set; }
+
     public ReticleCanvasControl()
     {
         InitializeComponent();
@@ -204,13 +211,31 @@ public partial class ReticleCanvasControl : UserControl
             Reticle.Size.Y.In(Reticle.Size.Y.Unit) <= 0)
             return;
 
+        // Map the optional moving-target box from angular to full-canvas pixel coordinates so the
+        // draw op can stroke it dashed (the element pipeline has no dash support).
+        SKRect? movingTargetPixelBox = null;
+        if (MovingTargetBox is ReticleRectangle box)
+        {
+            var topLeft = AngularToPixel(box.TopLeft);
+            var bottomRight = AngularToPixel(new ReticlePosition(
+                box.TopLeft.X + box.Size.X,
+                box.TopLeft.Y - box.Size.Y));
+            if (topLeft != null && bottomRight != null)
+            {
+                movingTargetPixelBox = new SKRect(
+                    (float)topLeft.Value.X, (float)topLeft.Value.Y,
+                    (float)bottomRight.Value.X, (float)bottomRight.Value.Y);
+            }
+        }
+
         // Create the custom draw operation
         var drawOp = new CustomDrawOp(
             new Rect(0, 0, Bounds.Width, Bounds.Height),
             Reticle,
             BackgroundColor,
             Underlay,
-            Overlay);
+            Overlay,
+            movingTargetPixelBox);
 
         context.Custom(drawOp);
     }
@@ -225,15 +250,18 @@ public partial class ReticleCanvasControl : UserControl
         private readonly Color _backgroundColor;
         private readonly ReticleElementsCollection? _underlay;
         private readonly ReticleElementsCollection? _overlay;
+        private readonly SKRect? _movingTargetBox;
 
         public CustomDrawOp(Rect bounds, ReticleDefinition reticle, Color backgroundColor,
-            ReticleElementsCollection? underlay, ReticleElementsCollection? overlay)
+            ReticleElementsCollection? underlay, ReticleElementsCollection? overlay,
+            SKRect? movingTargetBox)
         {
             _bounds = bounds;
             _reticle = reticle;
             _backgroundColor = backgroundColor;
             _underlay = underlay;
             _overlay = overlay;
+            _movingTargetBox = movingTargetBox;
         }
 
         public void Dispose()
@@ -251,7 +279,8 @@ public partial class ReticleCanvasControl : UserControl
                    op._reticle == _reticle &&
                    op._bounds == _bounds &&
                    op._underlay == _underlay &&
-                   op._overlay == _overlay;
+                   op._overlay == _overlay &&
+                   op._movingTargetBox == _movingTargetBox;
         }
 
         public void Render(ImmediateDrawingContext context)
@@ -338,6 +367,22 @@ public partial class ReticleCanvasControl : UserControl
 
             // Restore canvas state
             canvas.Restore();
+
+            // Draw the moving-target "aim here" box with a dashed stroke, in full-canvas pixel
+            // coordinates (AngularToPixel already accounts for the centering offset).
+            if (_movingTargetBox is SKRect dashRect)
+            {
+                using var dashEffect = SKPathEffect.CreateDash(new float[] { 4f, 4f }, 0f);
+                using var dashPaint = new SKPaint
+                {
+                    Color = SKColors.Red,
+                    IsAntialias = true,
+                    Style = SKPaintStyle.Stroke,
+                    StrokeWidth = 2f,
+                    PathEffect = dashEffect,
+                };
+                canvas.DrawRect(dashRect.Standardized, dashPaint);
+            }
         }
     }
 }

@@ -109,10 +109,12 @@
 
       </StackPanel>
 
-      <!-- Azimuth dial: arrow points shooter -> target, 0 = North (up) -->
+      <!-- Azimuth dial: arrow points shooter -> target, 0 = North (up).
+           Height stretches to match the azimuth + latitude control block. -->
       <controls:AzimuthDirectionControl Grid.Column="1"
                  x:Name="AzimuthIndicator" x:FieldModifier="internal"
-                 Width="80" Height="80" Margin="8,0,0,0"
+                 Width="80" Margin="8,0,0,0"
+                 VerticalAlignment="Stretch"
                  IsEnabled="False"/>
     </Grid>
 

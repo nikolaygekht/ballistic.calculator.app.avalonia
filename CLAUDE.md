@@ -4,6 +4,10 @@
 
 Create a new version of the BallisticCalculator application using **Avalonia UI** instead of WinForms. This is a complete rewrite that maintains the functionality of the original application while taking advantage of modern cross-platform UI technology.
 
+## Development Workflow
+
+**Trunk-based development.** Commit directly to `main`; do **not** create feature branches unless explicitly requested. Only commit/push when asked.
+
 ## Key References
 
 ### Libraries

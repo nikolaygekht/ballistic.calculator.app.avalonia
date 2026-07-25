@@ -14,7 +14,7 @@
                Margin="0,0,4,0"/>
 
     <!-- Right: Controls -->
-    <Border Grid.Column="1" Width="260" Padding="5">
+    <Border Grid.Column="1" Width="325" Padding="5">
       <StackPanel Spacing="4">
 
         <!-- Reticle loading -->
@@ -119,6 +119,59 @@
                        x:Name="TargetDistanceControl" x:FieldModifier="internal"
                        FontSize="{DynamicResource AppFontSize}"/>
           </Grid>
+
+          <TextBlock x:Name="TargetAngularSizeText" x:FieldModifier="internal"
+                     Text=""
+                     Foreground="Gray"
+                     FontSize="{DynamicResource AppFontSize}"/>
+
+          <Separator Margin="0,4"/>
+
+          <!-- Moving target -->
+          <CheckBox x:Name="MovingTargetCheck" x:FieldModifier="internal"
+                    Content="Moving target"
+                    FontWeight="Bold"
+                    FontSize="{DynamicResource AppFontSize}"/>
+
+          <StackPanel x:Name="MovingTargetControlsPanel" x:FieldModifier="internal"
+                      Spacing="4" IsEnabled="False">
+
+            <!-- Direction (numeric, synced with dial) + speed, with the dial on the right -->
+            <Grid ColumnDefinitions="*,Auto">
+              <StackPanel Grid.Column="0" Spacing="4">
+
+                <Grid ColumnDefinitions="60,*">
+                  <TextBlock Grid.Column="0" Text="Direction:"
+                             VerticalAlignment="Center"
+                             FontSize="{DynamicResource AppFontSize}"/>
+                  <controls:MeasurementControl Grid.Column="1"
+                             x:Name="MovingDirectionInput" x:FieldModifier="internal"
+                             FontSize="{DynamicResource AppFontSize}"/>
+                </Grid>
+
+                <Grid ColumnDefinitions="60,*">
+                  <TextBlock Grid.Column="0" Text="Speed:"
+                             VerticalAlignment="Center"
+                             FontSize="{DynamicResource AppFontSize}"/>
+                  <controls:MeasurementControl Grid.Column="1"
+                             x:Name="MovingSpeedControl" x:FieldModifier="internal"
+                             FontSize="{DynamicResource AppFontSize}"/>
+                </Grid>
+
+              </StackPanel>
+
+              <controls:AzimuthDirectionControl Grid.Column="1"
+                         x:Name="MovingDirectionControl" x:FieldModifier="internal"
+                         Width="64" Margin="8,0,0,0"
+                         VerticalAlignment="Stretch"/>
+            </Grid>
+
+            <TextBlock x:Name="LeadCorrectionText" x:FieldModifier="internal"
+                       Text=""
+                       Foreground="Gray"
+                       FontSize="{DynamicResource AppFontSize}"/>
+
+          </StackPanel>
 
         </StackPanel>
 

@@ -19,6 +19,7 @@ namespace BallisticCalculator.Panels.Panels;
 public partial class ReticlePanel : UserControl
 {
     private MeasurementSystem _measurementSystem = MeasurementSystem.Imperial;
+    private AngularUnit _angularUnits = AngularUnit.Mil;
     private ReticleDefinition? _reticle;
     private ShotData? _shotData;
     private TrajectoryPoint[]? _fineTrajectory;
@@ -43,6 +44,21 @@ public partial class ReticlePanel : UserControl
             if (_measurementSystem == value) return;
             _measurementSystem = value;
             ApplyMeasurementSystem();
+            UpdateReticle();
+        }
+    }
+
+    /// <summary>
+    /// Angular unit used to display the computed target angular size and moving-target lead.
+    /// Set by the host from the active window's View → Angular units selection.
+    /// </summary>
+    public AngularUnit AngularUnits
+    {
+        get => _angularUnits;
+        set
+        {
+            if (_angularUnits == value) return;
+            _angularUnits = value;
             UpdateReticle();
         }
     }
@@ -100,6 +116,18 @@ public partial class ReticlePanel : UserControl
         TargetDistanceControl.UnitType = typeof(DistanceUnit);
         TargetDistanceControl.Minimum = 0;
         TargetDistanceControl.Increment = 10;
+
+        MovingSpeedControl.UnitType = typeof(VelocityUnit);
+        MovingSpeedControl.Minimum = 0;
+        MovingSpeedControl.Increment = 1;
+
+        MovingDirectionInput.UnitType = typeof(AngularUnit);
+        MovingDirectionInput.Minimum = 0;
+        MovingDirectionInput.Maximum = 360;
+        MovingDirectionInput.Increment = 1;
+        MovingDirectionInput.ChangeUnit(AngularUnit.Degree, 0, false);
+        MovingDirectionInput.SetValue(new Measurement<AngularUnit>(0, AngularUnit.Degree));
+
         ApplyMeasurementSystem();
     }
 
@@ -109,6 +137,41 @@ public partial class ReticlePanel : UserControl
         TargetWidthControl.ValueChanged += (s, e) => OnTargetParameterChangedInternal(s, EventArgs.Empty);
         TargetHeightControl.ValueChanged += (s, e) => OnTargetParameterChangedInternal(s, EventArgs.Empty);
         TargetSizeUnitsCombo.SelectionChanged += (s, e) => OnTargetParameterChangedInternal(s, EventArgs.Empty);
+
+        MovingTargetCheck.IsCheckedChanged += OnMovingTargetToggled;
+        MovingSpeedControl.Changed += OnTargetParameterChangedInternal;
+
+        // Two-way sync between the numeric direction input (degrees) and the compass dial;
+        // the dial's Direction is the source of truth used by the overlay/lead calculation.
+        MovingDirectionInput.Changed += (s, e) =>
+        {
+            if (_syncingDirection) return;
+            var value = MovingDirectionInput.IsEmpty ? null : MovingDirectionInput.GetValue<AngularUnit>();
+            if (value != null)
+            {
+                _syncingDirection = true;
+                MovingDirectionControl.Direction = value.Value.In(AngularUnit.Degree);
+                _syncingDirection = false;
+            }
+            OnTargetParameterChangedInternal(s, EventArgs.Empty);
+        };
+        MovingDirectionControl.Changed += (s, e) =>
+        {
+            if (_syncingDirection) return;
+            _syncingDirection = true;
+            MovingDirectionInput.SetValue(new Measurement<AngularUnit>(
+                MovingDirectionControl.Direction, AngularUnit.Degree));
+            _syncingDirection = false;
+            OnTargetParameterChangedInternal(s, EventArgs.Empty);
+        };
+    }
+
+    private bool _syncingDirection;
+
+    private void OnMovingTargetToggled(object? sender, RoutedEventArgs e)
+    {
+        MovingTargetControlsPanel.IsEnabled = MovingTargetCheck.IsChecked == true;
+        OnTargetParameterChangedInternal(sender, EventArgs.Empty);
     }
 
     private void OnTargetParameterChangedInternal(object? sender, EventArgs e)
@@ -121,9 +184,15 @@ public partial class ReticlePanel : UserControl
     private void ApplyMeasurementSystem()
     {
         if (_measurementSystem == MeasurementSystem.Metric)
+        {
             TargetDistanceControl.ChangeUnit(DistanceUnit.Meter, 0);
+            MovingSpeedControl.ChangeUnit(VelocityUnit.KilometersPerHour, 1);
+        }
         else
+        {
             TargetDistanceControl.ChangeUnit(DistanceUnit.Yard, 0);
+            MovingSpeedControl.ChangeUnit(VelocityUnit.MilesPerHour, 1);
+        }
     }
 
     #endregion
@@ -178,9 +247,14 @@ public partial class ReticlePanel : UserControl
         {
             ReticleCanvas.Overlay = null;
             ReticleCanvas.Underlay = null;
+            ReticleCanvas.MovingTargetBox = null;
+            ClearInfoTexts();
             ReticleCanvas.InvalidateVisual();
             return;
         }
+
+        // Info texts apply only to Target mode; clear them here and set them in that branch.
+        ClearInfoTexts();
 
         var calculator = new TrajectoryToReticleCalculator(
             _fineTrajectory, _reticle.BulletDropCompensator, _zeroDistance);
@@ -188,12 +262,14 @@ public partial class ReticlePanel : UserControl
         if (RadioFarBdc.IsChecked == true)
         {
             ReticleCanvas.Underlay = null;
+            ReticleCanvas.MovingTargetBox = null;
             ReticleCanvas.Overlay = ReticleOverlayController.CreateBdcOverlay(
                 calculator, _measurementSystem, far: true);
         }
         else if (RadioNearBdc.IsChecked == true)
         {
             ReticleCanvas.Underlay = null;
+            ReticleCanvas.MovingTargetBox = null;
             ReticleCanvas.Overlay = ReticleOverlayController.CreateBdcOverlay(
                 calculator, _measurementSystem, far: false);
         }
@@ -221,10 +297,16 @@ public partial class ReticlePanel : UserControl
                 {
                     ReticleCanvas.Underlay = null;
                 }
+
+                ReticleCanvas.MovingTargetBox = CalculateMovingTargetBox(
+                    calculator, width, height, distance.Value);
+
+                UpdateInfoTexts(calculator, width, height, distance.Value);
             }
             else
             {
                 ReticleCanvas.Underlay = null;
+                ReticleCanvas.MovingTargetBox = null;
             }
             ReticleCanvas.Overlay = null;
         }
@@ -232,9 +314,79 @@ public partial class ReticlePanel : UserControl
         {
             ReticleCanvas.Overlay = null;
             ReticleCanvas.Underlay = null;
+            ReticleCanvas.MovingTargetBox = null;
         }
 
         ReticleCanvas.InvalidateVisual();
+    }
+
+    /// <summary>
+    /// Builds the dashed moving-target "aim here" box when the moving-target option is enabled
+    /// and a crossing speed is set; otherwise returns null. Uses the same target size/distance
+    /// as the static target box.
+    /// </summary>
+    private ReticleRectangle? CalculateMovingTargetBox(
+        TrajectoryToReticleCalculator calculator,
+        Measurement<DistanceUnit> width,
+        Measurement<DistanceUnit> height,
+        Measurement<DistanceUnit> distance)
+    {
+        if (MovingTargetCheck.IsChecked != true)
+            return null;
+
+        var speed = MovingSpeedControl.GetValue<VelocityUnit>();
+        if (speed == null || speed.Value.Value <= 0)
+            return null;
+
+        var direction = new Measurement<AngularUnit>(
+            MovingDirectionControl.Direction, AngularUnit.Degree);
+
+        return ReticleOverlayController.CreateMovingTargetOverlay(
+            calculator, width, height, distance, speed.Value, direction);
+    }
+
+    private void ClearInfoTexts()
+    {
+        TargetAngularSizeText.Text = "";
+        LeadCorrectionText.Text = "";
+    }
+
+    /// <summary>
+    /// Updates the read-only info lines under the Target inputs: the target's angular size and,
+    /// when the moving-target option is on, the computed lead hold-off — both in the current
+    /// angular unit.
+    /// </summary>
+    private void UpdateInfoTexts(
+        TrajectoryToReticleCalculator calculator,
+        Measurement<DistanceUnit> width,
+        Measurement<DistanceUnit> height,
+        Measurement<DistanceUnit> distance)
+    {
+        var units = new MeasurementSystemController(_measurementSystem, _angularUnits);
+
+        var angularWidth = ReticleOverlayController.CalculateAngularSize(width, distance);
+        var angularHeight = ReticleOverlayController.CalculateAngularSize(height, distance);
+        TargetAngularSizeText.Text =
+            $"Angular: {units.FormatAngular(angularWidth)} × {units.FormatAngular(angularHeight)} {units.AngularUnitName}";
+
+        if (MovingTargetCheck.IsChecked == true)
+        {
+            var speed = MovingSpeedControl.GetValue<VelocityUnit>();
+            if (speed != null && speed.Value.Value > 0)
+            {
+                var direction = new Measurement<AngularUnit>(
+                    MovingDirectionControl.Direction, AngularUnit.Degree);
+                var lead = ReticleOverlayController.CalculateMovingTargetLead(
+                    calculator, distance, speed.Value, direction);
+                if (lead != null)
+                {
+                    // Lead sign: left +, right -. Show magnitude plus the hold direction.
+                    var hold = lead.Value.Value >= 0 ? "left" : "right";
+                    LeadCorrectionText.Text =
+                        $"Lead: {units.FormatAngular(lead.Value.Abs())} {units.AngularUnitName} {hold}";
+                }
+            }
+        }
     }
 
     #endregion

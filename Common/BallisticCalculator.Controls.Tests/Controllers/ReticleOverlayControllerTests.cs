@@ -290,6 +290,216 @@ public class ReticleOverlayControllerTests
 
     #endregion
 
+    #region CreateMovingTargetOverlay
+
+    private static readonly Measurement<DistanceUnit> Size6In = new(6, DistanceUnit.Inch);
+    private static readonly Measurement<DistanceUnit> Dist300 = new(300, DistanceUnit.Yard);
+    private static Measurement<VelocityUnit> Mph(double v) => new(v, VelocityUnit.MilesPerHour);
+    private static Measurement<AngularUnit> Deg(double a) => new(a, AngularUnit.Degree);
+
+    private static double CenterXRad(ReticleRectangle box) =>
+        (box.TopLeft.X + box.Size.X / 2).In(AngularUnit.Radian);
+
+    private static double CenterYRad(ReticleRectangle box) =>
+        (box.TopLeft.Y - box.Size.Y / 2).In(AngularUnit.Radian);
+
+    [Fact]
+    public void CreateMovingTargetOverlay_ValidParams_ReturnsRedRectangle()
+    {
+        var calculator = CreateCalculator();
+
+        var result = ReticleOverlayController.CreateMovingTargetOverlay(
+            calculator, Size6In, Size6In, Dist300, Mph(10), Deg(90));
+
+        result.Should().NotBeNull();
+        result!.Color.Should().Be("red");
+    }
+
+    [Fact]
+    public void CreateMovingTargetOverlay_ZeroSpeed_MatchesStaticTargetBox()
+    {
+        var calculator = CreateCalculator();
+
+        var moving = ReticleOverlayController.CreateMovingTargetOverlay(
+            calculator, Size6In, Size6In, Dist300, Mph(0), Deg(90))!;
+        var stationary = (ReticleRectangle)ReticleOverlayController.CreateTargetOverlay(
+            calculator, Size6In, Size6In, Dist300)!;
+
+        CenterXRad(moving).Should().BeApproximately(
+            (stationary.TopLeft.X + stationary.Size.X / 2).In(AngularUnit.Radian), 1e-9);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(180)]
+    public void CreateMovingTargetOverlay_NoCrossingComponent_NoLead(double directionDeg)
+    {
+        var calculator = CreateCalculator();
+
+        var moving = ReticleOverlayController.CreateMovingTargetOverlay(
+            calculator, Size6In, Size6In, Dist300, Mph(15), Deg(directionDeg))!;
+        var stationary = (ReticleRectangle)ReticleOverlayController.CreateTargetOverlay(
+            calculator, Size6In, Size6In, Dist300)!;
+
+        CenterXRad(moving).Should().BeApproximately(
+            (stationary.TopLeft.X + stationary.Size.X / 2).In(AngularUnit.Radian), 1e-9);
+    }
+
+    [Fact]
+    public void CreateMovingTargetOverlay_CrossingFromRight_HoldsTowardReticleLeft()
+    {
+        // The test trajectory has zero windage, so the static box centers at X = 0.
+        // A target crossing from the right (dir 90) moves right-to-left, so the shooter holds
+        // ahead (to the left): the "aim here" box sits at reticle-left (negative X).
+        var calculator = CreateCalculator();
+
+        var moving = ReticleOverlayController.CreateMovingTargetOverlay(
+            calculator, Size6In, Size6In, Dist300, Mph(10), Deg(90))!;
+
+        CenterXRad(moving).Should().BeLessThan(0);
+    }
+
+    [Fact]
+    public void CreateMovingTargetOverlay_OppositeDirections_ShiftOppositeEqual()
+    {
+        var calculator = CreateCalculator();
+
+        var fromRight = ReticleOverlayController.CreateMovingTargetOverlay(
+            calculator, Size6In, Size6In, Dist300, Mph(12), Deg(90))!;
+        var fromLeft = ReticleOverlayController.CreateMovingTargetOverlay(
+            calculator, Size6In, Size6In, Dist300, Mph(12), Deg(270))!;
+
+        CenterXRad(fromRight).Should().BeLessThan(0);
+        CenterXRad(fromLeft).Should().BeApproximately(-CenterXRad(fromRight), 1e-9);
+    }
+
+    [Fact]
+    public void CreateMovingTargetOverlay_FasterSpeed_LargerShift()
+    {
+        var calculator = CreateCalculator();
+
+        var slow = ReticleOverlayController.CreateMovingTargetOverlay(
+            calculator, Size6In, Size6In, Dist300, Mph(5), Deg(90))!;
+        var fast = ReticleOverlayController.CreateMovingTargetOverlay(
+            calculator, Size6In, Size6In, Dist300, Mph(20), Deg(90))!;
+
+        System.Math.Abs(CenterXRad(fast)).Should().BeGreaterThan(System.Math.Abs(CenterXRad(slow)));
+    }
+
+    [Fact]
+    public void CreateMovingTargetOverlay_KnownMagnitude_MatchesAtanOfLeadOverRange()
+    {
+        // At 300 yd the test point has time-of-flight 0.403 s.
+        var calculator = CreateCalculator();
+
+        var moving = ReticleOverlayController.CreateMovingTargetOverlay(
+            calculator, Size6In, Size6In, Dist300, Mph(10), Deg(90))!;
+
+        double leadMeters = Mph(10).In(VelocityUnit.MetersPerSecond) * 0.403; // full crossing
+        double expectedRad = System.Math.Atan(leadMeters / Dist300.In(DistanceUnit.Meter));
+
+        // Windage is zero in the test trajectory; the hold is to the left (negative) of center.
+        CenterXRad(moving).Should().BeApproximately(-expectedRad, 1e-6);
+    }
+
+    [Fact]
+    public void CreateMovingTargetOverlay_LeadIsHorizontalOnly()
+    {
+        var calculator = CreateCalculator();
+
+        var moving = ReticleOverlayController.CreateMovingTargetOverlay(
+            calculator, Size6In, Size6In, Dist300, Mph(10), Deg(90))!;
+        var stationary = (ReticleRectangle)ReticleOverlayController.CreateTargetOverlay(
+            calculator, Size6In, Size6In, Dist300)!;
+
+        CenterYRad(moving).Should().BeApproximately(
+            (stationary.TopLeft.Y - stationary.Size.Y / 2).In(AngularUnit.Radian), 1e-9);
+    }
+
+    [Fact]
+    public void CreateMovingTargetOverlay_ZeroDistance_ReturnsNull()
+    {
+        var calculator = CreateCalculator();
+
+        var result = ReticleOverlayController.CreateMovingTargetOverlay(
+            calculator, Size6In, Size6In,
+            new Measurement<DistanceUnit>(0, DistanceUnit.Yard), Mph(10), Deg(90));
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public void CreateMovingTargetOverlay_DistancePastTrajectory_ReturnsNull()
+    {
+        var calculator = CreateCalculator();
+
+        var result = ReticleOverlayController.CreateMovingTargetOverlay(
+            calculator, Size6In, Size6In,
+            new Measurement<DistanceUnit>(5000, DistanceUnit.Yard), Mph(10), Deg(90));
+
+        result.Should().BeNull();
+    }
+
+    #endregion
+
+    #region CalculateMovingTargetLead
+
+    [Fact]
+    public void CalculateMovingTargetLead_FullCrossing_MatchesAtanOfLeadOverRange()
+    {
+        var calculator = CreateCalculator();
+
+        var lead = ReticleOverlayController.CalculateMovingTargetLead(
+            calculator, Dist300, Mph(10), Deg(90));
+
+        double leadMeters = Mph(10).In(VelocityUnit.MetersPerSecond) * 0.403; // tof at 300 yd
+        double expectedRad = System.Math.Atan(leadMeters / Dist300.In(DistanceUnit.Meter));
+
+        lead.Should().NotBeNull();
+        lead!.Value.In(AngularUnit.Radian).Should().BeApproximately(expectedRad, 1e-6);
+    }
+
+    [Fact]
+    public void CalculateMovingTargetLead_OppositeDirections_FlipSign()
+    {
+        var calculator = CreateCalculator();
+
+        var fromRight = ReticleOverlayController.CalculateMovingTargetLead(
+            calculator, Dist300, Mph(12), Deg(90))!.Value;
+        var fromLeft = ReticleOverlayController.CalculateMovingTargetLead(
+            calculator, Dist300, Mph(12), Deg(270))!.Value;
+
+        fromRight.In(AngularUnit.Radian).Should().BeGreaterThan(0); // crossing from right leads left (+)
+        fromLeft.In(AngularUnit.Radian).Should().BeApproximately(
+            -fromRight.In(AngularUnit.Radian), 1e-9);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(180)]
+    public void CalculateMovingTargetLead_NoCrossingComponent_Zero(double directionDeg)
+    {
+        var calculator = CreateCalculator();
+
+        var lead = ReticleOverlayController.CalculateMovingTargetLead(
+            calculator, Dist300, Mph(15), Deg(directionDeg));
+
+        lead!.Value.In(AngularUnit.Radian).Should().BeApproximately(0, 1e-9);
+    }
+
+    [Fact]
+    public void CalculateMovingTargetLead_DistancePastTrajectory_ReturnsNull()
+    {
+        var calculator = CreateCalculator();
+
+        var lead = ReticleOverlayController.CalculateMovingTargetLead(
+            calculator, new Measurement<DistanceUnit>(5000, DistanceUnit.Yard), Mph(10), Deg(90));
+
+        lead.Should().BeNull();
+    }
+
+    #endregion
+
     #region CalculateAngularSize
 
     [Fact]
