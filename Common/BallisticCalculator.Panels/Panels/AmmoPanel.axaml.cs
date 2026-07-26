@@ -117,6 +117,13 @@ public partial class AmmoPanel : UserControl
 
     public event EventHandler? Changed;
 
+    /// <summary>
+    /// Raised after a custom drag table (<c>.drg</c>) is loaded, carrying the metadata from its header.
+    /// The bullet fields are filled by this panel; the name and source belong to the library entry around
+    /// it, so the host (see <see cref="AmmoLibraryRecordPanel"/>) fills those.
+    /// </summary>
+    public event EventHandler<AmmunitionLibraryEntry>? CustomTableLoaded;
+
     #endregion
 
     #region Initialization
@@ -236,20 +243,31 @@ public partial class AmmoPanel : UserControl
         // length. Only positive values are copied: older files store the unused slots as 0, and
         // overwriting a good field with zero would silently break spin drift, which needs both the
         // diameter and the length.
+        //
+        // The format is always SI (kilograms and metres), so the values arrive as e.g. 0.010886kg /
+        // 0.0078232m. Unlike a saved ammunition file, those units carry no user intent worth preserving —
+        // they are an artefact of the file format — so they are converted to the panel's current units,
+        // which is the one place a load deliberately overrides SetValue's precision-preserving behaviour.
         var tableAmmo = table.Ammunition?.Ammunition;
         if (tableAmmo != null)
         {
+            var metric = _measurementSystem == MeasurementSystem.Metric;
+
             if (tableAmmo.Weight.Value > 0)
-                WeightControl.SetValue(tableAmmo.Weight);
+                WeightControl.SetValue(tableAmmo.Weight.To(metric ? WeightUnit.Gram : WeightUnit.Grain));
             if (tableAmmo.BulletDiameter.HasValue && tableAmmo.BulletDiameter.Value.Value > 0)
-                BulletDiameterControl.SetValue(tableAmmo.BulletDiameter.Value);
+                BulletDiameterControl.SetValue(tableAmmo.BulletDiameter.Value.To(metric ? DistanceUnit.Millimeter : DistanceUnit.Inch));
             if (tableAmmo.BulletLength.HasValue && tableAmmo.BulletLength.Value.Value > 0)
-                BulletLengthControl.SetValue(tableAmmo.BulletLength.Value);
+                BulletLengthControl.SetValue(tableAmmo.BulletLength.Value.To(metric ? DistanceUnit.Millimeter : DistanceUnit.Inch));
         }
 
         _customTableFileName = path;
         UpdateCustomTableDisplay();
         Changed?.Invoke(this, EventArgs.Empty);
+
+        // The name and source live on the library entry, not here; let the host pick them up.
+        if (table.Ammunition != null)
+            CustomTableLoaded?.Invoke(this, table.Ammunition);
     }
 
     private void OnClearCustomTable(object? sender, RoutedEventArgs e)

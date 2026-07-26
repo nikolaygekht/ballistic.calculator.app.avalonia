@@ -138,6 +138,7 @@ public partial class AmmoLibraryRecordPanel : UserControl
     private void WireEvents()
     {
         AmmoSubPanel.Changed += (s, e) => Changed?.Invoke(this, EventArgs.Empty);
+        AmmoSubPanel.CustomTableLoaded += OnCustomTableLoaded;
         NameTextBox.TextChanged += (s, e) => Changed?.Invoke(this, EventArgs.Empty);
         CaliberTextBox.TextChanged += (s, e) => Changed?.Invoke(this, EventArgs.Empty);
         BulletTypeCombo.SelectionChanged += (s, e) => Changed?.Invoke(this, EventArgs.Empty);
@@ -168,6 +169,28 @@ public partial class AmmoLibraryRecordPanel : UserControl
     #endregion
 
     #region File Operations
+
+    /// <summary>
+    /// A loaded custom drag table names the bullet it was measured from (and, since
+    /// BallisticCalculator 1.1.11.2, where the data came from), so fill those in. An existing name is not
+    /// overwritten — the user may be attaching a table to a record they already named — but an empty one is
+    /// far more useful filled than blank.
+    /// </summary>
+    private void OnCustomTableLoaded(object? sender, AmmunitionLibraryEntry entry)
+    {
+        if (string.IsNullOrWhiteSpace(NameTextBox.Text) && !string.IsNullOrWhiteSpace(entry.Name))
+            NameTextBox.Text = entry.Name;
+
+        // "drg file" is what the library reports when the header carries no source of its own; it says
+        // nothing a user would want recorded.
+        if (string.IsNullOrWhiteSpace(SourceTextBox.Text) &&
+            !string.IsNullOrWhiteSpace(entry.Source) &&
+            entry.Source != "drg file" &&
+            entry.Source != "0")
+        {
+            SourceTextBox.Text = entry.Source;
+        }
+    }
 
     private async void OnLoadClick(object? sender, RoutedEventArgs e)
     {

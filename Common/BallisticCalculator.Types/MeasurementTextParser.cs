@@ -45,12 +45,19 @@ public static class MeasurementTextParser
         ["mtr"] = "m",
     };
 
-    /// <summary>Parses a distance, applying <paramref name="fallbackUnit"/> to a bare number.</summary>
-    public static bool TryParseDistance(string? text, DistanceUnit fallbackUnit, out Measurement<DistanceUnit> value) =>
+    /// <summary>
+    /// Parses a distance. A bare number takes <paramref name="fallbackUnit"/>; pass <c>null</c> to require
+    /// the text to carry its own unit, which is what file import does — reading a yards file as metres
+    /// produces a plausible-looking but wrong result, so the unit is not guessed.
+    /// </summary>
+    public static bool TryParseDistance(string? text, DistanceUnit? fallbackUnit, out Measurement<DistanceUnit> value) =>
         TryParseMeasurement(text, fallbackUnit, DistanceAliases, out value);
 
-    /// <summary>Parses a velocity, applying <paramref name="fallbackUnit"/> to a bare number.</summary>
-    public static bool TryParseVelocity(string? text, VelocityUnit fallbackUnit, out Measurement<VelocityUnit> value) =>
+    /// <summary>
+    /// Parses a velocity. A bare number takes <paramref name="fallbackUnit"/>; pass <c>null</c> to require
+    /// the text to carry its own unit.
+    /// </summary>
+    public static bool TryParseVelocity(string? text, VelocityUnit? fallbackUnit, out Measurement<VelocityUnit> value) =>
         TryParseMeasurement(text, fallbackUnit, VelocityAliases, out value);
 
     /// <summary>
@@ -96,21 +103,25 @@ public static class MeasurementTextParser
                                NumberStyles.Float, CultureInfo.InvariantCulture, out value);
     }
 
-    private static bool TryParseMeasurement<TUnit>(string? text, TUnit fallbackUnit,
+    private static bool TryParseMeasurement<TUnit>(string? text, TUnit? fallbackUnit,
                                                    Dictionary<string, string> aliases,
                                                    out Measurement<TUnit> value)
-        where TUnit : Enum
+        where TUnit : struct, Enum
     {
-        value = new Measurement<TUnit>(0, fallbackUnit);
+        value = new Measurement<TUnit>(0, fallbackUnit ?? default);
         if (string.IsNullOrWhiteSpace(text))
             return false;
 
         var normalized = NormalizeDecimalMark(text.Trim());
 
-        // A bare number takes the column's unit — that is what the dialogs' unit combos are for.
+        // A bare number takes the caller's unit. With no fallback unit the value is refused rather than
+        // guessed — file import requires the unit to be in the text.
         if (double.TryParse(normalized, NumberStyles.Float, CultureInfo.InvariantCulture, out var bare))
         {
-            value = new Measurement<TUnit>(bare, fallbackUnit);
+            if (fallbackUnit == null)
+                return false;
+
+            value = new Measurement<TUnit>(bare, fallbackUnit.Value);
             return true;
         }
 

@@ -182,8 +182,9 @@ public partial class BallisticCoefficientControl : UserControl
 
     private void WireEvents()
     {
-        // Focus management
-        this.GotFocus += (s, e) => NumericPart?.Focus();
+        // No GotFocus forwarding to NumericPart: it bubbles, so it trapped focus inside the control and
+        // Tab could never reach the drag-table combo or the next field. See the same note in
+        // MeasurementControl.WireEvents.
 
         // Keyboard handling
         if (NumericPart != null)

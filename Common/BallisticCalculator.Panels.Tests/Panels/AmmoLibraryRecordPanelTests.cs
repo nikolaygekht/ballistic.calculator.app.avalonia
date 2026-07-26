@@ -317,4 +317,58 @@ public class AmmoLibraryRecordPanelTests
             Ammunition = CreateTestAmmunition(),
         };
     }
+
+    #region Custom drag table metadata
+
+    // A .drg names the bullet it was measured from; that name belongs in the record around the ammo panel.
+    [AvaloniaFact]
+    public void BrowseCustomTable_ShouldFillTheEmptyNameAndSource()
+    {
+        var panel = new AmmoLibraryRecordPanel();
+        var path = WriteDrg("CFM,6_5mm Lapua 139gr Scenar,0.0090072,0.00671,0.0344932,Radar Data");
+        panel.FileDialogService = new MockFileDialogService { NextOpenResult = path };
+
+        panel.AmmoSubPanel.BrowseTableButton.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Avalonia.Controls.Button.ClickEvent));
+
+        panel.NameTextBox.Text.Should().Be("6_5mm Lapua 139gr Scenar");
+        panel.SourceTextBox.Text.Should().Be("Radar Data");
+    }
+
+    [AvaloniaFact]
+    public void BrowseCustomTable_ShouldNotOverwriteANameTheUserAlreadyTyped()
+    {
+        var panel = new AmmoLibraryRecordPanel();
+        panel.NameTextBox.Text = "my load";
+        panel.SourceTextBox.Text = "my notes";
+        var path = WriteDrg("CFM,6_5mm Lapua 139gr Scenar,0.0090072,0.00671,0.0344932,Radar Data");
+        panel.FileDialogService = new MockFileDialogService { NextOpenResult = path };
+
+        panel.AmmoSubPanel.BrowseTableButton.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Avalonia.Controls.Button.ClickEvent));
+
+        panel.NameTextBox.Text.Should().Be("my load");
+        panel.SourceTextBox.Text.Should().Be("my notes");
+    }
+
+    [AvaloniaFact]
+    public void BrowseCustomTable_ShouldNotRecordThePlaceholderSource()
+    {
+        // A 4-field header has no source; the library reports "drg file", which is not worth storing.
+        var panel = new AmmoLibraryRecordPanel();
+        var path = WriteDrg("CFM,minimal,0.0090072,0.00671");
+        panel.FileDialogService = new MockFileDialogService { NextOpenResult = path };
+
+        panel.AmmoSubPanel.BrowseTableButton.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Avalonia.Controls.Button.ClickEvent));
+
+        panel.NameTextBox.Text.Should().Be("minimal");
+        panel.SourceTextBox.Text.Should().BeNullOrEmpty();
+    }
+
+    private static string WriteDrg(string header)
+    {
+        var path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"ammolib-{System.Guid.NewGuid():N}.drg");
+        System.IO.File.WriteAllLines(path, new[] { header, "0.2 0.5", "0.3 1.0", "0.25 2.0" });
+        return path;
+    }
+
+    #endregion
 }

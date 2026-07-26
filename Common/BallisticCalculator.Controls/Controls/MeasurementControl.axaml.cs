@@ -172,7 +172,12 @@ public partial class MeasurementControl : UserControl
 
     private void WireEvents()
     {
-        this.GotFocus += (s, e) => NumericPart?.Focus();
+        // No GotFocus forwarding to NumericPart here. GotFocus bubbles, so forwarding it trapped focus:
+        // tabbing from the number to the unit combo raised GotFocus on this control, which pulled focus
+        // straight back to the number — Tab died at the first measurement field of any panel. The
+        // forwarding never worked as intended anyway, since a UserControl is not focusable by default,
+        // so Focus() on the control itself was already a no-op. Tab now walks number -> unit -> next
+        // field by Avalonia's default navigation.
 
         if (NumericPart != null)
         {

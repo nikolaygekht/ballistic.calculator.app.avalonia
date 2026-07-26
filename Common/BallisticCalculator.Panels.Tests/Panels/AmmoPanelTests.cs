@@ -283,6 +283,50 @@ public class AmmoPanelTests
         panel.BCControl.Value!.Value.Table.Should().Be(DragTableId.GC);
     }
 
+    // The .drg format stores SI values (kg / m). Showing "0.010886 kg" is correct and unreadable, so a
+    // load converts to the panel's current units.
+    [AvaloniaTheory]
+    [InlineData(MeasurementSystem.Imperial, WeightUnit.Grain, DistanceUnit.Inch, 168.0, 0.308, 1.215)]
+    [InlineData(MeasurementSystem.Metric, WeightUnit.Gram, DistanceUnit.Millimeter, 10.886, 7.8232, 30.861)]
+    public void BrowseCustomTable_ShouldConvertSiValuesToTheCurrentSystem(
+        MeasurementSystem system, WeightUnit weightUnit, DistanceUnit distanceUnit,
+        double weight, double diameter, double length)
+    {
+        var panel = new AmmoPanel { MeasurementSystem = system };
+        var path = WriteDrg("CFM,308 168gr,0.010886,0.0078232,0.030861,radar data");
+        panel.FileDialogService = new MockFileDialogService { NextOpenResult = path };
+
+        panel.BrowseTableButton.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Avalonia.Controls.Button.ClickEvent));
+
+        var w = panel.WeightControl.GetValue<WeightUnit>()!.Value;
+        w.Unit.Should().Be(weightUnit);
+        w.Value.Should().BeApproximately(weight, 0.01);
+
+        var d = panel.BulletDiameterControl.GetValue<DistanceUnit>()!.Value;
+        d.Unit.Should().Be(distanceUnit);
+        d.Value.Should().BeApproximately(diameter, 0.01);
+
+        var l = panel.BulletLengthControl.GetValue<DistanceUnit>()!.Value;
+        l.Unit.Should().Be(distanceUnit);
+        l.Value.Should().BeApproximately(length, 0.01);
+    }
+
+    [AvaloniaFact]
+    public void BrowseCustomTable_ShouldReportTheHeaderMetadata()
+    {
+        var panel = new AmmoPanel();
+        var path = WriteDrg("CFM,6_5mm Lapua 139gr Scenar,0.0090072,0.00671,0.0344932,Radar Data");
+        panel.FileDialogService = new MockFileDialogService { NextOpenResult = path };
+        AmmunitionLibraryEntry? reported = null;
+        panel.CustomTableLoaded += (_, entry) => reported = entry;
+
+        panel.BrowseTableButton.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Avalonia.Controls.Button.ClickEvent));
+
+        reported.Should().NotBeNull();
+        reported!.Name.Should().Be("6_5mm Lapua 139gr Scenar");
+        reported.Source.Should().Be("Radar Data");
+    }
+
     // Files written before 1.1.11.2 store the unused header slots as 0. Copying those would silently
     // zero the length and break spin drift, which needs both diameter and length.
     [AvaloniaFact]
