@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using Avalonia.Headless.XUnit;
 using Xunit;
 using AwesomeAssertions;
@@ -5,6 +7,7 @@ using Gehtsoft.Measurements;
 using BallisticCalculator;
 using BallisticCalculator.Controls.Models;
 using BallisticCalculator.Panels.Panels;
+using BallisticCalculator.Panels.Tests.Mocks;
 using BallisticCalculator.Types;
 
 namespace BallisticCalculator.Panels.Tests.Panels;
@@ -261,6 +264,45 @@ public class AmmoPanelTests
         // Units in dropdowns should be Imperial
         GetSelectedUnit(panel.WeightControl).Should().Be(WeightUnit.Grain);
         GetSelectedUnit(panel.MuzzleVelocityControl).Should().Be(VelocityUnit.FeetPerSecond);
+    }
+
+    // Custom drag table (.drg) browse: the header metadata must land in the bullet fields.
+    // Bullet length is carried by the .drg header as of BallisticCalculator 1.1.11.2.
+    [AvaloniaFact]
+    public void BrowseCustomTable_ShouldPickUpWeightDiameterAndLength()
+    {
+        var panel = new AmmoPanel();
+        var path = WriteDrg("CFM,308 168gr,0.010886,0.0078232,0.030861,radar data");
+        panel.FileDialogService = new MockFileDialogService { NextOpenResult = path };
+
+        panel.BrowseTableButton.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Avalonia.Controls.Button.ClickEvent));
+
+        panel.WeightControl.GetValue<WeightUnit>()!.Value.In(WeightUnit.Grain).Should().BeApproximately(168, 0.5);
+        panel.BulletDiameterControl.GetValue<DistanceUnit>()!.Value.In(DistanceUnit.Inch).Should().BeApproximately(0.308, 0.001);
+        panel.BulletLengthControl.GetValue<DistanceUnit>()!.Value.In(DistanceUnit.Inch).Should().BeApproximately(1.215, 0.001);
+        panel.BCControl.Value!.Value.Table.Should().Be(DragTableId.GC);
+    }
+
+    // Files written before 1.1.11.2 store the unused header slots as 0. Copying those would silently
+    // zero the length and break spin drift, which needs both diameter and length.
+    [AvaloniaFact]
+    public void BrowseCustomTable_LegacyFileWithoutLength_ShouldKeepExistingLength()
+    {
+        var panel = new AmmoPanel();
+        panel.BulletLengthControl.SetValue(new Measurement<DistanceUnit>(1.2, DistanceUnit.Inch));
+        var path = WriteDrg("CFM,legacy 168gr,0.010886,0.0078232,0,0");
+        panel.FileDialogService = new MockFileDialogService { NextOpenResult = path };
+
+        panel.BrowseTableButton.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Avalonia.Controls.Button.ClickEvent));
+
+        panel.BulletLengthControl.GetValue<DistanceUnit>()!.Value.In(DistanceUnit.Inch).Should().BeApproximately(1.2, 0.001);
+    }
+
+    private static string WriteDrg(string header)
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"ammopanel-{Guid.NewGuid():N}.drg");
+        File.WriteAllLines(path, new[] { header, "0.2 0.5", "0.3 1.0", "0.25 2.0" });
+        return path;
     }
 
     private static object? GetSelectedUnit(BallisticCalculator.Controls.Controls.MeasurementControl control)

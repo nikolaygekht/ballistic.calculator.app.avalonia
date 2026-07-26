@@ -15,9 +15,13 @@ Create a new version of the BallisticCalculator application using **Avalonia UI*
   - Provides generic `Measurement<T>` struct where T is a unit enum (DistanceUnit, VelocityUnit, WeightUnit, etc.)
   - Static method: `Measurement<T>.GetUnitNames()` returns `Tuple<T, string>[]` for populating unit lists
 
-- **BallisticCalculator** (NuGet **1.1.11**, capped `[1.1.x,2)`): Core ballistic calculation library.
+- **BallisticCalculator** (NuGet **1.1.11.2**, capped `[1.1.x,2)`): Core ballistic calculation library.
   Source at `/mnt/d/develop/components/BusinessSpecificComponents/BallisticCalculator.Net/`.
   - Provides `BallisticCoefficient` struct, `DragTableId` enum, and the calculation engine.
+  - **`.drg` metadata (1.1.11.2):** the header carries name, weight, diameter, **bullet length** and
+    **source**; `DrgDragTable.Save`/`Open` round-trip all of them, and
+    `RadarDragTableFactory.Create` takes optional `bulletLength`/`source`. Files written earlier store
+    those two slots as `0` — treat non-positive as absent.
   - **Zeroing API (1.1.11):** `SightAngle` was removed — compute the zero with
     `TrajectoryCalculator.CalculateZeroParameters(...)` then `ShotParameters.Apply(zero)`. `ShotParameters`
     also has `ShotDropAdjustment`/`ShotWindageAdjustment` (dialed clicks), `BarrelAzimuth`, `Latitude`.

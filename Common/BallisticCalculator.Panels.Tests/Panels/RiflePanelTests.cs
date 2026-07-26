@@ -258,7 +258,7 @@ public class RiflePanelTests
         sight!.SightHeight.In(DistanceUnit.Inch).Should().BeApproximately(3, 0.01);
         sight.VerticalClick!.Value.In(AngularUnit.Mil).Should().BeApproximately(0.1, 0.001);
         sight.HorizontalClick!.Value.In(AngularUnit.Mil).Should().BeApproximately(0.1, 0.001);
-        // The selection must stick after applying (it should not snap back to "(custom)").
+        // The selection must stick after applying (it should not snap back to "(select)").
         panel.SightPresetCombo.SelectedIndex.Should().Be(1);
     }
 
@@ -294,7 +294,7 @@ public class RiflePanelTests
     [AvaloniaFact]
     public void SightPreset_KeepsSelection_WhenFieldReSetToSameValue()
     {
-        // Re-applying values that still match the preset must NOT revert the combo to "(custom)".
+        // Re-applying values that still match the preset must NOT revert the combo to "(select)".
         var panel = new RiflePanel();
         panel.SetDictionary(TestDictionary());
         panel.SightPresetCombo.SelectedIndex = 1;

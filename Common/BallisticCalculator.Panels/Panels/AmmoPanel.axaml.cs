@@ -232,12 +232,19 @@ public partial class AmmoPanel : UserControl
         BCControl.Value = new BallisticCoefficient(1, DragTableId.GC);
         FormFactorCheckBox.IsChecked = true;
 
+        // The .drg header carries weight, diameter and (since BallisticCalculator 1.1.11.2) bullet
+        // length. Only positive values are copied: older files store the unused slots as 0, and
+        // overwriting a good field with zero would silently break spin drift, which needs both the
+        // diameter and the length.
         var tableAmmo = table.Ammunition?.Ammunition;
         if (tableAmmo != null)
         {
-            WeightControl.SetValue(tableAmmo.Weight);
-            if (tableAmmo.BulletDiameter.HasValue)
+            if (tableAmmo.Weight.Value > 0)
+                WeightControl.SetValue(tableAmmo.Weight);
+            if (tableAmmo.BulletDiameter.HasValue && tableAmmo.BulletDiameter.Value.Value > 0)
                 BulletDiameterControl.SetValue(tableAmmo.BulletDiameter.Value);
+            if (tableAmmo.BulletLength.HasValue && tableAmmo.BulletLength.Value.Value > 0)
+                BulletLengthControl.SetValue(tableAmmo.BulletLength.Value);
         }
 
         _customTableFileName = path;

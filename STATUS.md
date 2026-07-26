@@ -1,12 +1,12 @@
 # BallisticCalculator2 — Project Status
 
-Last updated: 2026-07-24
+Last updated: 2026-07-25
 
 ## Overview
 
 Avalonia rewrite of the WinForms BallisticCalculator. Core trajectory math comes from the
-**BallisticCalculator 1.1.11** NuGet package (+ Gehtsoft.Measurements); the app is action-driven with
-direct-UI-access controls (no MVVM/reactive) per `CLAUDE.md`.
+**BallisticCalculator 1.1.11.2** NuGet package (+ Gehtsoft.Measurements); the app is action-driven with
+direct-UI-access controls (no MVVM/reactive) per `CLAUDE.md`. Trunk-based development (commit to `main`).
 
 ## Completed
 
@@ -14,106 +14,99 @@ direct-UI-access controls (no MVVM/reactive) per `CLAUDE.md`.
 
 | Component | Notes |
 |-----------|-------|
-| MeasurementControl / MeasurementController | Generic measurement input + unit selector; two-path precision (SetValue preserves, Value/ChangeUnit clamp). Tab now uses default value→unit→next navigation. |
-| BallisticCoefficientControl | BC value + drag-table selector. |
-| WindDirectionControl / WindDirectionController | Wind dial (0°=tailwind, arrow edge→center). |
-| AzimuthDirectionControl / AzimuthDirectionController | **New.** Compass dial: 0°=North (up), clockwise, arrow center→target. |
-| ReticleCanvasControl | Reticle rendering, Underlay/Overlay collections, AngularToPixel/PixelToAngular. |
-| TrajectoryChartControl / ChartController | ScottPlot trajectory chart. |
-| TrajectoryTableControl | DataGrid trajectory table + column-width persistence. |
-| TrajectoryToReticleCalculator / ReticleOverlayController | BDC point mapping + BDC/target overlays. |
-| SummaryController | **New.** Zero adjustments, point-blank dead zone (`Tools.PointBlankRange`, bottom aim), near/far zero, subsonic distance. |
+| MeasurementControl / MeasurementController | Generic measurement input + unit selector; two-path precision (SetValue preserves, Value/ChangeUnit clamp). |
+| BallisticCoefficientControl | BC value + drag-table selector (incl. GC/custom). |
+| WindDirectionControl / AzimuthDirectionControl | Wind dial (0°=tailwind) and compass dial (0°=North, clockwise, center→target). |
+| ReticleCanvasControl | Reticle rendering, Underlay/Overlay collections, **dashed `MovingTargetBox`** aim overlay, AngularToPixel/PixelToAngular. |
+| SkiaReticleCanvas | IReticleCanvas impl; renders the 1.1.11.1 **line styles** (Solid/Dashed/Dotted: dashed 4w/3w, dotted w/2w round caps). |
+| TrajectoryChartControl / TrajectoryTableControl | ScottPlot chart + DataGrid table (column-width persistence). |
+| TrajectoryToReticleCalculator / ReticleOverlayController | BDC mapping; BDC/target overlays; **moving-target lead overlay** + angular-size / lead helpers (`Tools.MovingTargetLead`). |
+| SummaryController | Zero adjustments; **bottom- and center-aimed** point-blank spans (`Tools.PointBlankRange`); near/far zero as line-of-sight crossings (independent of the corridor); target size; subsonic distance. |
 
 ### Types Library (`Common/BallisticCalculator.Types/`)
 
 | Type | Notes |
 |------|-------|
-| ShotData | Ammunition, Weapon, Atmosphere, Winds, Parameters, **Zeroing (ZeroingData)**. |
-| ZeroingData | **New.** All zeroing inputs: distance, zero ammo/atmosphere, V/H impact offsets, zeroing wind, zeroing shot angle. |
-| ZeroingCalculator | **New.** Builds library `ZeroingParameters`/`Rifle` from ShotData (`BuildInputs`) and computes the zero (`Compute`). |
-| ShotTrajectoryCalculator | **New. Single source of truth** for turning ShotData into a trajectory; `Calculate` (display) + `CalculateFine` (2.5 m step, ≥1500 m). |
+| ShotData / ZeroingData | Shot inputs; ZeroingData holds distance, zero ammo/atmosphere, V/H impact offsets, zeroing wind, shot angle. |
+| ZeroingCalculator / ShotTrajectoryCalculator | Single source of truth: build library inputs + trajectory (`Calculate` / `CalculateFine`). Both **thread custom GC drag tables** into the zero and shot calls. |
+| BallisticDictionary | **New.** Loads/saves `data/dictionaries.xml` (sight & barrel presets), sorted by name, malformed entries skipped, missing file → empty. |
+| CustomDragTableLoader | **New.** Loads/caches a `.drg` for GC ammunition (resolves path or falls back to `data/drg`). |
+| DataFolders | **New.** Standard folders next to the exe: `data/reticle`, `data/legacy-ammo`, `data/drg`. |
 | MeasurementSystem, ChartTrajectory, DropBase, TrajectoryChartMode | Shared enums/models. |
 
 ### Panels Library (`Common/BallisticCalculator.Panels/`)
 
 | Panel | Notes |
 |-------|-------|
-| AmmoPanel / AmmoLibraryRecordPanel | Ammunition entry + library load/save (.ammox). |
-| WindPanel / MultiWindPanel | Single / multi-wind entry. |
-| AtmospherePanel | Altitude, pressure, temperature, humidity. |
-| RiflePanel | Sight height, zero distance, H/V clicks, rifling, **impact offset (V + H)**, **zeroing shot angle**. |
-| ZeroAmmoPanel / ZeroAtmospherePanel / ZeroWindPanel | Optional zero-condition overrides (ammo / atmosphere / **wind, new**). |
-| ParametersPanel | Max range, step, shot angle (degrees); **V/H clicks → ShotDrop/WindageAdjustment**; **Coriolis** (azimuth dial + latitude with N/S). |
-| SummaryPanel | **New.** Read-only output table (selectable/copyable): zero adj, dead zone, near/far zero, subsonic. |
-| ReticlePanel | Reticle display; BDC (near/far) + target overlay; consumes a provided fine trajectory. |
-| ShotDataPanel | TabControl container (Ammo/Weather/Wind/Rifle/Parameters); assembles ZeroingData; `Validate()`. |
+| AmmoPanel / AmmoLibraryRecordPanel | Ammunition entry + library load/save (default folder `data/legacy-ammo`). **Custom drag table (GC): Browse `.drg` / Clear** row — fills BC=(1,GC)+form factor + weight/diameter; `CustomTableFileName` round-trips. |
+| WindPanel / MultiWindPanel / AtmospherePanel | Wind (single/multi) and atmosphere entry. |
+| RiflePanel | **Now sight height + H/V clicks + rifling only.** Sight & barrel **dictionary preset dropdowns** (a sight preset fills height/clicks and suggests the zero distance). |
+| ZeroPanel | **New.** The Zero tab: zero distance, impact offset (V/H), zeroing shot angle, and the zero ammo/atmosphere/wind sub-panels. |
+| ParametersPanel | Max range, step, shot angle; V/H clicks → ShotDrop/WindageAdjustment; Coriolis (azimuth dial + latitude N/S). Azimuth dial height matches the azimuth/latitude block. |
+| SummaryPanel | Compact left-aligned readout: zero adj, target size, bottom- & center-aimed dead-zone spans, near/far zero, subsonic. |
+| ReticlePanel | BDC + target overlay; **moving-target** section (enable + direction dial synced with a numeric degrees input + speed); shows target angular size + lead in the current angular unit; target size up to 10000; wider (325) data panel. |
+| ShotDataPanel | TabControl: **Ammunition / Weather / Wind / Rifle / Zero / Parameters**; assembles the library `Rifle` from Rifle+Zero tabs; `Validate()`. |
 
 ### Main Desktop Application (`Desktop/BallisticCalculator/`)
 
-- Full menu (Trajectory / View / Windows / Help), MDI via `iciclecreek.Avalonia.WindowManager`, keyboard
-  shortcuts, persistent state (`appstate.json`).
-- `TrajectoryView` tabs: **Table, Chart, Reticle, Summary**. Builds the display trajectory (coarse) plus
-  one shared **fine** trajectory (via `ShotTrajectoryCalculator.CalculateFine`) handed to the reticle and
-  summary.
-- `ShotCalculator` = `ApplyDefaults` + delegate to `ShotTrajectoryCalculator`.
-- `ShotParametersDialog` (wraps `ShotDataPanel`), `CompareView`, CSV export (local/invariant), About dialog.
-- Persistence: `.trajectory` (BXml). Zeroing saved as its own `<zeroing>` element (sight+rifling in
-  `<weapon>`); older files where zeroing lived in `<weapon>` are migrated on load.
-- Uses the 1.1.11 zeroing API: `CalculateZeroParameters(...)` + `ShotParameters.Apply(...)` (the removed
-  `SightAngle`).
+- Full menu (Trajectory / View / **Tools** / Windows / Help), MDI via `iciclecreek.Avalonia.WindowManager`,
+  keyboard shortcuts, persistent state (`appstate.json`).
+- **Tools menu:** Edit Sights / Edit Barrels — master-detail dictionary editors that save the merged
+  `data/dictionaries.xml` (`SightListEditorDialog` / `BarrelListEditorDialog`).
+- `TrajectoryView` tabs: Table, Chart, Reticle, Summary. Coarse display trajectory + one shared **fine**
+  trajectory (reticle + summary). `AngularUnits` now also flows to the reticle panel.
+- `ShotParametersDialog` (wraps `ShotDataPanel`), `CompareView`, CSV export, About dialog.
+- Persistence: `.trajectory` (BXml); `<zeroing>` element with migration of older files.
+- **`data/` folder is copied next to the binaries** (csproj `Content` link), so presets/reticles/ammo/drg
+  ship with the app; open/save dialogs default to the matching `data/*` subfolder.
 
 ### Other Desktop Applications / Tools
 
 | App | Notes |
 |-----|-------|
-| ReticleEditor | Reticle editor. |
+| ReticleEditor | Save / Save As implemented (Save falls back to Save As when unnamed; default folder `data/reticle`); fixed added elements not listing; **Move Up/Down** for elements and path sub-elements; **line-style editing** (Solid/Dashed/Dotted) on line/circle/rectangle/path. |
 | DebugApp / DebugApp1 | Controls / panels test harnesses. |
-| Tools/DependencyUpdater (`depupdate`) | Console tool: bumps PackageReference versions within their declared ranges (respects upper bounds), reading feeds from NuGet.config. `UpdateDeps.bat` launcher. |
-
-### Version policy
-
-Avalonia / SkiaSharp / ScottPlot references carry explicit upper bounds (e.g. Avalonia `[11.3.x,12)`),
-so a transitive dependency can never cross a major boundary. `depupdate` enforces/reports this.
+| Tools/DependencyUpdater (`depupdate`) | Bumps PackageReference versions within declared ranges. |
 
 ### Test Summary
 
 | Project | Tests | Status |
 |---------|------:|--------|
-| BallisticCalculator.Controls.Tests | 287 | passing |
-| BallisticCalculator.Panels.Tests | 195 | passing |
+| BallisticCalculator.Controls.Tests | 305 | passing |
+| BallisticCalculator.Panels.Tests | 209 | passing |
 | ReticleEditor.Tests | 66 | passing |
 
 ## Key Design Decisions
 
 ### Trajectory calculation — one source of truth
-`ShotTrajectoryCalculator.Calculate(shotData, stepOverride?, maxDistanceOverride?)` is the only place that
-turns a `ShotData` into a trajectory. Table/chart use the coarse display trajectory; the reticle and the
-summary analysis share **one fine trajectory** (`CalculateFine`: 2.5 m step, reaching ≥1500 m or the
-configured max). The coarse trajectory can't resolve the point-blank corridor, which is why the summary/
-reticle need the fine one.
+`ShotTrajectoryCalculator` is the only place that turns a `ShotData` into a trajectory. Table/chart use the
+coarse display trajectory; reticle + summary share one **fine** trajectory (`CalculateFine`: 2.5 m step,
+≥1500 m). GC ("custom") coefficients have no built-in curve, so `CustomDragTableLoader` supplies the `.drg`
+`DragTable` to **both** `CalculateZeroParameters` and `Calculate`.
 
-### Zeroing model
-`ZeroingData` collects all zeroing inputs in one place, referenced once by `ShotData.Zeroing`. At calc
-time `ZeroingCalculator.BuildInputs` produces the library `ZeroingParameters` (distance + ammo/atmosphere
-overrides + V/H offsets) plus the zeroing wind and shot angle passed to `CalculateZeroParameters`.
+### Rifle vs Zero split
+The old combined Rifle tab is split: `RiflePanel` (sight + clicks + rifling) and `ZeroPanel` (zero distance,
+impact offset, shot angle, zero ammo/atmosphere/wind). `ShotDataPanel.BuildRifle` assembles the library
+`Rifle` from the sight (Rifle tab) + zero distance/offsets (Zero tab) + rifling.
 
-### Parameters: clicks vs shot angle, Coriolis
-Shot angle (line-of-sight incline, degrees) is separate from dialed clicks. V/H clicks are converted to
-`ShotParameters.ShotDropAdjustment` / `ShotWindageAdjustment` via the sight's click sizes. Azimuth
-(compass, 0°=N) + latitude (magnitude + N/S selector) feed `BarrelAzimuth` / `Latitude` for Coriolis,
-gated by a checkbox.
+### Dictionary presets
+`BallisticDictionary` (`data/dictionaries.xml`) supplies sight and barrel presets, edited via the Tools-menu
+editors and consumed by the Rifle-tab dropdowns. A sight preset fills height/clicks and cross-fills the
+zero distance; a combo reverts to "(custom)" only when a field no longer matches the preset.
+
+### Reticle line styles (1.1.11.1)
+Elements carry a nullable `LineStyle` (Solid/Dashed/Dotted); **null = Solid** for legacy reticles, and the
+editor stores Solid as null so Solid elements stay identical to legacy files. `SkiaReticleCanvas` renders
+the dash patterns.
+
+### Summary readouts
+Near/far zero are computed as line-of-sight crossings, independent of the point-blank corridor (so they no
+longer vanish when the corridor can't close). The dead zone is shown as a range span for **both** bottom-
+and center-aim, alongside the target size.
 
 ### Value formatting — two-path precision
-`SetValue<T>()` → `ParseValuePreservePrecision` (keeps meaningful precision, trims zeros). `Value` setter /
-`ChangeUnit` → `ParseValue` (strict DecimalPoints) to stop float noise accumulating through conversions.
-
-### File format — .trajectory
-`TrajectoryFormState` (BXml) wraps ammo, sight+rifling, `<zeroing>` (ZeroingData), atmosphere, winds,
-parameters + display state. `FromShotData`/`ToShotData` bridge runtime ↔ serialized; old-format files
-(zeroing inside `<weapon>`) are migrated.
-
-### Defaults (`ShotCalculator.ApplyDefaults`)
-Atmosphere: sea-level standard. Rifle: 3″ sight, 100 yd/m zero. Parameters: 1000 yd/m max, 100 yd/m step.
+`SetValue<T>()` preserves meaningful precision; `Value`/`ChangeUnit` apply strict DecimalPoints to stop
+float noise accumulating through unit conversions.
 
 ## File Structure (current, abridged)
 
@@ -121,21 +114,24 @@ Atmosphere: sea-level standard. Rifle: 3″ sight, 100 yd/m zero. Parameters: 10
 Common/
 ├── BallisticCalculator.Controls/ (Controls/, Controllers/, Canvas/, Models/)
 ├── BallisticCalculator.Panels/   (Panels/, Services/)
-├── BallisticCalculator.Types/    (ShotData, ZeroingData, ZeroingCalculator, ShotTrajectoryCalculator, enums)
+├── BallisticCalculator.Types/    (ShotData, ZeroingData, calculators, BallisticDictionary,
+│                                   CustomDragTableLoader, DataFolders, enums)
 └── *.Tests/
 Desktop/
 ├── BallisticCalculator/ (Models/, Views/ + Views/Dialogs/, Utilities/, Services/, Assets/)
 ├── DebugApp/, DebugApp1/, ReticleEditor/ (+ ReticleEditor.Tests)
 Tools/
 └── DependencyUpdater/ (depupdate console tool)
+data/  (dictionaries.xml, reticle/, legacy-ammo/, drg/ — copied next to the binaries)
 ```
 
 ## Next Steps
 
-Planned in **`claude/07-25-plan.md`** (implementation 2026-07-25), all on the 1.1.11 `Tools` namespace:
-1. Moving target — lead-off aim (dotted target outline on the reticle) via `Tools.MovingTargetLead`.
-2. Tools menu → Approximate DRG table from BCs / from Velocities (`DrgDragTableFactory` /
-   `Tools.RadarDragTableFactory`), saved as `.drg`.
-3. Tools menu → Hit probability (`Tools.HitProbability`).
+From **`claude/07-25-plan.md`** (1.1.11 `Tools` namespace):
+1. ~~Moving target — lead-off aim on the reticle (`Tools.MovingTargetLead`).~~ **Done.**
+2. Tools menu → **Approximate DRG table** generation from BCs / from Velocities (`DrgDragTableFactory` /
+   `Tools.RadarDragTableFactory`), saved as `.drg`. *(Loading/using existing `.drg` GC tables is done; the
+   generation dialogs are still pending.)*
+3. Tools menu → **Hit probability** (`Tools.HitProbability`). **Pending.**
 
 The original phased plan is archived at `claude/Archive/APP_PLAN.md`.

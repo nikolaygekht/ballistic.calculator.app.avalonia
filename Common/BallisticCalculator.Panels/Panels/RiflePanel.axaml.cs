@@ -18,7 +18,7 @@ public partial class RiflePanel : UserControl
     private BallisticDictionary _dictionary = BallisticDictionary.Empty;
     private bool _applyingPreset;
 
-    // The presets currently reflected by the fields; the combos revert to "(custom)" only once a
+    // The presets currently reflected by the fields; the combos revert to "(select)" only once a
     // field no longer matches its preset (i.e. the user edited it), not merely because a field
     // raised a change while the preset was being applied.
     private SightDictionaryEntry? _sightPreset;
@@ -187,13 +187,13 @@ public partial class RiflePanel : UserControl
 
         _applyingPreset = true;
         SightPresetCombo.Items.Clear();
-        SightPresetCombo.Items.Add("(custom)");
+        SightPresetCombo.Items.Add("(select)");
         foreach (var sight in _dictionary.Sights)
             SightPresetCombo.Items.Add(sight.Name);
         SightPresetCombo.SelectedIndex = 0;
 
         BarrelPresetCombo.Items.Clear();
-        BarrelPresetCombo.Items.Add("(custom)");
+        BarrelPresetCombo.Items.Add("(select)");
         foreach (var barrel in _dictionary.Barrels)
             BarrelPresetCombo.Items.Add(barrel.Name);
         BarrelPresetCombo.SelectedIndex = 0;
@@ -213,7 +213,7 @@ public partial class RiflePanel : UserControl
     }
 
     /// <summary>
-    /// When a field changes, drop the corresponding preset back to "(custom)" only if the fields no
+    /// When a field changes, drop the corresponding preset back to "(select)" only if the fields no
     /// longer match the applied preset. This keeps the preset selected after it is applied (the apply
     /// itself sets values that still match) while reverting on a genuine user edit.
     /// </summary>
@@ -337,7 +337,7 @@ public partial class RiflePanel : UserControl
         if (_applyingPreset)
             return;
 
-        var index = SightPresetCombo.SelectedIndex - 1; // 0 == "(custom)"
+        var index = SightPresetCombo.SelectedIndex - 1; // 0 == "(select)"
         if (index < 0 || index >= _dictionary.Sights.Count)
         {
             _sightPreset = null;
@@ -371,7 +371,7 @@ public partial class RiflePanel : UserControl
         if (_applyingPreset)
             return;
 
-        var index = BarrelPresetCombo.SelectedIndex - 1; // 0 == "(custom)"
+        var index = BarrelPresetCombo.SelectedIndex - 1; // 0 == "(select)"
         if (index < 0 || index >= _dictionary.Barrels.Count)
         {
             _barrelPreset = null;

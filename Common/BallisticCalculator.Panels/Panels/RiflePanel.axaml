@@ -9,8 +9,8 @@
   <StackPanel Spacing="4">
 
     <!-- Sight preset (from data/dictionaries.xml) -->
-    <Grid ColumnDefinitions="100,*">
-      <TextBlock Grid.Column="0" Text="Sight:"
+    <Grid ColumnDefinitions="110,*">
+      <TextBlock Grid.Column="0" Text="Sight Preset:"
                  VerticalAlignment="Center"
                  FontWeight="Bold"
                  FontSize="{DynamicResource AppFontSize}"/>
@@ -21,7 +21,7 @@
     </Grid>
 
     <!-- Sight Height -->
-    <Grid ColumnDefinitions="100,*">
+    <Grid ColumnDefinitions="110,*">
       <TextBlock Grid.Column="0" Text="Sight Height:"
                  VerticalAlignment="Center"
                  FontSize="{DynamicResource AppFontSize}"/>
@@ -31,7 +31,7 @@
     </Grid>
 
     <!-- Horizontal Click -->
-    <Grid ColumnDefinitions="100,*">
+    <Grid ColumnDefinitions="110,*">
       <TextBlock Grid.Column="0" Text="H Click:"
                  VerticalAlignment="Center"
                  FontSize="{DynamicResource AppFontSize}"/>
@@ -41,7 +41,7 @@
     </Grid>
 
     <!-- Vertical Click -->
-    <Grid ColumnDefinitions="100,*">
+    <Grid ColumnDefinitions="110,*">
       <TextBlock Grid.Column="0" Text="V Click:"
                  VerticalAlignment="Center"
                  FontSize="{DynamicResource AppFontSize}"/>
@@ -53,8 +53,8 @@
     <Separator/>
 
     <!-- Barrel preset (from data/dictionaries.xml) -->
-    <Grid ColumnDefinitions="100,*">
-      <TextBlock Grid.Column="0" Text="Barrel:"
+    <Grid ColumnDefinitions="110,*">
+      <TextBlock Grid.Column="0" Text="Barrel Preset:"
                  VerticalAlignment="Center"
                  FontWeight="Bold"
                  FontSize="{DynamicResource AppFontSize}"/>
@@ -65,7 +65,7 @@
     </Grid>
 
     <!-- Rifling Direction -->
-    <Grid ColumnDefinitions="100,*">
+    <Grid ColumnDefinitions="110,*">
       <TextBlock Grid.Column="0" Text="Rifling:"
                  VerticalAlignment="Center"
                  FontSize="{DynamicResource AppFontSize}"/>
@@ -75,7 +75,7 @@
     </Grid>
 
     <!-- Rifling Step -->
-    <Grid ColumnDefinitions="100,*">
+    <Grid ColumnDefinitions="110,*">
       <TextBlock Grid.Column="0" Text="Twist Rate:"
                  VerticalAlignment="Center"
                  FontSize="{DynamicResource AppFontSize}"/>
