@@ -1,12 +1,17 @@
 # Plan: two `.drg` generator dialogs (Approximate Drag Table)
 
-> **Status 2026-07-26 — implemented.** All of §1–§4 is built and green (130 new tests, 710 total):
+> **Status 2026-07-26 — done, tested by hand, pushed** (`e4ca151`…`ea8a165`; 744 tests green). Built:
 > `CsvTextTableReader`, `MeasurementTextParser`, `DragTableBuilder`/`DrgMetadata` in
 > `BallisticCalculator.Types`; `DrgFromBcPanel` and `DrgFromVelocitiesPanel` in
-> `BallisticCalculator.Panels` with `ApproximateDrgFromBcDialog` / `ApproximateDrgFromVelocitiesDialog`
-> shells and the Tools → Approximate Drag Table menu. The four sample CSVs are committed to
-> `Panels.Tests/TestData/` so no test depends on a path outside the repo. Remaining: interactive smoke
-> pass (the app launches; the GUI itself was not driven), and the deliberately-broken sample files.
+> `BallisticCalculator.Panels` with scrollable `ApproximateDrgFromBcDialog` /
+> `ApproximateDrgFromVelocitiesDialog` shells, `AtmosphereDialog`, and the Tools → Approximate Drag Table
+> menu. The four sample CSVs are committed to `Panels.Tests/TestData/` so no test depends on a path outside
+> the repo. The velocities path was confirmed against real data: the generated table reproduces the input
+> velocities to 0.013%.
+>
+> **The layout below (§2/§3) is the first cut and was reworked after review** — see the Layout rework note at
+> the end of this banner. Still open: a deliberately-broken CSV set for the rejection paths (all four real
+> samples are clean).
 >
 > **Multi-BC scale — resolved in BallisticCalculator 1.1.11.3.** `DrgDragTableFactory.Build` used to return
 > `Cd_base(M)/BC(M)`, a reciprocal-BC curve needing a BC *value* of 1.0, while every other custom table holds
@@ -25,10 +30,33 @@
 > - The reader's ambiguity rule needed widening: under a `,` separator, *more than two fields* is
 >   ambiguous, because `100,780,2` is either two values with a decimal comma or three columns. Taking the
 >   first two fields silently read it as `(100, 780)`.
+>
+> **Layout rework (after hands-on review).** What shipped differs from §2/§3 below:
+> - Both dialogs **scroll**; the header is **one field per row** (Name / Source / Weight / Diameter / Length,
+>   all the same width) instead of short boxes for long values and long boxes for short ones.
+> - Rows live in a **two-column `DataGrid`** with an **entry row** underneath and
+>   **Add / Change / Delete / Sort / Load Csv**, then Set Atmosphere / Save Drg / Close. Editing is explicit —
+>   select a row to load it, `Change` writes it back — so nothing depends on a change event firing.
+> - The atmosphere moved from an inline expander to its own dialog behind **Set Atmosphere**; the panel raises
+>   `AtmosphereRequested` and the shell owns the window.
+> - **CSV unit combos are gone**: the file must carry its units and a bare number is refused, because reading
+>   a yards file as metres yields a plausible curve that is quietly wrong. The reader therefore takes a
+>   "why is this row unusable" function instead of a bool, and quotes that reason with the offending line.
+> - BC knots are **always Mach** (no velocity toggle), and each knot's coefficient is entered with
+>   `BallisticCoefficientControl`, keeping its own drag table; a mixed G1/G7 curve is normalized on save by
+>   converting each knot at its own Mach (`DragTableBuilder.NormalizeCurve`), which is exact at the knots.
+> - Implausible values are refused on import (Mach > 10, BC > 5) — that is what catches a velocity-keyed file
+>   whose bare numbers have no unit to give them away.
+>
+> **Defects found by that review and fixed** (commit `296793e`): Tab navigation was trapped inside
+> `MeasurementControl`/`BallisticCoefficientControl` by a bubbling `GotFocus` forwarded to the numeric part
+> (Tab died at the first measurement field of *any* panel); a loaded `.drg` did not fill the record's name or
+> source; and bullet values arrived in the file's SI units (`0.010886 kg`) instead of the panel's.
 
 Design for **2026-07-26**. Implements Feature 2 of [`07-25-plan.md`](07-25-plan.md) with the decisions
-confirmed below. Two *separate* editors, each a list+detail table editor with CSV import, each producing
-a `DrgDragTable` saved to a `.drg` file.
+confirmed below. Two *separate* editors with CSV import, each producing a `DrgDragTable` saved to a `.drg`
+file. (The sections below record the design as agreed; where the built result differs, the banner above says
+so.)
 
 ## Confirmed decisions
 

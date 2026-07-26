@@ -1,6 +1,6 @@
 # BallisticCalculator2 — Project Status
 
-Last updated: 2026-07-25
+Last updated: 2026-07-26
 
 ## Overview
 
@@ -14,8 +14,8 @@ direct-UI-access controls (no MVVM/reactive) per `CLAUDE.md`. Trunk-based develo
 
 | Component | Notes |
 |-----------|-------|
-| MeasurementControl / MeasurementController | Generic measurement input + unit selector; two-path precision (SetValue preserves, Value/ChangeUnit clamp). |
-| BallisticCoefficientControl | BC value + drag-table selector (incl. GC/custom). |
+| MeasurementControl / MeasurementController | Generic measurement input + unit selector; two-path precision (SetValue preserves, Value/ChangeUnit clamp). Tab walks value → unit → next field (see the focus note below). |
+| BallisticCoefficientControl | BC value + drag-table selector (incl. GC/custom); same Tab behaviour. |
 | WindDirectionControl / AzimuthDirectionControl | Wind dial (0°=tailwind) and compass dial (0°=North, clockwise, center→target). |
 | ReticleCanvasControl | Reticle rendering, Underlay/Overlay collections, **dashed `MovingTargetBox`** aim overlay, AngularToPixel/PixelToAngular. |
 | SkiaReticleCanvas | IReticleCanvas impl; renders the 1.1.11.1 **line styles** (Solid/Dashed/Dotted: dashed 4w/3w, dotted w/2w round caps). |
@@ -31,9 +31,9 @@ direct-UI-access controls (no MVVM/reactive) per `CLAUDE.md`. Trunk-based develo
 | ZeroingCalculator / ShotTrajectoryCalculator | Single source of truth: build library inputs + trajectory (`Calculate` / `CalculateFine`). Both **thread custom GC drag tables** into the zero and shot calls. |
 | BallisticDictionary | **New.** Loads/saves `data/dictionaries.xml` (sight & barrel presets), sorted by name, malformed entries skipped, missing file → empty. |
 | CustomDragTableLoader | **New.** Loads/caches a `.drg` for GC ammunition (resolves path or falls back to `data/drg`). |
-| CsvTextTableReader | **New.** Two-column CSV → raw text fields. All-or-nothing: only empty lines skipped, optional header on line 1, any other bad line rejects the file; separator chosen by trying `;`/tab/`,`. |
-| MeasurementTextParser | **New.** Unit-suffixed value parsing with the aliases the library lacks (`fps`, `mps`, `mph`, `yds`…), decimal-comma normalization, and bare-number fallback units. |
-| DragTableBuilder / DrgMetadata | **New.** Builds `GC` tables from a BC-vs-Mach curve or radar readings, validating first (≥1 knot / ≥3 strictly-decreasing readings) and carrying the `.drg` header metadata. |
+| CsvTextTableReader | **New.** Two-column CSV → raw text fields. All-or-nothing: only empty lines skipped, optional header on line 1, any other bad line rejects the whole file quoting that line. Separator chosen by trying `;`/tab/`,` and keeping the one under which *every* row parses; the caller supplies a "why is this row unusable" function so the message says what to fix. |
+| MeasurementTextParser | **New.** Unit-suffixed value parsing with the aliases the library lacks (`fps`, `mps`, `mph`, `yds`…) and decimal-comma normalization. A null fallback unit means the text must carry its own unit — what file import uses. |
+| DragTableBuilder / DrgMetadata | **New.** Builds `GC` tables from a BC-vs-Mach curve or radar readings, validating first (≥1 knot / ≥3 strictly-decreasing readings, positive weight and diameter) with user-facing messages. `NormalizeCurve` converts knots quoted against another standard table at their own Mach. |
 | DataFolders | **New.** Standard folders next to the exe: `data/reticle`, `data/legacy-ammo`, `data/drg`. |
 | MeasurementSystem, ChartTrajectory, DropBase, TrajectoryChartMode | Shared enums/models. |
 
@@ -41,7 +41,7 @@ direct-UI-access controls (no MVVM/reactive) per `CLAUDE.md`. Trunk-based develo
 
 | Panel | Notes |
 |-------|-------|
-| AmmoPanel / AmmoLibraryRecordPanel | Ammunition entry + library load/save (default folder `data/legacy-ammo`). **Custom drag table (GC): Browse `.drg` / Clear** row — fills BC=(1,GC)+form factor + weight/diameter; `CustomTableFileName` round-trips. |
+| AmmoPanel / AmmoLibraryRecordPanel | Ammunition entry + library load/save (default folder `data/legacy-ammo`). **Custom drag table (GC): Browse `.drg` / Clear** row — fills BC=(1,GC)+form factor, weight, diameter and **bullet length**, converted to the panel's units (the format stores SI), and fills empty **name/source** from the header; `CustomTableFileName` round-trips. Only positive values are copied, since pre-1.1.11.2 files store the unused slots as 0. |
 | WindPanel / MultiWindPanel / AtmospherePanel | Wind (single/multi) and atmosphere entry. |
 | RiflePanel | **Now sight height + H/V clicks + rifling only.** Sight & barrel **dictionary preset dropdowns** (a sight preset fills height/clicks and suggests the zero distance). |
 | ZeroPanel | **New.** The Zero tab: zero distance, impact offset (V/H), zeroing shot angle, and the zero ammo/atmosphere/wind sub-panels. |
@@ -49,17 +49,19 @@ direct-UI-access controls (no MVVM/reactive) per `CLAUDE.md`. Trunk-based develo
 | SummaryPanel | Compact left-aligned readout: zero adj, target size, bottom- & center-aimed dead-zone spans, near/far zero, subsonic. |
 | ReticlePanel | BDC + target overlay; **moving-target** section (enable + direction dial synced with a numeric degrees input + speed); shows target angular size + lead in the current angular unit; target size up to 10000; wider (325) data panel. |
 | ShotDataPanel | TabControl: **Ammunition / Weather / Wind / Rifle / Zero / Parameters**; assembles the library `Rifle` from Rifle+Zero tabs; `Validate()`. |
-| DrgFromBcPanel | **New.** Builds a `.drg` from a BC-vs-Mach curve: knot list + detail, Mach/velocity display toggle (Mach stays canonical), CSV import that can set the base table from the file's `0.462G7`. |
-| DrgFromVelocitiesPanel | **New.** Builds a `.drg` from measured downrange velocities: reading list + detail, reused `AtmospherePanel` for the measurement conditions, CSV-unit fallback combos for bare numbers. |
+| DrgFromBcPanel | **New.** Builds a `.drg` from a BC-vs-Mach curve. Knots are always keyed by Mach; each knot's coefficient is entered with `BallisticCoefficientControl` and keeps its own drag table, so a mixed G1/G7 curve is normalized on save (converted at each knot's own Mach, count reported). Load Csv adopts the base table when every coefficient names the same one. |
+| DrgFromVelocitiesPanel | **New.** Builds a `.drg` from measured downrange velocities. `Set Atmosphere` (the shell's dialog) sets the air the data was measured in — it drives the recovered drag, and the current conditions are named in the status line. |
+| (both editors) | Stacked header (Name / Source / Weight / Diameter / Length, one field per row), a two-column `DataGrid`, an entry row, and Add / Change / Delete / Sort / Load Csv + Save Drg / Close. Editing is explicit: select a row to load it, `Change` writes it back. CSV files must carry their units — a bare number is refused rather than assumed. |
 
 ### Main Desktop Application (`Desktop/BallisticCalculator/`)
 
 - Full menu (Trajectory / View / **Tools** / Windows / Help), MDI via `iciclecreek.Avalonia.WindowManager`,
   keyboard shortcuts, persistent state (`appstate.json`).
-- **Tools menu:** Approximate Drag Table → From BC Curve / From Measured Velocities — thin `Window` shells
-  around the two editor panels (always enabled; prefill bullet + weather from the active window when there
-  is one). Edit Sights / Edit Barrels — master-detail dictionary editors that save the merged
-  `data/dictionaries.xml` (`SightListEditorDialog` / `BarrelListEditorDialog`).
+- **Tools menu:** Approximate Drag Table → From BC Curve / From Measured Velocities — thin scrollable `Window`
+  shells around the two editor panels (always enabled; prefill bullet + weather from the active window when
+  there is one), plus `AtmosphereDialog` for the velocities editor. Edit Sights / Edit Barrels —
+  master-detail dictionary editors that save the merged `data/dictionaries.xml`
+  (`SightListEditorDialog` / `BarrelListEditorDialog`).
 - `TrajectoryView` tabs: Table, Chart, Reticle, Summary. Coarse display trajectory + one shared **fine**
   trajectory (reticle + summary). `AngularUnits` now also flows to the reticle panel.
 - `ShotParametersDialog` (wraps `ShotDataPanel`), `CompareView`, CSV export, About dialog.
@@ -79,9 +81,13 @@ direct-UI-access controls (no MVVM/reactive) per `CLAUDE.md`. Trunk-based develo
 
 | Project | Tests | Status |
 |---------|------:|--------|
-| BallisticCalculator.Controls.Tests | 305 | passing |
-| BallisticCalculator.Panels.Tests | 209 | passing |
+| BallisticCalculator.Controls.Tests | 309 | passing |
+| BallisticCalculator.Panels.Tests | 369 | passing |
 | ReticleEditor.Tests | 66 | passing |
+| **Total** | **744** | |
+
+Types-layer classes are tested from these suites (there is no separate `Types.Tests`); the four real CSV
+exports live in `Panels.Tests/TestData/` so no test depends on a path outside the repo.
 
 ## Key Design Decisions
 
@@ -99,7 +105,7 @@ impact offset, shot angle, zero ammo/atmosphere/wind). `ShotDataPanel.BuildRifle
 ### Dictionary presets
 `BallisticDictionary` (`data/dictionaries.xml`) supplies sight and barrel presets, edited via the Tools-menu
 editors and consumed by the Rifle-tab dropdowns. A sight preset fills height/clicks and cross-fills the
-zero distance; a combo reverts to "(custom)" only when a field no longer matches the preset.
+zero distance; a combo reverts to "(select)" only when a field no longer matches the preset.
 
 ### Reticle line styles (1.1.11.1)
 Elements carry a nullable `LineStyle` (Solid/Dashed/Dotted); **null = Solid** for legacy reticles, and the
@@ -111,6 +117,27 @@ Near/far zero are computed as line-of-sight crossings, independent of the point-
 longer vanish when the corridor can't close). The dead zone is shown as a range span for **both** bottom-
 and center-aim, alongside the target size.
 
+### Custom drag tables — one scale, two generators
+Every `.drg` holds the projectile's **own drag coefficient** and is run with a **form factor of 1** on table
+`GC`. Both generators produce that scale: `RadarDragTableFactory` recovers it from velocity decay, and since
+**1.1.11.3** `DrgDragTableFactory.Build` multiplies its `Cd_base(M)/BC(M)` curve by the sectional density (so
+bullet weight and diameter are inputs, not documentation). Before that a built table needed a BC *value* of
+1.0 and came back 1/SD — about 2.8× — too draggy once saved. A mixed G1/G7 knot set is normalized by
+converting each knot at **its own Mach**, which is exact here: the synthesized table is `Cd_base(M)/BC(M)` and
+the conversion scales BC by `Cd_target(M)/Cd_source(M)`, so the base-curve factors cancel and every knot lands
+on the same Cd either way.
+
+Cross-checking the two generators needs the **right atmosphere**: a published sheet's CD/BC columns are
+density-independent aerodynamic values, while its velocity table is raw measurement (the Warner sheets come
+from a ~6000 ft range), so at sea level the two disagree by a constant density ratio, not a bug.
+
+### Keyboard focus in composite controls
+`MeasurementControl` and `BallisticCoefficientControl` used to forward every bubbling `GotFocus` to their
+numeric part, which trapped focus: tabbing to the unit combo bounced straight back, so Tab died at the first
+measurement field of a panel. The forwarding is gone (a `UserControl` is not focusable by default, so it never
+did what it was for). Headless tests now cover forward and backward navigation through both controls — they
+are the only tests here that show a window and simulate keystrokes.
+
 ### Value formatting — two-path precision
 `SetValue<T>()` preserves meaningful precision; `Value`/`ChangeUnit` apply strict DecimalPoints to stop
 float noise accumulating through unit conversions.
@@ -120,10 +147,11 @@ float noise accumulating through unit conversions.
 ```
 Common/
 ├── BallisticCalculator.Controls/ (Controls/, Controllers/, Canvas/, Models/)
-├── BallisticCalculator.Panels/   (Panels/, Services/)
+├── BallisticCalculator.Panels/   (Panels/, Services/, Models/)
 ├── BallisticCalculator.Types/    (ShotData, ZeroingData, calculators, BallisticDictionary,
-│                                   CustomDragTableLoader, DataFolders, enums)
-└── *.Tests/
+│                                   CustomDragTableLoader, CsvTextTableReader, MeasurementTextParser,
+│                                   DragTableBuilder, DataFolders, enums)
+└── *.Tests/                      (Panels.Tests/TestData/ holds the real CSV samples)
 Desktop/
 ├── BallisticCalculator/ (Models/, Views/ + Views/Dialogs/, Utilities/, Services/, Assets/)
 ├── DebugApp/, DebugApp1/, ReticleEditor/ (+ ReticleEditor.Tests)
@@ -140,6 +168,19 @@ From **`claude/07-25-plan.md`** (1.1.11 `Tools` namespace):
    (`DrgDragTableFactory` / `Tools.RadarDragTableFactory`), saved as `.drg`.~~ **Done** — see
    `claude/07-26-drg-plan.md`. Two editors under Tools → Approximate Drag Table, with all-or-nothing CSV
    import and full header metadata. Interactive smoke pass still to do.
-3. Tools menu → **Hit probability** (`Tools.HitProbability`). **Pending.**
+3. Tools menu → **Hit probability** (`Tools.HitProbability`). **Pending.** Open decisions recorded there:
+   scatter plot (ScottPlot) vs numbers only, and the default target distance.
+4. Tools menu → **BC converter** (`Tools.BallisticCoefficientConverter`). **Pending**, added 2026-07-26.
+   Converts a published BC between standard tables (the everyday G1 ↔ G7 question) at a reference Mach or
+   velocity. The design's key point: a converted BC is exact only at its reference — ~1% at Mach 1.8–2.5 but
+   ~9% low near Mach 1.3 — so the dialog shows the whole reference band rather than a single number.
+
+### Smaller follow-ups
+
+| Item | Where |
+|------|-------|
+| `data/drg/Lapua/308-lapua n558 11,0g (170gr) naturalis_radar.drg` cannot be opened — its header has a period where a comma belongs (`.007830. .03370`), so `DrgDragTable.Open` throws. One-character data typo, pre-existing. | shipped data |
+| A deliberately-broken CSV set to exercise the import rejection paths (the four real samples are all clean). | test data |
+| Library wart: with a null `Source`, `Save` writes literal `0` and `Open` reports `"0"`. The app filters it, so nothing is user-visible. | BallisticCalculator.Net |
 
 The original phased plan is archived at `claude/Archive/APP_PLAN.md`.
