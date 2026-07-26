@@ -370,6 +370,8 @@ public partial class MainWindow : Window
         // Tools
         MenuToolsEditSights.Click += async (_, _) => await ShowDictionaryEditor(isSights: true);
         MenuToolsEditBarrels.Click += async (_, _) => await ShowDictionaryEditor(isSights: false);
+        MenuToolsDrgFromBc.Click += async (_, _) => await ShowDrgEditor(fromBcCurve: true);
+        MenuToolsDrgFromVelocities.Click += async (_, _) => await ShowDrgEditor(fromBcCurve: false);
 
         // Windows
         MenuWindowsCascade.Click += (_, _) => CascadeWindows();
@@ -385,6 +387,25 @@ public partial class MainWindow : Window
         Window dialog = isSights
             ? new Dialogs.SightListEditorDialog(system)
             : new Dialogs.BarrelListEditorDialog(system);
+        await dialog.ShowDialog<bool?>(this);
+    }
+
+    /// <summary>
+    /// Opens one of the custom drag table (<c>.drg</c>) generators. Both are standalone — they need no open
+    /// trajectory — but when one is active its ammunition and weather prefill the bullet and measurement
+    /// conditions.
+    /// </summary>
+    private async Task ShowDrgEditor(bool fromBcCurve)
+    {
+        var trajectory = _activeChild as ITrajectoryChildWindow;
+        var system = trajectory?.MeasurementSystem ?? MeasurementSystem.Imperial;
+        var ammunition = trajectory?.ShotData?.Ammunition?.Ammunition;
+
+        Window dialog = fromBcCurve
+            ? new Dialogs.ApproximateDrgFromBcDialog(system, _fileDialogService, ammunition)
+            : new Dialogs.ApproximateDrgFromVelocitiesDialog(system, _fileDialogService, ammunition,
+                                                             trajectory?.ShotData?.Atmosphere);
+
         await dialog.ShowDialog<bool?>(this);
     }
 

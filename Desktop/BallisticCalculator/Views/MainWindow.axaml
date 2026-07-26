@@ -100,6 +100,11 @@
             <MenuItem Header="_Tools">
                 <MenuItem Header="Edit _Sights..." x:Name="MenuToolsEditSights" />
                 <MenuItem Header="Edit _Barrels..." x:Name="MenuToolsEditBarrels" />
+                <Separator/>
+                <MenuItem Header="_Approximate Drag Table">
+                    <MenuItem Header="From _BC Curve..." x:Name="MenuToolsDrgFromBc" />
+                    <MenuItem Header="From Measured _Velocities..." x:Name="MenuToolsDrgFromVelocities" />
+                </MenuItem>
             </MenuItem>
 
             <!-- Windows Menu -->

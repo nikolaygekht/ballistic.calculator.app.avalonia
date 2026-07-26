@@ -31,6 +31,9 @@ direct-UI-access controls (no MVVM/reactive) per `CLAUDE.md`. Trunk-based develo
 | ZeroingCalculator / ShotTrajectoryCalculator | Single source of truth: build library inputs + trajectory (`Calculate` / `CalculateFine`). Both **thread custom GC drag tables** into the zero and shot calls. |
 | BallisticDictionary | **New.** Loads/saves `data/dictionaries.xml` (sight & barrel presets), sorted by name, malformed entries skipped, missing file → empty. |
 | CustomDragTableLoader | **New.** Loads/caches a `.drg` for GC ammunition (resolves path or falls back to `data/drg`). |
+| CsvTextTableReader | **New.** Two-column CSV → raw text fields. All-or-nothing: only empty lines skipped, optional header on line 1, any other bad line rejects the file; separator chosen by trying `;`/tab/`,`. |
+| MeasurementTextParser | **New.** Unit-suffixed value parsing with the aliases the library lacks (`fps`, `mps`, `mph`, `yds`…), decimal-comma normalization, and bare-number fallback units. |
+| DragTableBuilder / DrgMetadata | **New.** Builds `GC` tables from a BC-vs-Mach curve or radar readings, validating first (≥1 knot / ≥3 strictly-decreasing readings) and carrying the `.drg` header metadata. |
 | DataFolders | **New.** Standard folders next to the exe: `data/reticle`, `data/legacy-ammo`, `data/drg`. |
 | MeasurementSystem, ChartTrajectory, DropBase, TrajectoryChartMode | Shared enums/models. |
 
@@ -46,12 +49,16 @@ direct-UI-access controls (no MVVM/reactive) per `CLAUDE.md`. Trunk-based develo
 | SummaryPanel | Compact left-aligned readout: zero adj, target size, bottom- & center-aimed dead-zone spans, near/far zero, subsonic. |
 | ReticlePanel | BDC + target overlay; **moving-target** section (enable + direction dial synced with a numeric degrees input + speed); shows target angular size + lead in the current angular unit; target size up to 10000; wider (325) data panel. |
 | ShotDataPanel | TabControl: **Ammunition / Weather / Wind / Rifle / Zero / Parameters**; assembles the library `Rifle` from Rifle+Zero tabs; `Validate()`. |
+| DrgFromBcPanel | **New.** Builds a `.drg` from a BC-vs-Mach curve: knot list + detail, Mach/velocity display toggle (Mach stays canonical), CSV import that can set the base table from the file's `0.462G7`. |
+| DrgFromVelocitiesPanel | **New.** Builds a `.drg` from measured downrange velocities: reading list + detail, reused `AtmospherePanel` for the measurement conditions, CSV-unit fallback combos for bare numbers. |
 
 ### Main Desktop Application (`Desktop/BallisticCalculator/`)
 
 - Full menu (Trajectory / View / **Tools** / Windows / Help), MDI via `iciclecreek.Avalonia.WindowManager`,
   keyboard shortcuts, persistent state (`appstate.json`).
-- **Tools menu:** Edit Sights / Edit Barrels — master-detail dictionary editors that save the merged
+- **Tools menu:** Approximate Drag Table → From BC Curve / From Measured Velocities — thin `Window` shells
+  around the two editor panels (always enabled; prefill bullet + weather from the active window when there
+  is one). Edit Sights / Edit Barrels — master-detail dictionary editors that save the merged
   `data/dictionaries.xml` (`SightListEditorDialog` / `BarrelListEditorDialog`).
 - `TrajectoryView` tabs: Table, Chart, Reticle, Summary. Coarse display trajectory + one shared **fine**
   trajectory (reticle + summary). `AngularUnits` now also flows to the reticle panel.
@@ -129,9 +136,10 @@ data/  (dictionaries.xml, reticle/, legacy-ammo/, drg/ — copied next to the bi
 
 From **`claude/07-25-plan.md`** (1.1.11 `Tools` namespace):
 1. ~~Moving target — lead-off aim on the reticle (`Tools.MovingTargetLead`).~~ **Done.**
-2. Tools menu → **Approximate DRG table** generation from BCs / from Velocities (`DrgDragTableFactory` /
-   `Tools.RadarDragTableFactory`), saved as `.drg`. *(Loading/using existing `.drg` GC tables is done; the
-   generation dialogs are still pending.)*
+2. ~~Tools menu → **Approximate DRG table** generation from BCs / from Velocities
+   (`DrgDragTableFactory` / `Tools.RadarDragTableFactory`), saved as `.drg`.~~ **Done** — see
+   `claude/07-26-drg-plan.md`. Two editors under Tools → Approximate Drag Table, with all-or-nothing CSV
+   import and full header metadata. Interactive smoke pass still to do.
 3. Tools menu → **Hit probability** (`Tools.HitProbability`). **Pending.**
 
 The original phased plan is archived at `claude/Archive/APP_PLAN.md`.

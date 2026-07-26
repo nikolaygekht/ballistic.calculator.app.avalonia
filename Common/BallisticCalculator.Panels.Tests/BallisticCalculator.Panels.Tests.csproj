@@ -32,4 +32,11 @@
     <ProjectReference Include="..\BallisticCalculator.Panels\BallisticCalculator.Panels.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Real-world CSV samples (BC-vs-Mach and radar velocity exports), copied into the repo so the
+         tests never depend on a path outside it. Byte-for-byte as produced: ';' separated, CRLF, header
+         line, inline units, and no final end-of-line. -->
+    <None Include="TestData\*.csv" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

@@ -1,5 +1,23 @@
 # Plan: two `.drg` generator dialogs (Approximate Drag Table)
 
+> **Status 2026-07-26 — implemented.** All of §1–§4 is built and green (130 new tests, 710 total):
+> `CsvTextTableReader`, `MeasurementTextParser`, `DragTableBuilder`/`DrgMetadata` in
+> `BallisticCalculator.Types`; `DrgFromBcPanel` and `DrgFromVelocitiesPanel` in
+> `BallisticCalculator.Panels` with `ApproximateDrgFromBcDialog` / `ApproximateDrgFromVelocitiesDialog`
+> shells and the Tools → Approximate Drag Table menu. The four sample CSVs are committed to
+> `Panels.Tests/TestData/` so no test depends on a path outside the repo. Remaining: interactive smoke
+> pass (the app launches; the GUI itself was not driven), and the deliberately-broken sample files.
+>
+> Two implementation notes worth keeping:
+> - **`TextChanged` and `MeasurementControl.Changed` do not fire for programmatic values in headless
+>   Avalonia** (an existing comment in `MeasurementControlTests` says as much). The BC panel therefore
+>   watches `TextBox.TextProperty` changes, and the velocities panel commits the detail pane into its row
+>   at every point that consumes the rows (add, delete, selection change, import, build) rather than
+>   trusting an event — which also fixes a real-app case, since a unit switch raises no text change.
+> - The reader's ambiguity rule needed widening: under a `,` separator, *more than two fields* is
+>   ambiguous, because `100,780,2` is either two values with a decimal comma or three columns. Taking the
+>   first two fields silently read it as `(100, 780)`.
+
 Design for **2026-07-26**. Implements Feature 2 of [`07-25-plan.md`](07-25-plan.md) with the decisions
 confirmed below. Two *separate* editors, each a list+detail table editor with CSV import, each producing
 a `DrgDragTable` saved to a `.drg` file.
