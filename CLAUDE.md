@@ -15,13 +15,18 @@ Create a new version of the BallisticCalculator application using **Avalonia UI*
   - Provides generic `Measurement<T>` struct where T is a unit enum (DistanceUnit, VelocityUnit, WeightUnit, etc.)
   - Static method: `Measurement<T>.GetUnitNames()` returns `Tuple<T, string>[]` for populating unit lists
 
-- **BallisticCalculator** (NuGet **1.1.11.2**, capped `[1.1.x,2)`): Core ballistic calculation library.
+- **BallisticCalculator** (NuGet **1.1.11.3**, capped `[1.1.x,2)`): Core ballistic calculation library.
   Source at `/mnt/d/develop/components/BusinessSpecificComponents/BallisticCalculator.Net/`.
   - Provides `BallisticCoefficient` struct, `DragTableId` enum, and the calculation engine.
   - **`.drg` metadata (1.1.11.2):** the header carries name, weight, diameter, **bullet length** and
     **source**; `DrgDragTable.Save`/`Open` round-trip all of them, and
     `RadarDragTableFactory.Create` takes optional `bulletLength`/`source`. Files written earlier store
     those two slots as `0` — treat non-positive as absent.
+  - **Multi-BC scale (1.1.11.3):** `DrgDragTableFactory.Build` now returns the projectile's own Cd
+    (`Cd_base(M)/BC(M) * SD`), the same scale a `.drg` stores, so a built table survives Save/Open and runs
+    with the **form factor of 1** the factory stamps into the entry. Bullet **weight and diameter are
+    required** (they set the scale) and the supplied BC is overwritten. Before this, a built table needed a
+    BC *value* of 1.0 and was 1/SD (≈2.8×) too draggy once saved.
   - **Zeroing API (1.1.11):** `SightAngle` was removed — compute the zero with
     `TrajectoryCalculator.CalculateZeroParameters(...)` then `ShotParameters.Apply(zero)`. `ShotParameters`
     also has `ShotDropAdjustment`/`ShotWindageAdjustment` (dialed clicks), `BarrelAzimuth`, `Latitude`.

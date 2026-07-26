@@ -5,9 +5,13 @@ namespace BallisticCalculator.Types;
 
 /// <summary>
 /// The metadata a <c>.drg</c> header can carry (BallisticCalculator 1.1.11.2): name, source, bullet weight,
-/// diameter and length. Weight and diameter are optional for a BC-curve table, where they are documentation
-/// only, but required for a radar table, where they drive the drag recovery. Caliber, ammunition type,
-/// barrel length and muzzle velocity have no slot in the format and are deliberately absent.
+/// diameter and length.
+/// <para>
+/// Weight and diameter are <b>required by both</b> table builders and are not merely documentation: the radar
+/// factory recovers drag from them, and since 1.1.11.3 the BC-curve factory scales its curve by the sectional
+/// density they define. Only <see cref="Length"/> is header-only. Caliber, ammunition type, barrel length and
+/// muzzle velocity have no slot in the format and are deliberately absent.
+/// </para>
 /// </summary>
 public sealed record DrgMetadata(
     string Name,
@@ -98,7 +102,12 @@ public static class DragTableBuilder
 
     /// <summary>
     /// Synthesizes a table by scaling <paramref name="baseTable"/> with an effective-BC-vs-Mach curve.
-    /// Use the result with a ballistic coefficient of 1.0 on table <c>GC</c>.
+    /// <para>
+    /// Since BallisticCalculator 1.1.11.3 the result holds the projectile's own drag coefficient —
+    /// <c>Cd_base(M)/BC(M) * SD</c> — which is the scale a <c>.drg</c> file stores, so it survives a save and
+    /// reload and is run with the form factor of one that the factory stamps into the entry. That makes the
+    /// bullet weight and diameter inputs rather than documentation: they set the sectional density.
+    /// </para>
     /// </summary>
     /// <exception cref="ArgumentException">The metadata or the curve is unusable; the message is user-facing.</exception>
     public static DrgDragTable FromBcCurve(DrgMetadata metadata, DragTableId baseTable, IEnumerable<BcAtMach> curve)
@@ -106,6 +115,9 @@ public static class DragTableBuilder
         ArgumentNullException.ThrowIfNull(metadata);
         ArgumentNullException.ThrowIfNull(curve);
         RequireName(metadata);
+
+        // Checked here so the editor shows a sentence instead of the library's parameter-name exception.
+        RequireBullet(metadata, "the drag curve is scaled by the bullet's sectional density");
 
         if (baseTable == DragTableId.GC)
             throw new ArgumentException("The base table must be a standard curve (G1…RA4), not GC (custom).",
@@ -147,13 +159,7 @@ public static class DragTableBuilder
         ArgumentNullException.ThrowIfNull(readings);
         RequireName(metadata);
 
-        // Unlike the BC curve, these two are physics inputs rather than documentation.
-        if (metadata.Weight == null || metadata.Weight.Value.Value <= 0)
-            throw new ArgumentException("The bullet weight is required and must be greater than zero.",
-                                        nameof(metadata));
-        if (metadata.Diameter == null || metadata.Diameter.Value.Value <= 0)
-            throw new ArgumentException("The bullet diameter is required and must be greater than zero.",
-                                        nameof(metadata));
+        RequireBullet(metadata, "the drag recovery depends on them");
 
         var sorted = readings.OrderBy(r => r.Distance.In(DistanceUnit.Meter)).ToArray();
         if (sorted.Length < MinimumRadarReadings)
@@ -209,6 +215,16 @@ public static class DragTableBuilder
     {
         if (string.IsNullOrWhiteSpace(metadata.Name))
             throw new ArgumentException("A name for the drag table is required.", nameof(metadata));
+    }
+
+    /// <summary>Both builders need a real bullet; <paramref name="why"/> says what it is used for.</summary>
+    private static void RequireBullet(DrgMetadata metadata, string why)
+    {
+        if (metadata.Weight == null || metadata.Weight.Value.Value <= 0)
+            throw new ArgumentException($"The bullet weight is required — {why}.", nameof(metadata));
+
+        if (metadata.Diameter == null || metadata.Diameter.Value.Value <= 0)
+            throw new ArgumentException($"The bullet diameter is required — {why}.", nameof(metadata));
     }
 
     private static string? NullIfBlank(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();

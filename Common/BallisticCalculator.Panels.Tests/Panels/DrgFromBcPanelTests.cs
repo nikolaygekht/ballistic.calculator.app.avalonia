@@ -28,10 +28,16 @@ public class DrgFromBcPanelTests
         return path;
     }
 
+    /// <summary>
+    /// A panel with everything a save needs except the knots. Weight and diameter are inputs, not metadata:
+    /// since BallisticCalculator 1.1.11.3 the curve is scaled by the bullet's sectional density.
+    /// </summary>
     private static DrgFromBcPanel PanelWith(MockFileDialogService service)
     {
         var panel = new DrgFromBcPanel { FileDialogService = service };
         panel.NameBox.Text = "test table";
+        panel.WeightControl.SetValue(new Measurement<WeightUnit>(285, WeightUnit.Grain));
+        panel.DiameterControl.SetValue(new Measurement<DistanceUnit>(0.338, DistanceUnit.Inch));
         return panel;
     }
 
@@ -270,13 +276,29 @@ public class DrgFromBcPanelTests
     public void Save_WithoutName_ShouldReportAndNotOpenTheFileDialog()
     {
         var service = new MockFileDialogService { NextOpenResult = Sample("mbc1.csv") };
-        var panel = new DrgFromBcPanel { FileDialogService = service };
+        var panel = PanelWith(service);
+        panel.NameBox.Text = "";
         Click(panel.ImportButton);
 
         Click(panel.SaveButton);
 
         service.LastSaveOptions.Should().BeNull();
         panel.Status.Should().Contain("name");
+    }
+
+    [AvaloniaFact]
+    public void Save_WithoutBullet_ShouldReportAndNotOpenTheFileDialog()
+    {
+        // Weight and diameter set the curve's scale, so a save without them cannot be right.
+        var service = new MockFileDialogService { NextOpenResult = Sample("mbc1.csv") };
+        var panel = new DrgFromBcPanel { FileDialogService = service };
+        panel.NameBox.Text = "no bullet";
+        Click(panel.ImportButton);
+
+        Click(panel.SaveButton);
+
+        service.LastSaveOptions.Should().BeNull();
+        panel.Status.Should().Contain("weight").And.Contain("sectional density");
     }
 
     [AvaloniaFact]

@@ -8,6 +8,14 @@
 > `Panels.Tests/TestData/` so no test depends on a path outside the repo. Remaining: interactive smoke
 > pass (the app launches; the GUI itself was not driven), and the deliberately-broken sample files.
 >
+> **Multi-BC scale — resolved in BallisticCalculator 1.1.11.3.** `DrgDragTableFactory.Build` used to return
+> `Cd_base(M)/BC(M)`, a reciprocal-BC curve needing a BC *value* of 1.0, while every other custom table holds
+> physical Cd and runs with a form factor of 1 — so a built table saved as `.drg` came back 1/SD (≈2.8×) too
+> draggy. `Build` now multiplies by the sectional density and stamps the form-factor-1 GC value itself.
+> Breaking for us: **bullet weight and diameter are required inputs** to the BC path (they set the scale), the
+> entry's BC is overwritten, and a blank source becomes "bc curve". Verified against the Warner .338 Flatline
+> sheet: the built curve now reproduces its published CD column to 0.23% and survives Save/Open exactly.
+>
 > Two implementation notes worth keeping:
 > - **`TextChanged` and `MeasurementControl.Changed` do not fire for programmatic values in headless
 >   Avalonia** (an existing comment in `MeasurementControlTests` says as much). The BC panel therefore

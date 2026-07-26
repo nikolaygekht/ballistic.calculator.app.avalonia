@@ -5,7 +5,7 @@ Last updated: 2026-07-25
 ## Overview
 
 Avalonia rewrite of the WinForms BallisticCalculator. Core trajectory math comes from the
-**BallisticCalculator 1.1.11.2** NuGet package (+ Gehtsoft.Measurements); the app is action-driven with
+**BallisticCalculator 1.1.11.3** NuGet package (+ Gehtsoft.Measurements); the app is action-driven with
 direct-UI-access controls (no MVVM/reactive) per `CLAUDE.md`. Trunk-based development (commit to `main`).
 
 ## Completed

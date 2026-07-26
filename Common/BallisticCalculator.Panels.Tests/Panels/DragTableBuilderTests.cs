@@ -143,6 +143,82 @@ public class DragTableBuilderTests
         act.Should().Throw<ArgumentException>().Which.Message.Should().NotBeNullOrWhiteSpace();
     }
 
+    /// <summary>
+    /// Since BallisticCalculator 1.1.11.3 the synthesized curve is the projectile's own drag coefficient, so it
+    /// can be checked against a laboratory CD column. These are the Warner Tool / New Mexico Tech Doppler
+    /// figures for the .338 Flatline 285 gr, which publishes the BC-vs-Mach profile and the measured CD side by
+    /// side. Before that version the curve came out 1/SD (2.8x) too large and a saved file read back wrong.
+    /// </summary>
+    [Theory]
+    [InlineData(1.50, 0.462, 0.265)]
+    [InlineData(1.75, 0.463, 0.243)]
+    [InlineData(2.00, 0.470, 0.226)]
+    [InlineData(2.25, 0.480, 0.210)]
+    [InlineData(2.50, 0.484, 0.199)]
+    public void FromBcCurve_ShouldReproduceTheMeasuredDragCoefficient(double mach, double bcG7, double publishedCd)
+    {
+        var metadata = new DrgMetadata("338 Flatline 285gr", "Warner sheet",
+            new Measurement<WeightUnit>(285, WeightUnit.Grain),
+            new Measurement<DistanceUnit>(0.338, DistanceUnit.Inch),
+            null);
+
+        var curve = new[]
+        {
+            new BcAtMach(1.50, 0.462), new BcAtMach(1.75, 0.463), new BcAtMach(2.00, 0.470),
+            new BcAtMach(2.25, 0.480), new BcAtMach(2.50, 0.484),
+        };
+
+        var table = DragTableBuilder.FromBcCurve(metadata, DragTableId.G7, curve);
+
+        Cd(table, mach).Should().BeApproximately(publishedCd, publishedCd * 0.005);
+    }
+
+    [Fact]
+    public void FromBcCurve_SavedFile_ShouldPreserveTheCurveItself()
+    {
+        // The drg scale is what makes this possible: the file stores exactly what Build produced.
+        var table = DragTableBuilder.FromBcCurve(Metadata(), DragTableId.G7, Curve());
+        var path = Path.Combine(Path.GetTempPath(), $"builder-{Guid.NewGuid():N}.drg");
+
+        try
+        {
+            table.Save(path);
+            var reopened = DrgDragTable.Open(path);
+
+            reopened.Count.Should().Be(table.Count);
+            foreach (var mach in new[] { 1.2, 1.5, 2.0, 2.25 })
+                Cd(reopened, mach).Should().BeApproximately(Cd(table, mach), 1e-9);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Theory]
+    [InlineData("noWeight")]
+    [InlineData("zeroWeight")]
+    [InlineData("noDiameter")]
+    [InlineData("zeroDiameter")]
+    public void FromBcCurve_WithoutABullet_ShouldThrowWithAReadableMessage(string scenario)
+    {
+        // 1.1.11.3 made these inputs rather than metadata, because they set the curve's scale.
+        var metadata = Metadata();
+        metadata = scenario switch
+        {
+            "noWeight" => metadata with { Weight = null },
+            "zeroWeight" => metadata with { Weight = new Measurement<WeightUnit>(0, WeightUnit.Grain) },
+            "noDiameter" => metadata with { Diameter = null },
+            _ => metadata with { Diameter = new Measurement<DistanceUnit>(0, DistanceUnit.Inch) },
+        };
+
+        var act = () => DragTableBuilder.FromBcCurve(metadata, DragTableId.G7, Curve());
+
+        act.Should().Throw<ArgumentException>()
+           .Which.Message.Should().Contain(scenario.Contains("Weight") ? "weight" : "diameter")
+           .And.Contain("sectional density");
+    }
+
     [Fact]
     public void FromBcCurve_SavedFile_ShouldRoundTripAllMetadata()
     {

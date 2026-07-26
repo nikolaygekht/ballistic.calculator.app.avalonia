@@ -45,6 +45,10 @@
                                    FontSize="{DynamicResource AppFontSize}"/>
     </Grid>
 
+    <TextBlock Text="Weight and diameter are required — the curve is scaled by the bullet's sectional density."
+               Foreground="Gray" TextWrapping="Wrap"
+               FontSize="{DynamicResource AppFontSize}"/>
+
     <Grid ColumnDefinitions="90,Auto,*">
       <TextBlock Grid.Column="0" Text="Base table" VerticalAlignment="Center"
                  FontSize="{DynamicResource AppFontSize}"/>
