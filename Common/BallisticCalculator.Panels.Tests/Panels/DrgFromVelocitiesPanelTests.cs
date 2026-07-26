@@ -37,6 +37,12 @@ public class DrgFromVelocitiesPanelTests
         return panel;
     }
 
+    private static void Enter(DrgFromVelocitiesPanel panel, double yards, double fps)
+    {
+        panel.DistanceControl.SetValue(new Measurement<DistanceUnit>(yards, DistanceUnit.Yard));
+        panel.VelocityControl.SetValue(new Measurement<VelocityUnit>(fps, VelocityUnit.FeetPerSecond));
+    }
+
     #region Editing
 
     [AvaloniaFact]
@@ -45,96 +51,104 @@ public class DrgFromVelocitiesPanelTests
         var panel = new DrgFromVelocitiesPanel();
 
         panel.Readings.Should().BeEmpty();
-        panel.DetailPanel.IsEnabled.Should().BeFalse();
-        panel.Status.Should().Contain("No readings").And.Contain("3");   // states the minimum
+        panel.Status.Should().Contain("No readings")
+             .And.Contain("3")                       // states the minimum
+             .And.Contain("standard atmosphere");
     }
 
     [AvaloniaFact]
-    public void Add_ShouldAppendReadingAndSelectIt()
+    public void Add_ShouldAppendTheEntryAndSelectIt()
     {
         var panel = new DrgFromVelocitiesPanel();
+        Enter(panel, 100, 3001.2);
 
         Click(panel.AddButton);
 
         panel.Readings.Should().HaveCount(1);
-        panel.ReadingsList.SelectedIndex.Should().Be(0);
-        panel.DetailPanel.IsEnabled.Should().BeTrue();
+        panel.Readings[0].Distance.In(DistanceUnit.Yard).Should().BeApproximately(100, 1e-6);
+        panel.Readings[0].Velocity.In(VelocityUnit.FeetPerSecond).Should().BeApproximately(3001.2, 1e-3);
+        panel.ReadingsGrid.SelectedItem.Should().BeSameAs(panel.Readings[0]);
     }
 
     [AvaloniaFact]
-    public void Add_Twice_ShouldStepDownrangeAndSlowDown()
+    public void Add_WithoutVelocity_ShouldReportAndAddNothing()
     {
         var panel = new DrgFromVelocitiesPanel();
+        panel.DistanceControl.SetValue(new Measurement<DistanceUnit>(100, DistanceUnit.Yard));
 
         Click(panel.AddButton);
-        Click(panel.AddButton);
 
-        var readings = panel.Readings;
-        readings[1].Distance.In(DistanceUnit.Meter).Should().BeGreaterThan(readings[0].Distance.In(DistanceUnit.Meter));
-        readings[1].Velocity.In(VelocityUnit.MetersPerSecond).Should().BeLessThan(readings[0].Velocity.In(VelocityUnit.MetersPerSecond));
+        panel.Readings.Should().BeEmpty();
+        panel.Status.Should().Contain("velocity");
     }
 
     [AvaloniaFact]
-    public void Delete_ShouldRemoveSelectedReading()
+    public void Change_ShouldWriteTheEntryIntoTheSelectedRow()
     {
         var panel = new DrgFromVelocitiesPanel();
-        Click(panel.AddButton);
+        Enter(panel, 100, 3001.2);
         Click(panel.AddButton);
 
-        panel.ReadingsList.SelectedIndex = 0;
+        Enter(panel, 300, 2847.2);
+        Click(panel.ChangeButton);
+
+        panel.Readings.Should().HaveCount(1);
+        panel.Readings[0].Distance.In(DistanceUnit.Yard).Should().BeApproximately(300, 1e-6);
+        panel.Readings[0].Velocity.In(VelocityUnit.FeetPerSecond).Should().BeApproximately(2847.2, 1e-3);
+        panel.Readings[0].DistanceText.Should().Contain("300");
+    }
+
+    [AvaloniaFact]
+    public void SelectingARow_ShouldLoadItIntoTheEntryFields()
+    {
+        // A DataGrid only raises SelectionChanged once its rows are materialized, so this behaviour needs a
+        // shown window rather than a bare panel.
+        var panel = new DrgFromVelocitiesPanel();
+        var window = new Window { Content = panel, Width = 600, Height = 640 };
+        window.Show();
+        Enter(panel, 0, 3078.8);
+        Click(panel.AddButton);
+        Enter(panel, 100, 3001.2);
+        Click(panel.AddButton);
+
+        panel.ReadingsGrid.SelectedItem = panel.Readings[0];
+
+        panel.DistanceControl.GetValue<DistanceUnit>()!.Value.In(DistanceUnit.Yard).Should().Be(0);
+        panel.VelocityControl.GetValue<VelocityUnit>()!.Value.In(VelocityUnit.FeetPerSecond).Should().BeApproximately(3078.8, 1e-3);
+    }
+
+    [AvaloniaFact]
+    public void Delete_ShouldRemoveSelectedRow()
+    {
+        var panel = new DrgFromVelocitiesPanel();
+        Enter(panel, 0, 3078.8);
+        Click(panel.AddButton);
+        Enter(panel, 100, 3001.2);
+        Click(panel.AddButton);
+
+        panel.ReadingsGrid.SelectedItem = panel.Readings[0];
         Click(panel.DeleteButton);
 
         panel.Readings.Should().HaveCount(1);
+        panel.Readings[0].Distance.In(DistanceUnit.Yard).Should().BeApproximately(100, 1e-6);
     }
 
     [AvaloniaFact]
-    public void EditingDetail_ShouldBeCommittedWhenTheRowIsUsed()
+    public void Sort_ShouldOrderByDistance()
     {
         var panel = new DrgFromVelocitiesPanel();
+        Enter(panel, 200, 2923.9);
+        Click(panel.AddButton);
+        Enter(panel, 0, 3078.8);
         Click(panel.AddButton);
 
-        panel.DistanceControl.SetValue(new Measurement<DistanceUnit>(300, DistanceUnit.Yard));
-        panel.VelocityControl.SetValue(new Measurement<VelocityUnit>(2847.2, VelocityUnit.FeetPerSecond));
+        Click(panel.SortButton);
 
-        // Adding the next row commits the detail pane into the row it belongs to; correctness must not
-        // depend on a change event, which is not raised for a programmatic set (nor for a unit switch).
-        Click(panel.AddButton);
-
-        panel.Readings[0].Distance.In(DistanceUnit.Yard).Should().BeApproximately(300, 1e-6);
-        panel.Readings[0].Velocity.In(VelocityUnit.FeetPerSecond).Should().BeApproximately(2847.2, 1e-3);
-        panel.Readings[0].Display.Should().Contain("300");
+        panel.Readings.Select(r => r.Distance.In(DistanceUnit.Meter)).Should().BeInAscendingOrder();
     }
 
     [AvaloniaFact]
-    public void EditingDetail_ShouldBeCommittedWhenTheSelectionMoves()
-    {
-        var panel = new DrgFromVelocitiesPanel();
-        Click(panel.AddButton);
-        Click(panel.AddButton);
-
-        panel.ReadingsList.SelectedIndex = 0;
-        panel.DistanceControl.SetValue(new Measurement<DistanceUnit>(50, DistanceUnit.Yard));
-        panel.ReadingsList.SelectedIndex = 1;
-
-        panel.Readings[0].Distance.In(DistanceUnit.Yard).Should().BeApproximately(50, 1e-6);
-    }
-
-    [AvaloniaFact]
-    public void EditingDetail_ShouldBeCommittedBeforeBuilding()
-    {
-        var service = new MockFileDialogService { NextOpenResult = Sample("velocity1.csv") };
-        var panel = PanelWith(service);
-        Click(panel.ImportButton);
-
-        panel.ReadingsList.SelectedIndex = 0;
-        panel.VelocityControl.SetValue(new Measurement<VelocityUnit>(3100, VelocityUnit.FeetPerSecond));
-        panel.Build();
-
-        panel.Readings[0].Velocity.In(VelocityUnit.FeetPerSecond).Should().BeApproximately(3100, 1e-3);
-    }
-
-    [AvaloniaFact]
-    public void Atmosphere_ShouldRoundTripThroughTheSharedPanel()
+    public void Atmosphere_ShouldBeReportedInTheStatus()
     {
         var panel = new DrgFromVelocitiesPanel
         {
@@ -142,7 +156,19 @@ public class DrgFromVelocitiesPanelTests
         };
 
         panel.Atmosphere.Should().NotBeNull();
-        panel.Atmosphere!.Altitude.In(DistanceUnit.Foot).Should().BeApproximately(5000, 1);
+        panel.Status.Should().NotContain("standard atmosphere");
+    }
+
+    [AvaloniaFact]
+    public void SetAtmosphereButton_ShouldAskTheHost()
+    {
+        var panel = new DrgFromVelocitiesPanel();
+        var asked = false;
+        panel.AtmosphereRequested += (_, _) => asked = true;
+
+        Click(panel.AtmosphereButton);
+
+        asked.Should().BeTrue();
     }
 
     #endregion
@@ -162,7 +188,6 @@ public class DrgFromVelocitiesPanelTests
         panel.Readings.Should().HaveCount(16);
         panel.Readings[0].Distance.In(DistanceUnit.Yard).Should().Be(0);
         panel.Readings[15].Distance.In(DistanceUnit.Yard).Should().Be(1500);
-        // Inline units in the file win over the CSV unit combos.
         panel.Readings[0].Velocity.In(VelocityUnit.FeetPerSecond).Should().BeApproximately(muzzleFps, 0.01);
         panel.Readings[15].Velocity.In(VelocityUnit.FeetPerSecond).Should().BeApproximately(lastFps, 0.01);
         panel.Status.Should().Contain("16 readings");
@@ -195,12 +220,25 @@ public class DrgFromVelocitiesPanelTests
         panel.Readings[0].Velocity.In(VelocityUnit.FeetPerSecond).Should().BeApproximately(3078.8, 0.01);
     }
 
+    // Units are required in the file: reading a yards file as metres yields a plausible curve that is
+    // quietly wrong, and only the file knows which it is.
     [AvaloniaFact]
-    public void Import_BareNumbers_ShouldUseTheCsvUnitCombos()
+    public void Import_BareNumbers_ShouldRejectAndSayWhatIsMissing()
     {
         var service = new MockFileDialogService { NextOpenResult = TempCsv("0;850", "100;780.2", "200;714.9") };
         var panel = PanelWith(service);
-        panel.MeasurementSystem = MeasurementSystem.Metric;      // sets the CSV combos to m and m/s
+
+        Click(panel.ImportButton);
+
+        panel.Readings.Should().BeEmpty();
+        panel.Status.Should().Contain("unit").And.Contain("Nothing was imported");
+    }
+
+    [AvaloniaFact]
+    public void Import_MetricUnitsInFile_ShouldBeTakenFromTheFile()
+    {
+        var service = new MockFileDialogService { NextOpenResult = TempCsv("0m;850m/s", "100m;780.2m/s", "200m;714.9m/s") };
+        var panel = PanelWith(service);
 
         Click(panel.ImportButton);
 
@@ -234,7 +272,9 @@ public class DrgFromVelocitiesPanelTests
     {
         var service = new MockFileDialogService();
         var panel = PanelWith(service);
+        Enter(panel, 0, 3078.8);
         Click(panel.AddButton);
+        Enter(panel, 100, 3001.2);
         Click(panel.AddButton);
 
         Click(panel.SaveButton);
@@ -303,6 +343,18 @@ public class DrgFromVelocitiesPanelTests
         {
             File.Delete(path);
         }
+    }
+
+    [AvaloniaFact]
+    public void CloseButton_ShouldRaiseCloseRequested()
+    {
+        var panel = new DrgFromVelocitiesPanel();
+        var raised = false;
+        panel.CloseRequested += (_, _) => raised = true;
+
+        Click(panel.CloseButton);
+
+        raised.Should().BeTrue();
     }
 
     #endregion

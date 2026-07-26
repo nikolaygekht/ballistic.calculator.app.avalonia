@@ -1,0 +1,25 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:panels="using:BallisticCalculator.Panels.Panels"
+        x:Class="BallisticCalculator.Views.Dialogs.AtmosphereDialog"
+        Title="Atmosphere"
+        Width="420" Height="300"
+        MinWidth="360" MinHeight="240"
+        FontSize="{DynamicResource AppFontSize}"
+        WindowStartupLocation="CenterOwner"
+        CanResize="true"
+        SizeToContent="Height">
+
+  <DockPanel Margin="12">
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal"
+                HorizontalAlignment="Center" Spacing="10" Margin="0,12,0,0">
+      <Button Content="OK" Click="OnOK" Width="80"
+              FontSize="{DynamicResource AppFontSize}"/>
+      <Button Content="Cancel" Click="OnCancel" Width="80"
+              FontSize="{DynamicResource AppFontSize}"/>
+    </StackPanel>
+
+    <panels:AtmospherePanel x:Name="AtmospherePanel" x:FieldModifier="internal"
+                            FontSize="{DynamicResource AppFontSize}"/>
+  </DockPanel>
+</Window>

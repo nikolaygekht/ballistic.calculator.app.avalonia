@@ -24,13 +24,20 @@ public class SampleCsvImportTests
         return path;
     }
 
-    private static bool BcRow(string a, string b) =>
-        MeasurementTextParser.TryParseDouble(a, out _) &&
-        MeasurementTextParser.TryParseBc(b, DragTableId.G7, out _);
+    private static string? BcRow(string a, string b)
+    {
+        if (!MeasurementTextParser.TryParseDouble(a, out _)) return "the Mach value is not a number";
+        if (!MeasurementTextParser.TryParseBc(b, DragTableId.G7, out _)) return "the ballistic coefficient is not valid";
+        return null;
+    }
 
-    private static bool VelocityRow(string a, string b) =>
-        MeasurementTextParser.TryParseDistance(a, DistanceUnit.Yard, out _) &&
-        MeasurementTextParser.TryParseVelocity(b, VelocityUnit.FeetPerSecond, out _);
+    // Units are required on import: a bare number would be guesswork (see the panels).
+    private static string? VelocityRow(string a, string b)
+    {
+        if (!MeasurementTextParser.TryParseDistance(a, null, out _)) return "no unit given for the distance";
+        if (!MeasurementTextParser.TryParseVelocity(b, null, out _)) return "no unit given for the velocity";
+        return null;
+    }
 
     private static DrgMetadata Metadata(string name) =>
         new(name, "imported",

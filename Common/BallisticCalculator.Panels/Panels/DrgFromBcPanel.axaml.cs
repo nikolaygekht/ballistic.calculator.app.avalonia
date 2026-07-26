@@ -16,19 +16,16 @@ namespace BallisticCalculator.Panels.Panels;
 /// <summary>
 /// Builds a custom drag table from a BC-vs-Mach curve and saves it as a <c>.drg</c> file.
 /// <para>
-/// Knots are keyed by Mach because that is what <c>DrgDragTableFactory</c> takes, but they can be entered
-/// and displayed as velocities — published multi-BC data usually comes in velocity bands. The model keeps
-/// Mach, so switching the display mode never loses precision.
+/// Knots are always keyed by Mach — that is what <c>DrgDragTableFactory</c> takes, and a velocity would need
+/// a reference atmosphere to be meaningful. Each knot keeps the drag table its coefficient was quoted
+/// against, so a curve typed from a report records what the report said; knots quoted against another table
+/// are converted to the base table at their own Mach when the table is built.
 /// </para>
 /// </summary>
 public partial class DrgFromBcPanel : UserControl
 {
-    private const string ModeMach = "Mach";
-    private const string ModeVelocity = "Velocity";
-
     private readonly ObservableCollection<BcKnotEditModel> _knots = new();
     private MeasurementSystem _measurementSystem = MeasurementSystem.Imperial;
-    private bool _loadingDetail;
 
     public DrgFromBcPanel()
     {
@@ -71,11 +68,18 @@ public partial class DrgFromBcPanel : UserControl
         }
     }
 
-    /// <summary>The knots currently in the list, in list order.</summary>
+    /// <summary>The knots currently in the grid, in grid order.</summary>
     internal IReadOnlyList<BcKnotEditModel> Knots => _knots;
 
-    /// <summary>The message shown under the list; also the error surface for a refused import or save.</summary>
+    /// <summary>The message under the buttons; also the error surface for a refused import or save.</summary>
     internal string Status => StatusText.Text ?? "";
+
+    #endregion
+
+    #region Events
+
+    /// <summary>Raised by the Close button; the hosting window closes itself.</summary>
+    public event EventHandler? CloseRequested;
 
     #endregion
 
@@ -97,34 +101,13 @@ public partial class DrgFromBcPanel : UserControl
             BaseTableCombo.Items.Add(new DragTableInfo(id, id.ToString()));
         SelectBaseTable(DragTableId.G7);
 
-        KnotModeCombo.Items.Add(ModeMach);
-        KnotModeCombo.Items.Add(ModeVelocity);
-        KnotModeCombo.SelectedIndex = 0;
-
-        foreach (var (unit, name) in Measurement<VelocityUnit>.GetUnitNames())
-            VelocityUnitCombo.Items.Add(new UnitItem(unit, name));
-        VelocityUnitCombo.SelectedIndex = 0;
-        VelocityUnitCombo.IsVisible = false;
-
         SourceBox.Text = "BC curve";
-        KnotsList.ItemsSource = _knots;
+        KnotsGrid.ItemsSource = _knots;
     }
 
     private void WireEvents()
     {
-        KnotModeCombo.SelectionChanged += (_, _) => ApplyKnotMode();
-        VelocityUnitCombo.SelectionChanged += (_, _) => RefreshKnotDisplay();
-
-        // Watch the Text property rather than TextChanged: the event is not raised for programmatic text
-        // in headless mode (see the note in MeasurementControlTests), while property changes always are.
-        XValueBox.PropertyChanged += OnDetailBoxPropertyChanged;
-        BcBox.PropertyChanged += OnDetailBoxPropertyChanged;
-    }
-
-    private void OnDetailBoxPropertyChanged(object? sender, Avalonia.AvaloniaPropertyChangedEventArgs e)
-    {
-        if (e.Property == TextBox.TextProperty)
-            OnDetailEdited();
+        KnotsGrid.SelectionChanged += OnSelectionChanged;
     }
 
     private void ApplyMeasurementSystem()
@@ -134,29 +117,56 @@ public partial class DrgFromBcPanel : UserControl
         WeightControl.ChangeUnit(metric ? WeightUnit.Gram : WeightUnit.Grain);
         DiameterControl.ChangeUnit(metric ? DistanceUnit.Millimeter : DistanceUnit.Inch);
         LengthControl.ChangeUnit(metric ? DistanceUnit.Millimeter : DistanceUnit.Inch);
-        SelectVelocityUnit(metric ? VelocityUnit.MetersPerSecond : VelocityUnit.FeetPerSecond);
     }
 
     #endregion
 
     #region Knot list
 
-    private BcKnotEditModel? Selected => KnotsList.SelectedItem as BcKnotEditModel;
+    private BcKnotEditModel? Selected => KnotsGrid.SelectedItem as BcKnotEditModel;
+
+    /// <summary>Selecting a row loads it into the entry fields, where Change writes it back.</summary>
+    private void OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        var selected = Selected;
+        if (selected == null)
+            return;
+
+        MachBox.Text = selected.MachText;
+        BcControl.Value = selected.Bc;
+    }
 
     private void OnAdd(object? sender, RoutedEventArgs e)
     {
-        // A new knot continues the curve: one step past the last Mach, same BC, so only one field needs
-        // typing in the common case.
-        var last = _knots.LastOrDefault();
-        var knot = new BcKnotEditModel
+        if (!TryReadEntry(out var mach, out var bc, out var problem))
         {
-            Mach = last == null ? 1.5 : last.Mach + 0.25,
-            Bc = last?.Bc ?? 0.5,
-        };
+            ShowError(problem);
+            return;
+        }
 
+        var knot = new BcKnotEditModel { Mach = mach, Bc = bc };
         _knots.Add(knot);
-        RefreshKnotDisplay();
-        KnotsList.SelectedItem = knot;
+        KnotsGrid.SelectedItem = knot;
+        UpdateStatus();
+    }
+
+    private void OnChange(object? sender, RoutedEventArgs e)
+    {
+        var selected = Selected;
+        if (selected == null)
+        {
+            ShowError("Select the knot to change first.");
+            return;
+        }
+
+        if (!TryReadEntry(out var mach, out var bc, out var problem))
+        {
+            ShowError(problem);
+            return;
+        }
+
+        selected.Mach = mach;
+        selected.Bc = bc;
         UpdateStatus();
     }
 
@@ -164,79 +174,62 @@ public partial class DrgFromBcPanel : UserControl
     {
         var selected = Selected;
         if (selected == null)
+        {
+            ShowError("Select the knot to delete first.");
             return;
+        }
 
         var index = _knots.IndexOf(selected);
         _knots.Remove(selected);
 
         if (_knots.Count > 0)
-            KnotsList.SelectedIndex = Math.Min(index, _knots.Count - 1);
+            KnotsGrid.SelectedIndex = Math.Min(index, _knots.Count - 1);
 
         UpdateStatus();
     }
 
-    private void OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    private void OnSort(object? sender, RoutedEventArgs e)
     {
-        var selected = Selected;
-        DetailPanel.IsEnabled = selected != null;
+        var sorted = _knots.OrderBy(k => k.Mach).ToArray();
+        _knots.Clear();
+        foreach (var knot in sorted)
+            _knots.Add(knot);
 
-        _loadingDetail = true;
-        try
-        {
-            XValueBox.Text = selected == null ? "" : FormatXValue(selected);
-            BcBox.Text = selected == null ? "" : Format(selected.Bc, 4);
-        }
-        finally
-        {
-            _loadingDetail = false;
-        }
+        UpdateStatus();
     }
 
     /// <summary>
-    /// Detail edits write straight back into the selected model (the direct-UI-access pattern) so there is
-    /// no commit step to forget. Unparseable text is simply not stored — validation happens on save.
+    /// Reads the entry fields. Mach carries no unit, so it is a plain number; the coefficient comes from the
+    /// BC control with its own drag table.
     /// </summary>
-    private void OnDetailEdited()
+    private bool TryReadEntry(out double mach, out BallisticCoefficient bc, out string problem)
     {
-        var selected = Selected;
-        if (_loadingDetail || selected == null)
-            return;
+        mach = 0;
+        bc = default;
+        problem = "";
 
-        if (MeasurementTextParser.TryParseDouble(XValueBox.Text, out var x))
-            selected.Mach = IsVelocityMode ? DragTableBuilder.VelocityToMach(new Measurement<VelocityUnit>(x, SelectedVelocityUnit)) : x;
+        if (!MeasurementTextParser.TryParseDouble(MachBox.Text, out mach) || mach <= 0)
+        {
+            problem = "Enter a Mach number greater than zero.";
+            return false;
+        }
 
-        if (MeasurementTextParser.TryParseDouble(BcBox.Text, out var bc))
-            selected.Bc = bc;
+        var value = BcControl.Value;
+        if (value == null || value.Value.Value <= 0)
+        {
+            problem = "Enter a ballistic coefficient greater than zero.";
+            return false;
+        }
 
-        selected.Display = DisplayFor(selected);
-        UpdateStatus();
+        bc = value.Value;
+        if (bc.Table == DragTableId.GC)
+        {
+            problem = "A knot must be quoted against a standard table (G1…RA4), not GC.";
+            return false;
+        }
+
+        return true;
     }
-
-    private void ApplyKnotMode()
-    {
-        VelocityUnitCombo.IsVisible = IsVelocityMode;
-        XValueLabel.Text = IsVelocityMode ? "Velocity:" : "Mach:";
-        RefreshKnotDisplay();
-
-        // Re-render the detail box in the new mode without treating it as an edit.
-        OnSelectionChanged(null, null!);
-    }
-
-    private void RefreshKnotDisplay()
-    {
-        foreach (var knot in _knots)
-            knot.Display = DisplayFor(knot);
-    }
-
-    private string DisplayFor(BcKnotEditModel knot) =>
-        IsVelocityMode
-            ? $"{Format(DragTableBuilder.MachToVelocity(knot.Mach, SelectedVelocityUnit).Value, 1)} {UnitName(SelectedVelocityUnit)}   BC {Format(knot.Bc, 4)}"
-            : $"M {Format(knot.Mach, 4)}   BC {Format(knot.Bc, 4)}";
-
-    private string FormatXValue(BcKnotEditModel knot) =>
-        IsVelocityMode
-            ? Format(DragTableBuilder.MachToVelocity(knot.Mach, SelectedVelocityUnit).Value, 1)
-            : Format(knot.Mach, 4);
 
     #endregion
 
@@ -249,7 +242,7 @@ public partial class DrgFromBcPanel : UserControl
 
         var path = await FileDialogService.OpenFileAsync(new FileDialogOptions
         {
-            Title = "Import BC Curve",
+            Title = "Load BC Curve",
             DefaultExtension = "csv",
             Filters =
             {
@@ -265,112 +258,98 @@ public partial class DrgFromBcPanel : UserControl
     }
 
     /// <summary>
-    /// Reads a whole file or nothing: on any unusable line the list is left exactly as it was and the
-    /// offending line is quoted in the status. A curve silently missing a knot looks plausible and is wrong.
+    /// Reads a whole file or nothing: on any unusable line the grid is left exactly as it was and the
+    /// offending line is quoted. A curve silently missing a knot looks plausible and is wrong.
     /// </summary>
     internal void Import(string path)
     {
-        if (!CsvTextTableReader.TryReadFile(path, IsUsableRow, out var table, out var error))
+        if (!CsvTextTableReader.TryReadFile(path, RowProblem, out var table, out var error))
         {
             ShowError(error);
             return;
         }
 
-        var (xRole, _) = MapColumns(table);
+        var machFirst = MachColumnOf(table) == 0;
 
         var imported = new List<BcKnotEditModel>(table.Rows.Count);
-        DragTableId? fileTable = null;
-        var mixedTables = false;
-
         foreach (var row in table.Rows)
         {
-            var xText = xRole == 0 ? row.First : row.Second;
-            var bcText = xRole == 0 ? row.Second : row.First;
+            var machText = machFirst ? row.First : row.Second;
+            var bcText = machFirst ? row.Second : row.First;
 
-            if (!TryParseX(xText, out var mach) || !MeasurementTextParser.TryParseBc(bcText, SelectedBaseTable, out var bc))
+            if (!MeasurementTextParser.TryParseDouble(machText, out var mach) ||
+                !MeasurementTextParser.TryParseBc(bcText, SelectedBaseTable, out var bc))
             {
-                // TryRead already accepted every row under one of the roles; a failure here means the
-                // header pointed at the wrong columns.
-                ShowError($"{System.IO.Path.GetFileName(path)}: line {row.LineNumber} could not be read as " +
-                          "a Mach/velocity and BC pair. Nothing was imported.");
+                ShowError($"{System.IO.Path.GetFileName(path)}: line {row.LineNumber} could not be read as a " +
+                          "Mach and BC pair. Nothing was imported.");
                 return;
             }
 
-            if (fileTable == null)
-                fileTable = bc.Table;
-            else if (fileTable != bc.Table)
-                mixedTables = true;
-
-            imported.Add(new BcKnotEditModel { Mach = mach, Bc = bc.Value });
+            imported.Add(new BcKnotEditModel { Mach = mach, Bc = bc });
         }
 
         _knots.Clear();
         foreach (var knot in imported.OrderBy(k => k.Mach))
             _knots.Add(knot);
-        RefreshKnotDisplay();
         if (_knots.Count > 0)
-            KnotsList.SelectedIndex = 0;
+            KnotsGrid.SelectedIndex = 0;
 
+        // When every coefficient names the same table, that is the curve they belong to — adopt it rather
+        // than making the user match the combo to the file by hand.
+        var tables = _knots.Select(k => k.Bc.Table).Distinct().ToArray();
         var note = "";
-        if (mixedTables)
+        if (tables.Length == 1 && tables[0] != DragTableId.GC)
         {
-            note = " The file names more than one drag table; the base table was left unchanged.";
+            SelectBaseTable(tables[0]);
+            note = $" Base table {tables[0]} taken from the file.";
         }
-        else if (fileTable != null && fileTable != DragTableId.GC)
+        else if (tables.Length > 1)
         {
-            SelectBaseTable(fileTable.Value);
-            note = $" Base table {fileTable} taken from the file.";
+            note = $" Knots name {tables.Length} different tables; they will be converted to {SelectedBaseTable} on save.";
         }
 
-        ShowInfo($"Imported {_knots.Count} knot{(_knots.Count == 1 ? "" : "s")} from " +
+        ShowInfo($"Loaded {_knots.Count} knot{(_knots.Count == 1 ? "" : "s")} from " +
                  $"{System.IO.Path.GetFileName(path)}.{note}");
     }
 
     /// <summary>
-    /// A row is usable if it reads as (Mach|velocity, BC) in either column order — the header decides which,
-    /// but the reader needs to know a row is parseable before the header has been interpreted.
+    /// A row is usable when one field is a plain number (the Mach) and the other a coefficient. Mach has no
+    /// unit, so a bare number is expected here — unlike the velocities editor, nothing has to be guessed.
     /// </summary>
-    private bool IsUsableRow(string first, string second) =>
-        (TryParseX(first, out _) && MeasurementTextParser.TryParseBc(second, SelectedBaseTable, out _)) ||
-        (TryParseX(second, out _) && MeasurementTextParser.TryParseBc(first, SelectedBaseTable, out _));
-
-    private bool TryParseX(string text, out double mach)
+    private string? RowProblem(string first, string second)
     {
-        mach = 0;
+        if (IsPair(first, second) || IsPair(second, first))
+            return null;
 
-        // An explicit velocity unit wins over the display mode: a file saying "2700ft/s" is unambiguous.
-        if (MeasurementTextParser.TryParseVelocity(text, SelectedVelocityUnit, out var velocity) &&
-            text.Any(char.IsLetter))
-        {
-            mach = DragTableBuilder.VelocityToMach(velocity);
-            return true;
-        }
-
-        if (!MeasurementTextParser.TryParseDouble(text, out var value) || value <= 0)
-            return false;
-
-        mach = IsVelocityMode
-            ? DragTableBuilder.VelocityToMach(new Measurement<VelocityUnit>(value, SelectedVelocityUnit))
-            : value;
-        return true;
+        return "expected a Mach number and a ballistic coefficient (for example 1.5;0.462G7)";
     }
 
+    // Both columns are bare numbers here, so plausibility is the only thing separating them: a drag curve
+    // runs to about Mach 5, and no ballistic coefficient reaches 5. Without the bounds, a velocity-keyed
+    // file ("2700;0.307") would be read as Mach 2700 — or transposed into Mach 0.307 with a BC of 2700.
+    private const double MaximumPlausibleMach = 10;
+    private const double MaximumPlausibleBc = 5;
+
+    private bool IsPair(string machText, string bcText) =>
+        MeasurementTextParser.TryParseDouble(machText, out var mach) && mach > 0 && mach < MaximumPlausibleMach &&
+        MeasurementTextParser.TryParseBc(bcText, SelectedBaseTable, out var bc) && bc.Value <= MaximumPlausibleBc;
+
     /// <summary>
-    /// Decides which column holds the Mach/velocity value: the header when it names the columns, otherwise
-    /// the documented default order (mach;bc). Returns the column index of each role.
+    /// Which column holds the Mach: the header when it names the columns, otherwise the documented default
+    /// order (mach;bc). A header naming BC first transposes the pair.
     /// </summary>
-    private (int XColumn, int BcColumn) MapColumns(CsvTextTable table)
+    private static int MachColumnOf(CsvTextTable table)
     {
         var first = (table.HeaderFirst ?? "").ToLowerInvariant();
         var second = (table.HeaderSecond ?? "").ToLowerInvariant();
 
         static bool IsBc(string h) => h.Contains("bc") || h.Contains("coefficient");
-        static bool IsX(string h) => h.Contains("mach") || h.Contains("vel") || h.Contains("speed");
+        static bool IsMach(string h) => h.Contains("mach");
 
-        if (IsBc(first) || IsX(second))
-            return (1, 0);
+        if (IsBc(first) || IsMach(second))
+            return 1;
 
-        return (0, 1);
+        return 0;
     }
 
     #endregion
@@ -383,9 +362,10 @@ public partial class DrgFromBcPanel : UserControl
             return;
 
         DrgDragTable table;
+        int converted;
         try
         {
-            table = Build();
+            table = Build(out converted);
         }
         catch (ArgumentException ex)
         {
@@ -415,14 +395,22 @@ public partial class DrgFromBcPanel : UserControl
             return;
         }
 
-        ShowInfo($"Saved {System.IO.Path.GetFileName(path)} — {table.Count} points. " +
-                 "Use it with a ballistic coefficient of 1.0 on table GC.");
+        var note = converted == 0
+            ? ""
+            : $" {converted} knot{(converted == 1 ? "" : "s")} converted to {SelectedBaseTable} at their own Mach.";
+        ShowInfo($"Saved {System.IO.Path.GetFileName(path)} — {table.Count} points.{note}");
     }
 
     /// <summary>Builds the table from the current inputs, throwing <see cref="ArgumentException"/> for the UI.</summary>
-    internal DrgDragTable Build() =>
-        DragTableBuilder.FromBcCurve(BuildMetadata(), SelectedBaseTable,
-                                     _knots.Select(k => new BcAtMach(k.Mach, k.Bc)));
+    internal DrgDragTable Build(out int converted)
+    {
+        var curve = DragTableBuilder.NormalizeCurve(
+            _knots.Select(k => (k.Mach, k.Bc)), SelectedBaseTable, out converted);
+
+        return DragTableBuilder.FromBcCurve(BuildMetadata(), SelectedBaseTable, curve);
+    }
+
+    internal DrgDragTable Build() => Build(out _);
 
     internal DrgMetadata BuildMetadata() => new(
         NameBox.Text ?? "",
@@ -439,6 +427,8 @@ public partial class DrgFromBcPanel : UserControl
         return string.IsNullOrWhiteSpace(name) ? "custom.drg" : name + ".drg";
     }
 
+    private void OnClose(object? sender, RoutedEventArgs e) => CloseRequested?.Invoke(this, EventArgs.Empty);
+
     #endregion
 
     #region Status
@@ -447,13 +437,18 @@ public partial class DrgFromBcPanel : UserControl
     {
         if (_knots.Count == 0)
         {
-            ShowInfo("No knots yet — add one or import a CSV.");
+            ShowInfo("No knots yet — add one or load a CSV. A CSV without a header is read as mach;bc.");
             return;
         }
 
         var machs = _knots.Select(k => k.Mach).ToArray();
+        var tables = _knots.Select(k => k.Bc.Table).Distinct().ToArray();
+        var tableNote = tables.Length == 1
+            ? $"against {tables[0]}"
+            : $"against {string.Join(", ", tables)} — converted to {SelectedBaseTable} on save";
+
         ShowInfo($"{_knots.Count} knot{(_knots.Count == 1 ? "" : "s")}, " +
-                 $"Mach {Format(machs.Min(), 4)}–{Format(machs.Max(), 4)}.");
+                 $"Mach {Format(machs.Min())}–{Format(machs.Max())}, {tableNote}.");
     }
 
     private void ShowInfo(string message)
@@ -470,12 +465,7 @@ public partial class DrgFromBcPanel : UserControl
 
     #endregion
 
-    #region Combo helpers
-
-    private bool IsVelocityMode => (KnotModeCombo.SelectedItem as string) == ModeVelocity;
-
-    private VelocityUnit SelectedVelocityUnit =>
-        (VelocityUnit)((VelocityUnitCombo.SelectedItem as UnitItem)?.Unit ?? VelocityUnit.FeetPerSecond);
+    #region Helpers
 
     private DragTableId SelectedBaseTable =>
         (BaseTableCombo.SelectedItem as DragTableInfo)?.Value ?? DragTableId.G7;
@@ -492,23 +482,7 @@ public partial class DrgFromBcPanel : UserControl
         }
     }
 
-    private void SelectVelocityUnit(VelocityUnit unit)
-    {
-        for (int i = 0; i < VelocityUnitCombo.Items.Count; i++)
-        {
-            if (VelocityUnitCombo.Items[i] is UnitItem item && item.Unit is VelocityUnit u && u.Equals(unit))
-            {
-                VelocityUnitCombo.SelectedIndex = i;
-                return;
-            }
-        }
-    }
-
-    private static string UnitName(VelocityUnit unit) =>
-        Measurement<VelocityUnit>.GetUnitNames().FirstOrDefault(t => t.Item1.Equals(unit))?.Item2 ?? "";
-
-    private static string Format(double value, int decimals) =>
-        Math.Round(value, decimals).ToString("0.####", CultureInfo.CurrentCulture);
+    private static string Format(double value) => value.ToString("0.####", CultureInfo.CurrentCulture);
 
     #endregion
 }

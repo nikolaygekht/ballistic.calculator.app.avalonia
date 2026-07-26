@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using BallisticCalculator.Controls.Controls;
-using BallisticCalculator.Controls.Models;
 using BallisticCalculator.Panels.Models;
 using BallisticCalculator.Panels.Services;
 using BallisticCalculator.Tools;
@@ -18,17 +15,13 @@ namespace BallisticCalculator.Panels.Panels;
 /// <summary>
 /// Recovers a custom drag table from measured downrange velocities (radar or chronograph data) and saves it
 /// as a <c>.drg</c> file. Weight, diameter and the atmosphere the data was measured in are physics inputs
-/// here, not documentation: air density drives the recovered drag coefficients.
+/// here rather than documentation: air density drives the recovered drag coefficients.
 /// </summary>
 public partial class DrgFromVelocitiesPanel : UserControl
 {
     private readonly ObservableCollection<RadarReadingEditModel> _readings = new();
     private MeasurementSystem _measurementSystem = MeasurementSystem.Imperial;
-    private bool _loadingDetail;
-
-    // The row the detail pane currently edits. Tracked separately from ReadingsList.SelectedItem so edits
-    // can be committed into the row being left when the selection moves.
-    private RadarReadingEditModel? _editing;
+    private Atmosphere? _atmosphere;
 
     public DrgFromVelocitiesPanel()
     {
@@ -71,18 +64,38 @@ public partial class DrgFromVelocitiesPanel : UserControl
         }
     }
 
-    /// <summary>The atmosphere the readings were taken in; defaults to sea-level standard.</summary>
+    /// <summary>
+    /// The air the readings were measured in. Null means sea-level standard; the Set Atmosphere button asks
+    /// the host to edit it, because the same velocities recorded in thinner air mean a different drag curve.
+    /// </summary>
     public Atmosphere? Atmosphere
     {
-        get => AtmosphereSubPanel.Atmosphere;
-        set => AtmosphereSubPanel.Atmosphere = value;
+        get => _atmosphere;
+        set
+        {
+            _atmosphere = value;
+            UpdateStatus();
+        }
     }
 
-    /// <summary>The readings currently in the list, in list order.</summary>
+    /// <summary>The readings currently in the grid, in grid order.</summary>
     internal IReadOnlyList<RadarReadingEditModel> Readings => _readings;
 
-    /// <summary>The message shown under the list; also the error surface for a refused import or save.</summary>
+    /// <summary>The message under the buttons; also the error surface for a refused import or save.</summary>
     internal string Status => StatusText.Text ?? "";
+
+    #endregion
+
+    #region Events
+
+    /// <summary>Raised by the Close button; the hosting window closes itself.</summary>
+    public event EventHandler? CloseRequested;
+
+    /// <summary>
+    /// Raised by Set Atmosphere. The host shows the atmosphere editor and writes the result back to
+    /// <see cref="Atmosphere"/> — windows belong to the application, not to a panel library.
+    /// </summary>
+    public event EventHandler? AtmosphereRequested;
 
     #endregion
 
@@ -104,21 +117,13 @@ public partial class DrgFromVelocitiesPanel : UserControl
         VelocityControl.Minimum = 0;
         VelocityControl.DecimalPoints = 1;
 
-        foreach (var (unit, name) in Measurement<DistanceUnit>.GetUnitNames())
-            CsvDistanceUnitCombo.Items.Add(new UnitItem(unit, name));
-        foreach (var (unit, name) in Measurement<VelocityUnit>.GetUnitNames())
-            CsvVelocityUnitCombo.Items.Add(new UnitItem(unit, name));
-
         SourceBox.Text = "radar data";
-        ReadingsList.ItemsSource = _readings;
+        ReadingsGrid.ItemsSource = _readings;
     }
 
     private void WireEvents()
     {
-        // MeasurementControl raises Changed for both text and unit edits, so the detail pane needs no
-        // property watching of its own.
-        DistanceControl.Changed += (_, _) => OnDetailEdited();
-        VelocityControl.Changed += (_, _) => OnDetailEdited();
+        ReadingsGrid.SelectionChanged += OnSelectionChanged;
     }
 
     private void ApplyMeasurementSystem()
@@ -130,64 +135,56 @@ public partial class DrgFromVelocitiesPanel : UserControl
         LengthControl.ChangeUnit(metric ? DistanceUnit.Millimeter : DistanceUnit.Inch);
         DistanceControl.ChangeUnit(metric ? DistanceUnit.Meter : DistanceUnit.Yard);
         VelocityControl.ChangeUnit(metric ? VelocityUnit.MetersPerSecond : VelocityUnit.FeetPerSecond);
-        AtmosphereSubPanel.MeasurementSystem = _measurementSystem;
-
-        Select(CsvDistanceUnitCombo, metric ? DistanceUnit.Meter : DistanceUnit.Yard);
-        Select(CsvVelocityUnitCombo, metric ? VelocityUnit.MetersPerSecond : VelocityUnit.FeetPerSecond);
     }
 
     #endregion
 
     #region Reading list
 
-    private RadarReadingEditModel? Selected => ReadingsList.SelectedItem as RadarReadingEditModel;
+    private RadarReadingEditModel? Selected => ReadingsGrid.SelectedItem as RadarReadingEditModel;
 
-    /// <summary>
-    /// Copies the detail controls into the row they belong to. Called both from the controls' Changed event
-    /// (so the list updates as the user types) and at every point that consumes the rows, so a value is
-    /// never lost just because no change event arrived — a unit switch and a programmatic set are two cases
-    /// where it does not.
-    /// </summary>
-    private void CommitDetail()
+    /// <summary>Selecting a row loads it into the entry fields, where Change writes it back.</summary>
+    private void OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        var target = _editing;
-        if (target == null)
+        var selected = Selected;
+        if (selected == null)
             return;
 
-        var distance = DistanceControl.GetValue<DistanceUnit>();
-        if (distance != null)
-            target.Distance = distance.Value;
-
-        var velocity = VelocityControl.GetValue<VelocityUnit>();
-        if (velocity != null)
-            target.Velocity = velocity.Value;
-
-        target.Display = DisplayFor(target);
+        DistanceControl.SetValue(selected.Distance);
+        VelocityControl.SetValue(selected.Velocity);
     }
 
     private void OnAdd(object? sender, RoutedEventArgs e)
     {
-        CommitDetail();
-
-        // Continue the series: one step further out, a little slower — a plausible next row that only
-        // needs the measured number typed over it.
-        var last = _readings.LastOrDefault();
-        var distanceUnit = CsvDistanceUnit;
-        var step = distanceUnit == DistanceUnit.Meter ? 100 : 100;
-
-        var reading = new RadarReadingEditModel
+        if (!TryReadEntry(out var distance, out var velocity, out var problem))
         {
-            Distance = last == null
-                ? new Measurement<DistanceUnit>(0, distanceUnit)
-                : new Measurement<DistanceUnit>(last.Distance.In(distanceUnit) + step, distanceUnit),
-            Velocity = last == null
-                ? new Measurement<VelocityUnit>(CsvVelocityUnit == VelocityUnit.MetersPerSecond ? 850 : 2800, CsvVelocityUnit)
-                : new Measurement<VelocityUnit>(last.Velocity.Value * 0.97, last.Velocity.Unit),
-        };
+            ShowError(problem);
+            return;
+        }
 
+        var reading = new RadarReadingEditModel { Distance = distance, Velocity = velocity };
         _readings.Add(reading);
-        RefreshDisplay();
-        ReadingsList.SelectedItem = reading;
+        ReadingsGrid.SelectedItem = reading;
+        UpdateStatus();
+    }
+
+    private void OnChange(object? sender, RoutedEventArgs e)
+    {
+        var selected = Selected;
+        if (selected == null)
+        {
+            ShowError("Select the reading to change first.");
+            return;
+        }
+
+        if (!TryReadEntry(out var distance, out var velocity, out var problem))
+        {
+            ShowError(problem);
+            return;
+        }
+
+        selected.Distance = distance;
+        selected.Velocity = velocity;
         UpdateStatus();
     }
 
@@ -195,64 +192,55 @@ public partial class DrgFromVelocitiesPanel : UserControl
     {
         var selected = Selected;
         if (selected == null)
+        {
+            ShowError("Select the reading to delete first.");
             return;
+        }
 
-        _editing = null;                       // the row is going away; nothing to commit into
         var index = _readings.IndexOf(selected);
         _readings.Remove(selected);
 
         if (_readings.Count > 0)
-            ReadingsList.SelectedIndex = Math.Min(index, _readings.Count - 1);
+            ReadingsGrid.SelectedIndex = Math.Min(index, _readings.Count - 1);
 
         UpdateStatus();
     }
 
-    private void OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    private void OnSort(object? sender, RoutedEventArgs e)
     {
-        // Save whatever is in the detail pane into the row being left before loading the new one.
-        CommitDetail();
+        var sorted = _readings.OrderBy(r => r.Distance.In(DistanceUnit.Meter)).ToArray();
+        _readings.Clear();
+        foreach (var reading in sorted)
+            _readings.Add(reading);
 
-        var selected = Selected;
-        _editing = selected;
-        DetailPanel.IsEnabled = selected != null;
-
-        _loadingDetail = true;
-        try
-        {
-            if (selected == null)
-            {
-                DistanceControl.Value = null;
-                VelocityControl.Value = null;
-            }
-            else
-            {
-                DistanceControl.SetValue(selected.Distance);
-                VelocityControl.SetValue(selected.Velocity);
-            }
-        }
-        finally
-        {
-            _loadingDetail = false;
-        }
-    }
-
-    private void OnDetailEdited()
-    {
-        if (_loadingDetail || _editing == null)
-            return;
-
-        CommitDetail();
         UpdateStatus();
     }
 
-    private void RefreshDisplay()
+    private bool TryReadEntry(out Measurement<DistanceUnit> distance, out Measurement<VelocityUnit> velocity,
+                              out string problem)
     {
-        foreach (var reading in _readings)
-            reading.Display = DisplayFor(reading);
-    }
+        distance = default;
+        velocity = default;
+        problem = "";
 
-    private static string DisplayFor(RadarReadingEditModel reading) =>
-        $"{reading.Distance}   {reading.Velocity}";
+        var d = DistanceControl.IsEmpty ? null : DistanceControl.GetValue<DistanceUnit>();
+        if (d == null)
+        {
+            problem = "Enter the distance of the reading.";
+            return false;
+        }
+
+        var v = VelocityControl.IsEmpty ? null : VelocityControl.GetValue<VelocityUnit>();
+        if (v == null || v.Value.Value <= 0)
+        {
+            problem = "Enter a velocity greater than zero.";
+            return false;
+        }
+
+        distance = d.Value;
+        velocity = v.Value;
+        return true;
+    }
 
     #endregion
 
@@ -265,7 +253,7 @@ public partial class DrgFromVelocitiesPanel : UserControl
 
         var path = await FileDialogService.OpenFileAsync(new FileDialogOptions
         {
-            Title = "Import Measured Velocities",
+            Title = "Load Measured Velocities",
             DefaultExtension = "csv",
             Filters =
             {
@@ -281,29 +269,27 @@ public partial class DrgFromVelocitiesPanel : UserControl
     }
 
     /// <summary>
-    /// Reads a whole file or nothing: on any unusable line the list is left exactly as it was and the
-    /// offending line is quoted in the status.
+    /// Reads a whole file or nothing: on any unusable line the grid is left exactly as it was and the
+    /// offending line is quoted.
     /// </summary>
     internal void Import(string path)
     {
-        CommitDetail();
-
-        if (!CsvTextTableReader.TryReadFile(path, IsUsableRow, out var table, out var error))
+        if (!CsvTextTableReader.TryReadFile(path, RowProblem, out var table, out var error))
         {
             ShowError(error);
             return;
         }
 
-        var distanceColumn = DistanceColumnOf(table);
+        var distanceFirst = DistanceColumnOf(table) == 0;
 
         var imported = new List<RadarReadingEditModel>(table.Rows.Count);
         foreach (var row in table.Rows)
         {
-            var distanceText = distanceColumn == 0 ? row.First : row.Second;
-            var velocityText = distanceColumn == 0 ? row.Second : row.First;
+            var distanceText = distanceFirst ? row.First : row.Second;
+            var velocityText = distanceFirst ? row.Second : row.First;
 
-            if (!MeasurementTextParser.TryParseDistance(distanceText, CsvDistanceUnit, out var distance) ||
-                !MeasurementTextParser.TryParseVelocity(velocityText, CsvVelocityUnit, out var velocity))
+            if (!MeasurementTextParser.TryParseDistance(distanceText, null, out var distance) ||
+                !MeasurementTextParser.TryParseVelocity(velocityText, null, out var velocity))
             {
                 ShowError($"{System.IO.Path.GetFileName(path)}: line {row.LineNumber} could not be read as a " +
                           "distance and velocity pair. Nothing was imported.");
@@ -313,27 +299,32 @@ public partial class DrgFromVelocitiesPanel : UserControl
             imported.Add(new RadarReadingEditModel { Distance = distance, Velocity = velocity });
         }
 
-        _editing = null;
         _readings.Clear();
         foreach (var reading in imported.OrderBy(r => r.Distance.In(DistanceUnit.Meter)))
             _readings.Add(reading);
-        RefreshDisplay();
         if (_readings.Count > 0)
-            ReadingsList.SelectedIndex = 0;
+            ReadingsGrid.SelectedIndex = 0;
 
-        ShowInfo($"Imported {_readings.Count} reading{(_readings.Count == 1 ? "" : "s")} from " +
+        ShowInfo($"Loaded {_readings.Count} reading{(_readings.Count == 1 ? "" : "s")} from " +
                  $"{System.IO.Path.GetFileName(path)}. {Range()}");
     }
 
     /// <summary>
-    /// A row is usable if it reads as (distance, velocity) in either column order — the header decides
-    /// which, but the reader must know a row is parseable before the header has been interpreted.
+    /// A row is usable when one field is a distance and the other a velocity, <b>each with its own unit</b>.
+    /// A bare number is refused rather than assumed: reading a yards file as metres yields a plausible curve
+    /// that is quietly wrong, and the file is the only place that knows which it is.
     /// </summary>
-    private bool IsUsableRow(string first, string second) =>
-        (MeasurementTextParser.TryParseDistance(first, CsvDistanceUnit, out _) &&
-         MeasurementTextParser.TryParseVelocity(second, CsvVelocityUnit, out _)) ||
-        (MeasurementTextParser.TryParseDistance(second, CsvDistanceUnit, out _) &&
-         MeasurementTextParser.TryParseVelocity(first, CsvVelocityUnit, out _));
+    private string? RowProblem(string first, string second)
+    {
+        if (IsPair(first, second) || IsPair(second, first))
+            return null;
+
+        return "expected a distance and a velocity, each with its unit (for example 100yd;3001.2ft/s)";
+    }
+
+    private static bool IsPair(string distanceText, string velocityText) =>
+        MeasurementTextParser.TryParseDistance(distanceText, null, out _) &&
+        MeasurementTextParser.TryParseVelocity(velocityText, null, out _);
 
     /// <summary>
     /// Which column holds the distance: the header when it names the columns, otherwise the documented
@@ -357,6 +348,9 @@ public partial class DrgFromVelocitiesPanel : UserControl
     #endregion
 
     #region Save
+
+    private void OnSetAtmosphere(object? sender, RoutedEventArgs e) =>
+        AtmosphereRequested?.Invoke(this, EventArgs.Empty);
 
     private async void OnSave(object? sender, RoutedEventArgs e)
     {
@@ -396,18 +390,14 @@ public partial class DrgFromVelocitiesPanel : UserControl
             return;
         }
 
-        ShowInfo($"Saved {System.IO.Path.GetFileName(path)} — {table.Count} points. " +
-                 "Use it with a ballistic coefficient of 1.0 on table GC.");
+        ShowInfo($"Saved {System.IO.Path.GetFileName(path)} — {table.Count} points.");
     }
 
     /// <summary>Builds the table from the current inputs, throwing <see cref="ArgumentException"/> for the UI.</summary>
-    internal DrgDragTable Build()
-    {
-        CommitDetail();
-        return DragTableBuilder.FromRadarReadings(BuildMetadata(),
-                                                  _readings.Select(r => new RadarReading(r.Distance, r.Velocity)),
-                                                  Atmosphere);
-    }
+    internal DrgDragTable Build() =>
+        DragTableBuilder.FromRadarReadings(BuildMetadata(),
+                                           _readings.Select(r => new RadarReading(r.Distance, r.Velocity)),
+                                           _atmosphere);
 
     internal DrgMetadata BuildMetadata() => new(
         NameBox.Text ?? "",
@@ -424,20 +414,27 @@ public partial class DrgFromVelocitiesPanel : UserControl
         return string.IsNullOrWhiteSpace(name) ? "radar.drg" : name + ".drg";
     }
 
+    private void OnClose(object? sender, RoutedEventArgs e) => CloseRequested?.Invoke(this, EventArgs.Empty);
+
     #endregion
 
     #region Status
 
     private void UpdateStatus()
     {
+        var air = _atmosphere == null
+            ? "standard atmosphere"
+            : $"{_atmosphere.Altitude.ToString("ND", System.Globalization.CultureInfo.CurrentCulture)}, " +
+              $"{_atmosphere.Temperature.ToString("ND", System.Globalization.CultureInfo.CurrentCulture)}";
+
         if (_readings.Count == 0)
         {
-            ShowInfo($"No readings yet — add one or import a CSV. " +
-                     $"At least {DragTableBuilder.MinimumRadarReadings} are needed.");
+            ShowInfo($"No readings yet — add one or load a CSV with units (100yd;3001.2ft/s). " +
+                     $"At least {DragTableBuilder.MinimumRadarReadings} are needed. Measured in {air}.");
             return;
         }
 
-        ShowInfo($"{_readings.Count} reading{(_readings.Count == 1 ? "" : "s")}. {Range()}");
+        ShowInfo($"{_readings.Count} reading{(_readings.Count == 1 ? "" : "s")}. {Range()} Measured in {air}.");
     }
 
     private string Range()
@@ -446,8 +443,8 @@ public partial class DrgFromVelocitiesPanel : UserControl
             return "";
 
         var ordered = _readings.OrderBy(r => r.Distance.In(DistanceUnit.Meter)).ToArray();
-        return $"{ordered[0].Distance}–{ordered[^1].Distance}, " +
-               $"{ordered[0].Velocity}→{ordered[^1].Velocity}.";
+        return $"{ordered[0].DistanceText}–{ordered[^1].DistanceText}, " +
+               $"{ordered[0].VelocityText}→{ordered[^1].VelocityText}.";
     }
 
     private void ShowInfo(string message)
@@ -460,28 +457,6 @@ public partial class DrgFromVelocitiesPanel : UserControl
     {
         StatusText.Text = message;
         StatusText.Foreground = Avalonia.Media.Brushes.Firebrick;
-    }
-
-    #endregion
-
-    #region Combo helpers
-
-    private DistanceUnit CsvDistanceUnit =>
-        (DistanceUnit)((CsvDistanceUnitCombo.SelectedItem as UnitItem)?.Unit ?? DistanceUnit.Yard);
-
-    private VelocityUnit CsvVelocityUnit =>
-        (VelocityUnit)((CsvVelocityUnitCombo.SelectedItem as UnitItem)?.Unit ?? VelocityUnit.FeetPerSecond);
-
-    private static void Select(ComboBox combo, object unit)
-    {
-        for (int i = 0; i < combo.Items.Count; i++)
-        {
-            if (combo.Items[i] is UnitItem item && item.Unit.Equals(unit))
-            {
-                combo.SelectedIndex = i;
-                return;
-            }
-        }
     }
 
     #endregion

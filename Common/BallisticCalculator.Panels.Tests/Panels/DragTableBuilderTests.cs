@@ -171,6 +171,101 @@ public class DragTableBuilderTests
 
     #endregion
 
+    #region Normalizing a mixed-table curve
+
+    [Fact]
+    public void NormalizeCurve_KnotsAlreadyOnTheBaseTable_ShouldPassThroughUnchanged()
+    {
+        var knots = new[]
+        {
+            (1.5, new BallisticCoefficient(0.462, DragTableId.G7)),
+            (2.0, new BallisticCoefficient(0.470, DragTableId.G7)),
+        };
+
+        var curve = DragTableBuilder.NormalizeCurve(knots, DragTableId.G7, out var converted);
+
+        converted.Should().Be(0);
+        curve.Select(k => k.Bc).Should().Equal(new[] { 0.462, 0.470 });
+    }
+
+    [Fact]
+    public void NormalizeCurve_ShouldConvertForeignKnotsAndCountThem()
+    {
+        var knots = new[]
+        {
+            (1.5, new BallisticCoefficient(0.883, DragTableId.G1)),   // the G1 column of the same bullet
+            (2.0, new BallisticCoefficient(0.470, DragTableId.G7)),
+        };
+
+        var curve = DragTableBuilder.NormalizeCurve(knots, DragTableId.G7, out var converted);
+
+        converted.Should().Be(1);
+        curve[0].Mach.Should().Be(1.5);
+        curve[0].Bc.Should().NotBe(0.883);
+        curve[1].Bc.Should().Be(0.470);
+    }
+
+    /// <summary>
+    /// The point of converting at each knot's own Mach: the synthesized table is
+    /// <c>Cd_base(M)/BC(M)</c> and the conversion multiplies BC by <c>Cd_target(M)/Cd_source(M)</c>, so the
+    /// base-curve factors cancel and the Cd at every knot comes out identical either way. Verified against
+    /// the Warner 338 Flatline data sheet, which publishes both columns for the same bullet.
+    /// </summary>
+    [Fact]
+    public void NormalizeCurve_ConvertedKnots_ShouldGiveTheSameCdAtTheKnots()
+    {
+        var machs = new[] { 1.5, 1.75, 2.0, 2.25, 2.5 };
+        var g7 = new[] { 0.462, 0.463, 0.470, 0.480, 0.484 };
+        var g1 = new[] { 0.883, 0.920, 0.936, 0.954, 0.968 };
+
+        var native = DragTableBuilder.FromBcCurve(Metadata(), DragTableId.G7,
+            machs.Select((m, i) => new BcAtMach(m, g7[i])));
+
+        var viaG1 = DragTableBuilder.FromBcCurve(Metadata(), DragTableId.G7,
+            DragTableBuilder.NormalizeCurve(
+                machs.Select((m, i) => (m, new BallisticCoefficient(g1[i], DragTableId.G1))),
+                DragTableId.G7, out var converted));
+
+        converted.Should().Be(5);
+
+        foreach (var mach in machs)
+            Cd(viaG1, mach).Should().BeApproximately(Cd(native, mach), Cd(native, mach) * 0.005);
+    }
+
+    [Fact]
+    public void NormalizeCurve_CustomTableKnot_ShouldThrow()
+    {
+        var knots = new[] { (1.5, new BallisticCoefficient(1, DragTableId.GC)) };
+
+        var act = () => DragTableBuilder.NormalizeCurve(knots, DragTableId.G7, out _);
+
+        act.Should().Throw<ArgumentException>().Which.Message.Should().Contain("GC");
+    }
+
+    [Fact]
+    public void NormalizeCurve_FormFactorKnot_ShouldThrow()
+    {
+        var knots = new[]
+        {
+            (1.5, new BallisticCoefficient(1, DragTableId.G1, BallisticCoefficientValueType.FormFactor)),
+        };
+
+        var act = () => DragTableBuilder.NormalizeCurve(knots, DragTableId.G7, out _);
+
+        act.Should().Throw<ArgumentException>().Which.Message.Should().Contain("form factor");
+    }
+
+    private static double Cd(DragTable table, double mach)
+    {
+        for (int i = 0; i < table.Count; i++)
+            if (table[i].In(mach))
+                return table[i].CalculateDrag(mach);
+
+        throw new InvalidOperationException($"no drag table node covers Mach {mach}");
+    }
+
+    #endregion
+
     #region From radar readings
 
     [Fact]

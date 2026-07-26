@@ -3,131 +3,113 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="using:BallisticCalculator.Controls.Controls"
-             xmlns:panels="using:BallisticCalculator.Panels.Panels"
              xmlns:models="using:BallisticCalculator.Panels.Models"
-             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="560"
+             mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="520"
              x:Class="BallisticCalculator.Panels.Panels.DrgFromVelocitiesPanel">
 
-  <DockPanel>
+  <StackPanel Spacing="4">
 
-    <!-- Status + actions -->
-    <StackPanel DockPanel.Dock="Bottom" Spacing="4" Margin="0,6,0,0">
-      <TextBlock x:Name="StatusText" x:FieldModifier="internal"
-                 TextWrapping="Wrap"
+    <!-- Header: one field per row, all the same width -->
+    <Grid ColumnDefinitions="90,*">
+      <TextBlock Grid.Column="0" Text="Name" VerticalAlignment="Center"
                  FontSize="{DynamicResource AppFontSize}"/>
-      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
-        <Button x:Name="SaveButton" x:FieldModifier="internal"
-                Content="Save .drg..." Click="OnSave" Width="110"
-                FontSize="{DynamicResource AppFontSize}"/>
-      </StackPanel>
+      <TextBox Grid.Column="1" x:Name="NameBox" x:FieldModifier="internal"
+               FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <Grid ColumnDefinitions="90,*">
+      <TextBlock Grid.Column="0" Text="Source" VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <TextBox Grid.Column="1" x:Name="SourceBox" x:FieldModifier="internal"
+               FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <Grid ColumnDefinitions="90,*">
+      <TextBlock Grid.Column="0" Text="Weight" VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1" x:Name="WeightControl" x:FieldModifier="internal"
+                                   FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <Grid ColumnDefinitions="90,*">
+      <TextBlock Grid.Column="0" Text="Diameter" VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1" x:Name="DiameterControl" x:FieldModifier="internal"
+                                   FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <Grid ColumnDefinitions="90,*">
+      <TextBlock Grid.Column="0" Text="Length" VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1" x:Name="LengthControl" x:FieldModifier="internal"
+                                   FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <TextBlock Text="Weight and diameter are required — the drag recovery depends on them."
+               Foreground="Gray" TextWrapping="Wrap"
+               FontSize="{DynamicResource AppFontSize}"/>
+
+    <Separator/>
+
+    <!-- Readings -->
+    <DataGrid x:Name="ReadingsGrid" x:FieldModifier="internal"
+              x:DataType="models:RadarReadingEditModel"
+              AutoGenerateColumns="False"
+              Height="170"
+              IsReadOnly="True"
+              CanUserSortColumns="False"
+              GridLinesVisibility="All"
+              HeadersVisibility="Column"
+              SelectionMode="Single"
+              FontSize="{DynamicResource AppFontSize}">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Distance" Binding="{Binding DistanceText}" Width="*"/>
+        <DataGridTextColumn Header="Velocity" Binding="{Binding VelocityText}" Width="*"/>
+      </DataGrid.Columns>
+    </DataGrid>
+
+    <!-- Entry row for the selected/new reading -->
+    <Grid ColumnDefinitions="90,*">
+      <TextBlock Grid.Column="0" Text="Distance" VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1" x:Name="DistanceControl" x:FieldModifier="internal"
+                                   FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <Grid ColumnDefinitions="90,*">
+      <TextBlock Grid.Column="0" Text="Velocity" VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1" x:Name="VelocityControl" x:FieldModifier="internal"
+                                   FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <StackPanel Orientation="Horizontal" Spacing="6">
+      <Button x:Name="AddButton" x:FieldModifier="internal" Content="Add" Click="OnAdd" Width="70"
+              FontSize="{DynamicResource AppFontSize}"/>
+      <Button x:Name="ChangeButton" x:FieldModifier="internal" Content="Change" Click="OnChange" Width="70"
+              FontSize="{DynamicResource AppFontSize}"/>
+      <Button x:Name="DeleteButton" x:FieldModifier="internal" Content="Delete" Click="OnDelete" Width="70"
+              FontSize="{DynamicResource AppFontSize}"/>
+      <Button x:Name="SortButton" x:FieldModifier="internal" Content="Sort" Click="OnSort" Width="70"
+              FontSize="{DynamicResource AppFontSize}"/>
+      <Button x:Name="ImportButton" x:FieldModifier="internal" Content="Load Csv" Click="OnImport" Width="90"
+              FontSize="{DynamicResource AppFontSize}"/>
     </StackPanel>
 
-    <StackPanel Spacing="4">
+    <TextBlock x:Name="StatusText" x:FieldModifier="internal"
+               TextWrapping="Wrap" MinHeight="32"
+               FontSize="{DynamicResource AppFontSize}"/>
 
-      <!-- Metadata -->
-      <Grid ColumnDefinitions="110,*,70,*">
-        <TextBlock Grid.Column="0" Text="Name:" VerticalAlignment="Center"
-                   FontWeight="Bold" FontSize="{DynamicResource AppFontSize}"/>
-        <TextBox Grid.Column="1" x:Name="NameBox" x:FieldModifier="internal"
-                 FontSize="{DynamicResource AppFontSize}"/>
-        <TextBlock Grid.Column="2" Text="Source:" VerticalAlignment="Center" Margin="8,0,0,0"
-                   FontSize="{DynamicResource AppFontSize}"/>
-        <TextBox Grid.Column="3" x:Name="SourceBox" x:FieldModifier="internal"
-                 FontSize="{DynamicResource AppFontSize}"/>
-      </Grid>
-
-      <Grid ColumnDefinitions="110,*">
-        <TextBlock Grid.Column="0" Text="Bullet weight:" VerticalAlignment="Center"
-                   FontSize="{DynamicResource AppFontSize}"/>
-        <controls:MeasurementControl Grid.Column="1" x:Name="WeightControl" x:FieldModifier="internal"
-                                     FontSize="{DynamicResource AppFontSize}"/>
-      </Grid>
-
-      <Grid ColumnDefinitions="110,*">
-        <TextBlock Grid.Column="0" Text="Diameter:" VerticalAlignment="Center"
-                   FontSize="{DynamicResource AppFontSize}"/>
-        <controls:MeasurementControl Grid.Column="1" x:Name="DiameterControl" x:FieldModifier="internal"
-                                     FontSize="{DynamicResource AppFontSize}"/>
-      </Grid>
-
-      <Grid ColumnDefinitions="110,*">
-        <TextBlock Grid.Column="0" Text="Length:" VerticalAlignment="Center"
-                   FontSize="{DynamicResource AppFontSize}"/>
-        <controls:MeasurementControl Grid.Column="1" x:Name="LengthControl" x:FieldModifier="internal"
-                                     FontSize="{DynamicResource AppFontSize}"/>
-      </Grid>
-
-      <TextBlock Text="Weight and diameter are required — they drive the drag recovery. Length is written into the file."
-                 Foreground="Gray" TextWrapping="Wrap"
-                 FontSize="{DynamicResource AppFontSize}"/>
-
-      <Separator/>
-
-      <!-- Measurement conditions: the shared atmosphere panel, since air density drives the result -->
-      <Expander x:Name="AtmosphereExpander" x:FieldModifier="internal"
-                Header="Measurement conditions" IsExpanded="False"
-                HorizontalAlignment="Stretch"
-                FontSize="{DynamicResource AppFontSize}">
-        <panels:AtmospherePanel x:Name="AtmosphereSubPanel" x:FieldModifier="internal"
-                                Margin="0,4,0,0"
-                                FontSize="{DynamicResource AppFontSize}"/>
-      </Expander>
-
-      <!-- Reading list + detail -->
-      <Grid ColumnDefinitions="210,*" Height="200">
-        <DockPanel Grid.Column="0" Margin="0,0,12,0">
-          <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="6" Margin="0,6,0,0">
-            <Button x:Name="AddButton" x:FieldModifier="internal"
-                    Content="Add" Click="OnAdd" Width="60"
-                    FontSize="{DynamicResource AppFontSize}"/>
-            <Button x:Name="DeleteButton" x:FieldModifier="internal"
-                    Content="Delete" Click="OnDelete" Width="60"
-                    FontSize="{DynamicResource AppFontSize}"/>
-            <Button x:Name="ImportButton" x:FieldModifier="internal"
-                    Content="Import CSV..." Click="OnImport" Width="100"
-                    FontSize="{DynamicResource AppFontSize}"/>
-          </StackPanel>
-          <ListBox x:Name="ReadingsList" x:FieldModifier="internal"
-                   SelectionChanged="OnSelectionChanged"
-                   FontSize="{DynamicResource AppFontSize}">
-            <ListBox.ItemTemplate>
-              <DataTemplate x:DataType="models:RadarReadingEditModel">
-                <TextBlock Text="{Binding Display}" FontSize="{DynamicResource AppFontSize}"/>
-              </DataTemplate>
-            </ListBox.ItemTemplate>
-          </ListBox>
-        </DockPanel>
-
-        <StackPanel Grid.Column="1" x:Name="DetailPanel" x:FieldModifier="internal"
-                    Spacing="4" IsEnabled="False">
-          <TextBlock Text="Selected reading" FontWeight="SemiBold"
-                     FontSize="{DynamicResource AppFontSize}"/>
-          <Grid ColumnDefinitions="110,*">
-            <TextBlock Grid.Column="0" Text="Distance:" VerticalAlignment="Center"
-                       FontSize="{DynamicResource AppFontSize}"/>
-            <controls:MeasurementControl Grid.Column="1" x:Name="DistanceControl" x:FieldModifier="internal"
-                                         FontSize="{DynamicResource AppFontSize}"/>
-          </Grid>
-          <Grid ColumnDefinitions="110,*">
-            <TextBlock Grid.Column="0" Text="Velocity:" VerticalAlignment="Center"
-                       FontSize="{DynamicResource AppFontSize}"/>
-            <controls:MeasurementControl Grid.Column="1" x:Name="VelocityControl" x:FieldModifier="internal"
-                                         FontSize="{DynamicResource AppFontSize}"/>
-          </Grid>
-          <Grid ColumnDefinitions="110,Auto,Auto,Auto">
-            <TextBlock Grid.Column="0" Text="CSV units:" VerticalAlignment="Center"
-                       FontSize="{DynamicResource AppFontSize}"/>
-            <ComboBox Grid.Column="1" x:Name="CsvDistanceUnitCombo" x:FieldModifier="internal" Width="80"
-                      FontSize="{DynamicResource AppFontSize}"/>
-            <ComboBox Grid.Column="2" x:Name="CsvVelocityUnitCombo" x:FieldModifier="internal" Width="90" Margin="4,0,0,0"
-                      FontSize="{DynamicResource AppFontSize}"/>
-          </Grid>
-          <TextBlock Text="CSV units apply only to bare numbers; a value like 0yd or 3001.2ft/s keeps its own unit. A file without a header is read as distance;velocity."
-                     Foreground="Gray" TextWrapping="Wrap"
-                     FontSize="{DynamicResource AppFontSize}"/>
-        </StackPanel>
-      </Grid>
-
+    <!-- Actions -->
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+      <Button x:Name="AtmosphereButton" x:FieldModifier="internal" Content="Set Atmosphere"
+              Click="OnSetAtmosphere" Width="130"
+              FontSize="{DynamicResource AppFontSize}"/>
+      <Button x:Name="SaveButton" x:FieldModifier="internal" Content="Save Drg" Click="OnSave" Width="90"
+              FontSize="{DynamicResource AppFontSize}"/>
+      <Button x:Name="CloseButton" x:FieldModifier="internal" Content="Close" Click="OnClose" Width="90"
+              FontSize="{DynamicResource AppFontSize}"/>
     </StackPanel>
-  </DockPanel>
+
+  </StackPanel>
 </UserControl>

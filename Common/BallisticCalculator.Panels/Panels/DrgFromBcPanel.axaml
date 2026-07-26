@@ -4,126 +4,112 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="using:BallisticCalculator.Controls.Controls"
              xmlns:models="using:BallisticCalculator.Panels.Models"
-             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="520"
+             mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="520"
              x:Class="BallisticCalculator.Panels.Panels.DrgFromBcPanel">
 
-  <DockPanel>
+  <StackPanel Spacing="4">
 
-    <!-- Status + actions -->
-    <StackPanel DockPanel.Dock="Bottom" Spacing="4" Margin="0,6,0,0">
-      <TextBlock x:Name="StatusText" x:FieldModifier="internal"
-                 TextWrapping="Wrap"
+    <!-- Header: one field per row, all the same width -->
+    <Grid ColumnDefinitions="90,*">
+      <TextBlock Grid.Column="0" Text="Name" VerticalAlignment="Center"
                  FontSize="{DynamicResource AppFontSize}"/>
-      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
-        <Button x:Name="SaveButton" x:FieldModifier="internal"
-                Content="Save .drg..." Click="OnSave" Width="110"
+      <TextBox Grid.Column="1" x:Name="NameBox" x:FieldModifier="internal"
+               FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <Grid ColumnDefinitions="90,*">
+      <TextBlock Grid.Column="0" Text="Source" VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <TextBox Grid.Column="1" x:Name="SourceBox" x:FieldModifier="internal"
+               FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <Grid ColumnDefinitions="90,*">
+      <TextBlock Grid.Column="0" Text="Weight" VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1" x:Name="WeightControl" x:FieldModifier="internal"
+                                   FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <Grid ColumnDefinitions="90,*">
+      <TextBlock Grid.Column="0" Text="Diameter" VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1" x:Name="DiameterControl" x:FieldModifier="internal"
+                                   FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <Grid ColumnDefinitions="90,*">
+      <TextBlock Grid.Column="0" Text="Length" VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1" x:Name="LengthControl" x:FieldModifier="internal"
+                                   FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <Grid ColumnDefinitions="90,Auto,*">
+      <TextBlock Grid.Column="0" Text="Base table" VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <ComboBox Grid.Column="1" x:Name="BaseTableCombo" x:FieldModifier="internal" Width="90"
                 FontSize="{DynamicResource AppFontSize}"/>
-      </StackPanel>
+      <TextBlock Grid.Column="2" Text="the standard curve the knots scale"
+                 VerticalAlignment="Center" Margin="8,0,0,0" Foreground="Gray"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <Separator/>
+
+    <!-- Knots -->
+    <DataGrid x:Name="KnotsGrid" x:FieldModifier="internal"
+              x:DataType="models:BcKnotEditModel"
+              AutoGenerateColumns="False"
+              Height="170"
+              IsReadOnly="True"
+              CanUserSortColumns="False"
+              GridLinesVisibility="All"
+              HeadersVisibility="Column"
+              SelectionMode="Single"
+              FontSize="{DynamicResource AppFontSize}">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Mach" Binding="{Binding MachText}" Width="*"/>
+        <DataGridTextColumn Header="BC" Binding="{Binding BcText}" Width="*"/>
+      </DataGrid.Columns>
+    </DataGrid>
+
+    <!-- Entry row for the selected/new knot -->
+    <Grid ColumnDefinitions="90,110,60,*">
+      <TextBlock Grid.Column="0" Text="Mach" VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <TextBox Grid.Column="1" x:Name="MachBox" x:FieldModifier="internal"
+               FontSize="{DynamicResource AppFontSize}"/>
+      <TextBlock Grid.Column="2" Text="BC" VerticalAlignment="Center" Margin="8,0,0,0"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:BallisticCoefficientControl Grid.Column="3" x:Name="BcControl" x:FieldModifier="internal"
+                                            FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <StackPanel Orientation="Horizontal" Spacing="6">
+      <Button x:Name="AddButton" x:FieldModifier="internal" Content="Add" Click="OnAdd" Width="70"
+              FontSize="{DynamicResource AppFontSize}"/>
+      <Button x:Name="ChangeButton" x:FieldModifier="internal" Content="Change" Click="OnChange" Width="70"
+              FontSize="{DynamicResource AppFontSize}"/>
+      <Button x:Name="DeleteButton" x:FieldModifier="internal" Content="Delete" Click="OnDelete" Width="70"
+              FontSize="{DynamicResource AppFontSize}"/>
+      <Button x:Name="SortButton" x:FieldModifier="internal" Content="Sort" Click="OnSort" Width="70"
+              FontSize="{DynamicResource AppFontSize}"/>
+      <Button x:Name="ImportButton" x:FieldModifier="internal" Content="Load Csv" Click="OnImport" Width="90"
+              FontSize="{DynamicResource AppFontSize}"/>
     </StackPanel>
 
-    <StackPanel Spacing="4">
+    <TextBlock x:Name="StatusText" x:FieldModifier="internal"
+               TextWrapping="Wrap" MinHeight="32"
+               FontSize="{DynamicResource AppFontSize}"/>
 
-      <!-- Metadata: exactly the fields the .drg header carries -->
-      <Grid ColumnDefinitions="110,*,70,*">
-        <TextBlock Grid.Column="0" Text="Name:" VerticalAlignment="Center"
-                   FontWeight="Bold" FontSize="{DynamicResource AppFontSize}"/>
-        <TextBox Grid.Column="1" x:Name="NameBox" x:FieldModifier="internal"
-                 FontSize="{DynamicResource AppFontSize}"/>
-        <TextBlock Grid.Column="2" Text="Source:" VerticalAlignment="Center" Margin="8,0,0,0"
-                   FontSize="{DynamicResource AppFontSize}"/>
-        <TextBox Grid.Column="3" x:Name="SourceBox" x:FieldModifier="internal"
-                 FontSize="{DynamicResource AppFontSize}"/>
-      </Grid>
-
-      <Grid ColumnDefinitions="110,*">
-        <TextBlock Grid.Column="0" Text="Bullet weight:" VerticalAlignment="Center"
-                   FontSize="{DynamicResource AppFontSize}"/>
-        <controls:MeasurementControl Grid.Column="1" x:Name="WeightControl" x:FieldModifier="internal"
-                                     FontSize="{DynamicResource AppFontSize}"/>
-      </Grid>
-
-      <Grid ColumnDefinitions="110,*">
-        <TextBlock Grid.Column="0" Text="Diameter:" VerticalAlignment="Center"
-                   FontSize="{DynamicResource AppFontSize}"/>
-        <controls:MeasurementControl Grid.Column="1" x:Name="DiameterControl" x:FieldModifier="internal"
-                                     FontSize="{DynamicResource AppFontSize}"/>
-      </Grid>
-
-      <Grid ColumnDefinitions="110,*">
-        <TextBlock Grid.Column="0" Text="Length:" VerticalAlignment="Center"
-                   FontSize="{DynamicResource AppFontSize}"/>
-        <controls:MeasurementControl Grid.Column="1" x:Name="LengthControl" x:FieldModifier="internal"
-                                     FontSize="{DynamicResource AppFontSize}"/>
-      </Grid>
-
-      <TextBlock Text="Weight, diameter and length are written into the file; they do not affect the curve."
-                 Foreground="Gray" TextWrapping="Wrap"
-                 FontSize="{DynamicResource AppFontSize}"/>
-
-      <Separator/>
-
-      <!-- Curve inputs -->
-      <Grid ColumnDefinitions="110,Auto,Auto,Auto,Auto">
-        <TextBlock Grid.Column="0" Text="Base table:" VerticalAlignment="Center"
-                   FontSize="{DynamicResource AppFontSize}"/>
-        <ComboBox Grid.Column="1" x:Name="BaseTableCombo" x:FieldModifier="internal" Width="90"
-                  FontSize="{DynamicResource AppFontSize}"/>
-        <TextBlock Grid.Column="2" Text="Knots by:" VerticalAlignment="Center" Margin="12,0,4,0"
-                   FontSize="{DynamicResource AppFontSize}"/>
-        <ComboBox Grid.Column="3" x:Name="KnotModeCombo" x:FieldModifier="internal" Width="100"
-                  FontSize="{DynamicResource AppFontSize}"/>
-        <ComboBox Grid.Column="4" x:Name="VelocityUnitCombo" x:FieldModifier="internal" Width="90" Margin="4,0,0,0"
-                  FontSize="{DynamicResource AppFontSize}"/>
-      </Grid>
-
-      <!-- Knot list + detail -->
-      <Grid ColumnDefinitions="210,*" Height="210">
-        <DockPanel Grid.Column="0" Margin="0,0,12,0">
-          <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="6" Margin="0,6,0,0">
-            <Button x:Name="AddButton" x:FieldModifier="internal"
-                    Content="Add" Click="OnAdd" Width="60"
-                    FontSize="{DynamicResource AppFontSize}"/>
-            <Button x:Name="DeleteButton" x:FieldModifier="internal"
-                    Content="Delete" Click="OnDelete" Width="60"
-                    FontSize="{DynamicResource AppFontSize}"/>
-            <Button x:Name="ImportButton" x:FieldModifier="internal"
-                    Content="Import CSV..." Click="OnImport" Width="100"
-                    FontSize="{DynamicResource AppFontSize}"/>
-          </StackPanel>
-          <ListBox x:Name="KnotsList" x:FieldModifier="internal"
-                   SelectionChanged="OnSelectionChanged"
-                   FontSize="{DynamicResource AppFontSize}">
-            <ListBox.ItemTemplate>
-              <DataTemplate x:DataType="models:BcKnotEditModel">
-                <TextBlock Text="{Binding Display}" FontSize="{DynamicResource AppFontSize}"/>
-              </DataTemplate>
-            </ListBox.ItemTemplate>
-          </ListBox>
-        </DockPanel>
-
-        <StackPanel Grid.Column="1" x:Name="DetailPanel" x:FieldModifier="internal"
-                    Spacing="4" IsEnabled="False">
-          <TextBlock Text="Selected knot" FontWeight="SemiBold"
-                     FontSize="{DynamicResource AppFontSize}"/>
-          <Grid ColumnDefinitions="110,120">
-            <TextBlock Grid.Column="0" x:Name="XValueLabel" x:FieldModifier="internal"
-                       Text="Mach:" VerticalAlignment="Center"
-                       FontSize="{DynamicResource AppFontSize}"/>
-            <TextBox Grid.Column="1" x:Name="XValueBox" x:FieldModifier="internal"
-                     FontSize="{DynamicResource AppFontSize}"/>
-          </Grid>
-          <Grid ColumnDefinitions="110,120">
-            <TextBlock Grid.Column="0" Text="BC:" VerticalAlignment="Center"
-                       FontSize="{DynamicResource AppFontSize}"/>
-            <TextBox Grid.Column="1" x:Name="BcBox" x:FieldModifier="internal"
-                     FontSize="{DynamicResource AppFontSize}"/>
-          </Grid>
-          <TextBlock Text="A CSV without a header is read as mach;bc. A BC written as 0.462G7 also sets the base table."
-                     Foreground="Gray" TextWrapping="Wrap"
-                     FontSize="{DynamicResource AppFontSize}"/>
-        </StackPanel>
-      </Grid>
-
+    <!-- Actions -->
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+      <Button x:Name="SaveButton" x:FieldModifier="internal" Content="Save Drg" Click="OnSave" Width="90"
+              FontSize="{DynamicResource AppFontSize}"/>
+      <Button x:Name="CloseButton" x:FieldModifier="internal" Content="Close" Click="OnClose" Width="90"
+              FontSize="{DynamicResource AppFontSize}"/>
     </StackPanel>
-  </DockPanel>
+
+  </StackPanel>
 </UserControl>

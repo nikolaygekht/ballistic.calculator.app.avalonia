@@ -35,6 +35,13 @@ public class DrgFromBcPanelTests
         return panel;
     }
 
+    /// <summary>Fills the entry row the way a user would before pressing Add or Change.</summary>
+    private static void Enter(DrgFromBcPanel panel, string mach, double bc, DragTableId table = DragTableId.G7)
+    {
+        panel.MachBox.Text = mach;
+        panel.BcControl.Value = new BallisticCoefficient(bc, table);
+    }
+
     #region Editing
 
     [AvaloniaFact]
@@ -44,94 +51,111 @@ public class DrgFromBcPanelTests
 
         panel.Knots.Should().BeEmpty();
         (panel.BaseTableCombo.SelectedItem as DragTableInfo)!.Value.Should().Be(DragTableId.G7);
-        panel.DetailPanel.IsEnabled.Should().BeFalse();
-        panel.Status.Should().Contain("No knots");
+        panel.Status.Should().Contain("No knots").And.Contain("mach;bc");
     }
 
     [AvaloniaFact]
-    public void Add_ShouldAppendKnotAndSelectIt()
+    public void Add_ShouldAppendTheEntryAndSelectIt()
     {
         var panel = new DrgFromBcPanel();
+        Enter(panel, "1.5", 0.462);
 
         Click(panel.AddButton);
 
         panel.Knots.Should().HaveCount(1);
-        panel.KnotsList.SelectedIndex.Should().Be(0);
-        panel.DetailPanel.IsEnabled.Should().BeTrue();
+        panel.Knots[0].Mach.Should().BeApproximately(1.5, 1e-9);
+        panel.Knots[0].Bc.Value.Should().BeApproximately(0.462, 1e-9);
+        panel.KnotsGrid.SelectedItem.Should().BeSameAs(panel.Knots[0]);
         panel.Status.Should().Contain("1 knot");
     }
 
     [AvaloniaFact]
-    public void Add_Twice_ShouldContinueTheCurve()
+    public void Add_WithoutMach_ShouldReportAndAddNothing()
     {
         var panel = new DrgFromBcPanel();
+        panel.BcControl.Value = new BallisticCoefficient(0.462, DragTableId.G7);
 
         Click(panel.AddButton);
-        Click(panel.AddButton);
 
-        panel.Knots.Should().HaveCount(2);
-        panel.Knots[1].Mach.Should().BeGreaterThan(panel.Knots[0].Mach);
+        panel.Knots.Should().BeEmpty();
+        panel.Status.Should().Contain("Mach");
     }
 
     [AvaloniaFact]
-    public void Delete_ShouldRemoveSelectedKnot()
+    public void Change_ShouldWriteTheEntryIntoTheSelectedRow()
     {
         var panel = new DrgFromBcPanel();
-        Click(panel.AddButton);
+        Enter(panel, "1.5", 0.462);
         Click(panel.AddButton);
 
-        panel.KnotsList.SelectedIndex = 0;
+        Enter(panel, "1.75", 0.463);
+        Click(panel.ChangeButton);
+
+        panel.Knots.Should().HaveCount(1);
+        panel.Knots[0].Mach.Should().BeApproximately(1.75, 1e-9);
+        panel.Knots[0].Bc.Value.Should().BeApproximately(0.463, 1e-9);
+        panel.Knots[0].MachText.Should().Contain("1.75");
+    }
+
+    [AvaloniaFact]
+    public void Change_WithNothingSelected_ShouldReport()
+    {
+        var panel = new DrgFromBcPanel();
+        Enter(panel, "1.5", 0.462);
+
+        Click(panel.ChangeButton);
+
+        panel.Status.Should().Contain("Select");
+    }
+
+    [AvaloniaFact]
+    public void SelectingARow_ShouldLoadItIntoTheEntryFields()
+    {
+        // A DataGrid only raises SelectionChanged once its rows are materialized, so this behaviour needs a
+        // shown window rather than a bare panel.
+        var panel = new DrgFromBcPanel();
+        var window = new Window { Content = panel, Width = 600, Height = 620 };
+        window.Show();
+        Enter(panel, "1.5", 0.462);
+        Click(panel.AddButton);
+        Enter(panel, "2.25", 0.480, DragTableId.G1);
+        Click(panel.AddButton);
+
+        panel.KnotsGrid.SelectedItem = panel.Knots[0];
+
+        panel.MachBox.Text.Should().Contain("1.5");
+        panel.BcControl.Value!.Value.Value.Should().BeApproximately(0.462, 1e-9);
+        panel.BcControl.Value!.Value.Table.Should().Be(DragTableId.G7);
+    }
+
+    [AvaloniaFact]
+    public void Delete_ShouldRemoveSelectedRow()
+    {
+        var panel = new DrgFromBcPanel();
+        Enter(panel, "1.5", 0.462);
+        Click(panel.AddButton);
+        Enter(panel, "2.0", 0.470);
+        Click(panel.AddButton);
+
+        panel.KnotsGrid.SelectedItem = panel.Knots[0];
         Click(panel.DeleteButton);
 
         panel.Knots.Should().HaveCount(1);
+        panel.Knots[0].Mach.Should().BeApproximately(2.0, 1e-9);
     }
 
     [AvaloniaFact]
-    public void EditingDetail_ShouldWriteBackToTheModelAndList()
+    public void Sort_ShouldOrderByMach()
     {
         var panel = new DrgFromBcPanel();
+        Enter(panel, "2.5", 0.484);
+        Click(panel.AddButton);
+        Enter(panel, "1.5", 0.462);
         Click(panel.AddButton);
 
-        panel.XValueBox.Text = "1.75";
-        panel.BcBox.Text = "0.463";
+        Click(panel.SortButton);
 
-        panel.Knots[0].Mach.Should().BeApproximately(1.75, 1e-9);
-        panel.Knots[0].Bc.Should().BeApproximately(0.463, 1e-9);
-        panel.Knots[0].Display.Should().Contain("1.75").And.Contain("0.463");
-    }
-
-    [AvaloniaFact]
-    public void SwitchingToVelocityMode_ShouldPreserveMachExactly()
-    {
-        var panel = new DrgFromBcPanel();
-        Click(panel.AddButton);
-        panel.XValueBox.Text = "2.25";
-        var mach = panel.Knots[0].Mach;
-
-        panel.KnotModeCombo.SelectedIndex = 1;      // Velocity
-
-        panel.Knots[0].Mach.Should().Be(mach);
-        panel.XValueLabel.Text.Should().Be("Velocity:");
-        panel.VelocityUnitCombo.IsVisible.Should().BeTrue();
-        panel.XValueBox.Text.Should().NotBe("2.25");   // now shown as a velocity
-
-        panel.KnotModeCombo.SelectedIndex = 0;      // back to Mach
-        panel.Knots[0].Mach.Should().Be(mach);
-    }
-
-    [AvaloniaFact]
-    public void VelocityMode_TypedVelocity_ShouldConvertToMach()
-    {
-        var panel = new DrgFromBcPanel();
-        Click(panel.AddButton);
-        panel.KnotModeCombo.SelectedIndex = 1;
-        panel.VelocityUnitCombo.SelectedItem = panel.VelocityUnitCombo.Items
-            .OfType<UnitItem>().First(i => (VelocityUnit)i.Unit == VelocityUnit.FeetPerSecond);
-
-        panel.XValueBox.Text = "2700";
-
-        var expected = DragTableBuilder.VelocityToMach(new Measurement<VelocityUnit>(2700, VelocityUnit.FeetPerSecond));
-        panel.Knots[0].Mach.Should().BeApproximately(expected, 1e-9);
+        panel.Knots.Select(k => k.Mach).Should().BeInAscendingOrder();
     }
 
     [AvaloniaFact]
@@ -169,6 +193,7 @@ public class DrgFromBcPanelTests
         Click(panel.ImportButton);
 
         panel.Knots.Should().HaveCount(knots);
+        panel.Knots.Select(k => k.Bc.Table).Should().AllBeEquivalentTo(table);
         (panel.BaseTableCombo.SelectedItem as DragTableInfo)!.Value.Should().Be(table);
         panel.Status.Should().Contain($"{knots} knots").And.Contain(table.ToString());
     }
@@ -194,7 +219,19 @@ public class DrgFromBcPanelTests
 
         panel.Knots.Should().HaveCount(2);
         panel.Knots[0].Mach.Should().BeApproximately(1.20, 1e-9);
-        panel.Knots[0].Bc.Should().BeApproximately(0.307, 1e-9);
+        panel.Knots[0].Bc.Value.Should().BeApproximately(0.307, 1e-9);
+    }
+
+    [AvaloniaFact]
+    public void Import_MixedTables_ShouldKeepThemAndSayTheyWillBeConverted()
+    {
+        var service = new MockFileDialogService { NextOpenResult = TempCsv("1.5;0.883G1", "2.0;0.470G7") };
+        var panel = PanelWith(service);
+
+        Click(panel.ImportButton);
+
+        panel.Knots.Select(k => k.Bc.Table).Should().BeEquivalentTo(new[] { DragTableId.G1, DragTableId.G7 });
+        panel.Status.Should().Contain("converted");
     }
 
     [AvaloniaFact]
@@ -203,27 +240,26 @@ public class DrgFromBcPanelTests
         var service = new MockFileDialogService { NextOpenResult = Sample("mbc1.csv") };
         var panel = PanelWith(service);
         Click(panel.ImportButton);
-        var before = panel.Knots.Select(k => (k.Mach, k.Bc)).ToArray();
+        var before = panel.Knots.Select(k => (k.Mach, k.Bc.Value)).ToArray();
 
         service.NextOpenResult = TempCsv("1.5;0.462", "oops;0.463", "2;0.470");
         Click(panel.ImportButton);
 
-        panel.Knots.Select(k => (k.Mach, k.Bc)).Should().Equal(before);
+        panel.Knots.Select(k => (k.Mach, k.Bc.Value)).Should().Equal(before);
         panel.Status.Should().Contain("2").And.Contain("Nothing was imported");
     }
 
     [AvaloniaFact]
-    public void Import_VelocityKeyedFile_ShouldConvertToMach()
+    public void Import_VelocityInsteadOfMach_ShouldRejectRatherThanTreatItAsMach()
     {
-        // Inline units win over the display mode, which is still Mach here.
-        var service = new MockFileDialogService { NextOpenResult = TempCsv("velocity;bc", "2700ft/s;0.307", "1800ft/s;0.318") };
+        // 2700 is not a plausible Mach number; reading it as one would produce a nonsense curve.
+        var service = new MockFileDialogService { NextOpenResult = TempCsv("2700;0.307", "1800;0.318") };
         var panel = PanelWith(service);
 
         Click(panel.ImportButton);
 
-        panel.Knots.Should().HaveCount(2);
-        var expected = DragTableBuilder.VelocityToMach(new Measurement<VelocityUnit>(2700, VelocityUnit.FeetPerSecond));
-        panel.Knots.Select(k => k.Mach).Should().Contain(m => Math.Abs(m - expected) < 1e-9);
+        panel.Knots.Should().BeEmpty();
+        panel.Status.Should().Contain("Mach");
     }
 
     #endregion
@@ -273,19 +309,56 @@ public class DrgFromBcPanelTests
             Click(panel.SaveButton);
 
             service.LastSaveOptions!.DefaultExtension.Should().Be("drg");
-            File.Exists(path).Should().BeTrue();
+            File.Exists(path).Should().BeTrue(panel.Status);
 
             var table = DrgDragTable.Open(path);
             table.TableId.Should().Be(DragTableId.GC);
             table.Ammunition!.Name.Should().Be("308 220gr custom");
             table.Ammunition.Source.Should().Be("Litz");
             table.Ammunition.Ammunition.BulletLength!.Value.In(DistanceUnit.Inch).Should().BeApproximately(1.226, 1e-4);
-            panel.Status.Should().Contain("Saved").And.Contain("GC");
+            panel.Status.Should().Contain("Saved");
         }
         finally
         {
             File.Delete(path);
         }
+    }
+
+    [AvaloniaFact]
+    public void Save_MixedTables_ShouldConvertAndSayHowMany()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"drgbc-{Guid.NewGuid():N}.drg");
+        var service = new MockFileDialogService
+        {
+            NextOpenResult = TempCsv("1.5;0.883G1", "2.0;0.470G7", "2.5;0.484G7"),
+            NextSaveResult = path,
+        };
+        var panel = PanelWith(service);
+        Click(panel.ImportButton);
+
+        try
+        {
+            Click(panel.SaveButton);
+
+            File.Exists(path).Should().BeTrue(panel.Status);
+            panel.Status.Should().Contain("1 knot converted");
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [AvaloniaFact]
+    public void CloseButton_ShouldRaiseCloseRequested()
+    {
+        var panel = new DrgFromBcPanel();
+        var raised = false;
+        panel.CloseRequested += (_, _) => raised = true;
+
+        Click(panel.CloseButton);
+
+        raised.Should().BeTrue();
     }
 
     #endregion

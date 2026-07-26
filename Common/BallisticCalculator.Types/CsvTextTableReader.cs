@@ -15,8 +15,8 @@ public sealed record CsvTextTable(IReadOnlyList<CsvTextRow> Rows, char Separator
 
 /// <summary>
 /// Reads a two-column CSV of numbers-with-units into raw text fields, deliberately knowing nothing about
-/// measurements or ballistic coefficients — the caller supplies a predicate that decides whether a row's
-/// two fields parse.
+/// measurements or ballistic coefficients — the caller supplies a function that judges a row and, when it
+/// is unusable, says why in words the user can act on.
 /// <para>
 /// Import is <b>all or nothing</b>: only empty lines are skipped, an unparseable first line is taken as an
 /// optional header, and any other unparseable line rejects the whole file. A drag curve silently missing a
@@ -34,15 +34,17 @@ public static class CsvTextTableReader
     /// <summary>
     /// Reads lines into a table, or fails with a message naming the offending line.
     /// </summary>
-    /// <param name="isUsableRow">
-    /// Decides whether a split row's two fields both parse. Drives the header decision (an unusable first
-    /// line is a header) and the separator choice (a candidate is accepted only if every data line is
-    /// usable under it).
+    /// <param name="rowProblem">
+    /// Returns null when a split row's two fields are both usable, otherwise a short reason phrased for the
+    /// user ("no unit given for the distance"). The reason is quoted in <paramref name="error"/>, so the
+    /// message can say what to fix rather than just that something is wrong. Also drives the header
+    /// decision (a problematic first line is a header) and the separator choice (a candidate is accepted
+    /// only if no data line has a problem under it).
     /// </param>
-    public static bool TryRead(IEnumerable<string> lines, Func<string, string, bool> isUsableRow,
+    public static bool TryRead(IEnumerable<string> lines, Func<string, string, string?> rowProblem,
                                out CsvTextTable table, out string error)
     {
-        ArgumentNullException.ThrowIfNull(isUsableRow);
+        ArgumentNullException.ThrowIfNull(rowProblem);
 
         table = null!;
         error = "";
@@ -77,7 +79,7 @@ public static class CsvTextTableReader
 
         foreach (var separator in Separators)
         {
-            if (TryReadWith(numbered, separator, isUsableRow, out var candidate, out var candidateError, out var progress))
+            if (TryReadWith(numbered, separator, rowProblem, out var candidate, out var candidateError, out var progress))
             {
                 table = candidate;
                 return true;
@@ -98,7 +100,7 @@ public static class CsvTextTableReader
     /// As <see cref="TryRead"/>, plus I/O, binary-content and encoding rejection. Handles a BOM, CRLF or LF
     /// endings, and a missing final end-of-line.
     /// </summary>
-    public static bool TryReadFile(string? path, Func<string, string, bool> isUsableRow,
+    public static bool TryReadFile(string? path, Func<string, string, string?> rowProblem,
                                    out CsvTextTable table, out string error)
     {
         table = null!;
@@ -138,7 +140,7 @@ public static class CsvTextTableReader
             return false;
         }
 
-        if (!TryRead(lines, isUsableRow, out table, out var readError))
+        if (!TryRead(lines, rowProblem, out table, out var readError))
         {
             error = $"{Path.GetFileName(path)}: {readError}";
             return false;
@@ -170,7 +172,7 @@ public static class CsvTextTableReader
     /// consumed before failing, used to pick the most plausible candidate's error message.
     /// </summary>
     private static bool TryReadWith(List<(int Line, string Text)> numbered, char separator,
-                                    Func<string, string, bool> isUsableRow,
+                                    Func<string, string, string?> rowProblem,
                                     out CsvTextTable table, out string error, out int progress)
     {
         table = null!;
@@ -214,9 +216,11 @@ public static class CsvTextTableReader
                 }
             }
 
-            var usable = first != null && second != null && isUsableRow(first, second);
+            var problem = first == null || second == null
+                ? $"expected two values separated by '{separator}'"
+                : rowProblem(first, second);
 
-            if (!usable)
+            if (problem != null)
             {
                 // An unusable first line is the optional header. Anywhere else it is a hard error.
                 if (i == 0)
@@ -227,9 +231,7 @@ public static class CsvTextTableReader
                     continue;
                 }
 
-                error = parts.Length < 2
-                    ? $"line {line} \"{text}\" — expected two values separated by '{separator}'. Nothing was imported."
-                    : $"line {line} \"{text}\" — could not be read as a value pair. Nothing was imported.";
+                error = $"line {line} \"{text}\" — {problem}. Nothing was imported.";
                 return false;
             }
 

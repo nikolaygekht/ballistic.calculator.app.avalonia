@@ -1,59 +1,95 @@
 using System.ComponentModel;
+using System.Globalization;
 using Gehtsoft.Measurements;
 
 namespace BallisticCalculator.Panels.Models;
 
 /// <summary>
-/// One BC-vs-Mach knot being edited. <see cref="Mach"/> is the canonical key — the editor can display and
-/// accept the knot as a velocity instead, and converting for display only keeps the toggle lossless.
+/// One BC-vs-Mach knot in the drag table editor. Knots are always keyed by Mach, which is what
+/// <c>DrgDragTableFactory</c> takes; the coefficient keeps the drag table it was quoted against, so a curve
+/// read from a report that lists G1 and G7 columns records what the user actually typed.
 /// </summary>
 public sealed class BcKnotEditModel : INotifyPropertyChanged
 {
-    private string _display = "";
+    private double _mach;
+    private BallisticCoefficient _bc;
 
-    public double Mach { get; set; }
-
-    public double Bc { get; set; }
-
-    /// <summary>List text, recomputed by the panel because it depends on the current display mode.</summary>
-    public string Display
+    public double Mach
     {
-        get => _display;
+        get => _mach;
         set
         {
-            if (_display == value) return;
-            _display = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Display)));
+            if (_mach.Equals(value)) return;
+            _mach = value;
+            Notify(nameof(Mach));
+            Notify(nameof(MachText));
         }
     }
 
+    public BallisticCoefficient Bc
+    {
+        get => _bc;
+        set
+        {
+            if (_bc.Equals(value)) return;
+            _bc = value;
+            Notify(nameof(Bc));
+            Notify(nameof(BcText));
+        }
+    }
+
+    /// <summary>Grid text for the Mach column.</summary>
+    public string MachText => _mach.ToString("0.####", CultureInfo.CurrentCulture);
+
+    /// <summary>Grid text for the BC column, including its drag table (for example <c>0.462G7</c>).</summary>
+    public string BcText => _bc.ToString(CultureInfo.CurrentCulture);
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public override string ToString() => _display;
+    private void Notify(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+    public override string ToString() => $"{MachText} {BcText}";
 }
 
-/// <summary>One measured downrange velocity being edited.</summary>
+/// <summary>One measured downrange velocity in the drag table editor.</summary>
 public sealed class RadarReadingEditModel : INotifyPropertyChanged
 {
-    private string _display = "";
+    private Measurement<DistanceUnit> _distance;
+    private Measurement<VelocityUnit> _velocity;
 
-    public Measurement<DistanceUnit> Distance { get; set; }
-
-    public Measurement<VelocityUnit> Velocity { get; set; }
-
-    /// <summary>List text, recomputed by the panel so it follows the values as they are edited.</summary>
-    public string Display
+    public Measurement<DistanceUnit> Distance
     {
-        get => _display;
+        get => _distance;
         set
         {
-            if (_display == value) return;
-            _display = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Display)));
+            if (_distance.Equals(value) && _distance.Unit.Equals(value.Unit)) return;
+            _distance = value;
+            Notify(nameof(Distance));
+            Notify(nameof(DistanceText));
         }
     }
 
+    public Measurement<VelocityUnit> Velocity
+    {
+        get => _velocity;
+        set
+        {
+            if (_velocity.Equals(value) && _velocity.Unit.Equals(value.Unit)) return;
+            _velocity = value;
+            Notify(nameof(Velocity));
+            Notify(nameof(VelocityText));
+        }
+    }
+
+    // "ND" formats with the unit's own default accuracy, so a grid shows 100m and 3078.8ft/s rather than
+    // the full binary expansion of the value.
+    public string DistanceText => _distance.ToString("ND", CultureInfo.CurrentCulture);
+
+    public string VelocityText => _velocity.ToString("ND", CultureInfo.CurrentCulture);
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public override string ToString() => _display;
+    private void Notify(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+    public override string ToString() => $"{DistanceText} {VelocityText}";
 }

@@ -43,6 +43,60 @@ public static class DragTableBuilder
     }
 
     /// <summary>
+    /// Expresses every knot against <paramref name="baseTable"/>, converting the ones quoted against another
+    /// standard table at <b>their own Mach</b>, and reports how many were converted.
+    /// <para>
+    /// A published data sheet often lists both a G1 and a G7 column, so a hand-typed curve can end up mixing
+    /// them — and <c>BcAtMach</c> carries no table, so a G1 number handed to a G7 base curve would simply be
+    /// misread. Converting at each knot's own Mach is exact for this purpose: the synthesized table computes
+    /// <c>Cd_base(M)/BC(M)</c>, and the conversion multiplies the coefficient by <c>Cd_target(M)/Cd_source(M)</c>,
+    /// so the base-curve factors cancel and the resulting Cd at every knot is identical whichever table the
+    /// knot was quoted against. Only the interpolation between knots follows the chosen base curve's shape.
+    /// (The library's own accuracy caveat concerns converting a whole trajectory at a single reference
+    /// velocity, which is not what happens here.)
+    /// </para>
+    /// </summary>
+    public static IReadOnlyList<BcAtMach> NormalizeCurve(IEnumerable<(double Mach, BallisticCoefficient Bc)> knots,
+                                                        DragTableId baseTable, out int converted)
+    {
+        ArgumentNullException.ThrowIfNull(knots);
+
+        if (baseTable == DragTableId.GC)
+            throw new ArgumentException("The base table must be a standard curve (G1…RA4), not GC (custom).",
+                                       nameof(baseTable));
+
+        converted = 0;
+        var result = new List<BcAtMach>();
+
+        foreach (var (mach, bc) in knots)
+        {
+            if (bc.Table == baseTable)
+            {
+                result.Add(new BcAtMach(mach, bc.Value));
+                continue;
+            }
+
+            if (bc.Table == DragTableId.GC)
+                throw new ArgumentException($"The knot at Mach {Format(mach)} is quoted against GC (custom), " +
+                                            "which has no fixed curve to convert from.", nameof(knots));
+
+            if (bc.ValueType != BallisticCoefficientValueType.Coefficient)
+                throw new ArgumentException($"The knot at Mach {Format(mach)} is a form factor; only a " +
+                                            "coefficient can be converted between tables.", nameof(knots));
+
+            if (mach <= 0)
+                throw new ArgumentException($"Mach {Format(mach)} is not valid — Mach must be greater than zero.",
+                                            nameof(knots));
+
+            var target = BallisticCoefficientConverter.Convert(bc, baseTable, mach);
+            result.Add(new BcAtMach(mach, target.Value));
+            converted++;
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Synthesizes a table by scaling <paramref name="baseTable"/> with an effective-BC-vs-Mach curve.
     /// Use the result with a ballistic coefficient of 1.0 on table <c>GC</c>.
     /// </summary>

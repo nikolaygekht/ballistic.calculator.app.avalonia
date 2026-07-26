@@ -14,10 +14,17 @@ namespace BallisticCalculator.Panels.Tests.Panels;
 /// </summary>
 public class CsvTextTableReaderTests
 {
-    // A predicate standing in for the typed parsers: two plain numbers.
-    private static bool TwoNumbers(string a, string b) =>
-        double.TryParse(a, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out _) &&
-        double.TryParse(b, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out _);
+    // Stands in for the typed parsers: both fields must be plain numbers, and it says which one is not.
+    private static string? TwoNumbers(string a, string b)
+    {
+        if (!IsNumber(a)) return "the first value is not a number";
+        if (!IsNumber(b)) return "the second value is not a number";
+        return null;
+    }
+
+    private static bool IsNumber(string text) =>
+        double.TryParse(text, System.Globalization.NumberStyles.Float,
+                        System.Globalization.CultureInfo.InvariantCulture, out _);
 
     #region Accepted
 
