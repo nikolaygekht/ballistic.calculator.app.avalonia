@@ -25,27 +25,33 @@ Both entries below were **fixed on 2026-07-27** and are kept as the record of wh
 by scrolling.
 
 **Also affects** `Tools → Approximate .drg from BC` (`KnotsGrid`) — reported as "probably",
-and the markup confirms it: both grids are declared identically, fixed `Height="170"` with
-no `ScrollViewer.VerticalScrollBarVisibility` set.
+and the markup confirmed it: both grids were declared identically.
 
 **Cause and fix**
 
-Both grids set their own `Height="170"` while sitting in a `StackPanel` inside the dialog's
-`ScrollViewer`. A `StackPanel` measures its children with infinite height, so the `DataGrid`
-decided it had room for every row and its `Auto` scroll bar never appeared — the giveaway in
-`doc/screenshots/custom_drg.png` is that the two `*` columns span the full width, i.e. no space
-was reserved for a bar.
+**`Width="*"` columns.** A star column sizes itself from the grid's available width — the same
+budget the vertical scroll bar has to come out of — and the bar loses: the columns take the lot and
+no space is left to reserve. The giveaway is visible in `doc/screenshots/custom_drg.png`: with 16
+readings in a grid showing six, the two columns still span the full width, so nothing was ever set
+aside for a bar.
 
-The trajectory table (`TrajectoryTableControl.axaml`) has always scrolled correctly because it
-sets **no** `Height` of its own — its container bounds it. The fix does the same here: the grid
-lost its `Height`, and a `Border Height="170"` host provides it.
+`TrajectoryTableControl` has always scrolled correctly because its columns are **fixed pixel
+widths**, which do not compete for that budget. Both editors now match it: fixed widths (150),
+`CanUserResizeColumns`, and right-aligned cells via a `DataGridCell.rightAlign` style.
 
-Regression cover: `ReadingsGrid_Height_IsOwnedByTheHostNotTheGrid` and
-`KnotsGrid_Height_IsOwnedByTheHostNotTheGrid`.
+**Confirmed in the running app** on 2026-07-27 — the scroll bar appeared as soon as the velocities
+editor's columns became fixed. Regression cover: `ReadingsGrid_Columns_AreNotStarSized`,
+`KnotsGrid_Columns_AreNotStarSized`.
 
-**Not reproducible headlessly** — under `Avalonia.Headless` the self-constrained grid *did* get a
-working scroll bar, so the fix rests on the layout reasoning above and on matching the control that
-demonstrably works. Worth a glance in the running app.
+**Not reproducible headlessly** — under `Avalonia.Headless` the original grid reported a perfectly
+visible scroll bar with a sized thumb, so this class of defect cannot be caught by a headless test;
+it needs the real window.
+
+**A wrong turn worth remembering:** the first attempt blamed height ownership (the grid setting its
+own `Height="170"` inside a `StackPanel`, which measures with infinite height) and moved the height
+to a `Border` host. That changed nothing and was reverted. The lesson is the one that eventually
+solved it — diff against the control in the repo that already works, and change one difference at a
+time.
 
 ---
 

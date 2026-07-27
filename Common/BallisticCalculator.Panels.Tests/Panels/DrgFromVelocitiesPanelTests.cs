@@ -358,4 +358,21 @@ public class DrgFromVelocitiesPanelTests
     }
 
     #endregion
+
+    #region Layout
+
+    [AvaloniaFact]
+    public void ReadingsGrid_Columns_AreNotStarSized()
+    {
+        // Arrange & Act
+        var panel = new DrgFromVelocitiesPanel();
+
+        // Assert — a star column sizes itself from the grid's available width, which is the same
+        // budget the vertical scroll bar needs, and the bar loses: with more readings than fit, no
+        // scroll bar appeared at all (D-002).
+        panel.ReadingsGrid.Columns.Should().AllSatisfy(column =>
+            column.Width.IsStar.Should().BeFalse("a star column starves the vertical scroll bar"));
+    }
+
+    #endregion
 }

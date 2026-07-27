@@ -7,6 +7,12 @@
              mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="520"
              x:Class="BallisticCalculator.Panels.Panels.DrgFromBcPanel">
 
+  <UserControl.Styles>
+    <Style Selector="DataGridCell.rightAlign">
+      <Setter Property="HorizontalContentAlignment" Value="Right" />
+    </Style>
+  </UserControl.Styles>
+
   <StackPanel Spacing="4">
 
     <!-- Header: one field per row, all the same width -->
@@ -61,35 +67,67 @@
 
     <Separator/>
 
-    <!-- Knots -->
+    <!-- Knots. Fixed, resizable, right-aligned columns — see DrgFromVelocitiesPanel: star columns
+         take the width the vertical scroll bar needs, and the bar never appears (D-002). -->
     <DataGrid x:Name="KnotsGrid" x:FieldModifier="internal"
               x:DataType="models:BcKnotEditModel"
               AutoGenerateColumns="False"
               Height="170"
               IsReadOnly="True"
+              CanUserReorderColumns="False"
+              CanUserResizeColumns="True"
               CanUserSortColumns="False"
               GridLinesVisibility="All"
               HeadersVisibility="Column"
               SelectionMode="Single"
               FontSize="{DynamicResource AppFontSize}">
       <DataGrid.Columns>
-        <DataGridTextColumn Header="Mach" Binding="{Binding MachText}" Width="*"/>
-        <DataGridTextColumn Header="BC" Binding="{Binding BcText}" Width="*"/>
+        <DataGridTextColumn Header="Mach" Binding="{Binding MachText}" Width="150" CellStyleClasses="rightAlign"/>
+        <DataGridTextColumn Header="BC" Binding="{Binding BcText}" Width="150" CellStyleClasses="rightAlign"/>
       </DataGrid.Columns>
     </DataGrid>
 
-    <!-- Entry row for the selected/new knot -->
-    <Grid ColumnDefinitions="90,110,60,*">
-      <TextBlock Grid.Column="0" Text="Mach" VerticalAlignment="Center"
-                 FontSize="{DynamicResource AppFontSize}"/>
-      <TextBox Grid.Column="1" x:Name="MachBox" x:FieldModifier="internal"
-               FontSize="{DynamicResource AppFontSize}"/>
-      <TextBlock Grid.Column="2" Text="BC" VerticalAlignment="Center" Margin="8,0,0,0"
+    <!-- Entry fields for the selected/new knot, one per row like the header above. Mach and velocity are
+         the same knot said two ways and mirror each other through the air below; only the Mach is stored,
+         because a .drg curve is keyed by Mach. -->
+    <Grid ColumnDefinitions="90,*">
+      <TextBlock Grid.Column="0" Text="BC" VerticalAlignment="Center"
                  FontSize="{DynamicResource AppFontSize}"/>
       <!-- A knot must name a standard curve: GC is refused on Add, so it is not offered in the first place. -->
-      <controls:BallisticCoefficientControl Grid.Column="3" x:Name="BcControl" x:FieldModifier="internal"
+      <controls:BallisticCoefficientControl Grid.Column="1" x:Name="BcControl" x:FieldModifier="internal"
                                             AllowCustomTable="False"
                                             FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <Grid ColumnDefinitions="90,*">
+      <TextBlock Grid.Column="0" Text="Mach" VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <!-- A bare NumericUpDown is shorter than the composite controls above and below, which carry a unit
+           combo. Matching the neighbour keeps the three rows on one rhythm, and tracks the app font size
+           rather than pinning a pixel height. -->
+      <NumericUpDown Grid.Column="1" x:Name="MachControl" x:FieldModifier="internal"
+                     Increment="0.1" Minimum="0" FormatString="0.###"
+                     HorizontalContentAlignment="Right"
+                     MinHeight="{Binding #VelocityControl.Bounds.Height}"
+                     FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <Grid ColumnDefinitions="90,*">
+      <TextBlock Grid.Column="0" Text="Velocity" VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Column="1" x:Name="VelocityControl" x:FieldModifier="internal"
+                                   FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <Grid ColumnDefinitions="90,*,Auto">
+      <TextBlock Grid.Column="0" Text="Air" VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <TextBlock Grid.Column="1" x:Name="AtmosphereText" x:FieldModifier="internal"
+                 VerticalAlignment="Center" TextWrapping="Wrap" Foreground="Gray"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <Button Grid.Column="2" x:Name="AtmosphereButton" x:FieldModifier="internal"
+              Content="Set Atmosphere" Click="OnSetAtmosphere" Width="130"
+              FontSize="{DynamicResource AppFontSize}"/>
     </Grid>
 
     <StackPanel Orientation="Horizontal" Spacing="6">

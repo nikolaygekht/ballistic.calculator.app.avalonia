@@ -7,6 +7,12 @@
              mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="520"
              x:Class="BallisticCalculator.Panels.Panels.DrgFromVelocitiesPanel">
 
+  <UserControl.Styles>
+    <Style Selector="DataGridCell.rightAlign">
+      <Setter Property="HorizontalContentAlignment" Value="Right" />
+    </Style>
+  </UserControl.Styles>
+
   <StackPanel Spacing="4">
 
     <!-- Header: one field per row, all the same width -->
@@ -51,20 +57,24 @@
 
     <Separator/>
 
-    <!-- Readings -->
+    <!-- Readings. Fixed, resizable, right-aligned columns like TrajectoryTableControl: star columns
+         size themselves from the grid's available width, which is the same budget the vertical
+         scroll bar has to come out of, and the bar loses (D-002). -->
     <DataGrid x:Name="ReadingsGrid" x:FieldModifier="internal"
               x:DataType="models:RadarReadingEditModel"
               AutoGenerateColumns="False"
               Height="170"
               IsReadOnly="True"
+              CanUserReorderColumns="False"
+              CanUserResizeColumns="True"
               CanUserSortColumns="False"
               GridLinesVisibility="All"
               HeadersVisibility="Column"
               SelectionMode="Single"
               FontSize="{DynamicResource AppFontSize}">
       <DataGrid.Columns>
-        <DataGridTextColumn Header="Distance" Binding="{Binding DistanceText}" Width="*"/>
-        <DataGridTextColumn Header="Velocity" Binding="{Binding VelocityText}" Width="*"/>
+        <DataGridTextColumn Header="Distance" Binding="{Binding DistanceText}" Width="150" CellStyleClasses="rightAlign"/>
+        <DataGridTextColumn Header="Velocity" Binding="{Binding VelocityText}" Width="150" CellStyleClasses="rightAlign"/>
       </DataGrid.Columns>
     </DataGrid>
 

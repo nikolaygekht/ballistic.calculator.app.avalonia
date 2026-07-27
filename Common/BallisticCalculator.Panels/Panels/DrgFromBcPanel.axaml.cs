@@ -26,6 +26,10 @@ public partial class DrgFromBcPanel : UserControl
 {
     private readonly ObservableCollection<BcKnotEditModel> _knots = new();
     private MeasurementSystem _measurementSystem = MeasurementSystem.Imperial;
+    private Atmosphere? _atmosphere;
+
+    /// <summary>Guards the Mach ↔ velocity mirror against echoing back into the field being edited.</summary>
+    private bool _syncing;
 
     public DrgFromBcPanel()
     {
@@ -51,8 +55,27 @@ public partial class DrgFromBcPanel : UserControl
         }
     }
 
+    /// <summary>
+    /// The air the Mach ↔ velocity conversion is done in. Null means sea-level standard; the Set Atmosphere
+    /// button asks the host for a new one. It affects the entry row only — knots are stored as Mach, so a
+    /// curve does not depend on which air it was typed in.
+    /// </summary>
+    public Atmosphere? Atmosphere
+    {
+        get => _atmosphere;
+        set
+        {
+            _atmosphere = value;
+            UpdateAtmosphereText();
+            ShowVelocityForMach();
+        }
+    }
+
     /// <summary>The knots currently in the grid, in grid order.</summary>
     internal IReadOnlyList<BcKnotEditModel> Knots => _knots;
+
+    /// <summary>The air described beside the Set Atmosphere button.</summary>
+    internal string AtmosphereDescription => AtmosphereText.Text ?? "";
 
     /// <summary>The message under the buttons; also the error surface for a refused import or save.</summary>
     internal string Status => StatusText.Text ?? "";
@@ -63,6 +86,12 @@ public partial class DrgFromBcPanel : UserControl
 
     /// <summary>Raised by the Close button; the hosting window closes itself.</summary>
     public event EventHandler? CloseRequested;
+
+    /// <summary>
+    /// Raised by Set Atmosphere. The host shows the atmosphere editor and writes the result back to
+    /// <see cref="Atmosphere"/> — windows belong to the application, not to a panel library.
+    /// </summary>
+    public event EventHandler? AtmosphereRequested;
 
     #endregion
 
@@ -78,6 +107,9 @@ public partial class DrgFromBcPanel : UserControl
         LengthControl.UnitType = typeof(DistanceUnit);
         LengthControl.Minimum = 0;
         LengthControl.DecimalPoints = 3;
+        VelocityControl.UnitType = typeof(VelocityUnit);
+        VelocityControl.Minimum = 0;
+        VelocityControl.DecimalPoints = 1;
 
         // GC is excluded: the base curve must be a standard table.
         foreach (var id in Enum.GetValues<DragTableId>().Where(id => id != DragTableId.GC).OrderBy(id => id.ToString()))
@@ -86,11 +118,14 @@ public partial class DrgFromBcPanel : UserControl
 
         SourceBox.Text = "BC curve";
         KnotsGrid.ItemsSource = _knots;
+        UpdateAtmosphereText();
     }
 
     private void WireEvents()
     {
         KnotsGrid.SelectionChanged += OnSelectionChanged;
+        MachControl.ValueChanged += (_, _) => ShowVelocityForMach();
+        VelocityControl.Changed += (_, _) => ShowMachForVelocity();
     }
 
     private void ApplyMeasurementSystem()
@@ -100,7 +135,100 @@ public partial class DrgFromBcPanel : UserControl
         WeightControl.ChangeUnit(metric ? WeightUnit.Gram : WeightUnit.Grain);
         DiameterControl.ChangeUnit(metric ? DistanceUnit.Millimeter : DistanceUnit.Inch);
         LengthControl.ChangeUnit(metric ? DistanceUnit.Millimeter : DistanceUnit.Inch);
+        VelocityControl.ChangeUnit(metric ? VelocityUnit.MetersPerSecond : VelocityUnit.FeetPerSecond);
     }
+
+    #endregion
+
+    #region Mach and velocity
+
+    /// <summary>Decimals a computed Mach is rounded to; matches the entry control's FormatString.</summary>
+    private const int MachDecimals = 3;
+    private const double MachDisplayStep = 0.001;
+
+    /// <summary>Sea-level standard until the host says otherwise, matching the velocities editor.</summary>
+    private Atmosphere Air => _atmosphere ?? new Atmosphere();
+
+    /// <summary>The unit the user is working in, so a conversion does not fight their choice of unit.</summary>
+    private VelocityUnit VelocityUnitInUse =>
+        VelocityControl.GetValue<VelocityUnit>()?.Unit
+        ?? (_measurementSystem == MeasurementSystem.Metric ? VelocityUnit.MetersPerSecond : VelocityUnit.FeetPerSecond);
+
+    /// <summary>Mach is what a knot stores, so it leads: the velocity restates it in the current air.</summary>
+    private void ShowVelocityForMach()
+    {
+        if (_syncing)
+            return;
+
+        _syncing = true;
+        try
+        {
+            var mach = (double?)MachControl.Value;
+            if (mach is null or <= 0)
+            {
+                VelocityControl.Value = null;
+                return;
+            }
+
+            var velocity = Air.SoundVelocity * mach.Value;
+            VelocityControl.SetValue(velocity.To(VelocityUnitInUse));
+        }
+        finally
+        {
+            _syncing = false;
+        }
+    }
+
+    /// <summary>A velocity typed from a chronograph or a data sheet becomes the Mach that gets stored.</summary>
+    private void ShowMachForVelocity()
+    {
+        if (_syncing)
+            return;
+
+        _syncing = true;
+        try
+        {
+            var velocity = VelocityControl.IsEmpty ? null : VelocityControl.GetValue<VelocityUnit>();
+            if (velocity == null || velocity.Value.Value <= 0)
+            {
+                MachControl.Value = null;
+                return;
+            }
+
+            var mach = velocity.Value.In(VelocityUnit.MetersPerSecond) /
+                       Air.SoundVelocity.In(VelocityUnit.MetersPerSecond);
+
+            // Leave the Mach alone when it already says this velocity. Writing the velocity raises a
+            // *dispatched* change, which arrives after the guard above has been released, so without this
+            // the round trip would quietly re-round what the user typed: 1.2345 -> 1.235.
+            var current = (double?)MachControl.Value;
+            if (current is > 0 && Math.Abs(current.Value - mach) < MachDisplayStep / 2)
+                return;
+
+            MachControl.Value = Math.Round((decimal)mach, MachDecimals);
+        }
+        finally
+        {
+            _syncing = false;
+        }
+    }
+
+    private void UpdateAtmosphereText()
+    {
+        var culture = CultureInfo.CurrentCulture;
+        var sound = Air.SoundVelocity.To(_measurementSystem == MeasurementSystem.Metric
+            ? VelocityUnit.MetersPerSecond
+            : VelocityUnit.FeetPerSecond);
+
+        var air = _atmosphere == null
+            ? "sea-level standard"
+            : $"{_atmosphere.Altitude.ToString("ND", culture)}, {_atmosphere.Temperature.ToString("ND", culture)}";
+
+        AtmosphereText.Text = $"{air} — sound {sound.ToString("N0", culture)}";
+    }
+
+    private void OnSetAtmosphere(object? sender, RoutedEventArgs e) =>
+        AtmosphereRequested?.Invoke(this, EventArgs.Empty);
 
     #endregion
 
@@ -115,7 +243,7 @@ public partial class DrgFromBcPanel : UserControl
         if (selected == null)
             return;
 
-        MachBox.Text = selected.MachText;
+        MachControl.Value = (decimal)selected.Mach;
         BcControl.Value = selected.Bc;
     }
 
@@ -191,7 +319,8 @@ public partial class DrgFromBcPanel : UserControl
         bc = default;
         problem = "";
 
-        if (!MeasurementTextParser.TryParseDouble(MachBox.Text, out mach) || mach <= 0)
+        mach = (double?)MachControl.Value ?? 0;
+        if (mach <= 0)
         {
             problem = "Enter a Mach number greater than zero.";
             return false;

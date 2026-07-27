@@ -1,9 +1,11 @@
 using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using Xunit;
 using AwesomeAssertions;
 using BallisticCalculator;
@@ -42,9 +44,9 @@ public class DrgFromBcPanelTests
     }
 
     /// <summary>Fills the entry row the way a user would before pressing Add or Change.</summary>
-    private static void Enter(DrgFromBcPanel panel, string mach, double bc, DragTableId table = DragTableId.G7)
+    private static void Enter(DrgFromBcPanel panel, double mach, double bc, DragTableId table = DragTableId.G7)
     {
-        panel.MachBox.Text = mach;
+        panel.MachControl.Value = (decimal)mach;
         panel.BcControl.Value = new BallisticCoefficient(bc, table);
     }
 
@@ -64,7 +66,7 @@ public class DrgFromBcPanelTests
     public void Add_ShouldAppendTheEntryAndSelectIt()
     {
         var panel = new DrgFromBcPanel();
-        Enter(panel, "1.5", 0.462);
+        Enter(panel, 1.5, 0.462);
 
         Click(panel.AddButton);
 
@@ -91,10 +93,10 @@ public class DrgFromBcPanelTests
     public void Change_ShouldWriteTheEntryIntoTheSelectedRow()
     {
         var panel = new DrgFromBcPanel();
-        Enter(panel, "1.5", 0.462);
+        Enter(panel, 1.5, 0.462);
         Click(panel.AddButton);
 
-        Enter(panel, "1.75", 0.463);
+        Enter(panel, 1.75, 0.463);
         Click(panel.ChangeButton);
 
         panel.Knots.Should().HaveCount(1);
@@ -107,7 +109,7 @@ public class DrgFromBcPanelTests
     public void Change_WithNothingSelected_ShouldReport()
     {
         var panel = new DrgFromBcPanel();
-        Enter(panel, "1.5", 0.462);
+        Enter(panel, 1.5, 0.462);
 
         Click(panel.ChangeButton);
 
@@ -122,14 +124,14 @@ public class DrgFromBcPanelTests
         var panel = new DrgFromBcPanel();
         var window = new Window { Content = panel, Width = 600, Height = 620 };
         window.Show();
-        Enter(panel, "1.5", 0.462);
+        Enter(panel, 1.5, 0.462);
         Click(panel.AddButton);
-        Enter(panel, "2.25", 0.480, DragTableId.G1);
+        Enter(panel, 2.25, 0.480, DragTableId.G1);
         Click(panel.AddButton);
 
         panel.KnotsGrid.SelectedItem = panel.Knots[0];
 
-        panel.MachBox.Text.Should().Contain("1.5");
+        panel.MachControl.Value.Should().Be(1.5m);
         panel.BcControl.Value!.Value.Value.Should().BeApproximately(0.462, 1e-9);
         panel.BcControl.Value!.Value.Table.Should().Be(DragTableId.G7);
     }
@@ -138,9 +140,9 @@ public class DrgFromBcPanelTests
     public void Delete_ShouldRemoveSelectedRow()
     {
         var panel = new DrgFromBcPanel();
-        Enter(panel, "1.5", 0.462);
+        Enter(panel, 1.5, 0.462);
         Click(panel.AddButton);
-        Enter(panel, "2.0", 0.470);
+        Enter(panel, 2.0, 0.470);
         Click(panel.AddButton);
 
         panel.KnotsGrid.SelectedItem = panel.Knots[0];
@@ -154,9 +156,9 @@ public class DrgFromBcPanelTests
     public void Sort_ShouldOrderByMach()
     {
         var panel = new DrgFromBcPanel();
-        Enter(panel, "2.5", 0.484);
+        Enter(panel, 2.5, 0.484);
         Click(panel.AddButton);
-        Enter(panel, "1.5", 0.462);
+        Enter(panel, 1.5, 0.462);
         Click(panel.AddButton);
 
         Click(panel.SortButton);
@@ -361,6 +363,181 @@ public class DrgFromBcPanelTests
         Click(panel.CloseButton);
 
         raised.Should().BeTrue();
+    }
+
+    #endregion
+
+    #region Mach and velocity
+
+    private static double SoundFps(Atmosphere? air) =>
+        (air ?? new Atmosphere()).SoundVelocity.In(VelocityUnit.FeetPerSecond);
+
+    [AvaloniaFact]
+    public void Mach_WhenEntered_ShouldShowTheVelocityForTheCurrentAir()
+    {
+        // Arrange
+        var panel = new DrgFromBcPanel();
+
+        // Act
+        panel.MachControl.Value = 2.0m;
+
+        // Assert — standard air unless told otherwise
+        panel.VelocityControl.GetValue<VelocityUnit>()!.Value.In(VelocityUnit.FeetPerSecond)
+             .Should().BeApproximately(2.0 * SoundFps(null), 0.5);
+    }
+
+    [AvaloniaFact]
+    public void Velocity_WhenTyped_ShouldComputeTheMachForTheCurrentAir()
+    {
+        // Arrange — typing is the user-driven path; SetValue is the programmatic one and deliberately
+        // stays silent, which is what keeps the two fields from echoing each other.
+        var panel = new DrgFromBcPanel();
+        var fps = 1.5 * SoundFps(null);
+
+        // Act — TextChanged is dispatched rather than raised inline, so the queue has to run
+        panel.VelocityControl.NumericPart.Text = fps.ToString("0.0", CultureInfo.InvariantCulture);
+        Dispatcher.UIThread.RunJobs();
+
+        // Assert
+        ((double)panel.MachControl.Value!).Should().BeApproximately(1.5, 1e-3);
+    }
+
+    [AvaloniaFact]
+    public void Mach_TypedFinerThanTheVelocityShows_ShouldNotBeRewrittenByTheMirror()
+    {
+        // Arrange & Act — writing the velocity raises a dispatched change that comes back to the Mach
+        var panel = new DrgFromBcPanel();
+        panel.MachControl.Value = 1.2345m;
+        Dispatcher.UIThread.RunJobs();
+        Dispatcher.UIThread.RunJobs();
+
+        // Assert — what the user typed still stands
+        panel.MachControl.Value.Should().Be(1.2345m);
+    }
+
+    [AvaloniaFact]
+    public void Velocity_ChangedByMoreThanRounding_ShouldStillUpdateTheMach()
+    {
+        // Arrange — a Mach the mirror must not be too shy to change
+        var panel = new DrgFromBcPanel();
+        panel.MachControl.Value = 2.0m;
+        Dispatcher.UIThread.RunJobs();
+
+        // Act — a real edit, several ft/s away
+        var fps = 2.01 * SoundFps(null);
+        panel.VelocityControl.NumericPart.Text = fps.ToString("0.0", CultureInfo.InvariantCulture);
+        Dispatcher.UIThread.RunJobs();
+
+        // Assert
+        ((double)panel.MachControl.Value!).Should().BeApproximately(2.01, 1e-3);
+    }
+
+    [AvaloniaFact]
+    public void Velocity_WhenCleared_ShouldClearTheMach()
+    {
+        // Arrange
+        var panel = new DrgFromBcPanel();
+        panel.MachControl.Value = 2.0m;
+
+        // Act
+        panel.VelocityControl.NumericPart.Text = "";
+        Dispatcher.UIThread.RunJobs();
+
+        // Assert
+        panel.MachControl.Value.Should().BeNull();
+    }
+
+    [AvaloniaFact]
+    public void Atmosphere_WhenChanged_ShouldRestateTheVelocityForTheNewAir()
+    {
+        // Arrange — Mach 2 in standard air
+        var panel = new DrgFromBcPanel();
+        panel.MachControl.Value = 2.0m;
+        var standard = panel.VelocityControl.GetValue<VelocityUnit>()!.Value.In(VelocityUnit.FeetPerSecond);
+
+        // Act — thin, cold air at 10,000 ft: sound is slower, so Mach 2 is a lower velocity
+        var air = Atmosphere.CreateICAOAtmosphere(new Measurement<DistanceUnit>(10000, DistanceUnit.Foot));
+        panel.Atmosphere = air;
+
+        // Assert — the Mach the user typed is what stands; the velocity restates it
+        panel.MachControl.Value.Should().Be(2.0m);
+        var restated = panel.VelocityControl.GetValue<VelocityUnit>()!.Value.In(VelocityUnit.FeetPerSecond);
+        restated.Should().BeApproximately(2.0 * SoundFps(air), 0.5);
+        restated.Should().BeLessThan(standard);
+    }
+
+    [AvaloniaFact]
+    public void Atmosphere_WhenNotSet_ShouldSayStandard()
+    {
+        // Arrange & Act
+        var panel = new DrgFromBcPanel();
+
+        // Assert
+        panel.AtmosphereDescription.Should().Contain("standard");
+    }
+
+    [AvaloniaFact]
+    public void Atmosphere_WhenSet_ShouldBeDescribedToTheUser()
+    {
+        // Arrange
+        var panel = new DrgFromBcPanel();
+
+        // Act
+        panel.Atmosphere = Atmosphere.CreateICAOAtmosphere(new Measurement<DistanceUnit>(10000, DistanceUnit.Foot));
+
+        // Assert — the conversion depends on it, so it has to be visible
+        panel.AtmosphereDescription.Should().NotContain("standard");
+        panel.AtmosphereDescription.Should().Contain("10,000").And.Contain("ft");
+    }
+
+    [AvaloniaFact]
+    public void SetAtmosphereButton_ShouldAskTheHost()
+    {
+        // Arrange
+        var panel = new DrgFromBcPanel();
+        var asked = false;
+        panel.AtmosphereRequested += (_, _) => asked = true;
+
+        // Act
+        Click(panel.AtmosphereButton);
+
+        // Assert
+        asked.Should().BeTrue();
+    }
+
+    [AvaloniaFact]
+    public void SelectingARow_ShouldRestateTheVelocityForItsMach()
+    {
+        // Arrange
+        var panel = new DrgFromBcPanel();
+        var window = new Window { Content = panel, Width = 600, Height = 700 };
+        window.Show();
+        Enter(panel, 1.5, 0.462);
+        Click(panel.AddButton);
+        Enter(panel, 2.5, 0.484);
+        Click(panel.AddButton);
+
+        // Act
+        panel.KnotsGrid.SelectedItem = panel.Knots[0];
+
+        // Assert
+        panel.VelocityControl.GetValue<VelocityUnit>()!.Value.In(VelocityUnit.FeetPerSecond)
+             .Should().BeApproximately(1.5 * SoundFps(null), 0.5);
+    }
+
+    #endregion
+
+    #region Layout
+
+    [AvaloniaFact]
+    public void KnotsGrid_Columns_AreNotStarSized()
+    {
+        // Arrange & Act
+        var panel = new DrgFromBcPanel();
+
+        // Assert — see DrgFromVelocitiesPanelTests: star columns starve the vertical scroll bar (D-002).
+        panel.KnotsGrid.Columns.Should().AllSatisfy(column =>
+            column.Width.IsStar.Should().BeFalse("a star column starves the vertical scroll bar"));
     }
 
     #endregion
