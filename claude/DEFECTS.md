@@ -1,16 +1,18 @@
 # Known defects
 
-Open defects found by manual testing. Newest first. Not fixed — logged only.
+Found by manual testing. Newest first.
+
+Both entries below were **fixed on 2026-07-27** and are kept as the record of what went wrong.
 
 ---
 
 ## D-002 — .drg editors: the readings/knots grid has no vertical scroll bar
 
 - **Found:** 2026-07-27 (manual run of the desktop app)
-- **Status:** OPEN — not investigated, not fixed
+- **Status:** FIXED 2026-07-27
 - **Area:**
-  - `Common/BallisticCalculator.Panels/Panels/DrgFromVelocitiesPanel.axaml:55` — `ReadingsGrid`
-  - `Common/BallisticCalculator.Panels/Panels/DrgFromBcPanel.axaml:65` — `KnotsGrid`
+  - `Common/BallisticCalculator.Panels/Panels/DrgFromVelocitiesPanel.axaml` — `ReadingsGrid`
+  - `Common/BallisticCalculator.Panels/Panels/DrgFromBcPanel.axaml` — `KnotsGrid`
 
 **Steps to reproduce**
 
@@ -26,24 +28,33 @@ by scrolling.
 and the markup confirms it: both grids are declared identically, fixed `Height="170"` with
 no `ScrollViewer.VerticalScrollBarVisibility` set.
 
-**Notes**
+**Cause and fix**
 
-- Both dialogs wrap the whole panel in an outer
-  `ScrollViewer VerticalScrollBarVisibility="Auto"`
-  (`ApproximateDrgFromVelocitiesDialog.axaml:13`, `ApproximateDrgFromBcDialog.axaml:13`),
-  with the comment "the grid inside keeps its own height". The inner `DataGrid`'s own
-  scroll bar is the thing that is missing/not showing — likely interaction between the
-  outer `ScrollViewer` and the `DataGrid`'s internal one, or a missing explicit
-  `ScrollViewer.VerticalScrollBarVisibility="Visible"/"Auto"` on the grid. Unverified.
+Both grids set their own `Height="170"` while sitting in a `StackPanel` inside the dialog's
+`ScrollViewer`. A `StackPanel` measures its children with infinite height, so the `DataGrid`
+decided it had room for every row and its `Auto` scroll bar never appeared — the giveaway in
+`doc/screenshots/custom_drg.png` is that the two `*` columns span the full width, i.e. no space
+was reserved for a bar.
+
+The trajectory table (`TrajectoryTableControl.axaml`) has always scrolled correctly because it
+sets **no** `Height` of its own — its container bounds it. The fix does the same here: the grid
+lost its `Height`, and a `Border Height="170"` host provides it.
+
+Regression cover: `ReadingsGrid_Height_IsOwnedByTheHostNotTheGrid` and
+`KnotsGrid_Height_IsOwnedByTheHostNotTheGrid`.
+
+**Not reproducible headlessly** — under `Avalonia.Headless` the self-constrained grid *did* get a
+working scroll bar, so the fix rests on the layout reasoning above and on matching the control that
+demonstrably works. Worth a glance in the running app.
 
 ---
 
 ## D-001 — Windows menu: the first entry does not activate its window
 
 - **Found:** 2026-07-27 (manual run of the desktop app)
-- **Status:** OPEN — not investigated, not fixed
-- **Area:** `Desktop/BallisticCalculator/Views/MainWindow.axaml.cs` — `UpdateWindowsMenu()`
-  (`MainWindow.axaml.cs:264`), the dynamic `Windows` menu items
+- **Status:** FIXED 2026-07-27
+- **Area:** `Desktop/BallisticCalculator/Views/MainWindow.axaml.cs` — the dynamic `Windows` menu
+  items, and now `Views/WindowActivation.cs`
 
 **Steps to reproduce**
 
@@ -56,11 +67,21 @@ no `ScrollViewer.VerticalScrollBarVisibility` set.
 **Actual:** nothing happens — the first window is not brought forward or activated.
 The second and third entries work correctly.
 
-**Notes**
+**Cause and fix**
 
-- Reported as reproducible for the first entry only, regardless of which window that is —
-  so it looks positional (index 0), not tied to a particular child window.
-- Each item is wired as `item.Click += (_, _) => w.Activate();`, identical for every index,
-  so the difference is likely outside the click handler itself (e.g. the header access key
-  `_1`, item ordering relative to `MenuWindowsSeparator`, or the activation/`Deactivated`
-  bookkeeping around `MainWindow.axaml.cs:162-175`). Unverified — needs investigation.
+Nothing positional after all, and nothing wrong with the menu: `ManagedWindow.Activate()` returns
+without doing anything in two states, and the handler was a bare `w.Activate()`.
+
+1. **Minimized** — an explicit early return. Selecting a minimized window did nothing at all.
+2. **Already `IsActive`** — also an early return. A window can be active yet *buried*, because
+   raising another window's z-order (maximizing another child, for instance) does not transfer the
+   active state. Selecting the buried window then did nothing, which is the reported symptom.
+
+`Views/WindowActivation.cs` now decides what a window needs — restore if minimized, then either
+`Activate()` or, when it is already active, an explicit `BringToTop()` — and `MainWindow.BringToFront`
+applies it. The same two dead ends were hit by **Cascade** and by **View → Compare → Add** re-using an
+existing Compare window; both now go through the same helper.
+
+Verified against the library source: activation itself is sound, and each entry activates its own
+window. Cover: `WindowActivationTests` (the decision, case by case) and `WindowsMenuTests` (the menu,
+end to end).

@@ -5,7 +5,7 @@ Last updated: 2026-07-27
 ## Overview
 
 Avalonia rewrite of the WinForms BallisticCalculator. Core trajectory math comes from the
-**BallisticCalculator 1.1.11.3** NuGet package (+ Gehtsoft.Measurements); the app is action-driven with
+**BallisticCalculator 1.1.12** NuGet package (+ Gehtsoft.Measurements 1.1.18); the app is action-driven with
 direct-UI-access controls (no MVVM/reactive) per `CLAUDE.md`. Trunk-based development (commit to `main`).
 
 ## Completed
@@ -33,6 +33,8 @@ direct-UI-access controls (no MVVM/reactive) per `CLAUDE.md`. Trunk-based develo
 | CustomDragTableLoader | **New.** Loads/caches a `.drg` for GC ammunition (resolves path or falls back to `data/drg`). |
 | CsvTextTableReader | **New.** Two-column CSV → raw text fields. All-or-nothing: only empty lines skipped, optional header on line 1, any other bad line rejects the whole file quoting that line. Separator chosen by trying `;`/tab/`,` and keeping the one under which *every* row parses; the caller supplies a "why is this row unusable" function so the message says what to fix. |
 | MeasurementTextParser | **New.** Unit-suffixed value parsing with the aliases the library lacks (`fps`, `mps`, `mph`, `yds`…) and decimal-comma normalization. A null fallback unit means the text must carry its own unit — what file import uses. |
+| HitProbabilityCalculator | **New.** Wraps `Tools.HitProbability` — `ShotData` + `HitProbabilityInputs` → `HitProbabilityEstimate` (probability, impacts, shots-to-hit, mean and 90% radial miss), with the `ShootingPosition` presets (Supported 1/1, Prone 2/2, Kneeling 4/3, Standing 5/4, Custom) and `SampleImpacts` for thinning the plot. Shots bounded 1000…50 000. Carries the shot's geometry but **not** its dialed clicks: the library models the come-up itself, so a pre-dialed scope would count the hold twice. |
+| BcConversionCalculator | **New.** Converts a BC between standard tables at a reference velocity, returning the reference Mach and a transonic flag with it — the number is exact only at that reference. Refuses form factors and GC on either side. |
 | DragTableBuilder / DrgMetadata | **New.** Builds `GC` tables from a BC-vs-Mach curve or radar readings, validating first (≥1 knot / ≥3 strictly-decreasing readings, positive weight and diameter) with user-facing messages. `NormalizeCurve` converts knots quoted against another standard table at their own Mach. |
 | DataFolders | **New.** Standard folders next to the exe: `data/reticle`, `data/legacy-ammo`, `data/drg`. |
 | MeasurementSystem, ChartTrajectory, DropBase, TrajectoryChartMode | Shared enums/models. |
@@ -54,15 +56,20 @@ direct-UI-access controls (no MVVM/reactive) per `CLAUDE.md`. Trunk-based develo
 | (both editors) | Stacked header (Name / Source / Weight / Diameter / Length, one field per row), a two-column `DataGrid`, an entry row, and Add / Change / Delete / Sort / Load Csv + Save Drg / Close. Editing is explicit: select a row to load it, `Change` writes it back. CSV files must carry their units — a bare number is refused rather than assumed. |
 | BcConverterPanel | **New.** Converts a BC between standard tables (G1 ↔ G7) at a reference velocity. **GC is offered on neither side** — the source control sets `AllowCustomTable="False"` and the destination list is `BcConversionCalculator.StandardTables`. Source BC / Destination Table / Reference Velocity → a read-only Target BC that follows the inputs — no Convert button, because the point is watching the answer move with the reference. `Set Atmosphere` (the same shell dialog the velocities editor uses) sets only the speed of sound. Always states the reference Mach and the air; warns below Mach 1.5. |
 
+| HitProbabilityPanel | **New.** Monte-Carlo hit probability for the active shot: target distance + vital zone, group size (1σ per axis), a shooting-position combo that fills two always-editable spread multipliers (`NumericUpDown`), the range/wind estimation errors, the ammunition's MV deviation (a separate group — it is ammo quality, not a shooter error), and Shots/Seed — every plain number is a `NumericUpDown`, though **not** clipped to its bounds (Avalonia's default), so an out-of-range shot count is reported rather than silently rewritten. **Runs on the Estimate button only**: it is cheap enough to run live (~28 ms at 10 000 shots) but the inputs are guesses, and a probability from untouched defaults would imply they had been considered. A shown result persists when inputs change, so two set-ups can be compared. Target distance defaults to 300 yd/m, not the shot's maximum. Shows the probability, shots-to-hit at 50/75/90/95/98%, a ScottPlot impact scatter with the vital zone drawn to scale and **equal axis scaling**, and the mean / 90% radial miss. States that group size is 1σ (≈¼ of extreme spread) and that a correct come-up is assumed. |
+
 ### Main Desktop Application (`Desktop/BallisticCalculator/`)
 
 - Full menu (Trajectory / View / **Tools** / Windows / Help), MDI via `iciclecreek.Avalonia.WindowManager`,
   keyboard shortcuts, persistent state (`appstate.json`).
 - **Tools menu:** Approximate Drag Table → From BC Curve / From Measured Velocities — thin scrollable `Window`
-  shells around the two editor panels (always enabled; prefill bullet + weather from the active window when
-  there is one), plus `AtmosphereDialog` for the velocities editor. Convert Ballistic Coefficient — the same
-  shell pattern around `BcConverterPanel`, sharing that `AtmosphereDialog`; seeds the source BC from the active
-  window's ammunition (skipping a GC or form-factor one, which cannot be converted). Edit Sights / Edit Barrels —
+  shells around the two editor panels (always enabled), plus `AtmosphereDialog` for the velocities editor. Convert Ballistic Coefficient — the same
+  shell pattern around `BcConverterPanel`, sharing that `AtmosphereDialog`. Hit Probability — the only Tools
+  entry that reads the active shot (enabled with an active trajectory window only); its title names the shot.
+  **The drag table editors and the BC converter deliberately open empty** — they describe a bullet or a
+  published coefficient the user is working from, not whatever trajectory happens to be open; only the
+  measurement system follows the active window, being a display preference rather than data.
+  Edit Sights / Edit Barrels —
   master-detail dictionary editors that save the merged `data/dictionaries.xml`
   (`SightListEditorDialog` / `BarrelListEditorDialog`).
 - `TrajectoryView` tabs: Table, Chart, Reticle, Summary. Coarse display trajectory + one shared **fine**
@@ -171,8 +178,9 @@ From **`claude/07-25-plan.md`** (1.1.11 `Tools` namespace):
    (`DrgDragTableFactory` / `Tools.RadarDragTableFactory`), saved as `.drg`.~~ **Done** — see
    `claude/Archive/07-26-drg-plan.md`. Two editors under Tools → Approximate Drag Table, with all-or-nothing CSV
    import and full header metadata. Interactive smoke pass still to do.
-3. Tools menu → **Hit probability** (`Tools.HitProbability`). **Pending.** Open decisions recorded there:
-   scatter plot (ScottPlot) vs numbers only, and the default target distance.
+3. ~~Tools menu → **Hit probability** (`Tools.HitProbability`).~~ **Done** (2026-07-27) — see
+   `claude/07-27-hit-probability-plan.md`. Interactive smoke pass still to do; the proposed error-budget
+   defaults (range 2%, wind 30%, MV 0.7%) and the 1 MOA group default are judgement calls awaiting review.
 4. ~~Tools menu → **BC converter** (`Tools.BallisticCoefficientConverter`).~~ **Done** (2026-07-27).
    `BcConversionCalculator` + `BcConverterPanel` + `BcConverterDialog`: Source BC / Destination Table /
    Reference Velocity → a live read-only Target BC. A converted BC is exact only at its reference — ~1% at

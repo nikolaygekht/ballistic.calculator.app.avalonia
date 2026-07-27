@@ -146,7 +146,10 @@ public partial class MainWindow : Window
         AddChildWindow(view, title);
     }
 
-    private void AddChildWindow(IAppChildWindow content, string title)
+    /// <summary>The open child windows, in the order they were opened — the order the Windows menu lists.</summary>
+    internal IReadOnlyList<ManagedWindow> ChildWindows => _managedWindows;
+
+    internal void AddChildWindow(IAppChildWindow content, string title)
     {
         var window = new ManagedWindow
         {
@@ -231,7 +234,7 @@ public partial class MainWindow : Window
         {
             var compareView = (CompareView)compareWindow.Content!;
             compareView.AddTrajectory(chartTrajectory);
-            compareWindow.Activate();
+            BringToFront(compareWindow);
         }
         else
         {
@@ -274,9 +277,25 @@ public partial class MainWindow : Window
         {
             var w = _managedWindows[i];
             var item = new MenuItem { Header = $"_{i + 1} {w.Title}" };
-            item.Click += (_, _) => w.Activate();
+            item.Click += (_, _) => BringToFront(w);
             MenuWindows.Items.Add(item);
         }
+    }
+
+    /// <summary>
+    /// Brings a child window to the front — see <see cref="WindowActivation"/> for why calling
+    /// <c>Activate()</c> on its own is not enough.
+    /// </summary>
+    internal static void BringToFront(ManagedWindow window)
+    {
+        var plan = WindowActivation.For(window.WindowState, window.IsActive);
+
+        if (plan.Restore)
+            window.WindowState = WindowState.Normal;
+        if (plan.Activate)
+            window.Activate();
+        if (plan.BringToTop)
+            window.BringToTop();
     }
 
     private void UpdateWindowsMenuCheckmarks()
@@ -316,7 +335,7 @@ public partial class MainWindow : Window
             w.Position = new PixelPoint(WindowOffset * i, WindowOffset * i);
         }
 
-        _managedWindows[^1].Activate();
+        BringToFront(_managedWindows[^1]);
     }
 
     private void SetupMenuHandlers()
@@ -373,6 +392,7 @@ public partial class MainWindow : Window
         MenuToolsDrgFromBc.Click += async (_, _) => await ShowDrgEditor(fromBcCurve: true);
         MenuToolsDrgFromVelocities.Click += async (_, _) => await ShowDrgEditor(fromBcCurve: false);
         MenuToolsBcConverter.Click += async (_, _) => await ShowBcConverter();
+        MenuToolsHitProbability.Click += async (_, _) => await ShowHitProbability();
 
         // Windows
         MenuWindowsCascade.Click += (_, _) => CascadeWindows();
@@ -392,34 +412,50 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Opens one of the custom drag table (<c>.drg</c>) generators. Both are standalone — they need no open
-    /// trajectory — but when one is active its ammunition and weather prefill the bullet and measurement
-    /// conditions.
+    /// Opens one of the custom drag table (<c>.drg</c>) generators. Both are standalone and open <b>empty</b>:
+    /// they describe a bullet being characterised from a data sheet or radar session, which has nothing to do
+    /// with whatever trajectory happens to be open. Only the measurement system follows the active window, and
+    /// that is a display preference rather than data.
     /// </summary>
     private async Task ShowDrgEditor(bool fromBcCurve)
     {
-        var trajectory = _activeChild as ITrajectoryChildWindow;
-        var system = trajectory?.MeasurementSystem ?? MeasurementSystem.Imperial;
-        var ammunition = trajectory?.ShotData?.Ammunition?.Ammunition;
+        var system = (_activeChild as ITrajectoryChildWindow)?.MeasurementSystem ?? MeasurementSystem.Imperial;
 
         Window dialog = fromBcCurve
-            ? new Dialogs.ApproximateDrgFromBcDialog(system, _fileDialogService, ammunition)
-            : new Dialogs.ApproximateDrgFromVelocitiesDialog(system, _fileDialogService, ammunition,
-                                                             trajectory?.ShotData?.Atmosphere);
+            ? new Dialogs.ApproximateDrgFromBcDialog(system, _fileDialogService)
+            : new Dialogs.ApproximateDrgFromVelocitiesDialog(system, _fileDialogService);
 
         await dialog.ShowDialog<bool?>(this);
     }
 
     /// <summary>
-    /// Opens the BC converter. Standalone like the drag table generators — but when a trajectory is active its
-    /// ammunition seeds the source coefficient and its weather the speed of sound.
+    /// Opens the BC converter. Standalone like the drag table generators, and likewise <b>empty</b>: the
+    /// coefficient being converted is one the user is reading off a data sheet, not the one in an open shot.
     /// </summary>
     private async Task ShowBcConverter()
     {
-        var trajectory = _activeChild as ITrajectoryChildWindow;
-        var dialog = new Dialogs.BcConverterDialog(trajectory?.MeasurementSystem ?? MeasurementSystem.Imperial,
-                                                  trajectory?.ShotData?.Ammunition?.Ammunition,
-                                                  trajectory?.ShotData?.Atmosphere);
+        var system = (_activeChild as ITrajectoryChildWindow)?.MeasurementSystem ?? MeasurementSystem.Imperial;
+        var dialog = new Dialogs.BcConverterDialog(system);
+
+        await dialog.ShowDialog<bool?>(this);
+    }
+
+    /// <summary>
+    /// Opens the hit probability estimator for the active trajectory. Unlike the other Tools windows this one
+    /// needs a shot — everything but the target and the error budget comes from it — so the menu item is
+    /// disabled without one.
+    /// </summary>
+    private async Task ShowHitProbability()
+    {
+        if (_activeChild is not ITrajectoryChildWindow trajectory || trajectory.ShotData == null)
+            return;
+
+        var name = string.IsNullOrWhiteSpace(trajectory.FileName)
+            ? trajectory.ShotData.Ammunition?.Name
+            : System.IO.Path.GetFileNameWithoutExtension(trajectory.FileName);
+
+        var dialog = new Dialogs.HitProbabilityDialog(trajectory.MeasurementSystem, trajectory.AngularUnits,
+                                                     trajectory.ShotData, name);
 
         await dialog.ShowDialog<bool?>(this);
     }
@@ -446,6 +482,9 @@ public partial class MainWindow : Window
 
         // Edit parameters
         MenuViewEditParameters.IsEnabled = isTrajectory;
+
+        // Hit probability estimates against a specific shot; the other Tools entries are standalone.
+        MenuToolsHitProbability.IsEnabled = isTrajectory;
 
         // Measurement system
         MenuViewSystemImperial.IsEnabled = isAnyChild;

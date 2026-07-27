@@ -63,27 +63,6 @@ public partial class BcConverterPanel : UserControl
         }
     }
 
-    /// <summary>
-    /// Takes the source coefficient from an ammunition (typically the active shot's). A custom-table (GC) or
-    /// form-factor coefficient is ignored: it cannot be converted, so prefilling it would only show an error.
-    /// </summary>
-    public Ammunition? Prefill
-    {
-        set
-        {
-            var bc = value?.BallisticCoefficient;
-            if (bc == null ||
-                bc.Value.Table == DragTableId.GC ||
-                bc.Value.ValueType != BallisticCoefficientValueType.Coefficient ||
-                bc.Value.Value <= 0)
-                return;
-
-            SourceBcControl.Value = bc.Value;
-            SelectTargetTable(DefaultTargetFor(bc.Value.Table));
-            Recalculate();
-        }
-    }
-
     /// <summary>The table the source is being converted to.</summary>
     internal DragTableId TargetTable =>
         TableCombo.SelectedItem is DragTableId id ? id : DragTableId.G1;
@@ -141,11 +120,8 @@ public partial class BcConverterPanel : UserControl
         VelocityControl.ChangeUnit(metric ? VelocityUnit.MetersPerSecond : VelocityUnit.FeetPerSecond);
     }
 
-    /// <summary>Selects a destination table; used by the host, the prefill and the tests.</summary>
+    /// <summary>Selects a destination table; used by the host and the tests.</summary>
     internal void SelectTargetTable(DragTableId table) => TableCombo.SelectedItem = table;
-
-    private static DragTableId DefaultTargetFor(DragTableId source) =>
-        source == DragTableId.G7 ? DragTableId.G1 : DragTableId.G7;
 
     #endregion
 

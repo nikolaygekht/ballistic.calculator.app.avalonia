@@ -1,0 +1,184 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="using:BallisticCalculator.Controls.Controls"
+             xmlns:ScottPlot="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="520"
+             x:Class="BallisticCalculator.Panels.Panels.HitProbabilityPanel">
+
+  <Grid ColumnDefinitions="Auto,12,*" RowDefinitions="*,Auto">
+
+    <!-- ── Inputs ───────────────────────────────────────────────────────────────────── -->
+    <StackPanel Grid.Row="0" Grid.Column="0" Spacing="4" Width="290">
+
+      <TextBlock Text="Target" FontWeight="SemiBold" FontSize="{DynamicResource AppFontSize}"/>
+
+      <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Distance" VerticalAlignment="Center"
+                   Margin="0,0,8,0" FontSize="{DynamicResource AppFontSize}"/>
+        <controls:MeasurementControl Grid.Row="0" Grid.Column="1"
+                                     x:Name="DistanceControl" x:FieldModifier="internal"
+                                     FontSize="{DynamicResource AppFontSize}"/>
+
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Vital zone" VerticalAlignment="Center"
+                   Margin="0,8,8,0" FontSize="{DynamicResource AppFontSize}"/>
+        <controls:MeasurementControl Grid.Row="1" Grid.Column="1"
+                                     x:Name="TargetSizeControl" x:FieldModifier="internal"
+                                     Margin="0,8,0,0" FontSize="{DynamicResource AppFontSize}"/>
+      </Grid>
+
+      <Separator/>
+      <TextBlock Text="Shooter" FontWeight="SemiBold" FontSize="{DynamicResource AppFontSize}"/>
+
+      <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto">
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Group (1σ)" VerticalAlignment="Center"
+                   Margin="0,0,8,0" FontSize="{DynamicResource AppFontSize}"/>
+        <controls:MeasurementControl Grid.Row="0" Grid.Column="1"
+                                     x:Name="GroupControl" x:FieldModifier="internal"
+                                     FontSize="{DynamicResource AppFontSize}"/>
+
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Position" VerticalAlignment="Center"
+                   Margin="0,8,8,0" FontSize="{DynamicResource AppFontSize}"/>
+        <ComboBox Grid.Row="1" Grid.Column="1" x:Name="PositionCombo" x:FieldModifier="internal"
+                  HorizontalAlignment="Stretch" Margin="0,8,0,0"
+                  FontSize="{DynamicResource AppFontSize}"/>
+
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Spread H ×" VerticalAlignment="Center"
+                   Margin="0,8,8,0" FontSize="{DynamicResource AppFontSize}"/>
+        <NumericUpDown Grid.Row="2" Grid.Column="1" x:Name="SpreadHInput" x:FieldModifier="internal"
+                       Minimum="0.1" Maximum="20" Increment="0.1" FormatString="0.##"
+                       Margin="0,8,0,0" FontSize="{DynamicResource AppFontSize}"/>
+
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Spread V ×" VerticalAlignment="Center"
+                   Margin="0,8,8,0" FontSize="{DynamicResource AppFontSize}"/>
+        <NumericUpDown Grid.Row="3" Grid.Column="1" x:Name="SpreadVInput" x:FieldModifier="internal"
+                       Minimum="0.1" Maximum="20" Increment="0.1" FormatString="0.##"
+                       Margin="0,8,0,0" FontSize="{DynamicResource AppFontSize}"/>
+      </Grid>
+
+      <Separator/>
+      <TextBlock Text="Estimation error (1σ, %)" FontWeight="SemiBold"
+                 FontSize="{DynamicResource AppFontSize}"/>
+
+      <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Range" VerticalAlignment="Center"
+                   Margin="0,0,8,0" FontSize="{DynamicResource AppFontSize}"/>
+        <NumericUpDown Grid.Row="0" Grid.Column="1" x:Name="RangeErrorInput" x:FieldModifier="internal"
+                       Minimum="0" Maximum="100" Increment="1" FormatString="0.##"
+                       FontSize="{DynamicResource AppFontSize}"/>
+
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Wind" VerticalAlignment="Center"
+                   Margin="0,8,8,0" FontSize="{DynamicResource AppFontSize}"/>
+        <NumericUpDown Grid.Row="1" Grid.Column="1" x:Name="WindErrorInput" x:FieldModifier="internal"
+                       Minimum="0" Maximum="100" Increment="1" FormatString="0.##"
+                       Margin="0,8,0,0" FontSize="{DynamicResource AppFontSize}"/>
+      </Grid>
+
+      <Separator/>
+      <TextBlock Text="Ammunition" FontWeight="SemiBold" FontSize="{DynamicResource AppFontSize}"/>
+
+      <!-- Not an estimation error: this is how consistently the ammunition leaves the barrel. -->
+      <Grid ColumnDefinitions="Auto,*">
+        <TextBlock Grid.Column="0" Text="MV deviation (1σ, %)" VerticalAlignment="Center"
+                   Margin="0,0,8,0" FontSize="{DynamicResource AppFontSize}"/>
+        <NumericUpDown Grid.Column="1" x:Name="MvDeviationInput" x:FieldModifier="internal"
+                       Minimum="0" Maximum="10" Increment="0.1" FormatString="0.##"
+                       FontSize="{DynamicResource AppFontSize}"/>
+      </Grid>
+
+      <Separator/>
+      <TextBlock Text="Simulation" FontWeight="SemiBold" FontSize="{DynamicResource AppFontSize}"/>
+
+      <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Shots" VerticalAlignment="Center"
+                   Margin="0,0,8,0" FontSize="{DynamicResource AppFontSize}"/>
+        <NumericUpDown Grid.Row="0" Grid.Column="1" x:Name="ShotsInput" x:FieldModifier="internal"
+                       Minimum="1000" Maximum="50000" Increment="1000" FormatString="0"
+                       FontSize="{DynamicResource AppFontSize}"/>
+
+        <!-- Empty is meaningful here: no seed means re-roll, so the answer moves by the Monte-Carlo noise. -->
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Seed" VerticalAlignment="Center"
+                   Margin="0,8,8,0" FontSize="{DynamicResource AppFontSize}"/>
+        <NumericUpDown Grid.Row="1" Grid.Column="1" x:Name="SeedInput" x:FieldModifier="internal"
+                       Minimum="0" Maximum="2147483647" Increment="1" FormatString="0"
+                       Margin="0,8,0,0" FontSize="{DynamicResource AppFontSize}"/>
+      </Grid>
+
+      <TextBlock x:Name="NoteText" x:FieldModifier="internal"
+                 Text="Group size is a 1σ per-axis figure — about a quarter of the extreme spread of a large group. The estimate assumes your come-up and wind hold are correct for the range and wind you estimated, and a circular vital zone."
+                 Foreground="Gray" TextWrapping="Wrap" Margin="0,4,0,0"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </StackPanel>
+
+    <!-- ── Results ──────────────────────────────────────────────────────────────────── -->
+    <Grid Grid.Row="0" Grid.Column="2" RowDefinitions="Auto,Auto,Auto,*,Auto">
+
+      <TextBlock Grid.Row="0" Text="Hit probability" FontWeight="SemiBold"
+                 FontSize="{DynamicResource AppFontSize}"/>
+
+      <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8" Margin="0,2,0,0">
+        <TextBlock x:Name="ProbabilityText" x:FieldModifier="internal" Text=""
+                   FontSize="28" FontWeight="Bold" VerticalAlignment="Center"/>
+        <TextBlock Text="single shot" Foreground="Gray" VerticalAlignment="Bottom" Margin="0,0,0,6"
+                   FontSize="{DynamicResource AppFontSize}"/>
+      </StackPanel>
+
+      <!-- Shots for a first hit -->
+      <Grid Grid.Row="2" ColumnDefinitions="*,*,*,*,*" RowDefinitions="Auto,Auto" Margin="0,8,0,0">
+        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" Text="Shots for a first hit"
+                   FontWeight="SemiBold" Margin="0,0,0,2"
+                   FontSize="{DynamicResource AppFontSize}"/>
+        <StackPanel Grid.Row="1" Grid.Column="0">
+          <TextBlock Text="50%" Foreground="Gray" FontSize="{DynamicResource AppFontSize}"/>
+          <TextBlock x:Name="Hit50Text" x:FieldModifier="internal" Text=""
+                     FontSize="{DynamicResource AppFontSize}"/>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="1">
+          <TextBlock Text="75%" Foreground="Gray" FontSize="{DynamicResource AppFontSize}"/>
+          <TextBlock x:Name="Hit75Text" x:FieldModifier="internal" Text=""
+                     FontSize="{DynamicResource AppFontSize}"/>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="2">
+          <TextBlock Text="90%" Foreground="Gray" FontSize="{DynamicResource AppFontSize}"/>
+          <TextBlock x:Name="Hit90Text" x:FieldModifier="internal" Text=""
+                     FontSize="{DynamicResource AppFontSize}"/>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="3">
+          <TextBlock Text="95%" Foreground="Gray" FontSize="{DynamicResource AppFontSize}"/>
+          <TextBlock x:Name="Hit95Text" x:FieldModifier="internal" Text=""
+                     FontSize="{DynamicResource AppFontSize}"/>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="4">
+          <TextBlock Text="98%" Foreground="Gray" FontSize="{DynamicResource AppFontSize}"/>
+          <TextBlock x:Name="Hit98Text" x:FieldModifier="internal" Text=""
+                     FontSize="{DynamicResource AppFontSize}"/>
+        </StackPanel>
+      </Grid>
+
+      <Border Grid.Row="3" BorderThickness="1" BorderBrush="Gray" Margin="0,8,0,0" MinHeight="240">
+        <ScottPlot:AvaPlot x:Name="ImpactPlot" x:FieldModifier="internal"/>
+      </Border>
+
+      <TextBlock Grid.Row="4" x:Name="SpreadText" x:FieldModifier="internal" Text=""
+                 Foreground="Gray" TextWrapping="Wrap" Margin="0,4,0,0"
+                 FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <!-- ── Status + actions ─────────────────────────────────────────────────────────── -->
+    <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" ColumnDefinitions="*,Auto" Margin="0,8,0,0">
+      <TextBlock Grid.Column="0" x:Name="StatusText" x:FieldModifier="internal"
+                 TextWrapping="Wrap" MinHeight="32" VerticalAlignment="Center"
+                 FontSize="{DynamicResource AppFontSize}"/>
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+        <Button x:Name="EstimateButton" x:FieldModifier="internal" Content="Estimate"
+                Click="OnEstimate" Width="90" IsDefault="True"
+                FontSize="{DynamicResource AppFontSize}"/>
+        <Button x:Name="CloseButton" x:FieldModifier="internal" Content="Close"
+                Click="OnClose" Width="90"
+                FontSize="{DynamicResource AppFontSize}"/>
+      </StackPanel>
+    </Grid>
+
+  </Grid>
+</UserControl>

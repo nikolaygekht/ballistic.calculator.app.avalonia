@@ -164,26 +164,6 @@ public class DrgFromBcPanelTests
         panel.Knots.Select(k => k.Mach).Should().BeInAscendingOrder();
     }
 
-    [AvaloniaFact]
-    public void Prefill_ShouldFillMetadataFields()
-    {
-        var panel = new DrgFromBcPanel
-        {
-            Prefill = new Ammunition
-            {
-                Weight = new Measurement<WeightUnit>(220, WeightUnit.Grain),
-                BallisticCoefficient = new BallisticCoefficient(0.5, DragTableId.G7),
-                MuzzleVelocity = new Measurement<VelocityUnit>(2600, VelocityUnit.FeetPerSecond),
-                BulletDiameter = new Measurement<DistanceUnit>(0.308, DistanceUnit.Inch),
-                BulletLength = new Measurement<DistanceUnit>(1.226, DistanceUnit.Inch),
-            },
-        };
-
-        panel.WeightControl.GetValue<WeightUnit>()!.Value.In(WeightUnit.Grain).Should().BeApproximately(220, 0.01);
-        panel.DiameterControl.GetValue<DistanceUnit>()!.Value.In(DistanceUnit.Inch).Should().BeApproximately(0.308, 1e-6);
-        panel.LengthControl.GetValue<DistanceUnit>()!.Value.In(DistanceUnit.Inch).Should().BeApproximately(1.226, 1e-6);
-    }
-
     #endregion
 
     #region Import

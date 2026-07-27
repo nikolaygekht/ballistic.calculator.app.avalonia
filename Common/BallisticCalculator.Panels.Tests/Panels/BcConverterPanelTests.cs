@@ -262,42 +262,7 @@ public class BcConverterPanelTests
 
     #endregion
 
-    #region Prefill and units
-
-    [AvaloniaFact]
-    public void Prefill_ShouldTakeTheSourceCoefficientFromTheAmmunition()
-    {
-        // Arrange
-        var ammo = new Ammunition(new Measurement<WeightUnit>(168, WeightUnit.Grain),
-                                  new BallisticCoefficient(0.223, DragTableId.G7),
-                                  new Measurement<VelocityUnit>(2700, VelocityUnit.FeetPerSecond));
-        var panel = new BcConverterPanel();
-
-        // Act
-        panel.Prefill = ammo;
-
-        // Assert
-        panel.SourceBcControl.Value!.Value.Value.Should().BeApproximately(0.223, 1e-9);
-        panel.SourceBcControl.Value!.Value.Table.Should().Be(DragTableId.G7);
-        panel.TargetTable.Should().Be(DragTableId.G1, "a G7 source is asking to be read as G1");
-    }
-
-    [AvaloniaFact]
-    public void Prefill_WithACustomTableAmmunition_ShouldLeaveTheSourceAlone()
-    {
-        // Arrange: a GC coefficient cannot be converted, so prefilling it would only produce an error
-        var ammo = new Ammunition(new Measurement<WeightUnit>(168, WeightUnit.Grain),
-                                  new BallisticCoefficient(1.0, DragTableId.GC,
-                                                           BallisticCoefficientValueType.FormFactor),
-                                  new Measurement<VelocityUnit>(2700, VelocityUnit.FeetPerSecond));
-        var panel = new BcConverterPanel();
-
-        // Act
-        panel.Prefill = ammo;
-
-        // Assert
-        panel.SourceBcControl.IsEmpty.Should().BeTrue();
-    }
+    #region Units
 
     [AvaloniaFact]
     public void MeasurementSystem_Metric_ShouldSwitchTheReferenceVelocityToMetresPerSecond()

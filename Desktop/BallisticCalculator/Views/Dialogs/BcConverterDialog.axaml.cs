@@ -12,19 +12,15 @@ public partial class BcConverterDialog : Window
 {
     private readonly MeasurementSystem _system;
 
-    public BcConverterDialog(MeasurementSystem system, Ammunition? prefill = null, Atmosphere? atmosphere = null)
+    public BcConverterDialog(MeasurementSystem system)
     {
         _system = system;
         InitializeComponent();
 
         ConverterPanel.MeasurementSystem = system;
 
-        // Default to the active shot's air when there is one; the panel treats null as standard.
-        if (atmosphere != null)
-            ConverterPanel.Atmosphere = atmosphere;
-
-        ConverterPanel.Prefill = prefill;
-
+        // Nothing is taken from an open trajectory: the coefficient being converted is one the user is reading
+        // off a data sheet. The panel treats a null atmosphere as sea-level standard.
         ConverterPanel.CloseRequested += (_, _) => Close(true);
         ConverterPanel.AtmosphereRequested += async (_, _) => await EditAtmosphere();
     }

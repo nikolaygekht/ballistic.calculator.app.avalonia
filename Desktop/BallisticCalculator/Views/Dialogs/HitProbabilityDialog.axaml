@@ -1,0 +1,15 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:panels="using:BallisticCalculator.Panels.Panels"
+        x:Class="BallisticCalculator.Views.Dialogs.HitProbabilityDialog"
+        Title="Hit Probability"
+        Width="860" Height="600"
+        MinWidth="700" MinHeight="480"
+        FontSize="{DynamicResource AppFontSize}"
+        WindowStartupLocation="CenterOwner"
+        CanResize="true">
+
+  <!-- No ScrollViewer: the plot must take the space it is given, and the inputs are a fixed-height column. -->
+  <panels:HitProbabilityPanel x:Name="EstimatorPanel" x:FieldModifier="internal" Margin="12"
+                              FontSize="{DynamicResource AppFontSize}"/>
+</Window>

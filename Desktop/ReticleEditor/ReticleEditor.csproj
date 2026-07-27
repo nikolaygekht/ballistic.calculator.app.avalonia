@@ -25,8 +25,8 @@
       <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
       <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="BallisticCalculator" Version="1.1.11.3" />
-    <PackageReference Include="Gehtsoft.Measurements" Version="1.1.17" />
+    <PackageReference Include="BallisticCalculator" Version="1.1.12" />
+    <PackageReference Include="Gehtsoft.Measurements" Version="1.1.18" />
   </ItemGroup>
 
   <ItemGroup>

@@ -130,8 +130,14 @@ new Atmosphere(Measurement<DistanceUnit> altitude,
                double humidity)
 Atmosphere.CreateICAOAtmosphere(Measurement<DistanceUnit> altitude, double humidity = 0)
 ```
-Read-only properties: `Altitude`, `Pressure`, `Temperature`, `Humidity`, `SoundVelocity`, `Density`.
+Read-only properties: `Altitude`, `Pressure`, `Temperature`, `Humidity`, `SoundVelocity`, `Density`,
+`DensityAltitude` (1.1.12 — the standard-atmosphere altitude matching this air's density, humidity included).
 Static: `Atmosphere.StandardDensity`.
+
+`Density` is computed from the resolved station `Pressure`, so it is consistent with what the engine uses (this
+was wrong before 1.1.12 — up to 21% high at 5000 ft with `pressureAtSeaLevel: true`). `DensityAltitude` is
+baselined on the ICAO sea-level density, **not** `Atmosphere.StandardDensity` — they differ by ~0.005% (~1.9 ft)
+and are not interchangeable.
 
 ### Wind
 ```csharp
@@ -341,7 +347,9 @@ All three techniques use table id **`GC`** and require passing the `DragTable` i
 - **`GC` (custom) drag** requires passing the `DragTable` to **both** `CalculateZeroParameters` and
   `Calculate`; `DragTable.Get(DragTableId.GC)` throws — you must supply the instance.
 - The returned array may contain **fewer rows** than requested (subsonic/steep runs stop early).
-- No aerodynamic (vertical wind) jump term is modelled; a pure crosswind affects windage, not drop.
+- **Crosswind aerodynamic jump IS modelled** (Litz, Applied Ballistics Eq 5.4), so a pure crosswind moves the
+  point of impact **vertically** as well as horizontally. Like spin drift it needs `Rifling` **and** the bullet
+  diameter **and** length; without them the term is absent. Right twist + wind from the right lifts the impact.
 
 ---
 

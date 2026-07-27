@@ -106,6 +106,8 @@
                     <MenuItem Header="From Measured _Velocities..." x:Name="MenuToolsDrgFromVelocities" />
                 </MenuItem>
                 <MenuItem Header="Convert Ballistic _Coefficient..." x:Name="MenuToolsBcConverter" />
+                <MenuItem Header="Hit _Probability..." x:Name="MenuToolsHitProbability"
+                          IsEnabled="False" />
             </MenuItem>
 
             <!-- Windows Menu -->

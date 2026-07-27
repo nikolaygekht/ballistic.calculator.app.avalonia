@@ -47,23 +47,6 @@ public partial class DrgFromVelocitiesPanel : UserControl
         }
     }
 
-    /// <summary>Fills the header metadata from an ammunition (typically the active shot's).</summary>
-    public Ammunition? Prefill
-    {
-        set
-        {
-            if (value == null)
-                return;
-
-            if (value.Weight.Value > 0)
-                WeightControl.SetValue(value.Weight);
-            if (value.BulletDiameter.HasValue && value.BulletDiameter.Value.Value > 0)
-                DiameterControl.SetValue(value.BulletDiameter.Value);
-            if (value.BulletLength.HasValue && value.BulletLength.Value.Value > 0)
-                LengthControl.SetValue(value.BulletLength.Value);
-        }
-    }
-
     /// <summary>
     /// The air the readings were measured in. Null means sea-level standard; the Set Atmosphere button asks
     /// the host to edit it, because the same velocities recorded in thinner air mean a different drag curve.

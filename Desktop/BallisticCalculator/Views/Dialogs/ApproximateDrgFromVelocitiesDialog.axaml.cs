@@ -13,20 +13,16 @@ public partial class ApproximateDrgFromVelocitiesDialog : Window
 {
     private readonly MeasurementSystem _system;
 
-    public ApproximateDrgFromVelocitiesDialog(MeasurementSystem system, IFileDialogService fileDialogService,
-                                              Ammunition? prefill = null, Atmosphere? atmosphere = null)
+    public ApproximateDrgFromVelocitiesDialog(MeasurementSystem system, IFileDialogService fileDialogService)
     {
         _system = system;
         InitializeComponent();
 
         EditorPanel.MeasurementSystem = system;
         EditorPanel.FileDialogService = fileDialogService;
-        EditorPanel.Prefill = prefill;
 
-        // Default to the active shot's conditions when there are any; the panel treats null as standard.
-        if (atmosphere != null)
-            EditorPanel.Atmosphere = atmosphere;
-
+        // Nothing is taken from an open trajectory: the bullet and the air here belong to the measurement
+        // session the data came from. The panel treats a null atmosphere as sea-level standard.
         EditorPanel.CloseRequested += (_, _) => Close(true);
         EditorPanel.AtmosphereRequested += async (_, _) => await EditAtmosphere();
     }

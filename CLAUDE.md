@@ -15,7 +15,8 @@ Create a new version of the BallisticCalculator application using **Avalonia UI*
   - Provides generic `Measurement<T>` struct where T is a unit enum (DistanceUnit, VelocityUnit, WeightUnit, etc.)
   - Static method: `Measurement<T>.GetUnitNames()` returns `Tuple<T, string>[]` for populating unit lists
 
-- **BallisticCalculator** (NuGet **1.1.11.3**, capped `[1.1.x,2)`): Core ballistic calculation library.
+- **BallisticCalculator** (NuGet **1.1.12**; the `PackageReference`s pin exact versions, they are not ranges):
+  Core ballistic calculation library.
   Source at `/mnt/d/develop/components/BusinessSpecificComponents/BallisticCalculator.Net/`.
   - Provides `BallisticCoefficient` struct, `DragTableId` enum, and the calculation engine.
   - **`.drg` metadata (1.1.11.2):** the header carries name, weight, diameter, **bullet length** and
@@ -32,7 +33,14 @@ Create a new version of the BallisticCalculator application using **Avalonia UI*
     also has `ShotDropAdjustment`/`ShotWindageAdjustment` (dialed clicks), `BarrelAzimuth`, `Latitude`.
   - **`BallisticCalculator.Tools`** namespace: `PointBlankRange`, `MovingTargetLead`, `HitProbability`,
     `RadarDragTableFactory`, `BallisticCoefficientConverter` (see the `ballistic-calculator` skill).
-  - Consult the `ballistic-calculator` skill before using this API; it reflects the 1.1.11 surface.
+  - **Atmosphere (1.1.12):** `Density` is now computed from the resolved station `Pressure` rather than the
+    constructor's `pressure` argument — it was up to 21% high at 5000 ft with `pressureAtSeaLevel: true`. **No
+    trajectory, zero or drag result changes** (the engine always read the resolved pressure); only the public
+    property. `CreateICAOAtmosphere` no longer feeds `humidity` into the base-altitude slot (~0.008% of
+    pressure, and only for calls that passed a humidity). New `Atmosphere.DensityAltitude` — the
+    standard-atmosphere altitude matching this air's density; note its baseline is the ICAO sea-level density,
+    **not** `Atmosphere.StandardDensity` (they differ ~0.005%, about 1.9 ft, and are not interchangeable).
+  - Consult the `ballistic-calculator` skill before using this API; it reflects the 1.1.12 surface.
 
 ### Original Implementation
 - **Old WinForms Application**: `/mnt/d/develop/homeapps.projects/BallisticCalculator1/`

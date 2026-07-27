@@ -31,6 +31,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{07C2787E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DependencyUpdater", "Tools\DependencyUpdater\DependencyUpdater.csproj", "{7A89178B-9B5E-4359-8185-CD1F9569587E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BallisticCalculator.Tests", "Desktop\BallisticCalculator.Tests\BallisticCalculator.Tests.csproj", "{9F40A31C-444F-4768-B4ED-A6A97693E4A7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -173,6 +175,18 @@ Global
 		{7A89178B-9B5E-4359-8185-CD1F9569587E}.Release|x64.Build.0 = Release|Any CPU
 		{7A89178B-9B5E-4359-8185-CD1F9569587E}.Release|x86.ActiveCfg = Release|Any CPU
 		{7A89178B-9B5E-4359-8185-CD1F9569587E}.Release|x86.Build.0 = Release|Any CPU
+		{9F40A31C-444F-4768-B4ED-A6A97693E4A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F40A31C-444F-4768-B4ED-A6A97693E4A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F40A31C-444F-4768-B4ED-A6A97693E4A7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9F40A31C-444F-4768-B4ED-A6A97693E4A7}.Debug|x64.Build.0 = Debug|Any CPU
+		{9F40A31C-444F-4768-B4ED-A6A97693E4A7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9F40A31C-444F-4768-B4ED-A6A97693E4A7}.Debug|x86.Build.0 = Debug|Any CPU
+		{9F40A31C-444F-4768-B4ED-A6A97693E4A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F40A31C-444F-4768-B4ED-A6A97693E4A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F40A31C-444F-4768-B4ED-A6A97693E4A7}.Release|x64.ActiveCfg = Release|Any CPU
+		{9F40A31C-444F-4768-B4ED-A6A97693E4A7}.Release|x64.Build.0 = Release|Any CPU
+		{9F40A31C-444F-4768-B4ED-A6A97693E4A7}.Release|x86.ActiveCfg = Release|Any CPU
+		{9F40A31C-444F-4768-B4ED-A6A97693E4A7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -189,5 +203,6 @@ Global
 		{7D01FBF2-39BA-41BD-99D2-D6B1ECD00692} = {0706A038-862D-4E8A-892F-789EF48548FC}
 		{7E6CF6AF-EF2C-41B3-A278-6234F0095592} = {0706A038-862D-4E8A-892F-789EF48548FC}
 		{7A89178B-9B5E-4359-8185-CD1F9569587E} = {07C2787E-EAC7-C090-1BA3-A61EC2A24D84}
+		{9F40A31C-444F-4768-B4ED-A6A97693E4A7} = {0706A038-862D-4E8A-892F-789EF48548FC}
 	EndGlobalSection
 EndGlobal
