@@ -1,0 +1,68 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="using:BallisticCalculator.Controls.Controls"
+             mc:Ignorable="d" d:DesignWidth="440" d:DesignHeight="260"
+             x:Class="BallisticCalculator.Panels.Panels.BcConverterPanel">
+
+  <StackPanel Spacing="4">
+
+    <!-- One grid for all four fields: the labels share an Auto column, so they align and cannot be
+         clipped at a larger AppFontSize. -->
+    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+
+      <TextBlock Grid.Row="0" Grid.Column="0" Text="Source BC" VerticalAlignment="Center"
+                 Margin="0,0,8,0" FontSize="{DynamicResource AppFontSize}"/>
+      <!-- GC is not offered: a custom curve has no fixed shape to convert against, on either side. -->
+      <controls:BallisticCoefficientControl Grid.Row="0" Grid.Column="1"
+                                            x:Name="SourceBcControl" x:FieldModifier="internal"
+                                            AllowCustomTable="False"
+                                            FontSize="{DynamicResource AppFontSize}"/>
+
+      <TextBlock Grid.Row="1" Grid.Column="0" Text="Destination Table" VerticalAlignment="Center"
+                 Margin="0,8,8,0" FontSize="{DynamicResource AppFontSize}"/>
+      <ComboBox Grid.Row="1" Grid.Column="1" x:Name="TableCombo" x:FieldModifier="internal"
+                HorizontalAlignment="Stretch" Margin="0,8,0,0"
+                FontSize="{DynamicResource AppFontSize}"/>
+
+      <TextBlock Grid.Row="2" Grid.Column="0" Text="Reference Velocity" VerticalAlignment="Center"
+                 Margin="0,8,8,0" FontSize="{DynamicResource AppFontSize}"/>
+      <controls:MeasurementControl Grid.Row="2" Grid.Column="1"
+                                   x:Name="VelocityControl" x:FieldModifier="internal"
+                                   Margin="0,8,0,0"
+                                   FontSize="{DynamicResource AppFontSize}"/>
+
+      <Separator Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,8,0,0"/>
+
+      <TextBlock Grid.Row="4" Grid.Column="0" Text="Target BC" VerticalAlignment="Center"
+                 Margin="0,8,8,0" FontSize="{DynamicResource AppFontSize}"/>
+      <!-- An output, but a TextBox so the value can be selected and copied. -->
+      <TextBox Grid.Row="4" Grid.Column="1" x:Name="TargetBox" x:FieldModifier="internal"
+               IsReadOnly="True" Text="" Margin="0,8,0,0"
+               FontSize="{DynamicResource AppFontSize}"/>
+    </Grid>
+
+    <TextBlock x:Name="NoteText" x:FieldModifier="internal"
+               Text="A converted coefficient is only exact at its reference velocity — the two curves differ in shape, so use the velocity of the range band you care about."
+               Foreground="Gray" TextWrapping="Wrap"
+               FontSize="{DynamicResource AppFontSize}"/>
+
+    <TextBlock x:Name="WarningText" x:FieldModifier="internal"
+               IsVisible="False" Foreground="Firebrick" TextWrapping="Wrap"
+               FontSize="{DynamicResource AppFontSize}"/>
+
+    <TextBlock x:Name="StatusText" x:FieldModifier="internal"
+               TextWrapping="Wrap" MinHeight="32"
+               FontSize="{DynamicResource AppFontSize}"/>
+
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+      <Button x:Name="AtmosphereButton" x:FieldModifier="internal" Content="Set Atmosphere"
+              Click="OnSetAtmosphere" Width="130"
+              FontSize="{DynamicResource AppFontSize}"/>
+      <Button x:Name="CloseButton" x:FieldModifier="internal" Content="Close" Click="OnClose" Width="90"
+              FontSize="{DynamicResource AppFontSize}"/>
+    </StackPanel>
+
+  </StackPanel>
+</UserControl>

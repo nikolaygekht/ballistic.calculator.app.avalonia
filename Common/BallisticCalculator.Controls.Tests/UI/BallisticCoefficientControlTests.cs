@@ -109,6 +109,91 @@ public class BallisticCoefficientControlTests
         selectedTable!.Value.Should().Be(DragTableId.G7);
     }
 
+    #region AllowCustomTable
+
+    [AvaloniaFact]
+    public void AllowCustomTable_ShouldDefaultToTrue()
+    {
+        // Arrange & Act: the ammunition panel needs GC for a custom .drg curve
+        var control = new BallisticCoefficientControl();
+
+        // Assert
+        control.AllowCustomTable.Should().BeTrue();
+        control.TablePart.Items.Cast<DragTableInfo>().Should().Contain(t => t.Value == DragTableId.GC);
+    }
+
+    [AvaloniaFact]
+    public void AllowCustomTable_False_ShouldNotOfferGC()
+    {
+        // Arrange & Act
+        var control = new BallisticCoefficientControl { AllowCustomTable = false };
+
+        // Assert
+        var tables = control.TablePart.Items.Cast<DragTableInfo>().ToList();
+        tables.Should().HaveCount(9);
+        tables.Should().NotContain(t => t.Value == DragTableId.GC);
+    }
+
+    [AvaloniaFact]
+    public void AllowCustomTable_False_ShouldRefuseACustomTableValue()
+    {
+        // Arrange: the control cannot show a table it does not offer, so it holds nothing instead of
+        // silently re-labelling a GC coefficient as G1
+        var control = new BallisticCoefficientControl { AllowCustomTable = false };
+
+        // Act
+        control.Value = new BallisticCoefficient(0.5, DragTableId.GC);
+
+        // Assert
+        control.IsEmpty.Should().BeTrue();
+        control.Value.Should().BeNull();
+    }
+
+    [AvaloniaFact]
+    public void AllowCustomTable_TurnedOffWithAStandardValue_ShouldKeepTheValue()
+    {
+        // Arrange
+        var control = new BallisticCoefficientControl();
+        control.Value = new BallisticCoefficient(0.223, DragTableId.G7);
+
+        // Act
+        control.AllowCustomTable = false;
+
+        // Assert
+        control.Value!.Value.Value.Should().BeApproximately(0.223, 1e-9);
+        control.Value!.Value.Table.Should().Be(DragTableId.G7, "the selected table survives the rebuild");
+    }
+
+    [AvaloniaFact]
+    public void AllowCustomTable_TurnedOffWhileShowingGC_ShouldFallBackToTheDefaultTable()
+    {
+        // Arrange
+        var control = new BallisticCoefficientControl();
+        control.Value = new BallisticCoefficient(1.0, DragTableId.GC, BallisticCoefficientValueType.FormFactor);
+
+        // Act
+        control.AllowCustomTable = false;
+
+        // Assert
+        var selected = (DragTableInfo?)control.TablePart.SelectedItem;
+        selected!.Value.Should().Be(DragTableId.G1);
+    }
+
+    [AvaloniaFact]
+    public void AllowCustomTable_TurnedBackOn_ShouldOfferGCAgain()
+    {
+        // Arrange
+        var control = new BallisticCoefficientControl { AllowCustomTable = false };
+
+        // Act
+        control.AllowCustomTable = true;
+
+        // Assert
+        control.TablePart.Items.Cast<DragTableInfo>().Should().Contain(t => t.Value == DragTableId.GC);
+    }
+
+    #endregion
+
     [AvaloniaFact]
     public void TablePartWidth_ShouldBeConfigurable()
     {

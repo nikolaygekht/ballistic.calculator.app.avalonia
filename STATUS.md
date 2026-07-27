@@ -1,6 +1,6 @@
 # BallisticCalculator2 — Project Status
 
-Last updated: 2026-07-26
+Last updated: 2026-07-27
 
 ## Overview
 
@@ -15,7 +15,7 @@ direct-UI-access controls (no MVVM/reactive) per `CLAUDE.md`. Trunk-based develo
 | Component | Notes |
 |-----------|-------|
 | MeasurementControl / MeasurementController | Generic measurement input + unit selector; two-path precision (SetValue preserves, Value/ChangeUnit clamp). Tab walks value → unit → next field (see the focus note below). |
-| BallisticCoefficientControl | BC value + drag-table selector (incl. GC/custom); same Tab behaviour. |
+| BallisticCoefficientControl | BC value + drag-table selector (incl. GC/custom); same Tab behaviour. **`AllowCustomTable="False"`** drops GC from the list where a custom curve is meaningless (BC conversion, BC-vs-Mach knots) — and then the control refuses to hold a GC value at all, rather than showing the number under a table it was not quoted against. |
 | WindDirectionControl / AzimuthDirectionControl | Wind dial (0°=tailwind) and compass dial (0°=North, clockwise, center→target). |
 | ReticleCanvasControl | Reticle rendering, Underlay/Overlay collections, **dashed `MovingTargetBox`** aim overlay, AngularToPixel/PixelToAngular. |
 | SkiaReticleCanvas | IReticleCanvas impl; renders the 1.1.11.1 **line styles** (Solid/Dashed/Dotted: dashed 4w/3w, dotted w/2w round caps). |
@@ -49,9 +49,10 @@ direct-UI-access controls (no MVVM/reactive) per `CLAUDE.md`. Trunk-based develo
 | SummaryPanel | Compact left-aligned readout: zero adj, target size, bottom- & center-aimed dead-zone spans, near/far zero, subsonic. |
 | ReticlePanel | BDC + target overlay; **moving-target** section (enable + direction dial synced with a numeric degrees input + speed); shows target angular size + lead in the current angular unit; target size up to 10000; wider (325) data panel. |
 | ShotDataPanel | TabControl: **Ammunition / Weather / Wind / Rifle / Zero / Parameters**; assembles the library `Rifle` from Rifle+Zero tabs; `Validate()`. |
-| DrgFromBcPanel | **New.** Builds a `.drg` from a BC-vs-Mach curve. Knots are always keyed by Mach; each knot's coefficient is entered with `BallisticCoefficientControl` and keeps its own drag table, so a mixed G1/G7 curve is normalized on save (converted at each knot's own Mach, count reported). Load Csv adopts the base table when every coefficient names the same one. |
+| DrgFromBcPanel | **New.** Builds a `.drg` from a BC-vs-Mach curve. Knots are always keyed by Mach; each knot's coefficient is entered with `BallisticCoefficientControl` (`AllowCustomTable="False"` — a GC knot was already refused on Add, so it is no longer offered) and keeps its own drag table, so a mixed G1/G7 curve is normalized on save (converted at each knot's own Mach, count reported). Load Csv adopts the base table when every coefficient names the same one. |
 | DrgFromVelocitiesPanel | **New.** Builds a `.drg` from measured downrange velocities. `Set Atmosphere` (the shell's dialog) sets the air the data was measured in — it drives the recovered drag, and the current conditions are named in the status line. |
 | (both editors) | Stacked header (Name / Source / Weight / Diameter / Length, one field per row), a two-column `DataGrid`, an entry row, and Add / Change / Delete / Sort / Load Csv + Save Drg / Close. Editing is explicit: select a row to load it, `Change` writes it back. CSV files must carry their units — a bare number is refused rather than assumed. |
+| BcConverterPanel | **New.** Converts a BC between standard tables (G1 ↔ G7) at a reference velocity. **GC is offered on neither side** — the source control sets `AllowCustomTable="False"` and the destination list is `BcConversionCalculator.StandardTables`. Source BC / Destination Table / Reference Velocity → a read-only Target BC that follows the inputs — no Convert button, because the point is watching the answer move with the reference. `Set Atmosphere` (the same shell dialog the velocities editor uses) sets only the speed of sound. Always states the reference Mach and the air; warns below Mach 1.5. |
 
 ### Main Desktop Application (`Desktop/BallisticCalculator/`)
 
@@ -59,7 +60,9 @@ direct-UI-access controls (no MVVM/reactive) per `CLAUDE.md`. Trunk-based develo
   keyboard shortcuts, persistent state (`appstate.json`).
 - **Tools menu:** Approximate Drag Table → From BC Curve / From Measured Velocities — thin scrollable `Window`
   shells around the two editor panels (always enabled; prefill bullet + weather from the active window when
-  there is one), plus `AtmosphereDialog` for the velocities editor. Edit Sights / Edit Barrels —
+  there is one), plus `AtmosphereDialog` for the velocities editor. Convert Ballistic Coefficient — the same
+  shell pattern around `BcConverterPanel`, sharing that `AtmosphereDialog`; seeds the source BC from the active
+  window's ammunition (skipping a GC or form-factor one, which cannot be converted). Edit Sights / Edit Barrels —
   master-detail dictionary editors that save the merged `data/dictionaries.xml`
   (`SightListEditorDialog` / `BarrelListEditorDialog`).
 - `TrajectoryView` tabs: Table, Chart, Reticle, Summary. Coarse display trajectory + one shared **fine**
@@ -166,14 +169,16 @@ From **`claude/07-25-plan.md`** (1.1.11 `Tools` namespace):
 1. ~~Moving target — lead-off aim on the reticle (`Tools.MovingTargetLead`).~~ **Done.**
 2. ~~Tools menu → **Approximate DRG table** generation from BCs / from Velocities
    (`DrgDragTableFactory` / `Tools.RadarDragTableFactory`), saved as `.drg`.~~ **Done** — see
-   `claude/07-26-drg-plan.md`. Two editors under Tools → Approximate Drag Table, with all-or-nothing CSV
+   `claude/Archive/07-26-drg-plan.md`. Two editors under Tools → Approximate Drag Table, with all-or-nothing CSV
    import and full header metadata. Interactive smoke pass still to do.
 3. Tools menu → **Hit probability** (`Tools.HitProbability`). **Pending.** Open decisions recorded there:
    scatter plot (ScottPlot) vs numbers only, and the default target distance.
-4. Tools menu → **BC converter** (`Tools.BallisticCoefficientConverter`). **Pending**, added 2026-07-26.
-   Converts a published BC between standard tables (the everyday G1 ↔ G7 question) at a reference Mach or
-   velocity. The design's key point: a converted BC is exact only at its reference — ~1% at Mach 1.8–2.5 but
-   ~9% low near Mach 1.3 — so the dialog shows the whole reference band rather than a single number.
+4. ~~Tools menu → **BC converter** (`Tools.BallisticCoefficientConverter`).~~ **Done** (2026-07-27).
+   `BcConversionCalculator` + `BcConverterPanel` + `BcConverterDialog`: Source BC / Destination Table /
+   Reference Velocity → a live read-only Target BC. A converted BC is exact only at its reference — ~1% at
+   Mach 1.8–2.5 but ~9% low near Mach 1.3 — so the panel always names the reference Mach, keeps a standing note
+   that the number holds only there, and adds a warning below Mach 1.5. The reference band table from the
+   original design was dropped in favour of the single Target BC field. Interactive smoke pass still to do.
 
 ### Smaller follow-ups
 

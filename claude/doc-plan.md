@@ -1,78 +1,76 @@
-# Plan: User documentation + embedded local host
+# Plan: user documentation on GitHub Pages
 
 Not scheduled with the 2026-07-25 feature work — separate track. Design only.
 
 ## Context / goal
 
 Cross-platform user help for the Avalonia app (Windows/Linux/macOS). CHM/WinHelp are dead. Author the
-guide in Markdown, build a **static HTML site**, ship it with the app, and open it in the user's default
-browser. Serve it from a **tiny embedded local HTTP host** rather than `file://` (modern JS doc sites are
-SPAs whose routing/search break under `file://`). The host is deliberately chosen so it can later double
-as the channel a companion **mobile app** talks to.
+guide in Markdown, build a **static HTML site**, and **publish it to the project's GitHub Pages**. The app's
+Help menu opens that URL in the user's default browser.
 
-## Decisions
+## Decisions (2026-07-27)
 
-- **Generator: VitePress** (Node/Vite, Markdown-first, minimal config, built-in offline search). Emits a
-  fully static `dist/` (prerendered HTML per page + assets). GitHub Pages hosts the same `dist/` for the
-  online copy. *(Alternatives considered: Astro Starlight — closest to working from `file://`; Docusaurus
-  — heavier. MkDocs rejected: Python.)*
-- **Serve locally with Kestrel** (ASP.NET Core minimal `WebApplication`), not raw `HttpListener`: for help
-  alone `HttpListener` suffices, but Kestrel gives routing/JSON/WebSockets for the future mobile API for
-  free, and the `Microsoft.AspNetCore.App` runtime is already installed. One host serves static help now
-  and API endpoints later.
-- **Open via the existing pattern** — `Process.Start(new ProcessStartInfo { FileName = url,
-  UseShellExecute = true })` (same call the About dialog uses), pointed at the loopback URL.
+- **Hosting: GitHub Pages of this repo — the only copy.** Site URL
+  `https://nikolaygekht.github.io/ballistic.calculator.app.avalonia/`.
+- **Online only.** Nothing is bundled into the app, so there is **no embedded HTTP host**, no `Help/`
+  content folder, no `FrameworkReference`, and no `file://` constraint on the generator. Users without a
+  connection get no in-app help; accepted.
+- **Generator: VitePress** (Node/Vite, Markdown-first, built-in offline search). `base` must be set to
+  `/ballistic.calculator.app.avalonia/` for Pages to resolve assets.
+- **Publish from GitHub Actions on `main`** (`actions/deploy-pages`), not a hand-maintained `gh-pages`
+  branch — triggered on pushes touching `doc/**` plus manual `workflow_dispatch`.
+- **Open via the existing pattern** — the private `OpenUrl(...)` helper already in
+  `Desktop/BallisticCalculator/Views/MainWindow.axaml.cs:628`
+  (`Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true })`).
+
+### What this decision removed
+
+The previous design shipped the site inside the app and served it from a loopback **Kestrel** host, because
+SPA routing/search break under `file://`. Serving from Pages removes that entire layer. The Kestrel idea
+was also motivated by a future **mobile companion link** (desktop hosts, mobile connects) — that remains
+worth doing, but it is now an **independent track with no docs dependency**, and is described under
+"Deferred, unrelated" below rather than as a docs phase.
 
 ## Architecture
 
 ### Authoring (`doc/` — new VitePress project)
-- `doc/package.json`, `doc/.vitepress/config.ts` (nav/sidebar/search), `doc/index.md` + guide pages
-  (Getting Started, Entering a Shot, Zeroing, Parameters/Coriolis, Reticle, Summary/Tools, File formats).
-- Scripts: `npm run docs:dev` (author), `npm run docs:build` → `doc/.vitepress/dist`.
+- `doc/package.json`, `doc/.vitepress/config.ts` (`base`, nav, sidebar, search), `doc/index.md` + guide pages:
+  Getting Started, Entering a Shot, Zeroing, Parameters/Coriolis, Reticle, Summary, Tools (Approximate Drag
+  Table, Hit Probability, BC converter), File formats (`.drg`, ammo library, reticle).
+- Scripts: `npm run docs:dev` (author with live reload), `npm run docs:build` → `doc/.vitepress/dist`.
 - `.gitignore`: `doc/node_modules/`, `doc/.vitepress/dist/`, `doc/.vitepress/cache/`.
+- Screenshots under `doc/public/img/`; capture at a fixed window size so they stay consistent.
 
-### Build/bundle
-- Build step runs `npm ci && npm run docs:build` and copies `doc/.vitepress/dist` → the app output under
-  `Help/` (a Help content folder next to `Assets/`). Wire into `BuildRelease.bat` / `Setup/prepare.bat`
-  (and/or an MSBuild `AfterBuild` target that copies to `bin/.../Help`). Portable package already ships a
-  `content/` folder — include `Help/` there.
-
-### Runtime host (`Desktop/BallisticCalculator/Services/HelpServer.cs` — new)
-- Static class `HelpServer.EnsureRunning()` → builds a minimal `WebApplication` once, `UseStaticFiles`
-  (or `MapStaticAssets`) rooted at `AppContext.BaseDirectory/Help`, binds to `127.0.0.1:<free port>`,
-  starts it, returns `http://127.0.0.1:<port>/`. Idempotent; disposed on app exit.
-- Requires `<FrameworkReference Include="Microsoft.AspNetCore.App" />` in
-  `Desktop/BallisticCalculator/BallisticCalculator.csproj`. *(Fallback if we want to avoid that: ~30-line
-  `System.Net.HttpListener` static server — but then no easy path to the mobile API.)*
+### Publishing (`.github/workflows/docs.yml` — new; no workflows exist in the repo yet)
+- `on: push: branches: [main], paths: ['doc/**', '.github/workflows/docs.yml']` + `workflow_dispatch`.
+- Job: `actions/checkout` → `actions/setup-node` (LTS, npm cache) → `npm ci` → `npm run docs:build` →
+  `actions/configure-pages` / `upload-pages-artifact` (`doc/.vitepress/dist`) → `actions/deploy-pages`.
+- Permissions `pages: write`, `id-token: write`; Pages source set to **GitHub Actions** in repo settings
+  (one-time manual step).
 
 ### Menu wiring (`Views/MainWindow.axaml` + `.axaml.cs`)
-- `Help → User Guide` → `Process.Start(HelpServer.EnsureRunning(), UseShellExecute)`.
-- `Help → Online Docs` → open the GitHub Pages URL.
-
-## Phasing
-
-- **v1 (with the docs work):** loopback-only static help host + VitePress site + Help menu. No network
-  exposure, safe by default.
-- **v2 (only when a mobile client exists):** promote the host to an **opt-in, authenticated** LAN
-  listener — separate "Enable mobile link" toggle, pairing token (QR), ideally TLS (self-signed), off by
-  default. Add JSON/WebSocket endpoints. Never listen on `0.0.0.0` unauthenticated.
-- Keep request/response **DTOs in `Common/`** (e.g. `Common/BallisticCalculator.Contracts`) so the desktop
-  *server* and the mobile *client* share models — consistent with "shared logic in Common, platform UI on
-  top." Note this is a companion/remote pattern (desktop hosts, mobile connects), distinct from a
-  standalone mobile app reusing `Common` locally.
-
-## Security notes
-- Help mode binds loopback (`127.0.0.1`) only — not reachable off-machine.
-- Any LAN binding is explicit, authenticated, and TLS-preferred; default off.
+- Help menu currently holds only `_About` (`MainWindow.axaml:118`). Add above it:
+  - `Help → _User Guide` (F1) → `OpenUrl(HelpUrl)`.
+  - separator, then the existing `_About`.
+- Keep the URL as one `const string HelpUrl` next to `OpenUrl`; deep links per page can come later
+  (e.g. `HelpUrl + "tools/hit-probability"`) if we want context help from dialogs.
+- No build/packaging changes: `BuildRelease.bat`, `Setup/prepare.bat` and the portable `content/` folder are
+  untouched.
 
 ## Verification
-1. `npm run docs:build` produces `doc/.vitepress/dist`; build step drops it into the app's `Help/`.
-2. App runs; `Help → User Guide` opens the browser at `http://127.0.0.1:<port>/`, site + search work
-   offline; `Help → Online Docs` opens GitHub Pages.
-3. No listener on non-loopback interfaces in v1 (verify with `netstat`).
+1. `npm run docs:build` succeeds; local `npm run docs:preview` serves the site with working search.
+2. Push to `main` → workflow green → the Pages URL loads, nav/search/assets all resolve under the `base`
+   path (asset 404s are the classic symptom of a wrong `base`).
+3. App: `Help → User Guide` opens the default browser at the Pages URL on Windows and Linux.
 
 ## Open decisions
-- Generator confirm: VitePress vs Astro Starlight.
-- Kestrel (`FrameworkReference`) vs `HttpListener` for v1 (recommend Kestrel for the mobile future).
-- Whether to also produce a PDF manual (pandoc) as a secondary offline artifact.
-- Where the GitHub Pages site is published from (docs branch / Actions).
+- Whether to also produce a PDF manual (pandoc) as a secondary artifact — currently **no**.
+- Whether dialogs get context-sensitive deep links (F1 per window) or one entry point only.
+- Docs versioning: single "latest" site vs per-release copies — start with latest only.
+
+## Deferred, unrelated: mobile companion link
+Kept here only so the reasoning is not lost. If a mobile client is ever built, the desktop app can host an
+**opt-in, authenticated** LAN listener (Kestrel minimal `WebApplication`, pairing token/QR, TLS preferred,
+default off, never unauthenticated on `0.0.0.0`) with JSON/WebSocket endpoints, sharing DTOs from
+`Common/` (e.g. `Common/BallisticCalculator.Contracts`) between the desktop *server* and the mobile
+*client*. This has nothing to do with documentation and should not gate it.

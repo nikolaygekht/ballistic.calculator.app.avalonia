@@ -372,6 +372,7 @@ public partial class MainWindow : Window
         MenuToolsEditBarrels.Click += async (_, _) => await ShowDictionaryEditor(isSights: false);
         MenuToolsDrgFromBc.Click += async (_, _) => await ShowDrgEditor(fromBcCurve: true);
         MenuToolsDrgFromVelocities.Click += async (_, _) => await ShowDrgEditor(fromBcCurve: false);
+        MenuToolsBcConverter.Click += async (_, _) => await ShowBcConverter();
 
         // Windows
         MenuWindowsCascade.Click += (_, _) => CascadeWindows();
@@ -405,6 +406,20 @@ public partial class MainWindow : Window
             ? new Dialogs.ApproximateDrgFromBcDialog(system, _fileDialogService, ammunition)
             : new Dialogs.ApproximateDrgFromVelocitiesDialog(system, _fileDialogService, ammunition,
                                                              trajectory?.ShotData?.Atmosphere);
+
+        await dialog.ShowDialog<bool?>(this);
+    }
+
+    /// <summary>
+    /// Opens the BC converter. Standalone like the drag table generators — but when a trajectory is active its
+    /// ammunition seeds the source coefficient and its weather the speed of sound.
+    /// </summary>
+    private async Task ShowBcConverter()
+    {
+        var trajectory = _activeChild as ITrajectoryChildWindow;
+        var dialog = new Dialogs.BcConverterDialog(trajectory?.MeasurementSystem ?? MeasurementSystem.Imperial,
+                                                  trajectory?.ShotData?.Ammunition?.Ammunition,
+                                                  trajectory?.ShotData?.Atmosphere);
 
         await dialog.ShowDialog<bool?>(this);
     }

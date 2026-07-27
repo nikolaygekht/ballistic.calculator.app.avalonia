@@ -86,7 +86,9 @@
                FontSize="{DynamicResource AppFontSize}"/>
       <TextBlock Grid.Column="2" Text="BC" VerticalAlignment="Center" Margin="8,0,0,0"
                  FontSize="{DynamicResource AppFontSize}"/>
+      <!-- A knot must name a standard curve: GC is refused on Add, so it is not offered in the first place. -->
       <controls:BallisticCoefficientControl Grid.Column="3" x:Name="BcControl" x:FieldModifier="internal"
+                                            AllowCustomTable="False"
                                             FontSize="{DynamicResource AppFontSize}"/>
     </Grid>
 

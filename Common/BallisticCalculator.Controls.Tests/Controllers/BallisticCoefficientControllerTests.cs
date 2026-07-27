@@ -97,6 +97,36 @@ public class BallisticCoefficientControllerTests
         tables[^1].Value.Should().Be(DragTableId.GC);
     }
 
+    [Fact]
+    public void GetDragTables_WhenTheCustomTableIsNotAllowed_ShouldOmitGC()
+    {
+        // Arrange: a conversion between standard curves, or a BC-vs-Mach knot, cannot use GC at all
+        var controller = new BallisticCoefficientController { AllowCustomTable = false };
+
+        // Act
+        var tables = controller.GetDragTables(out int defaultIndex);
+
+        // Assert
+        tables.Should().HaveCount(9);
+        tables.Should().NotContain(t => t.Value == DragTableId.GC);
+        tables[defaultIndex].Value.Should().Be(DragTableId.G1, "G1 stays the default");
+    }
+
+    [Fact]
+    public void ParseValue_WithACustomTableValueWhenGCIsNotAllowed_ShouldStillReportTheValuesOwnTable()
+    {
+        // Arrange: the controller reports what the value is; refusing to show it is the control's job
+        var controller = new BallisticCoefficientController { AllowCustomTable = false };
+        var bc = new BallisticCoefficient(0.5, DragTableId.GC);
+
+        // Act
+        controller.ParseValue(bc, out var text, out var table, 3);
+
+        // Assert
+        text.Should().Be("0.500");
+        table.Value.Should().Be(DragTableId.GC);
+    }
+
     #endregion
 
     #region Value Parsing Tests (Text → BallisticCoefficient)

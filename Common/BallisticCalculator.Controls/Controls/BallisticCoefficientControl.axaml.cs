@@ -42,6 +42,10 @@ public partial class BallisticCoefficientControl : UserControl
         AvaloniaProperty.Register<BallisticCoefficientControl, double>(
             nameof(TablePartWidth), 80.0);
 
+    public static readonly StyledProperty<bool> AllowCustomTableProperty =
+        AvaloniaProperty.Register<BallisticCoefficientControl, bool>(
+            nameof(AllowCustomTable), true);
+
     public static readonly StyledProperty<CultureInfo> CultureProperty =
         AvaloniaProperty.Register<BallisticCoefficientControl, CultureInfo>(
             nameof(Culture), CultureInfo.InvariantCulture);
@@ -91,6 +95,17 @@ public partial class BallisticCoefficientControl : UserControl
             // Parse value to text and table
             _controller.ParseValue(value.Value, out string text, out DragTableInfo table, DecimalPoints, Culture);
 
+            if (!IsTableOffered(table.Value))
+            {
+                // A table this control does not offer (GC with AllowCustomTable off): hold nothing rather than
+                // show the number under a table it was not quoted against.
+                NumericPart.Text = "";
+                _originalText = "";
+                _originalValue = null;
+                _originalTable = (DragTableInfo?)TablePart.SelectedItem;
+                return;
+            }
+
             // Update UI
             NumericPart.Text = text;
             SelectTable(table);
@@ -130,6 +145,17 @@ public partial class BallisticCoefficientControl : UserControl
     {
         get => GetValue(TablePartWidthProperty);
         set => SetValue(TablePartWidthProperty, value);
+    }
+
+    /// <summary>
+    /// Whether the custom (GC) table is offered. Set false where a custom curve is meaningless — converting a
+    /// coefficient between standard tables, or a BC-vs-Mach knot. With it off the control cannot hold a GC
+    /// value: assigning one leaves the control empty rather than re-labelling it as a standard table.
+    /// </summary>
+    public bool AllowCustomTable
+    {
+        get => GetValue(AllowCustomTableProperty);
+        set => SetValue(AllowCustomTableProperty, value);
     }
 
     public CultureInfo Culture
@@ -173,11 +199,32 @@ public partial class BallisticCoefficientControl : UserControl
     {
         if (TablePart == null) return;
 
+        var previous = (TablePart.SelectedItem as DragTableInfo)?.Value;
+
         TablePart.Items.Clear();
         var tables = _controller.GetDragTables(out int defaultIndex);
         foreach (var table in tables)
             TablePart.Items.Add(table);
         TablePart.SelectedIndex = defaultIndex;
+
+        // Keep what was selected if the rebuilt list still offers it; otherwise the default stands.
+        if (previous != null)
+            SelectTable(new DragTableInfo(previous.Value, previous.Value.ToString()));
+    }
+
+    /// <summary>Whether the drag table combo currently offers this table.</summary>
+    private bool IsTableOffered(DragTableId table)
+    {
+        if (TablePart == null)
+            return false;
+
+        foreach (var item in TablePart.Items)
+        {
+            if (item is DragTableInfo info && info.Value == table)
+                return true;
+        }
+
+        return false;
     }
 
     private void WireEvents()
@@ -223,6 +270,11 @@ public partial class BallisticCoefficientControl : UserControl
                 _controller.DecimalPoints = (int?)e.NewValue;
             else if (e.Property == TablePartWidthProperty && TablePart != null)
                 TablePart.Width = (double)e.NewValue!;
+            else if (e.Property == AllowCustomTableProperty)
+            {
+                _controller.AllowCustomTable = (bool)e.NewValue!;
+                UpdateTables();
+            }
         };
     }
 
@@ -232,6 +284,7 @@ public partial class BallisticCoefficientControl : UserControl
         _controller.Minimum = Minimum;
         _controller.Maximum = Maximum;
         _controller.DecimalPoints = DecimalPoints;
+        _controller.AllowCustomTable = AllowCustomTable;
     }
 
     #endregion

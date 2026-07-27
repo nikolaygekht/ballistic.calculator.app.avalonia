@@ -1,0 +1,17 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:panels="using:BallisticCalculator.Panels.Panels"
+        x:Class="BallisticCalculator.Views.Dialogs.BcConverterDialog"
+        Title="Convert Ballistic Coefficient"
+        Width="500" Height="340"
+        MinWidth="420" MinHeight="240"
+        FontSize="{DynamicResource AppFontSize}"
+        WindowStartupLocation="CenterOwner"
+        CanResize="true">
+
+  <!-- Scrolls so the dialog stays usable on a short screen. -->
+  <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="12">
+    <panels:BcConverterPanel x:Name="ConverterPanel" x:FieldModifier="internal"
+                             FontSize="{DynamicResource AppFontSize}"/>
+  </ScrollViewer>
+</Window>

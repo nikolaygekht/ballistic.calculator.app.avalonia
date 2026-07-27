@@ -105,6 +105,7 @@
                     <MenuItem Header="From _BC Curve..." x:Name="MenuToolsDrgFromBc" />
                     <MenuItem Header="From Measured _Velocities..." x:Name="MenuToolsDrgFromVelocities" />
                 </MenuItem>
+                <MenuItem Header="Convert Ballistic _Coefficient..." x:Name="MenuToolsBcConverter" />
             </MenuItem>
 
             <!-- Windows Menu -->

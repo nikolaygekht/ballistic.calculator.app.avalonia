@@ -19,7 +19,15 @@ public class BallisticCoefficientController
     public int? DecimalPoints { get; set; } = 3;
 
     /// <summary>
-    /// Gets all available drag tables in alphabetical order with GC (custom) last
+    /// Whether the custom (GC) table is offered. Set false where a custom curve is meaningless — converting a
+    /// coefficient between standard tables, or a BC-vs-Mach knot — so GC cannot be picked at all rather than
+    /// being picked and then refused.
+    /// </summary>
+    public bool AllowCustomTable { get; set; } = true;
+
+    /// <summary>
+    /// Gets all available drag tables in alphabetical order with GC (custom) last, unless
+    /// <see cref="AllowCustomTable"/> excludes it
     /// </summary>
     /// <param name="defaultIndex">Index of the default table (G1)</param>
     /// <returns>List of drag table information</returns>
@@ -44,7 +52,7 @@ public class BallisticCoefficientController
         tables.Sort((a, b) => a.Name.CompareTo(b.Name));
 
         // Add GC at the end
-        if (gcTable != null)
+        if (gcTable != null && AllowCustomTable)
             tables.Add(gcTable);
 
         // G1 is the default (should be first after alphabetical sort)
@@ -112,9 +120,9 @@ public class BallisticCoefficientController
         string format = $"F{decimalPoints}";
         text = bc.Value.ToString(format, culture);
 
-        // Find the corresponding DragTableInfo
-        var tables = GetDragTables(out _);
-        table = tables.First(t => t.Value == bc.Table);
+        // Report the value's own table, even one GetDragTables does not offer (GC with AllowCustomTable off):
+        // saying what the value is belongs here, deciding whether to show it belongs to the control.
+        table = new DragTableInfo(bc.Table, bc.Table.ToString());
     }
 
     /// <summary>
