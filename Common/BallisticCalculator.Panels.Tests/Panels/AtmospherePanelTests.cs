@@ -217,7 +217,7 @@ public class AtmospherePanelTests
         // Values stay in original units
         result!.Altitude.In(DistanceUnit.Meter).Should().BeApproximately(500, 1);
         GetSelectedUnit(panel.AltitudeControl).Should().Be(DistanceUnit.Meter);
-        GetSelectedUnit(panel.PressureControl).Should().Be(PressureUnit.MillimetersOfMercury);
+        GetSelectedUnit(panel.PressureControl).Should().Be(PressureUnit.Hectopascal);
         GetSelectedUnit(panel.TemperatureControl).Should().Be(TemperatureUnit.Celsius);
     }
 
@@ -242,7 +242,7 @@ public class AtmospherePanelTests
         panel.MeasurementSystem = MeasurementSystem.Metric;
 
         GetSelectedUnit(panel.AltitudeControl).Should().Be(DistanceUnit.Meter);
-        GetSelectedUnit(panel.PressureControl).Should().Be(PressureUnit.MillimetersOfMercury);
+        GetSelectedUnit(panel.PressureControl).Should().Be(PressureUnit.Hectopascal);
         GetSelectedUnit(panel.TemperatureControl).Should().Be(TemperatureUnit.Celsius);
     }
 
@@ -305,4 +305,62 @@ public class AtmospherePanelTests
             new Measurement<TemperatureUnit>(20, TemperatureUnit.Celsius),
             0.65);
     }
+
+    #region One system, never a mix
+
+    [AvaloniaTheory]
+    [InlineData(MeasurementSystem.Imperial, DistanceUnit.Foot, PressureUnit.InchesOfMercury, TemperatureUnit.Fahrenheit)]
+    [InlineData(MeasurementSystem.Metric, DistanceUnit.Meter, PressureUnit.Hectopascal, TemperatureUnit.Celsius)]
+    public void Atmosphere_WhenLoaded_ShouldRestateEveryFieldInThePanelsSystem(
+        MeasurementSystem system, DistanceUnit altitude, PressureUnit pressure, TemperatureUnit temperature)
+    {
+        // Arrange — an Atmosphere carries its own units, and SetValue keeps a value's own unit by design,
+        // so loading one used to leave the dialog half metric and half imperial (claude/units.md).
+        var panel = new AtmospherePanel { MeasurementSystem = system };
+
+        // Act
+        panel.Atmosphere = CreateTestAtmosphere();
+
+        // Assert
+        GetSelectedUnit(panel.AltitudeControl).Should().Be(altitude);
+        GetSelectedUnit(panel.PressureControl).Should().Be(pressure);
+        GetSelectedUnit(panel.TemperatureControl).Should().Be(temperature);
+    }
+
+    [AvaloniaTheory]
+    [InlineData(MeasurementSystem.Imperial)]
+    [InlineData(MeasurementSystem.Metric)]
+    public void Atmosphere_WhenLoaded_ShouldKeepTheAirItWasGiven(MeasurementSystem system)
+    {
+        // Arrange
+        var panel = new AtmospherePanel { MeasurementSystem = system };
+        var air = CreateTestAtmosphere();
+
+        // Act — restating the units must convert, not relabel
+        panel.Atmosphere = air;
+
+        // Assert
+        var result = panel.Atmosphere;
+        result.Should().NotBeNull();
+        result!.Altitude.In(DistanceUnit.Meter).Should().BeApproximately(500, 1);
+        result.Pressure.In(PressureUnit.MillimetersOfMercury).Should().BeApproximately(720, 1);
+        result.Temperature.In(TemperatureUnit.Celsius).Should().BeApproximately(20, 0.1);
+    }
+
+    [AvaloniaFact]
+    public void Reset_InMetric_ShouldUseTheStandardAirInHectopascals()
+    {
+        // Arrange
+        var panel = new AtmospherePanel { MeasurementSystem = MeasurementSystem.Metric };
+
+        // Act
+        panel.Reset();
+
+        // Assert
+        GetSelectedUnit(panel.PressureControl).Should().Be(PressureUnit.Hectopascal);
+        panel.PressureControl.GetValue<PressureUnit>()!.Value.In(PressureUnit.Hectopascal)
+             .Should().BeApproximately(1013.2, 0.1);
+    }
+
+    #endregion
 }

@@ -126,6 +126,11 @@ public partial class MainWindow : Window
         if (result != true || dialog.Result == null)
             return;
 
+        // The standalone Tools dialogs belong to no trajectory, so they follow the units of the last one
+        // created — see claude/units.md. Saved now rather than at exit so it survives a crash.
+        _appState.LastMeasurementSystem = system;
+        AppStateManager.Save(_appState);
+
         _windowCounter++;
         var shotData = dialog.Result;
         var trajectory = ShotCalculator.Calculate(shotData, system);
@@ -401,10 +406,10 @@ public partial class MainWindow : Window
         MenuHelpAbout.Click += async (_, _) => await ShowAboutDialog();
     }
 
-    /// <summary>Opens the sight or barrel dictionary editor, using the active window's units if any.</summary>
+    /// <summary>Opens the sight or barrel dictionary editor in the last-created trajectory's units.</summary>
     private async Task ShowDictionaryEditor(bool isSights)
     {
-        var system = (_activeChild as ITrajectoryChildWindow)?.MeasurementSystem ?? MeasurementSystem.Imperial;
+        var system = _appState.LastMeasurementSystem;
         Window dialog = isSights
             ? new Dialogs.SightListEditorDialog(system)
             : new Dialogs.BarrelListEditorDialog(system);
@@ -414,12 +419,12 @@ public partial class MainWindow : Window
     /// <summary>
     /// Opens one of the custom drag table (<c>.drg</c>) generators. Both are standalone and open <b>empty</b>:
     /// they describe a bullet being characterised from a data sheet or radar session, which has nothing to do
-    /// with whatever trajectory happens to be open. Only the measurement system follows the active window, and
-    /// that is a display preference rather than data.
+    /// with whatever trajectory happens to be open. The units follow the last trajectory the user created
+    /// (<c>claude/units.md</c>) — a display preference rather than data.
     /// </summary>
     private async Task ShowDrgEditor(bool fromBcCurve)
     {
-        var system = (_activeChild as ITrajectoryChildWindow)?.MeasurementSystem ?? MeasurementSystem.Imperial;
+        var system = _appState.LastMeasurementSystem;
 
         Window dialog = fromBcCurve
             ? new Dialogs.ApproximateDrgFromBcDialog(system, _fileDialogService)
@@ -434,7 +439,7 @@ public partial class MainWindow : Window
     /// </summary>
     private async Task ShowBcConverter()
     {
-        var system = (_activeChild as ITrajectoryChildWindow)?.MeasurementSystem ?? MeasurementSystem.Imperial;
+        var system = _appState.LastMeasurementSystem;
         var dialog = new Dialogs.BcConverterDialog(system);
 
         await dialog.ShowDialog<bool?>(this);

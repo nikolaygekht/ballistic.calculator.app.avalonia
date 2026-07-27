@@ -71,6 +71,11 @@ public partial class AtmospherePanel : UserControl
             PressureControl.SetValue(value.Pressure);
             TemperatureControl.SetValue(value.Temperature);
             HumidityTextBox.Text = Math.Round(value.Humidity * 100).ToString(CultureInfo.InvariantCulture);
+
+            // An Atmosphere carries whatever units it was built with — the library's standard air mixes
+            // them — and SetValue keeps a value's own unit by design. Restate them in the panel's system,
+            // or the dialog shows metric altitude beside imperial pressure.
+            ApplyMeasurementSystem(convert: true);
         }
     }
 
@@ -111,13 +116,18 @@ public partial class AtmospherePanel : UserControl
 
     #region Unit Switching
 
-    private void ApplyMeasurementSystem()
+    private void ApplyMeasurementSystem() => ApplyMeasurementSystem(ConvertOnSystemChange);
+
+    /// <summary>
+    /// Puts every field in one system — see <c>claude/units.md</c>: a dialog is imperial or metric,
+    /// never a mix.
+    /// </summary>
+    private void ApplyMeasurementSystem(bool convert)
     {
-        var convert = ConvertOnSystemChange;
         if (_measurementSystem == MeasurementSystem.Metric)
         {
             AltitudeControl.ChangeUnit(DistanceUnit.Meter, 0, convert);
-            PressureControl.ChangeUnit(PressureUnit.MillimetersOfMercury, 1, convert);
+            PressureControl.ChangeUnit(PressureUnit.Hectopascal, 1, convert);
             TemperatureControl.ChangeUnit(TemperatureUnit.Celsius, 1, convert);
         }
         else
@@ -145,7 +155,7 @@ public partial class AtmospherePanel : UserControl
         if (_measurementSystem == MeasurementSystem.Metric)
         {
             AltitudeControl.SetValue(new Measurement<DistanceUnit>(0, DistanceUnit.Meter));
-            PressureControl.SetValue(new Measurement<PressureUnit>(760, PressureUnit.MillimetersOfMercury));
+            PressureControl.SetValue(new Measurement<PressureUnit>(1013.2, PressureUnit.Hectopascal));
             TemperatureControl.SetValue(new Measurement<TemperatureUnit>(15, TemperatureUnit.Celsius));
         }
         else
