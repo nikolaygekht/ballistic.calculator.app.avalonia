@@ -134,15 +134,12 @@ public class MeasurementControlTests
         var control = new MeasurementControl();
         control.UnitType = typeof(DistanceUnit);
 
-        bool eventFired = false;
-        control.Changed += (s, e) => eventFired = true;
-
-        // Act - Set value programmatically which should trigger changed event
+        // Act - Set value programmatically
         var measurement = new Measurement<DistanceUnit>(100, DistanceUnit.Meter);
         control.SetValue(measurement);
 
-        // Assert - Event should fire when value is set
-        // Note: In headless mode, TextChanged events might not fire, but programmatic sets should work
+        // Assert - the value lands. Whether Changed fires is not asserted here: TextChanged is dispatched
+        // rather than raised inline, so it only arrives once the dispatcher queue runs.
         control.GetValue<DistanceUnit>().Should().NotBeNull();
     }
 
@@ -275,7 +272,7 @@ public class MeasurementControlTests
         // Debug: Check state after UnitType is set
         var unitPartExists = control.UnitPart != null;
         var numericPartExists = control.NumericPart != null;
-        var itemsCountAfterUnitType = unitPartExists ? control.UnitPart.Items.Count : -1;
+        var itemsCountAfterUnitType = unitPartExists ? control.UnitPart!.Items.Count : -1;
 
         // Check if controller was created
         var controllerField = control.GetType().GetField("_controller",
@@ -295,19 +292,21 @@ public class MeasurementControlTests
         result.Value.Unit.Should().Be(DistanceUnit.Meter);
 
         // Also verify UI was updated
-        control.NumericPart.Text.Should().NotBeNullOrEmpty();
+        control.NumericPart.Should().NotBeNull();
+        control.NumericPart!.Text.Should().NotBeNullOrEmpty();
 
         // Debug output
-        if (control.UnitPart.SelectedItem == null)
+        control.UnitPart.Should().NotBeNull();
+        if (control.UnitPart!.SelectedItem == null)
         {
             throw new Exception($"UnitPart.SelectedItem is null. " +
                 $"UnitPart exists: {unitPartExists}, " +
                 $"NumericPart exists: {numericPartExists}, " +
                 $"Controller exists: {controllerExists}, " +
                 $"Items count after UnitType set: {itemsCountAfterUnitType}, " +
-                $"Items count now: {control.UnitPart.Items.Count}");
+                $"Items count now: {control.UnitPart!.Items.Count}");
         }
 
-        control.UnitPart.SelectedItem.Should().NotBeNull();
+        control.UnitPart!.SelectedItem.Should().NotBeNull();
     }
 }

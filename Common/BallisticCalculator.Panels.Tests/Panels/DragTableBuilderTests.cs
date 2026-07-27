@@ -168,6 +168,10 @@ public class DragTableBuilderTests
             new BcAtMach(2.25, 0.480), new BcAtMach(2.50, 0.484),
         };
 
+        // The row under test must be the one in the curve, or the published CD is being compared against
+        // a different knot than the sheet quotes it for.
+        curve.Should().ContainSingle(k => Math.Abs(k.Mach - mach) < 1e-9 && Math.Abs(k.Bc - bcG7) < 1e-9);
+
         var table = DragTableBuilder.FromBcCurve(metadata, DragTableId.G7, curve);
 
         Cd(table, mach).Should().BeApproximately(publishedCd, publishedCd * 0.005);

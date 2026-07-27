@@ -45,7 +45,7 @@ public class MeasurementControlFocusTests
 
         public object? Focused => Window.FocusManager?.GetFocusedElement();
 
-        public void Tab() => Window.KeyPress(Key.Tab, RawInputModifiers.None);
+        public void Tab() => Window.KeyPressQwerty(PhysicalKey.Tab, RawInputModifiers.None);
     }
 
     [AvaloniaFact]
@@ -80,10 +80,10 @@ public class MeasurementControlFocusTests
         h.Tab();    // -> numeric
         h.Tab();    // -> unit
 
-        h.Window.KeyPress(Key.Tab, RawInputModifiers.Shift);
+        h.Window.KeyPressQwerty(PhysicalKey.Tab, RawInputModifiers.Shift);
         h.Focused.Should().BeSameAs(h.Measurement.NumericPart);
 
-        h.Window.KeyPress(Key.Tab, RawInputModifiers.Shift);
+        h.Window.KeyPressQwerty(PhysicalKey.Tab, RawInputModifiers.Shift);
         h.Focused.Should().BeSameAs(h.Before);
     }
 
@@ -102,13 +102,13 @@ public class MeasurementControlFocusTests
         window.Show();
         before.Focus();
 
-        window.KeyPress(Key.Tab, RawInputModifiers.None);
+        window.KeyPressQwerty(PhysicalKey.Tab, RawInputModifiers.None);
         window.FocusManager?.GetFocusedElement().Should().BeSameAs(bc.NumericPart);
 
-        window.KeyPress(Key.Tab, RawInputModifiers.None);
+        window.KeyPressQwerty(PhysicalKey.Tab, RawInputModifiers.None);
         window.FocusManager?.GetFocusedElement().Should().BeSameAs(bc.TablePart);
 
-        window.KeyPress(Key.Tab, RawInputModifiers.None);
+        window.KeyPressQwerty(PhysicalKey.Tab, RawInputModifiers.None);
         window.FocusManager?.GetFocusedElement().Should().BeSameAs(after);
     }
 }

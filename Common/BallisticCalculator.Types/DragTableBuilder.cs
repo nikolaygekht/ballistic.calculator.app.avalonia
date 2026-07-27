@@ -159,7 +159,7 @@ public static class DragTableBuilder
         ArgumentNullException.ThrowIfNull(readings);
         RequireName(metadata);
 
-        RequireBullet(metadata, "the drag recovery depends on them");
+        var (weight, diameter) = RequireBullet(metadata, "the drag recovery depends on them");
 
         var sorted = readings.OrderBy(r => r.Distance.In(DistanceUnit.Meter)).ToArray();
         if (sorted.Length < MinimumRadarReadings)
@@ -189,7 +189,7 @@ public static class DragTableBuilder
                                            "must decrease with distance.", nameof(readings));
         }
 
-        return RadarDragTableFactory.Create(sorted, metadata.Weight.Value, metadata.Diameter.Value,
+        return RadarDragTableFactory.Create(sorted, weight, diameter,
                                             atmosphere, metadata.Name.Trim(),
                                             metadata.Length, NullIfBlank(metadata.Source));
     }
@@ -218,13 +218,20 @@ public static class DragTableBuilder
     }
 
     /// <summary>Both builders need a real bullet; <paramref name="why"/> says what it is used for.</summary>
-    private static void RequireBullet(DrgMetadata metadata, string why)
+    /// <summary>
+    /// Checks the two inputs the curve is scaled by and hands them back non-null, so callers pass them on
+    /// without a null-forgiving dereference the compiler cannot verify.
+    /// </summary>
+    private static (Measurement<WeightUnit> Weight, Measurement<DistanceUnit> Diameter) RequireBullet(
+        DrgMetadata metadata, string why)
     {
         if (metadata.Weight == null || metadata.Weight.Value.Value <= 0)
             throw new ArgumentException($"The bullet weight is required — {why}.", nameof(metadata));
 
         if (metadata.Diameter == null || metadata.Diameter.Value.Value <= 0)
             throw new ArgumentException($"The bullet diameter is required — {why}.", nameof(metadata));
+
+        return (metadata.Weight.Value, metadata.Diameter.Value);
     }
 
     private static string? NullIfBlank(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
