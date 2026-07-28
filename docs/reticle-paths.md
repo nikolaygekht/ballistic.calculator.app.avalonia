@@ -99,8 +99,8 @@ wedge. To make it a hollow outline of a thick chevron, extend the sequence back 
 
 ## Next
 
-The manual's remaining parts — the drag-model articles, hit probability, the ammunition library and the
-reference section — are listed in [all articles](index.md#all-articles) and still to be written.
+[Choosing a drag model](choosing-a-drag-model.md) — where the application's accuracy actually comes from,
+and the part of the manual that is also its argument.
 
 ---
 

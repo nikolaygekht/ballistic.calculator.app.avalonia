@@ -70,10 +70,13 @@ planned** — the structure is listed in full so you can see what is coming and 
 
 **Drag models — where accuracy comes from**
 
-- Choosing a drag model — what a BC actually is, when G1 misleads, and what the form-factor switch means
-- Custom drag tables (`.drg`) — a projectile's own measured curve, and what a `.drg` does not carry
-- Approximating a drag table you do not have — from a multi-BC curve, or from measured velocities
-- Converting a ballistic coefficient between tables — the G1 ↔ G7 question, and why it is
+- [Choosing a drag model](choosing-a-drag-model.md) — what a BC actually is, when G1 misleads, and what the
+  form-factor switch means
+- [Custom drag tables](custom-drag-tables.md) — a projectile's own measured curve, and what a `.drg` does
+  not carry
+- [Approximating a drag table](approximating-a-drag-table.md) — from a multi-BC curve, or from measured
+  velocities
+- [Converting a ballistic coefficient](converting-a-bc.md) — the G1 ↔ G7 question, and why it is
   velocity-dependent
 
 **Analysis**
@@ -82,7 +85,7 @@ planned** — the structure is listed in full so you can see what is coming and 
 
 **Libraries and editors**
 
-- Ammunition library, sight and barrel presets — stop re-typing
+- [Ammunition library and presets](library-and-presets.md) — stop re-typing loads, sights and barrels
 - [The reticle editor](reticle-editor.md) — what the separate editor application is for, and its window
 - [Reticle size and zero](reticle-parameters.md) — the coordinate space every element is placed in
 - [Reticle elements](reticle-elements.md) — the six element types, and what draw order decides

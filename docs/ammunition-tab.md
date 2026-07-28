@@ -131,8 +131,9 @@ Two things worth knowing about the reference that gets stored:
   as long as the `.drg` is one of the shipped tables, or the recipient drops it into `data/drg`. If it
   is nowhere to be found, the shot cannot be computed — a GC coefficient has no curve to fall back on.
 
-If you do not have a curve for your bullet, `Tools → Approximate Drag Table` builds one from a
-multi-BC curve or from measured downrange velocities. *(Article to come.)*
+If you do not have a curve for your bullet,
+[`Tools → Approximate Drag Table`](approximating-a-drag-table.md) builds one from a multi-BC curve or from
+measured downrange velocities.
 
 ## When diameter and length are needed
 
