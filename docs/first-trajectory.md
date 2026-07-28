@@ -39,14 +39,68 @@ system of the **last trajectory you created** — remembered between sessions, i
 your first. And **opening a saved `.trajectory` file restores the system that file was saved in**,
 without changing that preference.
 
-## The six tabs
+## The six tabs, in the order the work happens
 
-The dialog is one tab per step of the work, in the order the work happens: **Ammunition**, **Weather**,
-**Wind**, **Rifle**, **Zero**, **Parameters**. Each has its own article — see
-[all articles](index.md#all-articles); only [the Ammunition tab](ammunition-tab.md) is written so far.
+Only the first tab has to be filled in. The rest have defaults, and the dialog will offer them. Each tab
+has its own article; the ones not linked below are still to be written — see
+[all articles](index.md#all-articles).
 
-Only the first tab has to be filled in: the projectile. The other five have defaults and the dialog will
-offer them, so a load on its own is enough for a first answer.
+### 1. Ammunition — the projectile *(required)*
+
+Weight, ballistic coefficient and muzzle velocity are the three numbers without which nothing can be
+computed. This is also where a measured drag curve is attached, where the bullet's diameter and length
+are entered when the correction terms need them, and where a load is saved for re-use so you never type
+it twice.
+
+📖 **[The Ammunition tab](ammunition-tab.md)** — filling it by hand and saving the load, loading one
+from the library, driving the shot from a `.drg` curve, and exactly when diameter and length are
+needed.
+
+### 2. Weather — the air *(defaults to ICAO standard)*
+
+Altitude, pressure, temperature and humidity, with a *Reset to Standard* button. Left empty, the shot
+runs in the standard atmosphere. Two things here cause more wrong answers than anything else in the
+dialog — whether your pressure reading is station or sea-level, and the fact that altitude and pressure
+are not two ways of saying the same thing.
+
+*Article to come: the Weather tab.*
+
+### 3. Wind — the air, moving *(defaults to none)*
+
+One or more wind zones along the flight path, each with a direction, a speed and the distance at which
+it starts; the first zone always starts at the muzzle. Left empty, the shot is computed in still air.
+Wind direction is a convention worth getting right before trusting a windage number, and the first zone
+does more than the others — crosswind aerodynamic jump is imparted at the muzzle and reads only that
+zone.
+
+*Article to come: the Wind tab.*
+
+### 4. Rifle — the sight and the barrel *(defaults to a 3 in sight height)*
+
+The sight's height above the bore and its click values, and the barrel's rifling — twist direction and
+twist rate. Sight height matters at every range; the rifling is what makes **spin drift** and
+**aerodynamic jump** computable at all. Leave the barrel out and both terms are silently absent from
+the answer.
+
+*Article to come: the Rifle tab.*
+
+### 5. Zero — where the rifle is sighted in *(defaults to 100 yd / 100 m)*
+
+The zero distance, the angle the rifle was zeroed at, and an optional impact offset if the rifle does
+not print dead centre at that distance. The application never asks you for a sight angle: it computes
+the zero from these inputs. This tab also holds the feature few free solvers have — zeroing with a
+**different** cartridge, atmosphere or wind than the shot itself, so you can zero supersonic and shoot
+subsonic.
+
+*Article to come: the Zero tab.*
+
+### 6. Parameters — how far, how fine, and the exotic corrections *(defaults to 1000 yd/m in 100 yd/m steps)*
+
+Maximum range and output step, this shot's angle, any clicks already dialled on the turrets, and the
+Coriolis group — barrel azimuth and your latitude. Coriolis is noise at ordinary distances and is not
+at very long ones; leave azimuth and latitude out and the term is absent.
+
+*Article to come: the Parameters tab.*
 
 ## Pressing OK
 
@@ -58,18 +112,11 @@ The dialog checks three things, in this order:
    Parameters tab, the dialog names the tab: *"Not all required data filled in: …"*. It will not guess
    the rest.
 3. **An untouched tab is offered a default.** Tabs left completely empty are listed with *"… not
-   filled. Use default values?"* — answer yes and these are used:
-
-   | Tab | Default |
-   |---|---|
-   | Weather | the standard (ICAO) atmosphere |
-   | Wind | none — still air |
-   | Rifle | a 3 in sight height, and no rifling, so no spin drift or aerodynamic jump |
-   | Zero | 100 yd (imperial) or 100 m (metric) |
-   | Parameters | out to 1,000 yd/m in 100 yd/m steps |
+   filled. Use default values?"* — answer yes and the defaults noted against each tab above are used.
 
 So the shortest possible first run is: fill in the Ammunition tab, press **OK**, accept the defaults.
-That is a real trajectory — enough to see the machinery work before you start refining inputs.
+That gives a real trajectory for a standard-atmosphere, still-air, 100 yd zero shot out to 1,000 —
+enough to see the machinery work before you start refining inputs.
 
 ## Reading the answer
 
