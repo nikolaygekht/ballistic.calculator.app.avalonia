@@ -129,8 +129,8 @@ disagreed on a still day, this is a candidate.
 
 ## Next
 
-[Reading the table](index.md#all-articles) — every column, and the two conventions behind the drop and
-hold figures. Still to be written.
+[Reading the table](reading-the-table.md) — every column, and the two conventions behind the drop and
+windage figures.
 
 ---
 

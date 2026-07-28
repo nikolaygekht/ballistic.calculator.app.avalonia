@@ -58,8 +58,13 @@ planned** — the structure is listed in full so you can see what is coming and 
   cartridge, atmosphere or wind than the shot
 - [The Parameters tab](parameters-tab.md) — maximum range and step, shot angle, dialled clicks, and the
   Coriolis effect
-- Reading the table — every column, and the two conventions behind them
-- Chart, reticle and summary — the other three views of the same shot
+- [Reading the table](reading-the-table.md) — every column, and the two conventions behind the drop and
+  windage figures
+- [The chart view](chart-view.md) — one variable against range, and the two-curve mode that shows the
+  bullet crossing the sight line
+- [The reticle view](reticle-view.md) — the sight picture, BDC marks, target boxes and moving-target lead
+- The summary view — point-blank range, the dead zone, near and far zero, and where the bullet goes
+  subsonic
 - Comparing loads, saving and exporting — several trajectories on one chart, `.trajectory` files, CSV
 
 **Drag models — where accuracy comes from**

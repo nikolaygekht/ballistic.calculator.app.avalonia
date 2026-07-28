@@ -138,7 +138,7 @@ OK opens one window, titled with the ammunition name, holding four views of the 
 <a href="screenshots/ballistic_table.png"><img src="screenshots/ballistic_table.png" width="880"
 alt="The trajectory table out to 1,000 yards: range, velocity, Mach, drop, hold, clicks, windage, windage adjustment, time of flight, energy and optimal game weight"></a>
 
-*Articles to come: reading the table; chart, reticle and summary.*
+📖 **[Reading the table](reading-the-table.md)** · **[The chart view](chart-view.md)** · **[The reticle view](reticle-view.md)** — the summary view's article is still to be written.
 
 ## Changing your mind
 
