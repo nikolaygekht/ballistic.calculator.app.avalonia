@@ -15,6 +15,8 @@ and where they stop being trustworthy.
 |---|---|
 | have never seen this application | [What Ballistic Calculator 2 is](about.md) — what it computes, and what it deliberately does not |
 | want it running | [Installation and first run](installation.md) — from the Releases archive to a trajectory on screen |
+| want to compute a shot | [Your first trajectory](first-trajectory.md) — the six tabs, the imperial/metric choice, and what OK does |
+| are describing a bullet | [The Ammunition tab](ammunition-tab.md) — by hand, from a saved load, or from a measured `.drg` curve |
 | are new to external ballistics | [Recommended reading](recommended-reading.md) — the books and references this guide leans on instead of repeating |
 
 ## What this guide is, and what it is not
@@ -33,12 +35,14 @@ Fields are documented where a task needs them.
 
 The guide is being written article by article. Planned, in reading order:
 
-- **Getting started** — installation (done), then a full worked example: one real load entered, zeroed
-  and run end to end.
-- **Building and running a shot** — describing the load; zeroing (including zeroing with a *different*
-  cartridge, atmosphere or wind than the shot); atmosphere and wind; range, step, shot angle and the
-  Coriolis effect; reading the table; the chart, sight picture and summary views; comparing loads,
-  saving and CSV export.
+- **Getting started** — [installation](installation.md) and
+  [your first trajectory](first-trajectory.md) (both done).
+- **Building and running a shot** — one article per step of the Shot Parameters dialog.
+  [The Ammunition tab](ammunition-tab.md) is written; still to come are the Weather and Wind tabs
+  (atmosphere, wind zones and the direction convention), the Rifle tab (sight height, click values,
+  twist), the Zero tab (including zeroing with a *different* cartridge, atmosphere or wind than the
+  shot), and the Parameters tab (range, step, shot angle, dialled clicks, the Coriolis effect). Then
+  reading the table; the chart, sight picture and summary views; comparing loads, saving and CSV export.
 - **Drag models** — choosing between a standard curve and a measured one; custom `.drg` tables;
   approximating a table you do not have from a multi-BC curve or from measured downrange velocities;
   converting a ballistic coefficient between standard tables.

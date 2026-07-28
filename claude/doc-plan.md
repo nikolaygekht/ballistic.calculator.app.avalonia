@@ -118,7 +118,7 @@ honest guide with nothing important missing. Phases 2 and 3 add depth.
 |---|---|---|---|
 | 0 | **What Ballistic Calculator 2 is** (`about.md`) — **written 2026-07-28** | Decide whether the application answers the reader's question before they invest an evening in it: what it computes, the four goals, what it deliberately does *not* do (no 4DOF angular motion, no primer, no load data, no online lookup), and the risk notice in full. Added to the inventory when the first pages were written — the README's job, restated for a reader who arrived at the manual first | 1 |
 | 1 | **Installation and first run** (`installation.md`) — **written 2026-07-28** | Get from the Releases archive to a running app on Windows or Linux: the .NET 8 runtime requirement, unzip anywhere writable, `chmod +x` on Linux, what the `data` folder holds and why it must stay beside the executable, where `appstate.json` lives, and the imperial/metric choice made at `Trajectory → New`. Ends by pointing at article 2 | 1 |
-| 2 | **Your first trajectory** | Follow one worked example end to end — enter a real load, zero it, run it, read the table — and come out with a correct solution plus a mental map of the four views. This is the article that has to work; everything else can be skimmed | 1 |
+| 2 | **Your first trajectory** (`first-trajectory.md`) — **written 2026-07-28** | The map, not a walkthrough: the imperial/metric choice and how little it binds, one section per tab of the Shot Parameters dialog in workflow order (each linking to its own detailed article), what OK validates — the three messages, in order — the shortest possible first run on defaults, the four views of the answer, and `Ctrl+E` as the way to iterate | 1 |
 
 *Screenshots: `params_1_ammo.png`, `ballistic_table.png` (both shot). Needs: the empty main window at
 first run. `about.md` reuses the README's five (`ballistic_table`, `reticle`, `compare_charts`,
@@ -126,9 +126,16 @@ first run. `about.md` reuses the README's five (`ballistic_table`, `reticle`, `c
 
 #### Part 2 — Building and running a shot
 
+**Restructured 2026-07-28: one detailed article per dialog tab**, hung off `first-trajectory.md` as the
+hub, in tab order (Ammunition, Weather, Wind, Rifle, Zero, Parameters). This is not the "page per dialog
+tab" failure mode the principles above warn about, and the distinction is the point: each tab *is* a step
+of the workflow, and each article is organised by **what the reader is trying to do** — enter a load by
+hand, load a saved one, drive the shot from a measured curve, decide whether a field matters — not by
+walking fields top to bottom. The exhaustive per-field table still belongs once, in the reference part.
+
 | # | Article | Goal | Phase |
 |---|---|---|---|
-| 3 | **Describing the load** | Enter a load whose inputs are ballistically sufficient for the terms the reader wants: weight, muzzle velocity, BC **or** form factor, and why diameter, length and twist are not optional once spin drift and aerodynamic jump matter. Says plainly which terms silently vanish when a field is left empty | 1 |
+| 3 | **The Ammunition tab** (`ammunition-tab.md`) — **written 2026-07-28**, absorbing "Describing the load" | Four scenarios, in the order readers meet them: enter a load by hand and `Save` it as `.ammox`; `Load` a saved or legacy `.ammo` one; drive the shot from a `.drg` curve through `Browse…` (what the five automatic changes are, and that muzzle velocity is deliberately not one of them); and when diameter and length are actually needed — spin drift, aerodynamic jump, and the hard stop that a form factor without a diameter cannot be computed at all. Ends by stating that caliber / bullet type / barrel length / source never reach the solver | 1 |
 | 4 | **Zeroing** | Understand that the app computes the zero mathematically rather than being told a sight angle, then use zero distance, impact offset at zero, and — the feature no other free solver has — zeroing with a *different* cartridge, atmosphere or wind than the shot. Worked case: zero supersonic, shoot subsonic | 1 |
 | 5 | **Atmosphere and wind** | Enter conditions without the two classic errors: station pressure vs sea-level pressure, and wind direction convention. Covers multiple wind zones along the flight path and when they are worth the trouble | 1 |
 | 6 | **Range, step, angle and the Coriolis effect** | Know what each run-time knob changes: max range and step (and the cost of a fine step), uphill/downhill shots, already-dialled clicks, and the azimuth + latitude that Coriolis needs. Says when Coriolis is noise and when it is not | 2 |
