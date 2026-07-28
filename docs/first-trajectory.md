@@ -31,7 +31,8 @@ Three things are worth knowing about that choice, because it is less binding tha
   lose a load by starting it in the wrong system.
 - **Angular units are a separate choice.** `View → Angular Units` — MOA, mils, thousandths,
   milliradians, in/100 yd, cm/100 m — does not follow imperial versus metric, because a metric shooter
-  with an MOA scope is perfectly normal. Scope click values in the sight dictionary are always mils.
+  with an MOA scope is perfectly normal. Your scope's click size is a separate matter again, entered on
+  the [Rifle tab](rifle-tab.md#click-values-buy-you-two-things) in whatever unit the turret is marked in.
 
 Two smaller consequences, in case you meet them: the standalone tools under `Tools` (both drag-table
 builders, the BC converter, the sight and barrel dictionaries) belong to no window, so they open in the
@@ -84,7 +85,8 @@ twist rate. Sight height matters at every range; the rifling is what makes **spi
 **aerodynamic jump** computable at all. Leave the barrel out and both terms are silently absent from
 the answer.
 
-*Article to come: the Rifle tab.*
+📖 **[The Rifle tab](rifle-tab.md)** — sight height and what it does to the trajectory's shape,
+presets, click values, and the three inputs spin drift needs.
 
 ### 5. Zero — where the rifle is sighted in *(defaults to 100 yd / 100 m)*
 

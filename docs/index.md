@@ -52,7 +52,8 @@ planned** — the structure is listed in full so you can see what is coming and 
   sea-level pressure
 - [The Wind tab](wind-tab.md) — the direction convention, zones along the flight path, and why the first
   zone does more than the others
-- The Rifle tab — sight height, click values, twist direction and rate; sight and barrel presets
+- [The Rifle tab](rifle-tab.md) — sight height, click values, twist direction and rate; sight and
+  barrel presets
 - The Zero tab — zero distance, impact offset at zero, and zeroing with a *different* cartridge,
   atmosphere or wind than the shot
 - The Parameters tab — maximum range and step, shot angle, dialled clicks, and the Coriolis effect

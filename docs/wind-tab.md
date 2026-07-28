@@ -123,8 +123,8 @@ downrange produces no jump at all, however strong it is.
 
 ## Next
 
-[The Rifle tab](index.md#all-articles) — sight height, click values and the twist that makes spin drift
-computable. Still to be written.
+[The Rifle tab](rifle-tab.md) — sight height, click values, and the twist that makes spin drift
+computable.
 
 ---
 
