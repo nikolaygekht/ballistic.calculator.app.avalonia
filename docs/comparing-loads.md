@@ -116,8 +116,10 @@ a 300 yd zero and its rival 100. If you are testing one variable, change one var
 
 ## Next
 
-[The summary view](index.md#all-articles) — point-blank range, the dead zone, near and far zero, and where
-the bullet goes subsonic. Still to be written.
+[The reticle editor](reticle-editor.md) — the separate application that builds the reticles the sight
+picture draws on.
+
+*(The summary view, the fourth of the four trajectory views, is still to be written.)*
 
 ---
 

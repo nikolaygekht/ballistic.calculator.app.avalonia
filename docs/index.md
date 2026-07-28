@@ -83,7 +83,10 @@ planned** — the structure is listed in full so you can see what is coming and 
 **Libraries and editors**
 
 - Ammunition library, sight and barrel presets — stop re-typing
-- The reticle editor — build or edit a reticle, and how it appears in the sight picture
+- [The reticle editor](reticle-editor.md) — what the separate editor application is for, and its window
+- [Reticle size and zero](reticle-parameters.md) — the coordinate space every element is placed in
+- [Reticle elements](reticle-elements.md) — the six element types, and what draw order decides
+- [Reticle paths](reticle-paths.md) — move-to, line-to and arc, for shapes the other types cannot make
 
 **Reference**
 

@@ -94,7 +94,8 @@ The **Reticle Editor** is a separate application in the same folder (`ReticleEdi
 of lines, paths, circles, rectangles, text and BDC marks. Anything it saves into `data/reticle` appears in
 this view's `Load…` dialog.
 
-It has its own article to come.
+It has four articles of its own: [what it is for](reticle-editor.md),
+[size and zero](reticle-parameters.md), [elements](reticle-elements.md) and [paths](reticle-paths.md).
 
 ## Things worth knowing
 
