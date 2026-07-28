@@ -81,7 +81,8 @@ planned** — the structure is listed in full so you can see what is coming and 
 
 **Analysis**
 
-- Hit probability — building an error budget that is not wishful, and reading the three outputs
+- [Hit probability](hit-probability.md) — building an error budget that is not wishful, and reading the
+  three outputs
 
 **Libraries and editors**
 

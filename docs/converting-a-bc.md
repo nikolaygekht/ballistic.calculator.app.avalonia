@@ -78,10 +78,7 @@ note what that reference was, and treat the result as a good approximation rathe
 
 ## Next
 
-[Ammunition library and presets](library-and-presets.md) — saving loads, sights and barrels so nothing is
-typed twice.
-
-*(Hit probability, the last of the analysis tools, is still to be written.)*
+[Hit probability](hit-probability.md) — the Monte-Carlo tool, and the error budget it needs from you.
 
 ---
 
