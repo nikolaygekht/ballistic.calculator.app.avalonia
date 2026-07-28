@@ -25,9 +25,9 @@ Because the sight picture is only as truthful as the reticle behind it. The
 a target fits between them, where a moving-target lead sits. All of that is worthless if the marks are on
 the wrong subtensions.
 
-Eight reticles ship in `data/reticle` — `mildot`, `moa`, `bdc`, `chevron`, `german4`, `pso-1`, `segmented`
-and an M16 iron-sight picture — and they cover the common patterns. Your scope's reticle is quite possibly
-not among them, and this is what you use to describe it.
+Nine reticles ship in `data/reticle` — `mildot`, `h58`, `moa`, `bdc`, `chevron`, `german4`, `pso-1`,
+`segmented` and an M16 iron-sight picture — and they cover the common patterns. Your scope's reticle is
+quite possibly not among them, and this is what you use to describe it.
 
 Three other reasons people end up here:
 
