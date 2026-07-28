@@ -185,8 +185,8 @@ it.
 
 ## Next
 
-The rest of the shot: [Your first trajectory](first-trajectory.md) maps the other five tabs, and their
-own articles are being written.
+[The Weather tab](weather-tab.md) — the air the bullet has to fly through, and the one field on it that
+catches everybody.
 
 ---
 

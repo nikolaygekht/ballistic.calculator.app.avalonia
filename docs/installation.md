@@ -140,9 +140,8 @@ applications, and `BuildDebug.bat` / `TestDebug.bat` wrap the two commands above
 
 ## Next
 
-A full worked example — one real load entered, zeroed and run end to end — is the next article to be
-written. Until it lands, [What Ballistic Calculator 2 is](about.md) covers what each view is for, and
-[Recommended reading](recommended-reading.md) covers the ballistics behind the inputs.
+[Your first trajectory](first-trajectory.md) — the imperial/metric choice, what each of the six tabs
+owns, and what pressing OK actually checks.
 
 ---
 

@@ -135,7 +135,8 @@ number is produced.
 
 ## Next
 
-[Installation and first run](installation.md).
+[Installation and first run](installation.md) — from the Releases archive to a running application, and
+where it keeps its files.
 
 ---
 

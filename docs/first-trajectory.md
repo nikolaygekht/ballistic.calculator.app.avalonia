@@ -147,6 +147,10 @@ shot (and the window's measurement and angular units); `Trajectory → Export As
 itself, in either a local Excel-friendly format or a portable invariant one. To put two loads side by
 side, open both and use `View → Compare → Add`.
 
+## Next
+
+[The Ammunition tab](ammunition-tab.md) — the projectile, and the only tab you cannot skip.
+
 ---
 
 [← Contents](index.md)

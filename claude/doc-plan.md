@@ -106,6 +106,15 @@ book, and it would compete with better ones.
 - **Every article names its screenshots.** Existing captures are catalogued in
   [`../docs/screenshots/README.md`](../docs/screenshots/README.md); the inventory below marks what is
   already shot and what still needs capturing.
+- **Every article ends with `## Next`, then `[← Contents](index.md)`** (agreed 2026-07-28). One line:
+  the link plus a clause saying what the reader gets there. For the tab articles that is the **next tab
+  in dialog order** — Ammunition → Weather → Wind → Rifle → Zero → Parameters → reading the table — so
+  the manual can be read straight through without going back to the index between articles. Slate has no
+  sidebar, which is what makes the chain worth maintaining. When the next article does not exist yet,
+  link [`index.md#all-articles`](../docs/index.md) and say it is still to be written; when it lands, the
+  pointer becomes a real link. **Check the previous article's `Next` when adding one** — that is how
+  `installation.md` was left claiming the worked example was unwritten after
+  `first-trajectory.md` had shipped.
 
 ### Article inventory
 
