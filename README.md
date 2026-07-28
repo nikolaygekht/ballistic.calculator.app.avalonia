@@ -12,6 +12,9 @@ alt="The trajectory table: range, velocity, Mach, drop, hold, clicks, windage, t
 *Drop, windage, clicks, energy and time of flight out to 1,000 yd — .223 69 gr Sierra, 300 yd zero. Click any
 image to open it full size.*
 
+📖 **[User guide](https://nikolaygekht.github.io/ballistic.calculator.app.avalonia/)** — installation, what the
+model includes, and where to learn the ballistics behind the inputs.
+
 ## Goals
 
 **Accuracy comparable to commercial and 4DOF solvers.** The engine is a 3DOF (point-mass) integration with the
@@ -77,13 +80,18 @@ the barrel azimuth and your latitude. Leave them out and those terms are simply 
 ## Download
 
 Grab the latest archive from [Releases](https://github.com/nikolaygekht/ballistic.calculator.app.avalonia/releases),
-unzip it anywhere, and run it. There is no installer and nothing is written outside the folder you unzipped to.
+unzip it into a folder you can write to, and run it. There is no installer.
 
 * **Windows** — run `BallisticCalculator2.exe` (the reticle editor is `ReticleEditor.exe`)
 * **Linux** — run `BallisticCalculator2` (`chmod +x` it first if your unzip tool dropped the permission)
 
 Both platforms' binaries are in the same archive, alongside the shared `data` folder holding reticles, drag
-tables and the sample ammunition library. The builds are self-contained — no .NET installation required.
+tables and the sample ammunition library — keep that folder beside the executable. The builds are
+framework-dependent, so the **[.NET 8 runtime](https://dotnet.microsoft.com/download/dotnet/8.0)** has to be
+installed; the plain runtime is enough, Avalonia does not need the Desktop Runtime.
+
+Full instructions, including what the application stores and where, are in
+[Installation and first run](https://nikolaygekht.github.io/ballistic.calculator.app.avalonia/installation.html).
 
 ## Recommended reading
 
@@ -93,6 +101,9 @@ If precision shooting or external ballistics is new to you:
 * [Projectile motion](https://en.wikipedia.org/wiki/Projectile_motion)
 * [Ballistic coefficient](https://en.wikipedia.org/wiki/Ballistic_coefficient)
 * [Scope reticle](https://en.wikipedia.org/wiki/Reticle)
+
+The user guide's [Recommended reading](https://nikolaygekht.github.io/ballistic.calculator.app.avalonia/recommended-reading.html)
+adds the standard books, each mapped to the question it answers.
 
 ## RISK NOTICE
 
