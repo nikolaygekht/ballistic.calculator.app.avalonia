@@ -10,7 +10,7 @@ still to be written. The other eleven, including all eight Shot Parameters tab c
 here for that manual.
 
 On GitHub a bare `![]()` image is not clickable, so each one is wrapped in
-`<a href="doc/screenshots/…"><img width="…"></a>`: small preview in the page, full size on click.
+`<a href="docs/screenshots/…"><img width="…"></a>`: small preview in the page, full size on click.
 Widths are set per image because the set mixes aspect ratios — landscape trajectory windows
 (~1740×866), portrait dialogs (~1024×1035) and the very wide reticle editor (2260×876) cannot share
 one width without something becoming either illegible or overwhelming.

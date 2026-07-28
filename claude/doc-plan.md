@@ -16,12 +16,19 @@ Help menu opens that URL in the user's default browser.
   content folder, no `FrameworkReference`, and no `file://` constraint on the generator. Users without a
   connection get no in-app help; accepted.
 - **Generator: none of our own — plain Markdown built by GitHub's own Jekyll** (revised 2026-07-27,
-  superseding VitePress; see "What the Markdown decision removed"). Sidebar and search come from the
-  `just-the-docs` remote theme, so there is no Node toolchain, no lockfile and no build script in the
-  repository.
+  superseding VitePress; see "What the Markdown decision removed"). No Node toolchain, no lockfile and
+  no build script in the repository.
+- **Theme: `jekyll-theme-slate`** (decided 2026-07-28, superseding `just-the-docs`). One of GitHub's
+  built-in supported themes, so it goes in as `theme:` rather than `remote_theme:`. The trade is
+  explicit: Slate has **no sidebar and no search**, so `index.md` carries the contents by hand and every
+  article ends with a link back to it. Revisit if the manual outgrows a hand-written index.
 - **Publish by folder, from `main`** — Pages set to *Deploy from a branch*, source `main` + `/docs`.
-  No workflow, no `gh-pages` branch, nothing duplicated. **Requires renaming `doc/` → `docs/`**:
-  GitHub only offers the repository root or `/docs` as a branch source.
+  No workflow, no `gh-pages` branch, nothing duplicated. `doc/` → `docs/` **renamed 2026-07-28**
+  (briefly `usermanual/`, reverted): GitHub only offers the repository root or `/docs` as a branch
+  source.
+- **No pretty permalinks.** Pages resolve as `/about.html`, so relative image paths
+  (`screenshots/reticle.png`) work on the site *and* in GitHub's view of the same `.md`.
+  `permalink: pretty` would move pages to `/about/` and break all of them.
 - **Open via the existing pattern** — the private `OpenUrl(...)` helper already in
   `Desktop/BallisticCalculator/Views/MainWindow.axaml.cs:628`
   (`Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true })`).
@@ -29,16 +36,18 @@ Help menu opens that URL in the user's default browser.
 ### What the Markdown decision removed
 
 VitePress bought two things — a sidebar and offline search — at the price of a Node dependency tree,
-`npm ci` in CI, a `base`-path trap, and a generator to keep current. `just-the-docs` gives both back
-through one `remote_theme:` line, and GitHub builds it. What actually goes away:
+`npm ci` in CI, a `base`-path trap, and a generator to keep current. Both are given up rather than
+replaced (see the Slate decision above): the contents live in `index.md`, written by hand. What
+actually goes away:
 
 - `doc/package.json`, `doc/.vitepress/`, the `docs:dev` / `docs:build` scripts, three `.gitignore`
   entries, and `.github/workflows/docs.yml` entirely.
 - The `base: '/ballistic.calculator.app.avalonia/'` trap. Jekyll's `baseurl` handles it, and relative
   links need no prefix at all.
 - The `doc/site/` vs `doc/screenshots/` layout conflict — there is no page scanner to exclude
-  anything from. `docs/screenshots/README.md` simply becomes a page; either leave it (it is a useful
-  catalogue) or give it `nav_exclude: true`.
+  anything from. `docs/screenshots/README.md` has no front matter, so Jekyll would copy it verbatim;
+  `_config.yml` lists it under `exclude:` instead, keeping it a contributors' note in the repository
+  and off the site.
 
 What it costs, and it is worth stating plainly rather than discovering later:
 
@@ -95,7 +104,7 @@ book, and it would compete with better ones.
 - **State the caveat where the number is produced**, not in a disclaimer nobody reaches. The
   approximation tools and hit probability are the places this matters most.
 - **Every article names its screenshots.** Existing captures are catalogued in
-  [`../doc/screenshots/README.md`](../doc/screenshots/README.md); the inventory below marks what is
+  [`../docs/screenshots/README.md`](../docs/screenshots/README.md); the inventory below marks what is
   already shot and what still needs capturing.
 
 ### Article inventory
@@ -107,11 +116,13 @@ honest guide with nothing important missing. Phases 2 and 3 add depth.
 
 | # | Article | Goal — what the reader can do afterwards | Phase |
 |---|---|---|---|
-| 1 | **Installation and first run** | Get from the Releases archive to a running app on Windows or Linux: unzip anywhere, no installer, `chmod +x` on Linux, what the `data` folder holds, and the imperial/metric choice made at the first window. Ends by pointing at article 2 | 1 |
+| 0 | **What Ballistic Calculator 2 is** (`about.md`) — **written 2026-07-28** | Decide whether the application answers the reader's question before they invest an evening in it: what it computes, the four goals, what it deliberately does *not* do (no 4DOF angular motion, no primer, no load data, no online lookup), and the risk notice in full. Added to the inventory when the first pages were written — the README's job, restated for a reader who arrived at the manual first | 1 |
+| 1 | **Installation and first run** (`installation.md`) — **written 2026-07-28** | Get from the Releases archive to a running app on Windows or Linux: the .NET 8 runtime requirement, unzip anywhere writable, `chmod +x` on Linux, what the `data` folder holds and why it must stay beside the executable, where `appstate.json` lives, and the imperial/metric choice made at `Trajectory → New`. Ends by pointing at article 2 | 1 |
 | 2 | **Your first trajectory** | Follow one worked example end to end — enter a real load, zero it, run it, read the table — and come out with a correct solution plus a mental map of the four views. This is the article that has to work; everything else can be skimmed | 1 |
 
 *Screenshots: `params_1_ammo.png`, `ballistic_table.png` (both shot). Needs: the empty main window at
-first run.*
+first run. `about.md` reuses the README's five (`ballistic_table`, `reticle`, `compare_charts`,
+`hit_probability`, `custom_drg`); `installation.md` carries none yet.*
 
 #### Part 2 — Building and running a shot
 
@@ -169,7 +180,7 @@ loaded, the BC converter.*
 | 18 | **File formats** | Read or produce the files by hand: `.drg`, the ammunition library, reticle files, and the saved shot | 3 |
 | 19 | **What the model does and does not include** | Judge the numbers: 3DOF point-mass integration plus spin drift, aerodynamic jump and Coriolis; what a 4DOF model adds (angular motion, not a better drag model); and the risk notice in full rather than as fine print | 1 |
 | 20 | **Troubleshooting and FAQ** | Resolve the recurring stumbles — "why is my drop wrong at 1,000 yd", "why is spin drift zero", "why does the table stop early", "why do two solvers disagree" — each answer pointing at the article that explains it properly | 3 |
-| 21 | **Further reading** | Learn the ballistics this manual deliberately does not teach. Carries the README's reference links plus the standard books, each with one line on *why* it is worth the reader's time and which article sends them there. This page is what makes "no primer" an honest position rather than a gap | 1 |
+| 21 | **Recommended reading** (`recommended-reading.md`) — **written 2026-07-28**, titled as the README calls it rather than "Further reading" | Learn the ballistics this manual deliberately does not teach. Carries the README's reference links plus the standard books, each with one line on *why* it is worth the reader's time and which article sends them there. This page is what makes "no primer" an honest position rather than a gap | 1 |
 
 Candidate books for article 21, mapped to the articles that should link to them:
 
@@ -199,32 +210,35 @@ Article 21 is in Phase 1 on purpose: "no primer" only works if the reader is tol
 
 ### Authoring (`docs/` — plain Markdown, no project to install)
 
-The one-time rename is `git mv doc docs`, plus fixing the five image paths in the root `README.md`
-and the references in this plan and `doc/screenshots/README.md`.
+Done 2026-07-28: `doc/` → `docs/`, the five image paths in the root `README.md`, and the references in
+this plan, `claude/DEFECTS.md` and `docs/screenshots/README.md`.
 
 ```
 docs/
-  _config.yml          remote_theme: just-the-docs/just-the-docs, title, description, baseurl
-  index.md             the manual's front page — the six parts, and where to start
+  _config.yml          theme: jekyll-theme-slate, title, description, url, baseurl, exclude
+  index.md             the manual's front page — the contents by hand, and where to start
   <article>.md         one file per article in the inventory, front matter for title + nav order
-  screenshots/        already committed; images shared with the root README
+  screenshots/         already committed; images shared with the root README
 ```
 
 - **Front matter is mandatory** — Jekyll only converts files that have it. Minimum per page:
-  `title:` plus `nav_order:`; `parent:` to nest an article under its part.
+  `title:` plus `nav_order:`. `nav_order` builds nothing under Slate; it is kept as the record of
+  reading order, and as what a nav-bearing theme would need if we ever switch back.
+- **Slate has no sidebar**, so `index.md` is the only table of contents and every article ends with a
+  `[← Contents](index.md)` link. Adding an article means adding it to `index.md` by hand.
 - **One image store.** `docs/screenshots/` serves both the root README and the manual; no second copy
   under an assets folder. Relative links (`screenshots/reticle.png`) resolve in the built site and in
-  GitHub's file view alike.
-- `docs/screenshots/README.md` becomes a page unless it gets `nav_exclude: true`. Leaving it visible
-  is defensible — it is a genuine catalogue — but decide rather than drift.
+  GitHub's file view alike — which is what forbids `permalink: pretty`.
+- `docs/screenshots/README.md` is listed under `exclude:` in `_config.yml` — a contributors' note, kept
+  in the repository and off the site.
 - Capture at a fixed window size and 100 % display scaling so shots stay consistent; the capture
   notes in `claude/SCREENSHOTS.md` still apply.
 
 ### Publishing (no workflow, no `gh-pages` branch)
 - Repo Settings → Pages → **Deploy from a branch**, branch `main`, folder `/docs`. One-time click.
 - GitHub runs Jekyll on every push that touches `docs/`. Nothing else in the repository is published.
-- Theme plugins are limited to the Pages allow-list, which is why `just-the-docs` goes in as
-  `remote_theme` rather than a gem — no `Gemfile` needed.
+- `jekyll-theme-slate` is one of GitHub's built-in supported themes, so it goes in as `theme:` — no
+  `remote_theme`, no `Gemfile`.
 - `baseurl: /ballistic.calculator.app.avalonia` in `_config.yml` so theme assets resolve under the
   project-pages path.
 

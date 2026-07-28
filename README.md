@@ -6,7 +6,7 @@ This is the successor to the WinForms [Ballistic Calculator .NET](https://github
 rewritten from the ground up to be genuinely cross-platform rather than Windows-with-Wine. The trajectory
 mathematics comes from the [BallisticCalculator](https://github.com/gehtsoft-usa/BallisticCalculator1) library.
 
-<a href="doc/screenshots/ballistic_table.png"><img src="doc/screenshots/ballistic_table.png" width="880"
+<a href="docs/screenshots/ballistic_table.png"><img src="docs/screenshots/ballistic_table.png" width="880"
 alt="The trajectory table: range, velocity, Mach, drop, hold, clicks, windage, time of flight, energy and optimal game weight from the muzzle out to 1,000 yards"></a>
 
 *Drop, windage, clicks, energy and time of flight out to 1,000 yd — .223 69 gr Sierra, 300 yd zero. Click any
@@ -31,10 +31,10 @@ touch-first mobile app can be built on them rather than around them. That work h
 
 <table>
 <tr>
-<td align="center"><a href="doc/screenshots/reticle.png"><img src="doc/screenshots/reticle.png" width="200" alt="Sight picture: a Mil-Dot reticle with a 6 by 6 inch target box drawn to scale at 100 yards"></a><br><sub>Sight picture</sub></td>
-<td align="center"><a href="doc/screenshots/compare_charts.png"><img src="doc/screenshots/compare_charts.png" width="200" alt="Drop curves for two cartridges compared on one chart with a legend"></a><br><sub>Loads compared</sub></td>
-<td align="center"><a href="doc/screenshots/hit_probability.png"><img src="doc/screenshots/hit_probability.png" width="200" alt="Hit probability dialog: error budget inputs on the left, an 18.3 percent single-shot result and an impact scatter against the vital zone on the right"></a><br><sub>Hit probability</sub></td>
-<td align="center"><a href="doc/screenshots/custom_drg.png"><img src="doc/screenshots/custom_drg.png" width="200" alt="Approximate Drag Table dialog with sixteen measured downrange velocities loaded from a CSV file"></a><br><sub>Drag table from radar data</sub></td>
+<td align="center"><a href="docs/screenshots/reticle.png"><img src="docs/screenshots/reticle.png" width="200" alt="Sight picture: a Mil-Dot reticle with a 6 by 6 inch target box drawn to scale at 100 yards"></a><br><sub>Sight picture</sub></td>
+<td align="center"><a href="docs/screenshots/compare_charts.png"><img src="docs/screenshots/compare_charts.png" width="200" alt="Drop curves for two cartridges compared on one chart with a legend"></a><br><sub>Loads compared</sub></td>
+<td align="center"><a href="docs/screenshots/hit_probability.png"><img src="docs/screenshots/hit_probability.png" width="200" alt="Hit probability dialog: error budget inputs on the left, an 18.3 percent single-shot result and an impact scatter against the vital zone on the right"></a><br><sub>Hit probability</sub></td>
+<td align="center"><a href="docs/screenshots/custom_drg.png"><img src="docs/screenshots/custom_drg.png" width="200" alt="Approximate Drag Table dialog with sixteen measured downrange velocities loaded from a CSV file"></a><br><sub>Drag table from radar data</sub></td>
 </tr>
 </table>
 

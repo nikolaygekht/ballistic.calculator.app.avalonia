@@ -31,9 +31,9 @@ and the markup confirmed it: both grids were declared identically.
 
 **`Width="*"` columns.** A star column sizes itself from the grid's available width — the same
 budget the vertical scroll bar has to come out of — and the bar loses: the columns take the lot and
-no space is left to reserve. The giveaway is visible in `doc/screenshots/custom_drg.png`: with 16
-readings in a grid showing six, the two columns still span the full width, so nothing was ever set
-aside for a bar.
+no space is left to reserve. The giveaway is visible in `docs/screenshots/custom_drg.png`:
+with 16 readings in a grid showing six, the two columns still span the full width, so nothing was
+ever set aside for a bar.
 
 `TrajectoryTableControl` has always scrolled correctly because its columns are **fixed pixel
 widths**, which do not compete for that budget. Both editors now match it: fixed widths (150),

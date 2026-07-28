@@ -1,0 +1,23 @@
+# GitHub Pages configuration for the user guide.
+#
+# Published with Settings -> Pages -> "Deploy from a branch", branch `main`, folder `/docs`.
+# GitHub runs Jekyll itself, so there is nothing to build or install locally.
+#
+# Two constraints worth knowing before editing this file:
+#   * Every page needs YAML front matter. Jekyll only converts files that have it; a bare .md is
+#     copied verbatim and the browser shows plain text.
+#   * Do NOT set `permalink: pretty`. Pages resolve as /about.html, so a relative image path such as
+#     `screenshots/reticle.png` works both on the site and in GitHub's own view of the .md file.
+#     Pretty permalinks would move pages to /about/ and break every one of those links.
+
+title: Ballistic Calculator 2
+description: User guide — a free, open-source ballistic calculator for Windows and Linux
+theme: jekyll-theme-slate
+
+url: https://nikolaygekht.github.io
+baseurl: /ballistic.calculator.app.avalonia
+
+# The screenshot catalogue is a contributors' note, not a manual page. It has no front matter, so
+# Jekyll copies it as-is rather than rendering it; it stays readable in the repository.
+exclude:
+  - screenshots/README.md
