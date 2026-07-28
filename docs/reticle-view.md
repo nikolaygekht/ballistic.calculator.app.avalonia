@@ -108,8 +108,9 @@ It has its own article to come.
 
 ## Next
 
-[The summary view](index.md#all-articles) — point-blank range, the dead zone, near and far zero, and
-where the bullet goes subsonic. Still to be written.
+[Comparing loads](comparing-loads.md) — putting two solutions on one chart and reading the difference.
+
+*(The summary view, the fourth of the four, is still to be written.)*
 
 ---
 

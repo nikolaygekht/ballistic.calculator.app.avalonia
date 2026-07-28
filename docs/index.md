@@ -65,7 +65,8 @@ planned** — the structure is listed in full so you can see what is coming and 
 - [The reticle view](reticle-view.md) — the sight picture, BDC marks, target boxes and moving-target lead
 - The summary view — point-blank range, the dead zone, near and far zero, and where the bullet goes
   subsonic
-- Comparing loads, saving and exporting — several trajectories on one chart, `.trajectory` files, CSV
+- [Comparing loads](comparing-loads.md) — several trajectories on one chart, and what is worth comparing
+- Saving and exporting — `.trajectory` files, and the two CSV formats
 
 **Drag models — where accuracy comes from**
 

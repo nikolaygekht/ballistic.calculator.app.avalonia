@@ -61,23 +61,17 @@ menu item you will use most on this view.
 Re-selecting a variable from `View → Chart` re-autoscales both axes, which is the quickest way back to a
 sane view.
 
-## More than one trajectory
+## One shot here, several in the Compare window
 
-`View → Compare → Add` puts another open trajectory onto the same chart, and a legend appears naming each
-one. This is where the chart earns its keep — two loads' numbers interleaved in a table are hard work,
-while two curves separating past 450 yd tell the story at a glance.
+This view charts **one** trajectory: the one in its own window. A legend is drawn only when there is
+something to disambiguate — in the two-curve drop mode above, naming the bullet path and the line of sight
+— and a single curve gets none.
 
-<a href="screenshots/compare_charts.png"><img src="screenshots/compare_charts.png" width="800"
-alt="Two drop curves on one chart with a legend: a .223 55 gr FMJ against a .223 69 gr Sierra, separating past 450 yards"></a>
+To put two loads side by side, `View → Compare → Add` builds a separate window from the trajectories you
+have open. It uses this same chart, so everything on this page applies there too.
 
-*Two loads on one chart. The heavier, higher-BC bullet drops visibly less at 1,000 yd.*
-
-A legend also appears in the two-curve drop mode described above, naming the bullet path and the line of
-sight. With a single series and a single trajectory there is nothing to disambiguate, so no legend is
-drawn.
-
-Comparison has its own article to come — how the window works, what it does with mismatched units, and
-`View → Compare → Remove Last Added`.
+📖 **[Comparing loads](comparing-loads.md)** — building a comparison, why it is a snapshot rather than a
+live link, mixed units, and what is actually worth comparing.
 
 ## Things worth knowing
 
