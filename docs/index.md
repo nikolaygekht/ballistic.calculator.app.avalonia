@@ -48,9 +48,10 @@ planned** — the structure is listed in full so you can see what is coming and 
 
 - [The Ammunition tab](ammunition-tab.md) — by hand, from a saved load, from a `.drg` curve; when
   diameter and length matter
-- The Weather tab — altitude, pressure, temperature, humidity, and station versus sea-level pressure
-- The Wind tab — the direction convention, multiple zones along the flight path, and why the first zone
-  does more than the others
+- [The Weather tab](weather-tab.md) — altitude, pressure, temperature, humidity, and station versus
+  sea-level pressure
+- [The Wind tab](wind-tab.md) — the direction convention, zones along the flight path, and why the first
+  zone does more than the others
 - The Rifle tab — sight height, click values, twist direction and rate; sight and barrel presets
 - The Zero tab — zero distance, impact offset at zero, and zeroing with a *different* cartridge,
   atmosphere or wind than the shot

@@ -63,17 +63,19 @@ runs in the standard atmosphere. Two things here cause more wrong answers than a
 dialog — whether your pressure reading is station or sea-level, and the fact that altitude and pressure
 are not two ways of saying the same thing.
 
-*Article to come: the Weather tab.*
+📖 **[The Weather tab](weather-tab.md)** — the four fields, why the pressure must be the one where you
+are standing, and what the standard atmosphere gives you.
 
 ### 3. Wind — the air, moving *(defaults to none)*
 
-One or more wind zones along the flight path, each with a direction, a speed and the distance at which
-it starts; the first zone always starts at the muzzle. Left empty, the shot is computed in still air.
-Wind direction is a convention worth getting right before trusting a windage number, and the first zone
-does more than the others — crosswind aerodynamic jump is imparted at the muzzle and reads only that
-zone.
+One or more wind zones along the flight path, each with a direction, a speed and the distance at which it
+starts — a wind entered from 250 m means the first 250 m are calm. Left empty, the shot is computed in
+still air. Wind direction is a convention worth getting right before trusting a windage number, and the
+first zone does more than the others — crosswind aerodynamic jump is imparted at the muzzle and reads
+only that zone.
 
-*Article to come: the Wind tab.*
+📖 **[The Wind tab](wind-tab.md)** — the direction convention against the dial, what a zone's distance
+means, and when zones are worth the trouble.
 
 ### 4. Rifle — the sight and the barrel *(defaults to a 3 in sight height)*
 
