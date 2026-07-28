@@ -13,19 +13,19 @@ namespace BallisticCalculator.Tests.Views;
 /// End-to-end cover for the Windows menu (D-001), exercised through a real <see cref="MainWindow"/>.
 /// </summary>
 /// <remarks>
-/// Everything runs inside a single test on purpose. Only the first <see cref="WindowsPanel"/>
-/// created in a headless run resolves its control theme; a second <see cref="MainWindow"/> in the
-/// same process fails to apply the MDI template (<c>PART_Windows</c> missing), whether or not the
-/// first one was closed. So the whole menu scenario is walked through once here, and the decision
-/// logic behind it is covered case by case in <see cref="WindowActivationTests"/>.
+/// Everything runs inside a single test on purpose: only the first <see cref="WindowsPanel"/> created
+/// in a headless run resolves its control theme, so the window comes from
+/// <see cref="HeadlessMainWindow"/> and the whole menu scenario is walked through in one pass. The
+/// decision logic behind it is covered case by case in <see cref="WindowActivationTests"/>.
 /// </remarks>
+[Collection(HeadlessMainWindow.Collection)]
 public class WindowsMenuTests
 {
     [AvaloniaFact]
     public void WindowsMenu_SelectingEntries_AlwaysBringsThatWindowToTheFront()
     {
         // Arrange — three open child windows
-        var main = new MainWindow();
+        var main = HeadlessMainWindow.Instance;
         main.Show();
         Dispatcher.UIThread.RunJobs();
         for (var i = 0; i < 3; i++)

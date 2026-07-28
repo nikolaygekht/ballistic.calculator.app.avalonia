@@ -242,24 +242,39 @@ docs/
 - `baseurl: /ballistic.calculator.app.avalonia` in `_config.yml` so theme assets resolve under the
   project-pages path.
 
-### Menu wiring (`Views/MainWindow.axaml` + `.axaml.cs`)
-- Help menu currently holds only `_About` (`MainWindow.axaml:118`). Add above it:
-  - `Help → _User Guide` (F1) → `OpenUrl(HelpUrl)`.
-  - separator, then the existing `_About`.
-- Keep the URL as one `const string HelpUrl` next to `OpenUrl`; deep links per page can come later
-  (e.g. `HelpUrl + "tools/hit-probability"`) if we want context help from dialogs.
+### Menu wiring (`Views/MainWindow.axaml` + `.axaml.cs`) — **done 2026-07-28**
+- `Help → _User Guide` (F1), a separator, then the existing `_About` (which keeps `Ctrl+F1`). Bare F1
+  is handled at the top of `OnKeyDown`, before its `if (!ctrl) return` — `InputGesture` only draws the
+  accelerator, as the existing `Ctrl+…` shortcuts already show.
+- The URL is one `internal const string HelpUrl` next to `OpenUrl`; deep links per page can come later
+  (e.g. `HelpUrl + "installation.html"`) if we want context help from dialogs.
+- `internal Action<string> UrlOpener { get; init; } = OpenUrl` is the test seam. Without it a test that
+  clicks the item launches a real browser on the machine running the suite.
+- Cover: `HelpMenuTests` — the click, bare F1, F1 with a modifier doing nothing, the menu order, and
+  that `HelpUrl` is the published address. The one thing tests cannot reach is `Process.Start` itself,
+  so *press F1 once in the real app* after touching this code.
 - No build/packaging changes: `BuildRelease.bat`, `Setup/prepare.bat` and the portable `content/` folder are
   untouched.
 
+**A trap this uncovered, worth knowing before writing any other `MainWindow` test:** only the *first*
+`MainWindow` constructed in a headless process works — `WindowsPanel` resolves its control theme once,
+and the next window to lay out throws `ArgumentNullException: PART_Windows`. Merely constructing a
+second one (no `Show()`) is enough to break a *later* test. `HeadlessMainWindow` now owns the single
+instance, and `WindowsMenuTests` and `HelpMenuTests` share it through one xUnit collection.
+
 ## Verification
-1. Push to `main` → the Pages build in the repository's *Actions* / *Deployments* tab goes green, and
-   the site URL loads. A page rendering as **plain text is the missing-front-matter symptom**; theme
-   CSS 404s are the wrong-`baseurl` symptom.
-2. Sidebar lists every article in the intended order, and the theme's search finds a term that only
-   appears mid-article (e.g. "aerodynamic jump").
-3. Screenshots load on the site **and** in GitHub's own view of the same `.md` file — the point of
-   relative paths.
-4. App: `Help → User Guide` opens the default browser at the Pages URL on Windows and Linux.
+
+Done 2026-07-28 for the first three articles (`10d5e5c`):
+
+1. ✅ Pages build green for the pushed commit, site root 200. A page rendering as **plain text is the
+   missing-front-matter symptom**; theme CSS 404s are the wrong-`baseurl` symptom. Checked with
+   `gh api repos/<owner>/<repo>/pages/builds/latest` and `curl`.
+2. ✅ `index.md` lists every article that exists (no sidebar to check — Slate has none, and no search).
+3. ✅ Screenshots load on the site **and** in GitHub's own view of the same `.md` file — the point of
+   relative paths. `assets/css/style.css` resolves under the `baseurl`, and `screenshots/README.md`
+   is 404 by way of `exclude:`.
+4. ⏳ App: `Help → User Guide` opens the default browser at the Pages URL — wired and unit-tested, but
+   `Process.Start` itself is only provable by pressing F1 in the real app on each platform.
 
 ## Open decisions
 - Whether to also produce a PDF manual (pandoc) as a secondary artifact — currently **no**.

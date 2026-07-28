@@ -67,6 +67,14 @@ public partial class MainWindow : Window
         var shift = e.KeyModifiers.HasFlag(KeyModifiers.Shift);
         var alt = e.KeyModifiers.HasFlag(KeyModifiers.Alt);
 
+        // Bare F1 is the only unmodified accelerator; Ctrl+F1 stays with About, below.
+        if (e.Key == Key.F1 && !ctrl && !shift && !alt)
+        {
+            UrlOpener(HelpUrl);
+            e.Handled = true;
+            return;
+        }
+
         if (!ctrl) return;
 
         if (!shift && !alt)
@@ -403,6 +411,7 @@ public partial class MainWindow : Window
         MenuWindowsCascade.Click += (_, _) => CascadeWindows();
 
         // Help
+        MenuHelpUserGuide.Click += (_, _) => UrlOpener(HelpUrl);
         MenuHelpAbout.Click += async (_, _) => await ShowAboutDialog();
     }
 
@@ -683,6 +692,19 @@ public partial class MainWindow : Window
 
         await dialog.ShowDialog(this);
     }
+
+    /// <summary>
+    /// The published user guide — the <c>docs/</c> folder of the repository, served by GitHub Pages.
+    /// Per-page deep links can be appended to it (e.g. <c>HelpUrl + "installation.html"</c>) if dialogs
+    /// ever get context help.
+    /// </summary>
+    internal const string HelpUrl = "https://nikolaygekht.github.io/ballistic.calculator.app.avalonia/";
+
+    /// <summary>
+    /// How a URL is handed to the desktop. Replaced in tests, where the real implementation would
+    /// launch a browser on the machine running the suite.
+    /// </summary>
+    internal Action<string> UrlOpener { get; init; } = OpenUrl;
 
     private static void OpenUrl(string url)
     {

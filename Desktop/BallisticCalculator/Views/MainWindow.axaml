@@ -118,7 +118,10 @@
             </MenuItem>
 
             <!-- Help Menu -->
-            <MenuItem Header="_Help">
+            <MenuItem Header="_Help" x:Name="MenuHelp">
+                <MenuItem Header="_User Guide" x:Name="MenuHelpUserGuide"
+                          InputGesture="F1" />
+                <Separator />
                 <MenuItem Header="_About" x:Name="MenuHelpAbout"
                           InputGesture="Ctrl+F1" />
             </MenuItem>
