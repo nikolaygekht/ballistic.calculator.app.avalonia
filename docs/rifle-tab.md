@@ -127,8 +127,8 @@ not.
 
 ## Next
 
-[The Zero tab](index.md#all-articles) — zero distance, impact offset, and zeroing with a different
-cartridge, atmosphere or wind than the shot. Still to be written.
+[The Zero tab](zero-tab.md) — zero distance, impact offset, and zeroing with a different cartridge,
+atmosphere or wind than the shot.
 
 ---
 

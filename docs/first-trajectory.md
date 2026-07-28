@@ -96,7 +96,8 @@ the zero from these inputs. This tab also holds the feature few free solvers hav
 **different** cartridge, atmosphere or wind than the shot itself, so you can zero supersonic and shoot
 subsonic.
 
-*Article to come: the Zero tab.*
+📖 **[The Zero tab](zero-tab.md)** — the ordinary one-number zero, what "leave it alone" actually
+assumes, and the four ways a zeroing afternoon can differ from the shot.
 
 ### 6. Parameters — how far, how fine, and the exotic corrections *(defaults to 1000 yd/m in 100 yd/m steps)*
 
