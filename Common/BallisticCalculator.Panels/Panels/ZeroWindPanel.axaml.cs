@@ -10,6 +10,11 @@ namespace BallisticCalculator.Panels.Panels;
 /// Optional single wind used only while zeroing. Enabled by a checkbox, mirroring
 /// <see cref="ZeroAtmospherePanel"/>. Returns null when disabled.
 /// </summary>
+/// <remarks>
+/// One wind, deliberately — zeroing happens at a short, controlled distance, where splitting the air into
+/// zones the way <see cref="MultiWindPanel"/> does would be nonsense. The start distance is therefore
+/// pinned to the muzzle and read-only: this wind blows for the whole zeroing shot.
+/// </remarks>
 public partial class ZeroWindPanel : UserControl
 {
     private MeasurementSystem _measurementSystem = MeasurementSystem.Metric;
@@ -17,6 +22,7 @@ public partial class ZeroWindPanel : UserControl
     public ZeroWindPanel()
     {
         InitializeComponent();
+        WindSubPanel.AllowStartDistance = false;
         WireEvents();
     }
 

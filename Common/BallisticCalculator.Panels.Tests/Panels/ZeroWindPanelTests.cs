@@ -10,6 +10,68 @@ namespace BallisticCalculator.Panels.Tests.Panels;
 
 public class ZeroWindPanelTests
 {
+    #region The zeroing wind has no zones
+
+    /// <summary>
+    /// Zeroing is one wind, deliberately: it happens at a short, controlled distance, where splitting the
+    /// air into zones would be nonsense. So the start distance is pinned at the muzzle and not offered for
+    /// editing — a lone wind's range is ignored by the engine anyway, which would make any other value a
+    /// field that silently does nothing.
+    /// </summary>
+    [AvaloniaFact]
+    public void StartDistance_IsPinnedToTheMuzzleAndNotEditable()
+    {
+        // Arrange & Act
+        var panel = new ZeroWindPanel();
+
+        // Assert
+        panel.WindSubPanel.MaxDistanceCheckBox.IsChecked.Should().BeTrue();
+        panel.WindSubPanel.MaxDistanceCheckBox.IsEnabled.Should().BeFalse();
+        panel.WindSubPanel.MaxDistanceControl.IsEnabled.Should().BeFalse();
+        panel.WindSubPanel.MaxDistanceControl.GetValue<DistanceUnit>()!.Value.Value.Should().Be(0);
+    }
+
+    [AvaloniaFact]
+    public void Wind_SetWithAStartDistance_IsStillShownFromTheMuzzle()
+    {
+        // Arrange — an older file, or a hand-edited one, carrying a range on the zeroing wind
+        var panel = new ZeroWindPanel();
+
+        // Act
+        panel.Wind = new Wind
+        {
+            Direction = new Measurement<AngularUnit>(90, AngularUnit.Degree),
+            Velocity = new Measurement<VelocityUnit>(5, VelocityUnit.MetersPerSecond),
+            MaximumRange = new Measurement<DistanceUnit>(250, DistanceUnit.Meter),
+        };
+
+        // Assert — the wind is taken, the range is not
+        panel.WindSubPanel.MaxDistanceControl.GetValue<DistanceUnit>()!.Value.Value.Should().Be(0);
+        panel.Wind!.Velocity.In(VelocityUnit.MetersPerSecond).Should().BeApproximately(5, 0.5);
+        panel.Wind!.MaximumRange!.Value.Value.Should().Be(0, "the zeroing wind blows for the whole zeroing shot");
+    }
+
+    [AvaloniaFact]
+    public void Clear_LeavesTheStartDistancePinnedToTheMuzzle()
+    {
+        // Arrange
+        var panel = new ZeroWindPanel();
+        panel.Wind = new Wind
+        {
+            Direction = new Measurement<AngularUnit>(90, AngularUnit.Degree),
+            Velocity = new Measurement<VelocityUnit>(5, VelocityUnit.MetersPerSecond),
+        };
+
+        // Act
+        panel.Clear();
+
+        // Assert
+        panel.WindSubPanel.MaxDistanceCheckBox.IsChecked.Should().BeTrue();
+        panel.WindSubPanel.MaxDistanceControl.GetValue<DistanceUnit>()!.Value.Value.Should().Be(0);
+    }
+
+    #endregion
+
     [AvaloniaFact]
     public void Panel_ShouldInitialize()
     {

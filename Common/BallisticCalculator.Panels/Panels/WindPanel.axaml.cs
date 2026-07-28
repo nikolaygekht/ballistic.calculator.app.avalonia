@@ -13,6 +13,7 @@ namespace BallisticCalculator.Panels.Panels;
 public partial class WindPanel : UserControl
 {
     private MeasurementSystem _measurementSystem = MeasurementSystem.Metric;
+    private bool _allowStartDistance = true;
 
     public WindPanel()
     {
@@ -38,6 +39,24 @@ public partial class WindPanel : UserControl
     }
 
     public bool IsEmpty => DirectionControl.IsEmpty && VelocityControl.IsEmpty;
+
+    /// <summary>
+    /// Whether this wind may start downrange. The distance box means "this wind starts here" (see
+    /// <see cref="MultiWindPanel.Winds"/>), which only makes sense where the trajectory can be split into
+    /// zones. Set false for a lone wind — the zeroing wind — to pin it to the muzzle and take the box out
+    /// of play: with a single wind the library ignores the range, so any other value would be a field that
+    /// silently does nothing.
+    /// </summary>
+    public bool AllowStartDistance
+    {
+        get => _allowStartDistance;
+        set
+        {
+            _allowStartDistance = value;
+            if (!value)
+                PinToMuzzle();
+        }
+    }
 
     public Wind? Wind
     {
@@ -88,6 +107,9 @@ public partial class WindPanel : UserControl
 
             // Sync wind indicator
             WindIndicator.Direction = value.Direction.In(AngularUnit.Degree);
+
+            if (!_allowStartDistance)
+                PinToMuzzle();
         }
     }
 
@@ -177,6 +199,23 @@ public partial class WindPanel : UserControl
         MaxDistanceControl.Value = null;
         MaxDistanceCheckBox.IsChecked = false;
         WindIndicator.Direction = 0;
+
+        if (!_allowStartDistance)
+            PinToMuzzle();
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    /// <summary>Shows a start distance of 0, read-only — see <see cref="AllowStartDistance"/>.</summary>
+    private void PinToMuzzle()
+    {
+        var unit = _measurementSystem == MeasurementSystem.Metric ? DistanceUnit.Meter : DistanceUnit.Yard;
+        MaxDistanceCheckBox.IsChecked = true;
+        MaxDistanceControl.SetValue(new Measurement<DistanceUnit>(0, unit));
+        MaxDistanceCheckBox.IsEnabled = false;
+        MaxDistanceControl.IsEnabled = false;
     }
 
     #endregion
