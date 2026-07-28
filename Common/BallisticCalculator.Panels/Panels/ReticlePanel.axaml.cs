@@ -215,6 +215,21 @@ public partial class ReticlePanel : UserControl
         if (path == null)
             return;
 
+        LoadReticleFile(path);
+    }
+
+    /// <summary>
+    /// Loads the shipped <c>mildot.reticle</c> rather than the library's <see cref="MilDotReticle"/> object.
+    /// Both the object and the file used to be built in <see cref="AngularUnit.Mil"/> — the military mil, 1/6400
+    /// of a circle — but a mil-dot reticle is a <b>milliradian</b> instrument, so every subtension came out about
+    /// 1.9 % small. The file is fixed; the library object is not ours to fix yet, so it is no longer used.
+    /// </summary>
+    private void OnMilDot(object? sender, RoutedEventArgs e)
+        => LoadReticleFile(Path.Combine(DataFolders.Reticles, "mildot.reticle"));
+
+    /// <summary>Reads a <c>.reticle</c> file into the view, reporting a failure where the name is shown.</summary>
+    private void LoadReticleFile(string path)
+    {
         try
         {
             using var fs = new FileStream(path, FileMode.Open, FileAccess.Read);
@@ -224,11 +239,6 @@ public partial class ReticlePanel : UserControl
         {
             ReticleNameText.Text = $"Error: {ex.Message}";
         }
-    }
-
-    private void OnMilDot(object? sender, RoutedEventArgs e)
-    {
-        Reticle = new MilDotReticle();
     }
 
     private void OnDisplayModeChanged(object? sender, RoutedEventArgs e)

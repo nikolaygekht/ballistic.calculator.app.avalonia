@@ -27,6 +27,16 @@
     <PackageReference Include="Avalonia.Headless.XUnit" Version="[11.3.18,12)" />
   </ItemGroup>
 
+  <!-- The shipped reticles, so DataFolders.Reticles resolves in tests the way it does in the app.
+       Only data/reticle: the .drg library is large and no test needs it. -->
+  <ItemGroup>
+    <Content Include="..\..\data\reticle\**\*">
+      <Link>data\reticle\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </Content>
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\BallisticCalculator.Controls\BallisticCalculator.Controls.csproj" />
     <ProjectReference Include="..\BallisticCalculator.Panels\BallisticCalculator.Panels.csproj" />

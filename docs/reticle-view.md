@@ -22,7 +22,8 @@ size printed underneath.*
 
 The view starts empty — the name reads **(none)** and there is nothing to draw on.
 
-- **`Mil-Dot`** loads the built-in Mil-Dot reticle. One click, and enough for most purposes.
+- **`Mil-Dot`** loads the shipped `mildot.reticle` in one click — enough for most purposes. Its dots are
+  spaced at whole **milliradians**, as a mil-dot reticle's should be.
 - **`Load…`** opens the `data/reticle` folder, which ships with several: `mildot`, `moa`, `bdc`,
   `chevron`, `german4`, `pso-1`, `segmented`, and an M16 iron-sight picture. Your own reticles, built in
   the separate **Reticle Editor** application, live here too.
