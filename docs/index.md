@@ -56,7 +56,8 @@ planned** — the structure is listed in full so you can see what is coming and 
   barrel presets
 - [The Zero tab](zero-tab.md) — zero distance, impact offset at zero, and zeroing with a *different*
   cartridge, atmosphere or wind than the shot
-- The Parameters tab — maximum range and step, shot angle, dialled clicks, and the Coriolis effect
+- [The Parameters tab](parameters-tab.md) — maximum range and step, shot angle, dialled clicks, and the
+  Coriolis effect
 - Reading the table — every column, and the two conventions behind them
 - Chart, reticle and summary — the other three views of the same shot
 - Comparing loads, saving and exporting — several trajectories on one chart, `.trajectory` files, CSV

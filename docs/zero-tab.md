@@ -189,8 +189,8 @@ afternoon differed from the shot you are computing, one number is the whole trut
 
 ## Next
 
-[The Parameters tab](index.md#all-articles) — maximum range and step, this shot's angle, dialled clicks
-and the Coriolis effect. Still to be written.
+[The Parameters tab](parameters-tab.md) — maximum range and step, this shot's angle, dialled clicks and
+the Coriolis effect.
 
 ---
 

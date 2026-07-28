@@ -105,7 +105,8 @@ Maximum range and output step, this shot's angle, any clicks already dialled on 
 Coriolis group — barrel azimuth and your latitude. Coriolis is noise at ordinary distances and is not
 at very long ones; leave azimuth and latitude out and the term is absent.
 
-*Article to come: the Parameters tab.*
+📖 **[The Parameters tab](parameters-tab.md)** — what a fine step really costs, why a table can end
+early, dialled clicks, and measured Coriolis figures.
 
 ## Pressing OK
 
