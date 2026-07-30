@@ -3,6 +3,7 @@ using Avalonia.Interactivity;
 using BallisticCalculator.Types;
 using Gehtsoft.Measurements;
 using System;
+using System.Collections.Generic;
 
 namespace BallisticCalculator.Panels.Panels;
 
@@ -236,6 +237,27 @@ public partial class ParametersPanel : UserControl
     #endregion
 
     #region Public Methods
+
+    /// <summary>
+    /// Everything wrong with the parameters, as sentences to show the user. A click count is meaningless
+    /// without a click size, so <see cref="ClicksToAngle"/> can only discard it — and the click size lives
+    /// on the <b>Rifle</b> tab, which is what makes it easy to have one without the other (finding F-5;
+    /// several shipped sight presets carry no click values at all).
+    /// </summary>
+    public List<string> Problems()
+    {
+        var problems = new List<string>();
+
+        if ((VClicksControl.Value ?? 0) != 0 && RiflePanel?.VerticalClick == null)
+            problems.Add("V-Clicks are dialled, but the sight has no vertical click size — " +
+                         "fill in Vertical click on the Rifle tab.");
+
+        if ((HClicksControl.Value ?? 0) != 0 && RiflePanel?.HorizontalClick == null)
+            problems.Add("H-Clicks are dialled, but the sight has no horizontal click size — " +
+                         "fill in Horizontal click on the Rifle tab.");
+
+        return problems;
+    }
 
     public void Clear()
     {

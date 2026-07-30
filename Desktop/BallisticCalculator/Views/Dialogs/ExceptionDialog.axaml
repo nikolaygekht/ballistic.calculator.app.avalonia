@@ -1,0 +1,60 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        x:Class="BallisticCalculator.Views.Dialogs.ExceptionDialog"
+        Title="Error"
+        Width="640" Height="440"
+        MinWidth="420" MinHeight="280"
+        FontSize="{DynamicResource AppFontSize}"
+        WindowStartupLocation="CenterOwner"
+        CanResize="true">
+
+  <Grid Margin="20" RowDefinitions="Auto,Auto,Auto,*,Auto">
+
+    <!-- What the application was doing -->
+    <TextBlock Grid.Row="0"
+               x:Name="ContextText" x:FieldModifier="internal"
+               FontWeight="SemiBold"
+               TextWrapping="Wrap"
+               FontSize="{DynamicResource AppFontSize}"/>
+
+    <!-- What went wrong -->
+    <TextBlock Grid.Row="1"
+               x:Name="MessageText" x:FieldModifier="internal"
+               TextWrapping="Wrap"
+               Margin="0,8,0,0"
+               FontSize="{DynamicResource AppFontSize}"/>
+
+    <TextBlock Grid.Row="2" Text="Details:"
+               FontWeight="SemiBold"
+               Margin="0,12,0,2"
+               FontSize="{DynamicResource AppFontSize}"/>
+
+    <!-- The full exception chain, for a report -->
+    <TextBox Grid.Row="3"
+             x:Name="DetailsBox" x:FieldModifier="internal"
+             IsReadOnly="True"
+             AcceptsReturn="True"
+             TextWrapping="NoWrap"
+             FontFamily="Consolas,Menlo,Monospace"
+             VerticalAlignment="Stretch"
+             VerticalContentAlignment="Top"
+             ScrollViewer.HorizontalScrollBarVisibility="Auto"
+             ScrollViewer.VerticalScrollBarVisibility="Auto"
+             FontSize="{DynamicResource AppFontSize}"/>
+
+    <StackPanel Grid.Row="4"
+                Orientation="Horizontal" HorizontalAlignment="Center"
+                Spacing="10" Margin="0,20,0,0">
+      <Button x:Name="CopyButton" x:FieldModifier="internal"
+              Content="Copy" Width="80" Click="OnCopy"
+              FontSize="{DynamicResource AppFontSize}"/>
+      <Button x:Name="CloseButton" x:FieldModifier="internal"
+              Content="Close" Width="80" Click="OnClose" IsDefault="True" IsCancel="True"
+              FontSize="{DynamicResource AppFontSize}"/>
+    </StackPanel>
+
+  </Grid>
+</Window>

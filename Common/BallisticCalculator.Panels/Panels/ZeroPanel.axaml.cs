@@ -5,6 +5,7 @@ using BallisticCalculator.Panels.Services;
 using BallisticCalculator.Types;
 using Gehtsoft.Measurements;
 using System;
+using System.Collections.Generic;
 
 namespace BallisticCalculator.Panels.Panels;
 
@@ -187,6 +188,27 @@ public partial class ZeroPanel : UserControl
     /// <summary>Sets just the zero distance (used when a sight preset suggests a default zero).</summary>
     public void SetZeroDistance(Measurement<DistanceUnit> distance)
         => ZeroDistanceControl.SetValue(distance);
+
+    /// <summary>
+    /// Everything wrong with the zero, as sentences to show the user: each of the three overrides answers
+    /// for itself (finding F-4), and a ticked impact-offset group with nothing in it is the same trap.
+    /// </summary>
+    public List<string> Problems()
+    {
+        var problems = new List<string>();
+
+        problems.AddRange(ZeroAmmoSubPanel.Problems());
+        problems.AddRange(ZeroAtmosphereSubPanel.Problems());
+        problems.AddRange(ZeroWindSubPanel.Problems());
+
+        if (VerticalOffsetCheckBox.IsChecked == true &&
+            VerticalOffsetControl.IsEmpty && HorizontalOffsetControl.IsEmpty)
+        {
+            problems.Add("The zero impact offset is ticked, but neither offset is filled in.");
+        }
+
+        return problems;
+    }
 
     public void Clear()
     {

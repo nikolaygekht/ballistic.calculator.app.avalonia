@@ -1,10 +1,11 @@
-using System.Linq;
-using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using BallisticCalculator.Models;
 using BallisticCalculator.Services;
 using BallisticCalculator.Types;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace BallisticCalculator.Views.Dialogs;
 
@@ -39,19 +40,14 @@ public partial class ShotParametersDialog : Window
 
     private async void OnOK(object? sender, RoutedEventArgs e)
     {
-        var (shotData, emptyPanels, incompletePanels) = ShotDataPanel.Validate();
+        var (shotData, emptyPanels, incompletePanels, problems) = ShotDataPanel.Validate();
 
-        // Ammunition is required
-        if (shotData == null)
+        // Everything wrong with the dialog goes into one message: fixing one problem and being told about
+        // the next one is a worse experience than being told about all of them at once.
+        var message = BuildProblemMessage(shotData, incompletePanels, problems);
+        if (message != null)
         {
-            await ShowError("Ammunition data is required.");
-            return;
-        }
-
-        // Partially filled panels are a user error
-        if (incompletePanels.Count > 0)
-        {
-            await ShowError($"Not all required data filled in: {string.Join(", ", incompletePanels)}");
+            await ShowError(message);
             return;
         }
 
@@ -68,6 +64,35 @@ public partial class ShotParametersDialog : Window
         Close(true);
     }
 
+    /// <summary>
+    /// The single message listing everything that stops the dialog from being accepted, or null when
+    /// nothing does. Named problems come first — they say which field and why — and the partially filled
+    /// tabs follow, because "Weather is incomplete" is the vaguest thing here and the least useful to read
+    /// first.
+    /// </summary>
+    internal static string? BuildProblemMessage(ShotData? shotData,
+        List<string> incompletePanels, List<string> problems)
+    {
+        var lines = new List<string>(problems);
+
+        if (incompletePanels.Count > 0)
+            lines.Add($"Not all required data filled in: {string.Join(", ", incompletePanels)}.");
+
+        // The ammunition is the one thing with no default, so a missing one is always fatal. Its specific
+        // reasons are already in `problems`; this only covers the case where none were reported.
+        if (shotData == null && lines.Count == 0)
+            lines.Add("Ammunition data is required.");
+
+        if (lines.Count == 0)
+            return null;
+
+        if (lines.Count == 1)
+            return lines[0];
+
+        return "Please fix the following:\n\n" +
+               string.Join("\n", lines.ConvertAll(l => $"• {l}"));
+    }
+
     private void OnCancel(object? sender, RoutedEventArgs e)
     {
         Close(false);
@@ -75,24 +100,33 @@ public partial class ShotParametersDialog : Window
 
     private async Task ShowError(string message)
     {
+        // The message is now a list rather than one line, so the window grows to fit it instead of
+        // clipping at a fixed 150px.
         var dialog = new Window
         {
             Title = "Error",
-            Width = 350,
-            Height = 150,
+            Width = 460,
+            MinHeight = 140,
+            MaxHeight = 600,
+            SizeToContent = SizeToContent.Height,
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
-            CanResize = false,
+            CanResize = true,
             Content = new DockPanel
             {
                 Children =
                 {
                     CreateButton("OK", true, DockPanel.DockProperty, Avalonia.Controls.Dock.Bottom),
-                    new TextBlock
+                    new ScrollViewer
                     {
-                        Text = message,
-                        TextWrapping = Avalonia.Media.TextWrapping.Wrap,
-                        Margin = new Avalonia.Thickness(15),
-                        VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
+                        VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto,
+                        HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled,
+                        Content = new TextBlock
+                        {
+                            Text = message,
+                            TextWrapping = Avalonia.Media.TextWrapping.Wrap,
+                            Margin = new Avalonia.Thickness(15),
+                            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
+                        },
                     }
                 }
             }

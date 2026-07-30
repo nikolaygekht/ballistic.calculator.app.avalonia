@@ -8,6 +8,7 @@ using BallisticCalculator.Serialization;
 using BallisticCalculator.Types;
 using Gehtsoft.Measurements;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace BallisticCalculator.Panels.Panels;
@@ -101,6 +102,12 @@ public partial class AmmoLibraryRecordPanel : UserControl
         get => AmmoSubPanel.Ammunition;
         set => AmmoSubPanel.Ammunition = value;
     }
+
+    /// <summary>
+    /// The ammunition's problems (see <see cref="AmmoPanel.Problems"/>). The record's own fields — name,
+    /// caliber, type, barrel length, source — are all optional, so nothing is added here.
+    /// </summary>
+    public List<string> Problems() => AmmoSubPanel.Problems();
 
     #endregion
 

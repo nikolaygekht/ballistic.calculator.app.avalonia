@@ -7,6 +7,7 @@ using BallisticCalculator.Panels.Services;
 using BallisticCalculator.Types;
 using Gehtsoft.Measurements;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 [assembly: InternalsVisibleTo("BallisticCalculator.Panels.Tests")]
@@ -184,6 +185,68 @@ public partial class AmmoPanel : UserControl
     #endregion
 
     #region Public Methods
+
+    /// <summary>
+    /// Why this ammunition cannot be used for a calculation, as sentences to show the user; empty when it
+    /// can. Two of these states build a perfectly good <see cref="Ammunition"/> and only fail inside the
+    /// engine, so "is every field filled in" does not catch them:
+    /// <list type="bullet">
+    /// <item>a <b>form factor</b> is turned into a coefficient through the bullet's sectional density, so
+    /// it needs the diameter — and every <c>.drg</c> shot is a form-factor shot (finding F-1);</item>
+    /// <item>a <b>GC</b> ("custom") coefficient has no built-in drag curve, so the <c>.drg</c> file must be
+    /// found — a shared ammunition can name a table this machine does not have (finding F-1b).</item>
+    /// </list>
+    /// The remaining checks replace the old blanket "Ammunition data is required" with the field that is
+    /// actually missing.
+    /// </summary>
+    public List<string> Problems()
+    {
+        var problems = new List<string>();
+
+        var weight = WeightControl.GetValue<WeightUnit>();
+        var bc = BCControl.Value;
+        var velocity = MuzzleVelocityControl.GetValue<VelocityUnit>();
+
+        if (weight == null)
+            problems.Add("Bullet weight is not specified.");
+        if (bc == null)
+            problems.Add("Ballistic coefficient is not specified.");
+        if (velocity == null)
+            problems.Add("Muzzle velocity is not specified.");
+
+        // A zero or negative value in any of the three leaves the solver with nothing to integrate — the
+        // engine raises TrajectoryCannotBeCalculatedException. Cheaper to say which field it is.
+        if (bc != null && bc.Value.Value <= 0 && FormFactorCheckBox.IsChecked != true)
+            problems.Add("Ballistic coefficient must be greater than zero.");
+        if (weight != null && weight.Value.Value <= 0 && FormFactorCheckBox.IsChecked != true)
+            problems.Add("Bullet weight must be greater than zero.");
+        if (velocity != null && velocity.Value.Value <= 0)
+            problems.Add("Muzzle velocity must be greater than zero.");
+
+        var diameter = BulletDiameterControl.IsEmpty ? null : BulletDiameterControl.GetValue<DistanceUnit>();
+
+        if (FormFactorCheckBox.IsChecked == true)
+        {
+            if (diameter == null || diameter.Value.Value <= 0)
+                problems.Add("Bullet diameter is required when the ballistic coefficient is a form factor.");
+            if (bc != null && bc.Value.Value <= 0)
+                problems.Add("A form factor must be greater than zero.");
+            if (weight != null && weight.Value.Value <= 0)
+                problems.Add("Bullet weight is required when the ballistic coefficient is a form factor.");
+        }
+
+        if (bc?.Table == DragTableId.GC &&
+            CustomDragTableLoader.ResolvePath(_customTableFileName) == null)
+        {
+            problems.Add(string.IsNullOrEmpty(_customTableFileName)
+                ? "A custom (GC) ballistic coefficient needs a custom drag table — use Browse... to pick " +
+                  "the .drg file it was measured from."
+                : $"The custom drag table \"{Path.GetFileName(_customTableFileName)}\" cannot be found — " +
+                  $"neither as saved nor in {DataFolders.Drg}.");
+        }
+
+        return problems;
+    }
 
     public void Clear()
     {

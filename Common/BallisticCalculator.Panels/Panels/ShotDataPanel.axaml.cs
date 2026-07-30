@@ -145,19 +145,30 @@ public partial class ShotDataPanel : UserControl
 
     /// <summary>
     /// Validates the panel state and builds a ShotData allowing null fields for empty panels.
-    /// Returns (shotData, emptyPanels, incompletePanels).
+    /// Returns (shotData, emptyPanels, incompletePanels, problems).
     /// shotData is null only when ammunition is not filled.
     /// emptyPanels lists panels left completely empty (defaults can be applied).
     /// incompletePanels lists panels partially filled (user error).
+    /// problems lists specific, named faults — a field that is missing, a combination the engine cannot
+    /// compute, or a ticked group whose value would be silently discarded. Every problem found anywhere on
+    /// the dialog is collected in one pass, so the user sees all of them at once rather than one per
+    /// attempt.
     /// </summary>
-    public (ShotData? ShotData, List<string> EmptyPanels, List<string> IncompletePanels) Validate()
+    public (ShotData? ShotData, List<string> EmptyPanels, List<string> IncompletePanels,
+            List<string> Problems) Validate()
     {
         var emptyPanels = new List<string>();
         var incompletePanels = new List<string>();
 
+        // Collected regardless of whether the ammunition builds — the point is to report everything.
+        var problems = new List<string>();
+        problems.AddRange(AmmoLibPanel.Problems());
+        problems.AddRange(ZeroSubPanel.Problems());
+        problems.AddRange(ParametersSubPanel.Problems());
+
         var ammoEntry = AmmoLibPanel.LibraryEntry;
         if (ammoEntry == null)
-            return (null, emptyPanels, incompletePanels);
+            return (null, emptyPanels, incompletePanels, problems);
 
         var atmosphere = AtmosphereSubPanel.Atmosphere;
         if (atmosphere == null)
@@ -198,7 +209,7 @@ public partial class ShotDataPanel : UserControl
             Zeroing = ZeroSubPanel.Zeroing,
         };
 
-        return (shotData, emptyPanels, incompletePanels);
+        return (shotData, emptyPanels, incompletePanels, problems);
     }
 
     public void Clear()

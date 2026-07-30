@@ -3,6 +3,7 @@ using Avalonia.Interactivity;
 using BallisticCalculator;
 using BallisticCalculator.Types;
 using System;
+using System.Collections.Generic;
 
 namespace BallisticCalculator.Panels.Panels;
 
@@ -66,6 +67,22 @@ public partial class ZeroAtmospherePanel : UserControl
     #endregion
 
     #region Public Methods
+
+    /// <summary>
+    /// "Ticked but not filled in", or empty when the override is off or complete. Null from a ticked
+    /// override means "same as the shot" downstream, so the shot computes with the wrong zero and nothing
+    /// says so (finding F-4).
+    /// </summary>
+    public List<string> Problems()
+    {
+        if (EnableCheckBox.IsChecked != true || AtmoSubPanel.Atmosphere != null)
+            return new List<string>();
+
+        return new List<string>
+        {
+            "Other atmosphere for zero is ticked, but not all of its fields are filled in.",
+        };
+    }
 
     public void Clear()
     {

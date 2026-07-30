@@ -5,6 +5,8 @@ using BallisticCalculator.Panels.Services;
 using BallisticCalculator.Serialization;
 using BallisticCalculator.Types;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace BallisticCalculator.Panels.Panels;
 
@@ -79,6 +81,22 @@ public partial class ZeroAmmoPanel : UserControl
     #endregion
 
     #region Public Methods
+
+    /// <summary>
+    /// Why the override cannot be used, or empty when it is off or usable. A ticked-but-incomplete
+    /// override reads as null to <see cref="ZeroingCalculator"/>, which means "same as the shot" — the shot
+    /// then computes with the wrong zero and nothing says so (finding F-4). The inner panel's own problems
+    /// (form factor without diameter, missing <c>.drg</c>) apply to the zero ammunition too.
+    /// </summary>
+    public List<string> Problems()
+    {
+        if (EnableCheckBox.IsChecked != true)
+            return new List<string>();
+
+        return AmmoSubPanel.Problems()
+            .Select(p => $"Other ammunition for zero: {p}")
+            .ToList();
+    }
 
     public void Clear()
     {

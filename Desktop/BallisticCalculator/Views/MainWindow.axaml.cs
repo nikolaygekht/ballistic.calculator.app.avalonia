@@ -1,21 +1,21 @@
-using System;
+using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia;
+using BallisticCalculator.Models;
+using BallisticCalculator.Serialization;
+using BallisticCalculator.Services;
+using BallisticCalculator.Types;
+using BallisticCalculator.Utilities;
+using BallisticCalculator.Views.Dialogs;
+using Gehtsoft.Measurements;
+using Iciclecreek.Avalonia.WindowManager;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml;
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Input;
-using BallisticCalculator.Models;
-using BallisticCalculator.Serialization;
-using BallisticCalculator.Types;
-using Gehtsoft.Measurements;
-using BallisticCalculator.Services;
-using BallisticCalculator.Utilities;
-using BallisticCalculator.Views.Dialogs;
-using Iciclecreek.Avalonia.WindowManager;
+using System;
 
 namespace BallisticCalculator.Views;
 
@@ -29,6 +29,9 @@ public partial class MainWindow : Window
     private const int WindowOffset = 30;
     private const int MaxNewWindowSlots = 10;
 
+    /// <summary>Context line for the guards around the calculation — see <c>claude/07-28.md</c> F-1/F-2.</summary>
+    internal const string CalculationFailed = "The trajectory could not be calculated.";
+
     public MainWindow()
     {
         InitializeComponent();
@@ -38,6 +41,21 @@ public partial class MainWindow : Window
         SetupMenuHandlers();
         KeyDown += OnKeyDown;
         Closing += (_, _) => SaveState();
+    }
+
+    /// <summary>
+    /// Reports a calculation that did not happen. The engine names two failures as its own — a zero the load
+    /// cannot reach, and numbers the solver cannot integrate — and those are the user's to fix, so they get a
+    /// plain message. Anything else is a bug and gets the exception dialog, stack trace and all.
+    /// </summary>
+    private async Task ReportCalculationFailure(Exception error, string context)
+    {
+        var explanation = ShotCalculator.Explain(error);
+
+        if (explanation != null)
+            await MessageDialog.ShowAsync(this, "Cannot calculate this shot", explanation);
+        else
+            await ExceptionDialog.ShowAsync(this, context, error);
     }
 
     private void RestoreMainWindowState()
@@ -139,9 +157,18 @@ public partial class MainWindow : Window
         _appState.LastMeasurementSystem = system;
         AppStateManager.Save(_appState);
 
-        _windowCounter++;
         var shotData = dialog.Result;
-        var trajectory = ShotCalculator.Calculate(shotData, system);
+
+        // The dialog's validation should have caught anything uncomputable; this is the net under it, so a
+        // shot the engine refuses becomes a message rather than an unhandled exception on the UI thread
+        // (this handler is async void). See claude/07-28.md F-1/F-2.
+        if (!ShotCalculator.TryCalculate(shotData, system, out var trajectory, out var error))
+        {
+            await ReportCalculationFailure(error!, CalculationFailed);
+            return;
+        }
+
+        _windowCounter++;
 
         var view = new TrajectoryView
         {
@@ -209,8 +236,17 @@ public partial class MainWindow : Window
         if (result != true || dialog.Result == null)
             return;
 
+        // Recalculate before touching the window: an edit into an uncomputable state must leave the shot
+        // the user can already see intact, not replace it with a half-updated one.
+        if (!ShotCalculator.TryCalculate(dialog.Result, trajectoryChild.MeasurementSystem,
+                out var trajectory, out var error))
+        {
+            await ReportCalculationFailure(error!, CalculationFailed);
+            return;
+        }
+
         trajectoryChild.ShotData = dialog.Result;
-        trajectoryChild.Trajectory = ShotCalculator.Calculate(dialog.Result, trajectoryChild.MeasurementSystem);
+        trajectoryChild.Trajectory = trajectory;
 
         // Update the ManagedWindow title
         var title = dialog.Result.Ammunition?.Name ?? "Trajectory";
@@ -743,7 +779,14 @@ public partial class MainWindow : Window
                 return;
 
             var system = data.MeasurementSystem;
-            var trajectory = ShotCalculator.Calculate(shotData, system);
+
+            // A shared file can reference a .drg the reader does not have, which the engine refuses (F-1b).
+            if (!ShotCalculator.TryCalculate(shotData, system, out var trajectory, out var error))
+            {
+                await ReportCalculationFailure(error!,
+                    $"{Path.GetFileName(path)} was read, but its shot could not be calculated.");
+                return;
+            }
 
             _windowCounter++;
             var view = new TrajectoryView
@@ -767,8 +810,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            // Show error in a simple way — no MessageBox in Avalonia without TopLevel
-            Console.Error.WriteLine($"Error opening file: {ex.Message}");
+            await ExceptionDialog.ShowAsync(this, $"{Path.GetFileName(path)} could not be opened.", ex);
         }
     }
 
@@ -783,7 +825,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        DoSave(trajectoryChild);
+        await DoSave(trajectoryChild);
     }
 
     private async Task SaveAs()
@@ -803,7 +845,7 @@ public partial class MainWindow : Window
             return;
 
         trajectoryChild.FileName = path;
-        DoSave(trajectoryChild);
+        await DoSave(trajectoryChild);
 
         // Update title with file name
         var managedWindow = _managedWindows.FirstOrDefault(w => w.Content == trajectoryChild);
@@ -814,7 +856,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private void DoSave(ITrajectoryChildWindow child)
+    private async Task DoSave(ITrajectoryChildWindow child)
     {
         if (child.ShotData == null || string.IsNullOrEmpty(child.FileName))
             return;
@@ -837,7 +879,9 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error saving file: {ex.Message}");
+            // A save that failed silently is a file the user believes they have.
+            await ExceptionDialog.ShowAsync(this,
+                $"{Path.GetFileName(child.FileName)} could not be saved.", ex);
         }
     }
 

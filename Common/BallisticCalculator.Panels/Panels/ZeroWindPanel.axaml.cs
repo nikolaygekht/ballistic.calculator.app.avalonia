@@ -3,6 +3,7 @@ using Avalonia.Interactivity;
 using BallisticCalculator;
 using BallisticCalculator.Types;
 using System;
+using System.Collections.Generic;
 
 namespace BallisticCalculator.Panels.Panels;
 
@@ -76,6 +77,21 @@ public partial class ZeroWindPanel : UserControl
     #endregion
 
     #region Public Methods
+
+    /// <summary>
+    /// "Ticked but not filled in", or empty when the override is off or complete — the same silent
+    /// fallback as the other two zero overrides (finding F-4).
+    /// </summary>
+    public List<string> Problems()
+    {
+        if (EnableCheckBox.IsChecked != true || WindSubPanel.Wind != null)
+            return new List<string>();
+
+        return new List<string>
+        {
+            "Wind at zero is ticked, but not all of its fields are filled in.",
+        };
+    }
 
     public void Clear()
     {
