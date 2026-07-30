@@ -3,6 +3,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
 using AwesomeAssertions;
 using BallisticCalculator.Panels.Panels;
+using BallisticCalculator.Reticle;
 using BallisticCalculator.Reticle.Data;
 using BallisticCalculator.Serialization;
 using BallisticCalculator.Types;
@@ -16,18 +17,19 @@ namespace BallisticCalculator.Panels.Tests.Panels;
 
 public class ReticlePanelTests
 {
-    #region The shipped Mil-Dot reticle is in milliradians
+    #region The library Mil-Dot reticle is in milliradians
 
     /// <summary>
-    /// A mil-dot reticle is a <b>milliradian</b> instrument: one dot spacing is 1 mrad. Written in
-    /// <see cref="AngularUnit.Mil"/> — the military mil, 1/6400 of a circle — every subtension would be about
-    /// 1.9 % small, which is a hold error at any distance worth holding for.
+    /// A mil-dot reticle is a <b>milliradian</b> instrument: one dot spacing is 1 mrad. Built in
+    /// <see cref="AngularUnit.Mil"/> instead — the military mil, 1/6400 of a circle — every subtension would be
+    /// about 1.9 % small, a hold error at any distance worth holding for. Pinned here so a regression upstream
+    /// is caught by this suite.
     /// </summary>
     [Fact]
-    public void ShippedMilDotFile_UsesMilliradiansThroughout()
+    public void LibraryMilDot_UsesMilliradiansThroughout()
     {
         // Arrange & Act
-        var reticle = LoadShippedMilDot();
+        var reticle = new MilDotReticle();
 
         // Assert — the canvas and the aiming point
         reticle.Size!.X.Unit.Should().Be(AngularUnit.MRad);
@@ -46,9 +48,9 @@ public class ReticlePanelTests
 
     /// <summary>The dots are where a mil-dot reticle's dots are: whole milliradians from the centre.</summary>
     [Fact]
-    public void ShippedMilDotFile_HasItsDotsOnWholeMilliradians()
+    public void LibraryMilDot_HasItsDotsOnWholeMilliradians()
     {
-        var reticle = LoadShippedMilDot();
+        var reticle = new MilDotReticle();
 
         reticle.Size!.X.In(AngularUnit.MRad).Should().BeApproximately(12, 1e-9);
         reticle.Zero!.X.In(AngularUnit.MRad).Should().BeApproximately(6, 1e-9);
@@ -64,14 +66,14 @@ public class ReticlePanelTests
 
     #endregion
 
-    #region The Mil-Dot button reads that file
+    #region The Mil-Dot button builds that object
 
     /// <summary>
-    /// The button loads the shipped file rather than the library's <c>MilDotReticle</c> object, which is built
-    /// in military mils for the same reason the file used to be.
+    /// The button builds the library object. Nothing on this path touches the file system, so it cannot fail on
+    /// a missing or misnamed file.
     /// </summary>
     [AvaloniaFact]
-    public void MilDotButton_LoadsTheShippedFile()
+    public void MilDotButton_BuildsTheLibraryReticle()
     {
         // Arrange
         var panel = new ReticlePanel();
@@ -80,22 +82,16 @@ public class ReticlePanelTests
         // Act
         panel.MilDotButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
 
-        // Assert — it is the file: its name, its units, its BDC marks
+        // Assert
         panel.Reticle.Should().NotBeNull();
+        panel.Reticle.Should().BeOfType<MilDotReticle>();
         panel.Reticle!.Name.Should().Be("Mil-Dot Reticle");
         panel.Reticle.Size!.X.Unit.Should().Be(AngularUnit.MRad);
+        panel.Reticle.Size.X.In(AngularUnit.MRad).Should().BeApproximately(12, 1e-9);
         panel.Reticle.BulletDropCompensator.Should().NotBeEmpty();
         panel.ReticleNameText.Text.Should().Contain("Mil-Dot");
     }
 
     #endregion
 
-    private static ReticleDefinition LoadShippedMilDot()
-    {
-        var path = Path.Combine(DataFolders.Reticles, "mildot.reticle");
-        File.Exists(path).Should().BeTrue($"the shipped reticles are copied beside the tests ({path})");
-
-        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
-        return stream.BallisticXmlDeserialize<ReticleDefinition>()!;
-    }
 }

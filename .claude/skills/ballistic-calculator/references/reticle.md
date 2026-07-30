@@ -2,8 +2,14 @@
 
 Define a scope reticle in code (or load one that was serialized) and render it to SVG. Two namespaces:
 `BallisticCalculator.Reticle.Data` (the model) and `BallisticCalculator.Reticle.Draw` (rendering).
-All coordinates are angular — `Measurement<AngularUnit>` (usually `Mil`). Built-in example:
+All coordinates are angular — `Measurement<AngularUnit>`. Built-in example:
 `BallisticCalculator.Reticle.MilDotReticle`.
+
+> **`Mil` is not the milliradian.** `AngularUnit.Mil` is the **military mil**, 1/6400 of a circle;
+> `AngularUnit.MRad` is the milliradian, 1/6283.19. They differ by ~1.9 %, a real hold error at any distance
+> worth holding for. A "mil-dot" scope is a **milliradian** instrument, so build one in `MRad` —
+> `MilDotReticle` is 12 × 12 mrad, zero at 6/6 mrad, drop marks on whole milliradians. A stored reticle
+> carries its own unit; read it rather than assuming.
 
 ```csharp
 using BallisticCalculator.Reticle.Data;

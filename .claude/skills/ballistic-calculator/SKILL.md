@@ -14,7 +14,8 @@ description: >
   or projectile-motion exercises, a different ballistics library (e.g. GNU/JBM), game-engine or Unity
   projectile motion, plain unit conversions, and non-code ballistics questions (load-data or
   forensics advice). Self-contained: no access to the library source or binaries is required —
-  prefer this over scanning the package to rediscover the API.
+  prefer this over scanning the package to rediscover the API. Describes 1.1.13+, including the named
+  ZeroRangeCantBeReachedException / TrajectoryCannotBeCalculatedException failures.
 ---
 
 # BallisticCalculator
@@ -22,7 +23,8 @@ description: >
 A .NET library (`netstandard2.0`) that models the trajectory of a projectile through the
 atmosphere using a 3DOF (point-mass) model.
 
-- NuGet: **`BallisticCalculator`** (namespace `BallisticCalculator`).
+- NuGet: **`BallisticCalculator`** (namespace `BallisticCalculator`). This describes **1.1.13+**; where
+  behaviour changed, the version that changed it is named.
 - Depends on **`Gehtsoft.Measurements`** (namespace `Gehtsoft.Measurements`) — every physical
   quantity is a strongly-typed `Measurement<TUnit>`.
 - License: LGPL 2.1.
@@ -214,6 +216,35 @@ var trajectory = calc.Calculate(ammo, rifle, atmosphere, shot);
 The result array can be **shorter** than `MaximumDistance/Step + 1`: the run stops early if velocity
 drops below 50 ft/s or drop exceeds 10000 ft. Iterate the returned array; don't assume its length.
 
+### Failures the engine names
+
+Both calls throw rather than returning nonsense, and the two conditions a *user* can fix have their own
+exception types:
+
+```csharp
+// namespace BallisticCalculator; both : InvalidOperationException
+public class ZeroRangeCantBeReachedException : InvalidOperationException { }        // CalculateZeroParameters
+public class TrajectoryCannotBeCalculatedException : InvalidOperationException { }  // Calculate
+```
+
+| Type | Raised when | What the user changes |
+|---|---|---|
+| `ZeroRangeCantBeReachedException` | the load cannot carry to the zero distance — a subsonic pistol load asked for a 1,000 yd zero | zero closer, more muzzle velocity, better BC |
+| `TrajectoryCannotBeCalculatedException` | the numbers leave nothing to integrate — a zero or absurd BC, weight or muzzle velocity | fix the offending ammunition field |
+
+Two rules follow:
+
+- **Catch them before any broader handler.** They derive from `InvalidOperationException`, so a
+  `catch (InvalidOperationException)` earlier in the chain swallows them.
+- **Treat them as input errors, not crashes.** Show a plain message saying what to change; keep the stack
+  trace for exceptions the engine has *not* named, which are bugs worth reporting. The other throws are
+  ordinary argument faults and stay in that second category: `ArgumentException` for a form factor with no
+  bullet diameter (or a non-positive form factor/weight), and `ArgumentNullException` when the BC table is
+  `GC` and no `dragTable` was supplied.
+
+Where a field can be checked up front — a non-positive BC, weight or muzzle velocity — validate instead of
+catching. `TrajectoryCannotBeCalculatedException` is the net under that, not a substitute for it.
+
 ---
 
 ## 4. Reading the output (`TrajectoryPoint`, read-only)
@@ -347,6 +378,11 @@ All three techniques use table id **`GC`** and require passing the `DragTable` i
 - **`GC` (custom) drag** requires passing the `DragTable` to **both** `CalculateZeroParameters` and
   `Calculate`; `DragTable.Get(DragTableId.GC)` throws — you must supply the instance.
 - The returned array may contain **fewer rows** than requested (subsonic/steep runs stop early).
+- **`ZeroRangeCantBeReachedException` / `TrajectoryCannotBeCalculatedException`** both derive from
+  `InvalidOperationException` — catch them *before* any broader handler, and treat them as input errors the
+  user can fix rather than crashes. See §3.
+- **`AngularUnit.Mil` is the military mil (1/6400), not the milliradian** (`MRad`, 1/6283.19) — ~1.9 % apart.
+  A mil-dot reticle is a milliradian instrument, and `MilDotReticle` is built in `MRad`.
 - **Crosswind aerodynamic jump IS modelled** (Litz, Applied Ballistics Eq 5.4), so a pure crosswind moves the
   point of impact **vertically** as well as horizontally. Like spin drift it needs `Rifling` **and** the bullet
   diameter **and** length; without them the term is absent. Right twist + wind from the right lifts the impact.
