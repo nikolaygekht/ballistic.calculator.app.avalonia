@@ -107,8 +107,9 @@ public class ReticleOverlayControllerTests
 
         foreach (var element in elements.Cast<ReticleText>())
         {
-            // Labels should be whole numbers (distances formatted with N0)
-            int.TryParse(element.Text.Replace(",", ""), out int distance).Should().BeTrue();
+            // Whole numbers (distances formatted with N0), each carrying the unit it is measured in.
+            element.Text.Should().EndWith("yd");
+            int.TryParse(element.Text[..^2].Replace(",", ""), out int distance).Should().BeTrue();
             distance.Should().BeGreaterThan(100); // past zero
         }
     }
@@ -126,7 +127,31 @@ public class ReticleOverlayControllerTests
         elements.Count.Should().BeGreaterThan(0);
         foreach (var element in elements.Cast<ReticleText>())
         {
-            int.TryParse(element.Text.Replace(",", ""), out int _).Should().BeTrue();
+            element.Text.Should().EndWith("m");
+            element.Text.Should().NotEndWith("yd");
+            int.TryParse(element.Text[..^1].Replace(",", ""), out int _).Should().BeTrue();
+        }
+    }
+
+    [Fact]
+    public void CreateBdcOverlay_LabelUnitFollowsTheMeasurementSystem()
+    {
+        var calculator = CreateCalculator();
+
+        var imperial = ReticleOverlayController.CreateBdcOverlay(
+            calculator, MeasurementSystem.Imperial, far: true).Cast<ReticleText>().ToList();
+        var metric = ReticleOverlayController.CreateBdcOverlay(
+            calculator, MeasurementSystem.Metric, far: true).Cast<ReticleText>().ToList();
+
+        imperial.Should().NotBeEmpty();
+        metric.Should().HaveCount(imperial.Count);
+
+        // Same marks, same distances, restated in the other system: 500 yd -> 457 m.
+        for (int i = 0; i < imperial.Count; i++)
+        {
+            var yards = int.Parse(imperial[i].Text[..^2].Replace(",", ""));
+            var meters = int.Parse(metric[i].Text[..^1].Replace(",", ""));
+            meters.Should().BeCloseTo((int)(yards * 0.9144), 1);
         }
     }
 

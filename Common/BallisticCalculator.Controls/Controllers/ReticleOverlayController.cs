@@ -29,6 +29,10 @@ public static class ReticleOverlayController
             ? DistanceUnit.Yard
             : DistanceUnit.Meter;
 
+        // The mark labels are bare numbers otherwise, and nothing else on the canvas says which system
+        // they are in — a 500 reads the same whether it means yards or metres.
+        var unitName = Measurement<DistanceUnit>.GetUnitName(distanceUnits);
+
         for (int i = 0; i < calculator.Points.Count; i++)
         {
             var point = calculator.Points[i];
@@ -36,7 +40,7 @@ public static class ReticleOverlayController
                 continue;
 
             var value = point.Distance.In(distanceUnits);
-            var text = value.ToString("N0");
+            var text = value.ToString("N0") + unitName;
             var element = new ReticleText
             {
                 Text = text,

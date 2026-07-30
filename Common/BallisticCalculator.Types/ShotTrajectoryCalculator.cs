@@ -11,10 +11,14 @@ namespace BallisticCalculator.Types;
 public static class ShotTrajectoryCalculator
 {
     private static readonly Measurement<DistanceUnit> FineStep = new(2.5, DistanceUnit.Meter);
-    private static readonly Measurement<DistanceUnit> FineMinimumDistance = new(1500, DistanceUnit.Meter);
+    // Reaches well past 2000 m: BDC marks low in the reticle and target distances beyond the configured
+    // table range can only be resolved where the trajectory actually goes. Loads that die earlier are
+    // stopped by the engine's own limits (50 ft/s, 10000 ft of drop), so the cost is only paid by loads
+    // that carry that far.
+    private static readonly Measurement<DistanceUnit> FineMinimumDistance = new(3000, DistanceUnit.Meter);
 
     /// <summary>
-    /// Fine-step trajectory reaching at least 1500 m (or the configured max distance, whichever is
+    /// Fine-step trajectory reaching at least 3000 m (or the configured max distance, whichever is
     /// greater). Shared by the reticle (BDC marks) and the summary analysis (point-blank corridor +
     /// subsonic), which the coarse table trajectory can't resolve.
     /// </summary>

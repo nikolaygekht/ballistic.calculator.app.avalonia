@@ -69,7 +69,7 @@ public class ShotTrajectoryCalculatorTests
     }
 
     [Fact]
-    public void CalculateFine_ReturnsFinerTrajectoryReachingAtLeast1500m()
+    public void CalculateFine_ReturnsFinerTrajectoryReachingAtLeast3000m()
     {
         var data = BuildShotData(); // configured max = 500 m
 
@@ -77,7 +77,18 @@ public class ShotTrajectoryCalculatorTests
         var fine = ShotTrajectoryCalculator.CalculateFine(data)!;
 
         fine.Length.Should().BeGreaterThan(display.Length);
-        fine.Last().Distance.In(DistanceUnit.Meter).Should().BeGreaterThanOrEqualTo(1499);
+        fine.Last().Distance.In(DistanceUnit.Meter).Should().BeGreaterThanOrEqualTo(2999);
+    }
+
+    [Fact]
+    public void CalculateFine_ConfiguredMaxBeyondTheFineMinimum_Wins()
+    {
+        var data = BuildShotData();
+        data.Parameters!.MaximumDistance = new Measurement<DistanceUnit>(4000, DistanceUnit.Meter);
+
+        var fine = ShotTrajectoryCalculator.CalculateFine(data)!;
+
+        fine.Last().Distance.In(DistanceUnit.Meter).Should().BeGreaterThanOrEqualTo(3999);
     }
 
     [Fact]
