@@ -26,21 +26,21 @@
     <reticle-line start-x="-3moa" start-y="-68.5moa" end-x="-7moa" end-y="-68.5moa" line-width="0.25moa" line-color="black" />
     <reticle-line start-x="3moa" start-y="-68.5moa" end-x="7moa" end-y="-68.5moa" line-width="0.25moa" line-color="black" />
     <reticle-text position-x="5moa" position-y="-5.5moa" text-height="2moa" text="3" anchor="Left" text-color="black" />
-    <reticle-text position-x="5moa" position-y="-15.5moa" text-height="2moa" text="5" anchor="Left" text-color="black" />
-    <reticle-text position-x="5moa" position-y="-22moa" text-height="2moa" text="6" anchor="Left" text-color="black" />
-    <reticle-text position-x="-13moa" position-y="-31moa" text-height="2moa" text="7" anchor="Left" text-color="black" />
-    <reticle-text position-x="-13moa" position-y="-41moa" text-height="2moa" text="8" anchor="Left" text-color="black" />
-    <reticle-text position-x="-13moa" position-y="-53.5moa" text-height="2moa" text="9" anchor="Left" text-color="black" />
-    <reticle-text position-x="-13moa" position-y="-68moa" text-height="2moa" text="10" anchor="Left" text-color="black" />
+    <reticle-text position-x="5moa" position-y="-15moa" text-height="2moa" text="5" anchor="Left" text-color="black" />
+    <reticle-text position-x="5moa" position-y="-21.8moa" text-height="2moa" text="6" anchor="Left" text-color="black" />
+    <reticle-text position-x="-13moa" position-y="-30.6moa" text-height="2moa" text="7" anchor="Left" text-color="black" />
+    <reticle-text position-x="-13moa" position-y="-41.6moa" text-height="2moa" text="8" anchor="Left" text-color="black" />
+    <reticle-text position-x="-13moa" position-y="-53.9moa" text-height="2moa" text="9" anchor="Left" text-color="black" />
+    <reticle-text position-x="-13moa" position-y="-69.1moa" text-height="2moa" text="10" anchor="Left" text-color="black" />
   </elements>
   <bdc>
     <bdc position-x="0moa" position-y="-4.9moa" text-offset="10moa" text-height="2moa" />
-    <bdc position-x="0moa" position-y="-9moa" text-offset="10moa" text-height="2moa" />
+    <bdc position-x="0moa" position-y="-8.9moa" text-offset="10moa" text-height="2moa" />
     <bdc position-x="0moa" position-y="-14.4moa" text-offset="10moa" text-height="2moa" />
     <bdc position-x="0moa" position-y="-21.2moa" text-offset="10moa" text-height="2moa" />
     <bdc position-x="0moa" position-y="-30moa" text-offset="10moa" text-height="2moa" />
     <bdc position-x="0moa" position-y="-41moa" text-offset="10moa" text-height="2moa" />
-    <bdc position-x="0moa" position-y="-53.5moa" text-offset="10moa" text-height="2moa" />
+    <bdc position-x="0moa" position-y="-53.3moa" text-offset="10moa" text-height="2moa" />
     <bdc position-x="0moa" position-y="-68.5moa" text-offset="10moa" text-height="2moa" />
   </bdc>
 </reticle>

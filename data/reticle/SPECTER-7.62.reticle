@@ -1,0 +1,72 @@
+<!-- Elcan Specter DR 1-4x 7.62, as framed at 4x.
+     Ladder computed for the 7.62x51 M80 BPN bullet, 9.5 g (146.6 gr), BC 0.397 G1,
+     830 m/s (a 22 in barrel), 1:12 RH, 2.9 in sight height, ICAO sea level, 100 m zero.
+     Numerals and bdc anchors are 300-1000 m; the etched glass reads 100-1000 m with M80
+     and 100-600 m with the 7.62 carbine, which shares the 300-600 m crossbars.
+     The rangefinder at lower left assumes a 76 cm (30 in) target and is valid at 4x. -->
+<reticle name="Specter DR 1-4x 7.62 BDC (at 4x)" size-x="140moa" size-y="165moa" zero-x="70moa" zero-y="77moa">
+  <elements>
+    <!-- heavy duplex posts: inward from the field stop, stopping at the fine centre -->
+    <reticle-line start-x="17.2moa" start-y="0moa" end-x="70moa" end-y="0moa" line-width="5moa" line-color="black" />
+    <reticle-line start-x="-17.2moa" start-y="0moa" end-x="-70moa" end-y="0moa" line-width="5moa" line-color="black" />
+    <reticle-line start-x="0moa" start-y="17.2moa" end-x="0moa" end-y="77moa" line-width="5moa" line-color="black" />
+    <!-- fine centre cross; the intersection is the 100 m zero -->
+    <reticle-line start-x="-17.2moa" start-y="0moa" end-x="17.2moa" end-y="0moa" line-width="0.5moa" line-color="black" />
+    <reticle-line start-x="0moa" start-y="17.2moa" end-x="0moa" end-y="-19moa" line-width="0.5moa" line-color="black" />
+    <!-- 300-600 m holds: crossbars, tapering inward so the count reads under stress -->
+    <reticle-line start-x="-3.5moa" start-y="-4.7moa" end-x="3.5moa" end-y="-4.7moa" line-width="0.5moa" line-color="black" />
+    <reticle-line start-x="-2.5moa" start-y="-8.4moa" end-x="2.5moa" end-y="-8.4moa" line-width="0.5moa" line-color="black" />
+    <reticle-line start-x="-2moa" start-y="-12.9moa" end-x="2moa" end-y="-12.9moa" line-width="0.5moa" line-color="black" />
+    <reticle-line start-x="-1moa" start-y="-18.2moa" end-x="1moa" end-y="-18.2moa" line-width="0.5moa" line-color="black" />
+    <!-- 700-1000 m holds: circles, each ~1.4 m across at its own range -->
+    <reticle-circle center-x="0moa" center-y="-24.4moa" radius="3.44moa" fill="false" line-width="0.25moa" color="black" />
+    <reticle-line start-x="-3.94moa" start-y="-24.4moa" end-x="-7.44moa" end-y="-24.4moa" line-width="0.25moa" line-color="black" />
+    <reticle-line start-x="3.94moa" start-y="-24.4moa" end-x="7.44moa" end-y="-24.4moa" line-width="0.25moa" line-color="black" />
+    <reticle-circle center-x="0moa" center-y="-31.8moa" radius="3.01moa" fill="false" line-width="0.25moa" color="black" />
+    <reticle-line start-x="-3.51moa" start-y="-31.8moa" end-x="-7.01moa" end-y="-31.8moa" line-width="0.25moa" line-color="black" />
+    <reticle-line start-x="3.51moa" start-y="-31.8moa" end-x="7.01moa" end-y="-31.8moa" line-width="0.25moa" line-color="black" />
+    <reticle-circle center-x="0moa" center-y="-40.6moa" radius="2.67moa" fill="false" line-width="0.25moa" color="black" />
+    <reticle-line start-x="-3.17moa" start-y="-40.6moa" end-x="-6.67moa" end-y="-40.6moa" line-width="0.25moa" line-color="black" />
+    <reticle-line start-x="3.17moa" start-y="-40.6moa" end-x="6.67moa" end-y="-40.6moa" line-width="0.25moa" line-color="black" />
+    <reticle-circle center-x="0moa" center-y="-50.6moa" radius="2.41moa" fill="false" line-width="0.25moa" color="black" />
+    <reticle-line start-x="-2.91moa" start-y="-50.6moa" end-x="-6.41moa" end-y="-50.6moa" line-width="0.25moa" line-color="black" />
+    <reticle-line start-x="2.91moa" start-y="-50.6moa" end-x="6.41moa" end-y="-50.6moa" line-width="0.25moa" line-color="black" />
+    <!-- thin spine joining the circles -->
+    <reticle-line start-x="0moa" start-y="-19moa" end-x="0moa" end-y="-20.96moa" line-width="0.25moa" line-color="black" />
+    <reticle-line start-x="0moa" start-y="-27.84moa" end-x="0moa" end-y="-28.79moa" line-width="0.25moa" line-color="black" />
+    <reticle-line start-x="0moa" start-y="-34.81moa" end-x="0moa" end-y="-37.93moa" line-width="0.25moa" line-color="black" />
+    <reticle-line start-x="0moa" start-y="-43.27moa" end-x="0moa" end-y="-48.19moa" line-width="0.25moa" line-color="black" />
+    <reticle-line start-x="0moa" start-y="-53.01moa" end-x="0moa" end-y="-62moa" line-width="0.25moa" line-color="black" />
+    <!-- lower post -->
+    <reticle-line start-x="0moa" start-y="-62moa" end-x="0moa" end-y="-88moa" line-width="2moa" line-color="black" />
+    <!-- numerals are hundreds of metres; 4 is left off, as on the glass -->
+    <reticle-text position-x="5moa" position-y="-5.3moa" text-height="2moa" text="3" anchor="Left" text-color="black" />
+    <reticle-text position-x="5moa" position-y="-13.5moa" text-height="2moa" text="5" anchor="Left" text-color="black" />
+    <reticle-text position-x="5moa" position-y="-18.8moa" text-height="2moa" text="6" anchor="Left" text-color="black" />
+    <reticle-text position-x="-9.5moa" position-y="-25moa" text-height="2moa" text="7" anchor="Right" text-color="black" />
+    <reticle-text position-x="-9.5moa" position-y="-32.4moa" text-height="2moa" text="8" anchor="Right" text-color="black" />
+    <reticle-text position-x="-9.5moa" position-y="-41.2moa" text-height="2moa" text="9" anchor="Right" text-color="black" />
+    <reticle-text position-x="-9.5moa" position-y="-51.2moa" text-height="2moa" text="10" anchor="Right" text-color="black" />
+    <!-- rangefinder: each bar is 76 cm (30 in) at its range, left-aligned -->
+    <reticle-line start-x="-30moa" start-y="-62moa" end-x="-21.29moa" end-y="-62moa" line-width="0.5moa" line-color="black" />
+    <reticle-text position-x="-20.29moa" position-y="-62.7moa" text-height="2moa" text="300" anchor="Left" text-color="black" />
+    <reticle-line start-x="-30moa" start-y="-65moa" end-x="-23.47moa" end-y="-65moa" line-width="0.5moa" line-color="black" />
+    <reticle-text position-x="-22.47moa" position-y="-65.7moa" text-height="2moa" text="400" anchor="Left" text-color="black" />
+    <reticle-line start-x="-30moa" start-y="-68moa" end-x="-24.77moa" end-y="-68moa" line-width="0.5moa" line-color="black" />
+    <reticle-text position-x="-23.77moa" position-y="-68.7moa" text-height="2moa" text="500" anchor="Left" text-color="black" />
+    <reticle-line start-x="-30moa" start-y="-71moa" end-x="-25.65moa" end-y="-71moa" line-width="0.5moa" line-color="black" />
+    <reticle-text position-x="-24.65moa" position-y="-71.7moa" text-height="2moa" text="600" anchor="Left" text-color="black" />
+    <reticle-line start-x="-30moa" start-y="-60.5moa" end-x="-30moa" end-y="-72.5moa" line-width="0.25moa" line-color="black" />
+    <reticle-text position-x="-30moa" position-y="-78moa" text-height="2moa" text="30in/76cm" anchor="Left" text-color="black" />
+  </elements>
+  <bdc>
+    <bdc position-x="0moa" position-y="-4.7moa" text-offset="10moa" text-height="2moa" />
+    <bdc position-x="0moa" position-y="-8.4moa" text-offset="10moa" text-height="2moa" />
+    <bdc position-x="0moa" position-y="-12.9moa" text-offset="10moa" text-height="2moa" />
+    <bdc position-x="0moa" position-y="-18.2moa" text-offset="10moa" text-height="2moa" />
+    <bdc position-x="0moa" position-y="-24.4moa" text-offset="10moa" text-height="2moa" />
+    <bdc position-x="0moa" position-y="-31.8moa" text-offset="10moa" text-height="2moa" />
+    <bdc position-x="0moa" position-y="-40.6moa" text-offset="10moa" text-height="2moa" />
+    <bdc position-x="0moa" position-y="-50.6moa" text-offset="10moa" text-height="2moa" />
+  </bdc>
+</reticle>

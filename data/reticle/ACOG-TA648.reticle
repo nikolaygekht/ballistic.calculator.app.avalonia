@@ -1,4 +1,5 @@
-<!-- BDC is for M2 AP 709gr 2810fps, 1:15RH M2 barrel, 300 m zero. BDC is in meters -->
+<!-- BDC is for M2 AP 709gr 2810fps, 1:15RH M2 barrel, 300 m zero. BDC is in meters.
+     Sight height 3.5 in - the TA648 over an M2 Browning's bore. -->
 <reticle name="TA648-style .50 BMG BDC" size-x="28mrad" size-y="42mrad" zero-x="14mrad" zero-y="6mrad">
   <elements>
     <reticle-path line-width="0.12mrad" color="black">

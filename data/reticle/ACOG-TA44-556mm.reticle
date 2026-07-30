@@ -1,0 +1,45 @@
+<!-- Trijicon ACOG TA44 1.5x16S RTR .223 (TA44-C-400390), from Trijicon's per-part reticle sheet.
+     Every position here is a PRINTED dimension - the sheet is stamped "*Reticles not
+     drawn to scale", so nothing was measured off it.
+     Horseshoe 18.1 MOA outer diameter, 1.2 MOA thick, 9.1 MOA gap at the bottom
+     (from the 9 mm sheet); 2.0 MOA aiming dot; 0.44 MOA bars and spine; numerals 5.0 MOA tall at
+     10 MOA from the spine.
+     400 m: drop 6.5 MOA, bar 4.15 MOA
+     500 m: drop 11.5 MOA, bar 3.32 MOA
+     600 m: drop 17.9 MOA, bar 2.77 MOA
+     700 m: drop 26.1 MOA, bar 2.37 MOA
+     The numerals are hundreds of METRES, established by testing in the application:
+     with XM855 at a 100 m zero the marks label close to 400/500/600/700 m.
+     Bar widths are not dimensioned on this sheet, so they are the 19 in rule's
+     values at those metric ranges.
+     Trijicon publishes no load, muzzle velocity or zero for this reticle. -->
+<reticle name="ACOG TA44 1.5x16S RTR .223" size-x="44moa" size-y="46moa" zero-x="22moa" zero-y="13moa">
+  <elements>
+    <!-- RTR horseshoe: 18.1 MOA outer diameter, 1.2 MOA thick, 9.1 MOA gap at the bottom -->
+    <reticle-path fill="false" line-width="1.2moa" color="black">
+      <elements>
+        <reticle-path-move-to position-x="4.550moa" position-y="-7.120moa" />
+        <reticle-path-arc radius="8.450moa" clockwise="false" major-arc="true" position-x="-4.550moa" position-y="-7.120moa" />
+      </elements>
+    </reticle-path>
+    <!-- 2.0 MOA aiming dot at the centre -->
+    <reticle-circle center-x="0moa" center-y="0moa" radius="1moa" fill="true" line-width="0.05moa" color="red" />
+    <!-- 2.0 MOA dots on the horizontal axis at +/-16.1 MOA; the sheet does not say what they are for -->
+    <reticle-circle center-x="-16.1moa" center-y="0moa" radius="1moa" fill="true" line-width="0.05moa" color="black" />
+    <reticle-circle center-x="16.1moa" center-y="0moa" radius="1moa" fill="true" line-width="0.05moa" color="black" />
+    <!-- ladder: crossbar at each printed drop; each bar is 19 in wide at its own range -->
+    <reticle-line start-x="0moa" start-y="-9.05moa" end-x="0moa" end-y="-26.1moa" line-width="0.44moa" line-color="black" />
+    <reticle-line start-x="-2.075moa" start-y="-6.5moa" end-x="2.075moa" end-y="-6.5moa" line-width="0.44moa" line-color="black" />
+    <reticle-text position-x="10moa" position-y="-9moa" text-height="5moa" text="4" anchor="Left" text-color="black" />
+    <reticle-line start-x="-1.66moa" start-y="-11.5moa" end-x="1.66moa" end-y="-11.5moa" line-width="0.44moa" line-color="black" />
+    <reticle-line start-x="-1.385moa" start-y="-17.9moa" end-x="1.385moa" end-y="-17.9moa" line-width="0.44moa" line-color="black" />
+    <reticle-text position-x="10moa" position-y="-20.4moa" text-height="5moa" text="6" anchor="Left" text-color="black" />
+    <reticle-line start-x="-1.185moa" start-y="-26.1moa" end-x="1.185moa" end-y="-26.1moa" line-width="0.44moa" line-color="black" />
+  </elements>
+  <bdc>
+    <bdc position-x="0moa" position-y="-6.5moa" text-offset="-18moa" text-height="4moa" />
+    <bdc position-x="0moa" position-y="-11.5moa" text-offset="-18moa" text-height="4moa" />
+    <bdc position-x="0moa" position-y="-17.9moa" text-offset="-18moa" text-height="4moa" />
+    <bdc position-x="0moa" position-y="-26.1moa" text-offset="-18moa" text-height="4moa" />
+  </bdc>
+</reticle>

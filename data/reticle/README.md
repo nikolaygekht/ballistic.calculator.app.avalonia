@@ -1,144 +1,97 @@
 # Shipped reticles
 
 The `.reticle` files here are sight pictures for the **Reticle** tab (`Load…`) and for the **Reticle
-Editor**. They are XML, so you can read one in any text editor; where a reticle's drop marks were computed
-for a particular load, **the load is recorded in an XML comment at the top of the file**.
+Editor**. They are XML, so you can read one in any text editor — but the geometry is all they hold. Where a
+reticle's marks belong to a particular load, **that is recorded in the reticle's `.md` file**, not in the
+`.reticle` itself.
 
-Everything here is a *-style* rendering built from published subtension data — none of it is a manufacturer
-file, and none of it is exact.
+Everything here is a *-style* rendering built from published subtension data — none of it is a
+manufacturer file, and none of it is exact.
+
+**Each reticle has a companion `.md` beside it** — the pattern element by element, the full
+calibration, a mark-by-mark table, the ranging features and how the load was identified. The tables
+below are the index; the detail is one click away.
 
 ---
 
 ## How BDC marks work here
 
 A reticle can carry **bullet-drop-compensator points** (`<bdc>` elements). They are positions only. The
-application does not read a range off the reticle — it **labels each mark with the range at which *your*
-trajectory crosses it**, from the load, zero and conditions in the Shot Parameters dialog. That is what the
-*Far BDC* / *Near BDC* overlays draw.
+application does not read a range off the reticle — it **labels each mark with the range at which
+*your* trajectory crosses it**, from the load, zero and conditions in the Shot Parameters dialog. That
+is what the *Far BDC* / *Near BDC* overlays draw.
 
 Two consequences worth understanding before trusting any mark:
 
-- **A mark is "400 m" only for the load the reticle was etched for.** Put a different load behind the same
-  glass and the same mark is a different range — which the application will tell you, because it labels
-  from your trajectory rather than from the etching.
-- **A reticle with no BDC points is not broken.** It just has no marks nominated as hold-over points; the
-  grid is still there to measure with.
+- **A mark is "400 m" only for the load the reticle was etched for.** Put a different load behind the
+  same glass and the same mark is a different range — which the application will tell you, because it
+  labels from your trajectory rather than from the etching.
+- **A reticle with no BDC points is not broken.** It just has no marks nominated as hold-over points;
+  the grid is still there to measure with.
 
-That gives two kinds of reticle here:
-
-| Kind | What the marks are | Example |
-|---|---|---|
-| **Geometric** | marks on whole grid units — 1 mrad, 2 MOA and so on. Load-independent by design: they are places on a ruler | `MILDOT`, `H58`, `MOA-GRID` |
-| **Load-calibrated** | a ladder etched at the drops of one specific load, at stated ranges. Reproduced here by computing that load's trajectory | the ACOG, V-COG and Specter files |
-
-For a calibrated ladder, the comment in the file names the projectile, ballistic coefficient and drag
-model, muzzle velocity (and the barrel it implies), twist, sight height, atmosphere and zero. Those are the
-inputs to reproduce it: enter them in the dialog and the labels the application draws should land on the
-etched ranges.
-
-Most of those loads are in the shipped ammunition library, so `Load` on the Ammunition tab saves the typing:
-
-| Reticle | Library entry | |
-|---|---|---|
-| `ACOG-TA31` | `.223/XM855 Ammo` | exactly the ladder's load (BC 0.151 G7, 3050 ft/s, 20 in) |
-| `SPECTER-5.56` | `.223/XM855 Ammo` | same bullet — change the muzzle velocity to 2800 ft/s for the 16 in barrel |
-| `ACOG-TA648` | `50BMG M2` | 710 gr at 2830 ft/s against the ladder's 709 at 2810 |
-| `VCOG16-300BLK` | `.300 AAC/.300 AAC 115gr` and `.300 AAC 208gr Hornady` | 2295 and 1020 ft/s against the ladder's 2330 and 1010 — close enough that the marks land where they should |
-| `PSO-1` | `7.62x54/57N323S` | the LPS ball the chevrons were computed from |
+That gives the two kinds of reticle below: **load-calibrated** ladders etched at the drops of one
+specific load, and **geometric** patterns whose marks are places on a ruler.
 
 ---
 
-## The files
+## Load-calibrated
 
-| File | Reticle | Field of view | BDC marks | Calibration |
-|---|---|---|---|---|
-| `MILDOT.reticle` | Mil-Dot | 12 × 12 mrad | 6 | geometric — whole milliradians, ±1…−4 |
-| `H58.reticle` | H58-style grid (high magnification) | 21 × 21 mrad | 5 | geometric — every 2 mrad to −10 |
-| `MOA-GRID.reticle` | MOA grid | 32 × 32 MOA | 6 | geometric — every 2 MOA, +4 to −8 |
-| `GERMAN4.reticle` | German #4 | 60 × 60 MOA | — | no marks; a hunting picture |
-| `M-16 Iron 3 Inch Eye Relief.reticle` | M16 aperture and post | 350 × 350 MOA | — | no marks; an iron-sight picture, not a scope |
-| `PSO-1.reticle` | PSO-1 (SVD), in Soviet thousandths | 79 × 79 ths | 3 | LPS ball, 1100–1300 m **with the drum at 1000m (see below)** |
-| `ACOG-TA31.reticle` | Trijicon TA31 (ACOG 4×32), 5.56 chevron | 16 × 40 MOA | 6 | M855, 300–800 m |
-| `ACOG-TA648.reticle` | Trijicon TA648, .50 BMG | 28 × 42 mrad | 9 | M2 AP, 400–2000 m |
-| `VCOG16-300BLK.reticle` | Trijicon V-COG 1-6×24, 300 BLK | 172 × 172 MOA (at 6×) | 5 | two loads, supersonic + subsonic |
-| `SPECTER-5.56.reticle` | Elcan Specter 1-4×, 5.56 | 140 × 190 MOA | 8 | M855, 300–1000 m |
+A ladder tied to one load. The columns are the inputs to reproduce it: enter them in the Shot Parameters
+dialog and the labels the application draws should land on the marks' stated ranges.
 
----
+Most were **computed here** from the stated load in an **ICAO sea-level** atmosphere — those name a
+sight height. Where a manufacturer **publishes its own drop table**, that table is used instead and the
+atmosphere and sight height behind it are whatever the manufacturer used; those rows read "not
+published". Each reticle's own `.md` says which it is.
 
-## The calibrated ladders, in full
+| Reticle | Optic | Field of view | Load | Muzzle velocity | Sight height | Zero | Marks | Library entry |
+|---|---|---|---|---|---|---|---|---|
+| [ACOG-TA31](ACOG-TA31.md) | Trijicon TA31 (ACOG 4×32), 5.56 chevron | 16 × 40 MOA | M855 62 gr, 0.151 G7, 1:7 RH | 3050 ft/s (20 in) | 2.4 in | 100 m | 300–800 m, 6 | `.223/XM855 Ammo` — exactly this load |
+| [ACOG-TA31-762mm](ACOG-TA31-762mm.md) | Trijicon ACOG 4×32, .308 amber crosshair (TA01NSN-308) | 40 × 46 MOA | .308/7.62 — **Trijicon publish no load** | not published | not published | **100 m** — printed on the sheet | 6 marks; **what the numerals count is not stated** | `.308 Win/7.62x51 BPN` is the nearest shipped .308 |
+| [ACOG-TA44-556mm](ACOG-TA44-556mm.md) | Trijicon ACOG 1.5×16S, RTR .223 | 44 × 46 MOA | .223/5.56 — Trijicon publish no load; verified against XM855 | 3050 ft/s as XM855 | not published | **100 m** (not published; this is what matches) | 400–700 **m**, 4 | `.223/XM855 Ammo`, unchanged — labels 384/502/618/728 m |
+| [ACOG-TA44-9mm](ACOG-TA44-9mm.md) | Trijicon ACOG 1.5×16S, RTR 9 mm PCC | 44 × 58 MOA | 9 mm carbine — **Trijicon publish no load** | not published | not published | centre dot; distance **not published and undetermined** (50 m and 100 yd both fit, depending on load) | 150–300 **yd**, 4 | none shipped for 9 mm carbine |
+| [ACOG-TA648](ACOG-TA648.md) | Trijicon TA648, .50 BMG | 28 × 42 mrad | M2 AP 709 gr, 1:15 RH | 2810 ft/s | 3.5 in (M2 Browning) | **300 m** | 400–2000 m, 9 | `50BMG M2` — 710 gr at 2830 ft/s |
+| [HURON-BDC-HUNTER-4](HURON-BDC-HUNTER-4.md) | Trijicon Huron 1-4×24 BDC Hunter Holds (**SFP**, at 4×) | 36 × 40 MOA | **not published** — a hunting BDC, no load stated | — | — | crosshair; distance not published | 3 holds: 2.24 / 5 / 8.32 MOA | — |
+| [HURON-BDC-HUNTER-6](HURON-BDC-HUNTER-6.md) | Trijicon Huron 1-6×24 BDC Hunter Holds (**SFP**, at 6×) | 36 × 40 MOA | **not published** — a hunting BDC, no load stated | — | — | crosshair; distance not published | 3 holds: 2.22 / 5 / 8.29 MOA | — |
+| [HURON-BDC-HUNTER-9](HURON-BDC-HUNTER-9.md) | Trijicon Huron 3-9×40 BDC Hunter Holds (**SFP**, at 9×) | 36 × 40 MOA | **not published** — a hunting BDC, no load stated | — | — | crosshair; distance not published | 3 holds: 2.24 / 5 / 8.32 MOA | — |
+| [LEUP-CMR-W556](LEUP-CMR-W556.md) | Leupold CMR-W 5.56 Illum. FFP (to the 20 mil mark) | 42 × 22 mrad | .223/5.56 62 gr — Leupold's published ladder | 3050 ft/s as XM855 (Leupold quote 2970) | not published | **100 m** — Leupold state 50 m, but 100 m is what matches | 300–900 m, 7 | `.223/XM855 Ammo`, unchanged |
+| [LEUP-CMR-W762](LEUP-CMR-W762.md) | Leupold CMR-W 7.62 Illum. FFP (to the 20 mil mark) | 42 × 28 mrad | 7.62/.308 175 gr — Leupold's published ladder | 2575 ft/s | not published | **100 m** — Leupold state 50 m, but 100 m is what matches | 300–1200 m, 10 | set a 175 gr bullet at 2575 ft/s |
+| [LEUP-CMR2](LEUP-CMR2.md) | Leupold Illum. CM-R² (**SFP**, at 6×) | 22 × 18 mrad | **not published** — Leupold dimensions the geometry only | — | — | — | 300–900, 7 | — |
+| [PSO-1](PSO-1.md) | PSO-1 (SVD), in Soviet thousandths | 79 × 79 ths | 57-N-323S LPS ball 9.6 g, 0.400 G1 | 830 m/s | 65 mm | **drum at 1000 m** | 1100–1300 m, 3 | `7.62x54/57N323S` |
+| [SPECTER-5.56](SPECTER-5.56.md) | Elcan Specter 1-4×, 5.56 | 140 × 190 MOA | M855 62 gr, 0.151 G7, 1:7 RH | 2800 ft/s (16 in) | 2.9 in | 100 m | 300–1000 m, 8 | `.223/XM855 Ammo` — **set 2800 ft/s** |
+| [SPECTER-7.62](SPECTER-7.62.md) | Elcan Specter DR 1-4×, 7.62 (at 4×) | 140 × 165 MOA | M80 ball 9.5 g, 0.397 G1, 1:12 RH | 830 m/s (22 in) | 2.9 in | 100 m | 300–1000 m, 8 | `.308 Win/7.62x51 BPN` — **set 830 m/s** |
+| [VCOG-16-556-55gr](VCOG-16-556-55gr.md) | Trijicon VCOG 1-6×24, 5.56 segmented BDC (at 6×) | 96 × 88 MOA | .223/5.56 55 gr — **also the published sheet for the 77 gr part** | not published | not published | **100 m** (centre crosshair) | 300–800 m, 6 | `.223/XM855 Ammo` is 62 gr — nearest, not exact |
+| [VCOG-16-762-175gr](VCOG-16-762-175gr.md) | Trijicon VCOG 1-6×24, 7.62 segmented BDC (at 6×) | 96 × 100 MOA | 7.62/.308 175 gr | not published | not published | **100 m** (centre crosshair) | 300–1000 m, 8 | use a 175 gr bullet; `7.62x51 BPN` is 146.6 gr |
+| [VCOG16-300BLK](VCOG16-300BLK.md) | Trijicon V-COG 1-6×24, 300 BLK (at 6×) | 172 × 172 MOA | 115 gr, 0.290 G1 **and** 208 gr A-MAX, 0.648 G1, 1:8 RH | 2330 ft/s / 1010 ft/s | 2.9 in | 100 m, supersonic load | 200–600 m, 5 (+3 subsonic diamonds, unlabelled) | `.300 AAC/.300 AAC 115gr` and `.300 AAC 208gr Hornady` |
 
-### Trijicon TA31 — ACOG 4×32, 5.56 chevron
+Several rows need reading before use, and their docs say why:
 
-- **Chevron tip** is the 100 m zero. **Chevron base** is the 300 m hold, and is 19 in wide — silhouette
-  shoulders at 300 m, the ranging trick the pattern is designed around.
-- The lines below are **400…800 m**, each drawn 19 in wide at its own range.
-- Computed for **M855 62 gr, BC 0.151 G7, 3050 ft/s** (a 20 in barrel), 1:7 RH twist, **2.4 in** sight
-  height, ICAO sea level, **100 m zero**.
+- **PSO-1** means nothing until the elevation drum is dialled to 1000 m.
+- Both **Specter** files are cut for a barrel the library entry does not have, so the muzzle velocity must
+  be changed by hand.
+- Both **CMR-W** files line up at a **100 m** zero although Leupold publish 50 m — the same offset on two
+  different cartridges, so it is systematic rather than a quirk of one load.
+- **ACOG-TA44-9mm**'s zero is genuinely undetermined: Trijicon publish neither the load nor the zero, and
+  50 m and 100 yd both fit depending on which 9 mm load you assume.
+- **ACOG-TA31-762mm** is graduated in hundreds of *something* Trijicon never states; load it and let the
+  labels tell you.
+- **LEUP-CMR2** and the three **Huron** files are **second focal plane**: their subtensions are true only at
+  the magnification in the *Optic* column.
 
-### Trijicon TA648 — .50 BMG
+## Geometric
 
-- Nine marks, **400…2000 m in 200 m steps** (the etched numerals are hundreds of metres).
-- Computed for **M2 AP 709 gr at 2810 ft/s**, 1:15 RH (the M2 barrel), **300 m zero**.
+Marks on whole grid units. Load-independent by design — they are places on a ruler, and the
+application supplies the ranges.
 
-### Trijicon V-COG 1-6×24 — 300 BLK
-
-One of the busiest reticles, because 300 BLK is two cartridges in one chamber. Framed as Trijicon's reticle
-sheet draws it: the **6× field of view, 25 mils (84.5 MOA) in radius**.
-
-- **Centre crosshair** — 19 in at 100 m, and the 100 m supersonic zero. Its **bottom end is the 200 m**
-  supersonic hold.
-- **Stadia below** — 300, 400, 500 and 600 m, each 19 in wide at its own range.
-- **Three diamonds** — the *subsonic* holds: 25/50 m, 100 m, 150 m, centred on the hold. The 25/50 m
-  diamond sits on the 50 m hold; 25 m is 0.54 MOA lower.
-- **Ring** — 25 MOA gaps on both axes; 66.4 MOA across the outer corners, which is 19 in at 25 m.
-- Computed for **115 gr, BC 0.290 G1 at 2330 ft/s** (supersonic) and **208 gr A-MAX, BC 0.648 G1 at
-  1010 ft/s** (subsonic), **2.9 in** sight height (the V-COG's tall integral mount), 1:8 RH, ICAO sea
-  level, zeroed with the **supersonic** load at 100 m.
-- Both loads were identified from the sheet's own geometry, fitting to **0.17 and 0.18 MOA RMS** across
-  every mark it draws — so the ladder matches the published pattern, not merely a plausible 300 BLK.
-- The horizontal stadia are marked every 5 mils (16.9 MOA). The sheet's "16.9 MOA × 12" says the etched
-  pattern carries twelve of them, one mark further out than this field of view shows.
-
-### Elcan Specter 1-4× — 5.56
-
-- Eight marks, **300…1000 m** (numerals are hundreds of metres).
-- Computed for **M855 62 gr, BC 0.151 G7, 2800 ft/s** (a 16 in barrel), 1:7 RH twist, **2.9 in** sight
-  height, ICAO sea level, **100 m zero**.
-
-### PSO-1 — SVD, and the one reticle here that needs the turret dialled
-
-The three chevrons below the main one are **not** hold-overs from the zero. They only mean anything with the
-**elevation drum set to 10** — dialled for 1000 m. With that on the turret:
-
-- the **main chevron** is the 1000 m hold;
-- the three below are **1100, 1200 and 1300 m**.
-
-**Dialling to 1000 m is 30 vertical clicks** — the drum and the reticle are both graduated in Soviet
-thousandths (1 ths = 1/6000 of a circle = 1.0472 mrad = 3.6 MOA), and one click is 0.5 ths, so 30 clicks is
-15 ths up from the 100 m setting.
-
-Calibrated for **57-N-323S LPS ball, 9.6 g, BC 0.400 G1, 830 m/s**, 65 mm sight height, ICAO sea level.
-Recomputing that load puts the three holds below a 1000 m hold at **3.166 / 6.719 / 10.654 ths** against the
-etched **3.162 / 6.714 / 10.647** — agreement to five thousandths of a thousandth, which is what identifies
-the load and the drum setting together. Read at the drum's other settings the spacing does not fit.
-
-**Two ways to see that in the app**, since the *Far BDC* overlay labels marks from your *current* solution:
-
-1. **Set the zero to 1000 m** — simplest, and the labels land on 1100 / 1200 / 1300.
-2. **Keep the 100 m zero and dial it**: put `0.5 ths` in the sight's vertical click on the Rifle tab, then
-   enter **30** V-Clicks on the Parameters tab.
-
-With an ordinary 100 m zero and *nothing* dialled, the overlay will label these three marks with whatever
-ranges they happen to correspond to from the crosshair — correct arithmetic, but not what the etching means.
-
-One honest discrepancy: the real drum was cut to the issue firing tables, and this model puts the 1000 m
-come-up at **14.0 ths (28 clicks)** rather than 15. It moves where the main chevron lands by about 1 ths; it
-does not touch the spacing of the three chevrons below it, which is what they are read by.
-
-The PSO-1's own **stadiametric rangefinder** is at lower left and has nothing to do with drop: put the
-target's feet on the horizontal base line and its head on the curve, and read the range off the numbers —
-hundreds of metres, 2 nearest the centre out to 10 at the far left. It assumes the true **1.7 m** target
-height.
+| Reticle | Pattern | Field of view | Marks |
+|---|---|---|---|
+| [GERMAN4](GERMAN4.md) | German #4 hunting picture | 60 × 60 MOA | none — a hunting picture |
+| [H58](H58.md) | H58-style grid with a christmas tree | 21 × 21 mrad | every 2 mrad to −10 (5) |
+| [LEUP-CCH](LEUP-CCH.md) | Leupold FFP CCH (Mark 5HD) — mrad grid with a 20-row christmas tree | 15 × 25 mrad | every 1 mrad to −20 (20) |
+| [LEUP-CMR-MIL](LEUP-CMR-MIL.md) | Leupold CMR-MIL Illum. FFP (Mark 4HD 2-10×) — mrad tree, 5 rows | 28 × 24 mrad | 2 / 4 / 6 / 8 / 10 mrad (5) |
+| [M-16 Iron 3 Inch Eye Relief](M-16%20Iron%203%20Inch%20Eye%20Relief.md) | M16 aperture and post | 350 × 350 MOA | none — iron sights, not a scope |
+| [MILDOT](MILDOT.md) | Mil-Dot, in true milliradians | 12 × 12 mrad | whole mrad, +2 to −4 (6) |
+| [MOA-GRID](MOA-GRID.md) | MOA crosshair, 1 MOA hashes to ±14 — **MILDOT's field of view** | 12 × 12 mrad (41.25 MOA) | every 2 MOA, +4 to −14 (9) |
 
 ---
 
@@ -151,13 +104,22 @@ Drop any `.reticle` file in this folder and it appears in `Load…`. Two ways to
   [BallisticCalculator repository](https://github.com/gehtsoft-usa/BallisticCalculator1/tree/main/SKILL/SKILLS/reticle-designer)
   — describe the reticle in words and it writes the file, an SVG preview and a subtension table.
 
-Two conventions worth keeping if you add a calibrated reticle:
+Four conventions worth keeping:
 
-1. **Record the calibration in a comment at the top of the file** — projectile, BC and drag model, muzzle
-   velocity, twist, sight height, atmosphere, zero, and which ranges the marks are. Without it the marks are
-   just positions, and nobody can check them later.
-2. **Say what the ranging features measure**, if the reticle has any — a stadia pair is useless without the
-   target size it assumes.
+1. **Write a `<NAME>.md` next to it** and add a row to the table above. This is where a reticle's
+   provenance lives: what the pattern is, the calibration as a table (projectile, BC and drag model,
+   muzzle velocity, twist, sight height, atmosphere, zero), the marks with their ranges, the ranging
+   features, and how the load was identified if it was fitted rather than published. Copy the shape of an
+   existing one.
+2. **Don't put that in an XML comment in the `.reticle` file.** Comments do not survive a round-trip
+   through the Reticle Editor, so provenance kept there quietly disappears the first time the file is
+   re-saved. The `.md` is the record. (A `description` and zero fields are planned for the format itself,
+   which will make this moot.)
+3. **Keep both tables sorted alphabetically by file name** — always. They are indexes, and an index is
+   only usable if you can find a name in it without reading every row. Insert the new row in place
+   rather than appending it.
+4. **Say what the ranging features measure**, if the reticle has any — a stadia pair is useless without
+   the target size it assumes.
 
-The file format ignores attributes it does not understand, so a misspelling is a silently missing element
-rather than an error. Check the preview after editing by hand.
+The file format ignores attributes it does not understand, so a misspelling is a silently missing
+element rather than an error. Check the preview after editing by hand.

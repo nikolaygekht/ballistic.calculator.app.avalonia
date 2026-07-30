@@ -1,0 +1,56 @@
+<!-- Leupold Illum. CM-R2, as its sheet dimensions it.
+     SECOND focal plane: Leupold states the reticle "will measure (subtend) correctly
+     when the riflescope is set to the highest available magnification" - 6x on the
+     Patrol 6HD this sheet is drawn for. At any other setting the subtensions below
+     are wrong, which is why the magnification is in the reticle name.
+     Every dimension here is printed on the sheet: horseshoe 1.75 mil OD / 1.50 mil ID,
+     0.15 mil dot, 0.15 mil fine lines, 0.28 mil vertical hashes, horizontal hashes at
+     2.65 and 5.00 mil with the arm ending at 7.65 mil, and drop bars at 0.87, 1.89,
+     3.20, 4.95, 6.98, 9.60 and 12.51 mil from centre with widths 1.25, 1.00, 0.83,
+     0.71, 0.63 and 0.56 mil.
+     The sheet names NO cartridge, no muzzle velocity and no zero, and does not say
+     whether its 4/6/8 numerals are hundreds of metres or yards. Each bar is 0.5 m
+     (about 20 in) wide at its own range, which is what identifies 1.25 mil as the
+     400 m bar; the 300 m bar's width is the only value not printed. -->
+<reticle name="Leupold CM-R2 (at 6x, SFP)" size-x="22mrad" size-y="18mrad" zero-x="11mrad" zero-y="3.5mrad">
+  <elements>
+    <!-- horizontal arms: fine line out to 7.65 mil, closed by a T post -->
+    <reticle-line start-x="-0.875mrad" start-y="0mrad" end-x="-7.65mrad" end-y="0mrad" line-width="0.15mrad" line-color="black" />
+    <reticle-line start-x="-7.65mrad" start-y="-0.6mrad" end-x="-7.65mrad" end-y="0.6mrad" line-width="0.3mrad" line-color="black" />
+    <reticle-line start-x="-2.65mrad" start-y="-0.14mrad" end-x="-2.65mrad" end-y="0.14mrad" line-width="0.3mrad" line-color="black" />
+    <reticle-line start-x="-5mrad" start-y="-0.14mrad" end-x="-5mrad" end-y="0.14mrad" line-width="0.3mrad" line-color="black" />
+    <reticle-line start-x="0.875mrad" start-y="0mrad" end-x="7.65mrad" end-y="0mrad" line-width="0.15mrad" line-color="black" />
+    <reticle-line start-x="7.65mrad" start-y="-0.6mrad" end-x="7.65mrad" end-y="0.6mrad" line-width="0.3mrad" line-color="black" />
+    <reticle-line start-x="2.65mrad" start-y="-0.14mrad" end-x="2.65mrad" end-y="0.14mrad" line-width="0.3mrad" line-color="black" />
+    <reticle-line start-x="5mrad" start-y="-0.14mrad" end-x="5mrad" end-y="0.14mrad" line-width="0.3mrad" line-color="black" />
+    <!-- centre: red horseshoe 1.75 mil OD / 1.50 mil ID with the 0.15 mil dot -->
+    <reticle-path fill="false" line-width="0.125mrad" color="red">
+      <elements>
+        <reticle-path-move-to position-x="0.381mrad" position-y="-0.717mrad" />
+        <reticle-path-arc radius="0.812mrad" clockwise="false" major-arc="true" position-x="-0.381mrad" position-y="-0.717mrad" />
+      </elements>
+    </reticle-path>
+    <reticle-circle center-x="0mrad" center-y="0mrad" radius="0.075mrad" fill="true" line-width="0.02mrad" color="red" />
+    <!-- drop ladder: each bar 0.5 m wide at its own range; numerals in hundreds -->
+    <reticle-line start-x="0mrad" start-y="-0.875mrad" end-x="0mrad" end-y="-12.51mrad" line-width="0.15mrad" line-color="black" />
+    <reticle-line start-x="-0.835mrad" start-y="-0.87mrad" end-x="0.835mrad" end-y="-0.87mrad" line-width="0.3mrad" line-color="black" />
+    <reticle-line start-x="-0.625mrad" start-y="-1.89mrad" end-x="0.625mrad" end-y="-1.89mrad" line-width="0.3mrad" line-color="black" />
+    <reticle-text position-x="0.975mrad" position-y="-2.17mrad" text-height="0.8mrad" text="4" anchor="Left" text-color="black" />
+    <reticle-line start-x="-0.5mrad" start-y="-3.2mrad" end-x="0.5mrad" end-y="-3.2mrad" line-width="0.3mrad" line-color="black" />
+    <reticle-line start-x="-0.415mrad" start-y="-4.95mrad" end-x="0.415mrad" end-y="-4.95mrad" line-width="0.3mrad" line-color="black" />
+    <reticle-text position-x="0.765mrad" position-y="-5.23mrad" text-height="0.8mrad" text="6" anchor="Left" text-color="black" />
+    <reticle-line start-x="-0.355mrad" start-y="-6.98mrad" end-x="0.355mrad" end-y="-6.98mrad" line-width="0.3mrad" line-color="black" />
+    <reticle-line start-x="-0.315mrad" start-y="-9.6mrad" end-x="0.315mrad" end-y="-9.6mrad" line-width="0.3mrad" line-color="black" />
+    <reticle-text position-x="0.665mrad" position-y="-9.88mrad" text-height="0.8mrad" text="8" anchor="Left" text-color="black" />
+    <reticle-line start-x="-0.28mrad" start-y="-12.51mrad" end-x="0.28mrad" end-y="-12.51mrad" line-width="0.3mrad" line-color="black" />
+  </elements>
+  <bdc>
+    <bdc position-x="0mrad" position-y="-0.87mrad" text-offset="-3.5mrad" text-height="0.7mrad" />
+    <bdc position-x="0mrad" position-y="-1.89mrad" text-offset="-3.5mrad" text-height="0.7mrad" />
+    <bdc position-x="0mrad" position-y="-3.2mrad" text-offset="-3.5mrad" text-height="0.7mrad" />
+    <bdc position-x="0mrad" position-y="-4.95mrad" text-offset="-3.5mrad" text-height="0.7mrad" />
+    <bdc position-x="0mrad" position-y="-6.98mrad" text-offset="-3.5mrad" text-height="0.7mrad" />
+    <bdc position-x="0mrad" position-y="-9.6mrad" text-offset="-3.5mrad" text-height="0.7mrad" />
+    <bdc position-x="0mrad" position-y="-12.51mrad" text-offset="-3.5mrad" text-height="0.7mrad" />
+  </bdc>
+</reticle>

@@ -1,0 +1,28 @@
+<reticle name="ACOG 4x32 .308 Crosshair (TA01NSN-308)" size-x="40moa" size-y="46moa" zero-x="20moa" zero-y="10moa">
+  <elements>
+    <reticle-line start-x="0moa" start-y="10moa" end-x="0moa" end-y="0moa" line-width="0.4moa" line-color="black" />
+    <reticle-line start-x="-7.85moa" start-y="0moa" end-x="7.85moa" end-y="0moa" line-width="0.4moa" line-color="orange" />
+    <reticle-line start-x="0moa" start-y="0moa" end-x="0moa" end-y="-6.6moa" line-width="0.4moa" line-color="orange" />
+    <reticle-line start-x="-8.95moa" start-y="0moa" end-x="-20moa" end-y="0moa" line-width="2.6moa" line-color="black" />
+    <reticle-line start-x="8.95moa" start-y="0moa" end-x="20moa" end-y="0moa" line-width="2.6moa" line-color="black" />
+    <reticle-line start-x="-3.95moa" start-y="-3.6moa" end-x="3.95moa" end-y="-3.6moa" line-width="0.4moa" line-color="orange" />
+    <reticle-line start-x="-2.6moa" start-y="-6.6moa" end-x="2.6moa" end-y="-6.6moa" line-width="0.4moa" line-color="orange" />
+    <reticle-line start-x="-1.95moa" start-y="-10.1moa" end-x="1.95moa" end-y="-10.1moa" line-width="0.4moa" line-color="black" />
+    <reticle-line start-x="-1.55moa" start-y="-14moa" end-x="1.55moa" end-y="-14moa" line-width="0.4moa" line-color="black" />
+    <reticle-line start-x="0moa" start-y="-6.6moa" end-x="0moa" end-y="-14moa" line-width="0.4moa" line-color="black" />
+    <reticle-line start-x="0moa" start-y="-14moa" end-x="0moa" end-y="-33moa" line-width="2.6moa" line-color="black" />
+    <reticle-circle center-x="0moa" center-y="-19.1moa" radius="1.1moa" fill="true" line-width="0.25moa" color="white" />
+    <reticle-circle center-x="0moa" center-y="-25.5moa" radius="1moa" fill="true" line-width="0.25moa" color="white" />
+    <reticle-text position-x="2.6moa" position-y="-11.85moa" text-height="3.5moa" text="4" anchor="Left" text-color="black" />
+    <reticle-text position-x="2.6moa" position-y="-20.85moa" text-height="3.5moa" text="6" anchor="Left" text-color="black" />
+    <reticle-text position-x="2.6moa" position-y="-27.25moa" text-height="3.5moa" text="8" anchor="Left" text-color="black" />
+  </elements>
+  <bdc>
+    <bdc position-x="0moa" position-y="-3.6moa" text-offset="-16moa" text-height="3moa" />
+    <bdc position-x="0moa" position-y="-6.6moa" text-offset="-16moa" text-height="3moa" />
+    <bdc position-x="0moa" position-y="-10.1moa" text-offset="-16moa" text-height="3moa" />
+    <bdc position-x="0moa" position-y="-14moa" text-offset="-16moa" text-height="3moa" />
+    <bdc position-x="0moa" position-y="-19.1moa" text-offset="-16moa" text-height="3moa" />
+    <bdc position-x="0moa" position-y="-25.5moa" text-offset="-16moa" text-height="3moa" />
+  </bdc>
+</reticle>

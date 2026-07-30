@@ -1,0 +1,25 @@
+<reticle name="Trijicon Huron 1-6x24 BDC Hunter Holds (at 6x, SFP)" size-x="36moa" size-y="40moa" zero-x="18moa" zero-y="16moa">
+  <elements>
+    <!-- fine cross, 0.5 MOA lines, out to the 15 MOA post shoulders -->
+    <reticle-line start-x="-15moa" start-y="0moa" end-x="15moa" end-y="0moa" line-width="0.5moa" line-color="black" />
+    <reticle-line start-x="0moa" start-y="15.9moa" end-x="0moa" end-y="-15moa" line-width="0.5moa" line-color="black" />
+    <!-- heavy duplex posts, 2.5 MOA thick, from 15 MOA outward (they run off-frame) -->
+    <reticle-line start-x="-15moa" start-y="0moa" end-x="-18moa" end-y="0moa" line-width="2.5moa" line-color="black" />
+    <reticle-line start-x="15moa" start-y="0moa" end-x="18moa" end-y="0moa" line-width="2.5moa" line-color="black" />
+    <reticle-line start-x="0moa" start-y="-15moa" end-x="0moa" end-y="-24moa" line-width="2.5moa" line-color="black" />
+    <!-- ticks on the horizontal at +/-5 and +/-10 MOA, 2.5 MOA tall -->
+    <reticle-line start-x="-5moa" start-y="-1.25moa" end-x="-5moa" end-y="1.25moa" line-width="0.5moa" line-color="black" />
+    <reticle-line start-x="5moa" start-y="-1.25moa" end-x="5moa" end-y="1.25moa" line-width="0.5moa" line-color="black" />
+    <reticle-line start-x="-10moa" start-y="-1.25moa" end-x="-10moa" end-y="1.25moa" line-width="0.5moa" line-color="black" />
+    <reticle-line start-x="10moa" start-y="-1.25moa" end-x="10moa" end-y="1.25moa" line-width="0.5moa" line-color="black" />
+    <!-- the three BDC holds -->
+    <reticle-line start-x="-1.3moa" start-y="-2.22moa" end-x="1.3moa" end-y="-2.22moa" line-width="1moa" line-color="black" />
+    <reticle-line start-x="-1.3moa" start-y="-5moa" end-x="1.3moa" end-y="-5moa" line-width="1moa" line-color="black" />
+    <reticle-line start-x="-1.3moa" start-y="-8.29moa" end-x="1.3moa" end-y="-8.29moa" line-width="1moa" line-color="black" />
+  </elements>
+  <bdc>
+    <bdc position-x="0moa" position-y="-2.22moa" text-offset="-9.4moa" text-height="1.6moa" />
+    <bdc position-x="0moa" position-y="-5moa" text-offset="-9.4moa" text-height="1.6moa" />
+    <bdc position-x="0moa" position-y="-8.29moa" text-offset="-9.4moa" text-height="1.6moa" />
+  </bdc>
+</reticle>
