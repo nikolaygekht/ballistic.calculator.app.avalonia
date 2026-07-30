@@ -8,8 +8,8 @@ nav_order: 3
 **Goal of this article:** get from the download to a trajectory on screen, on Windows or Linux, and
 know where the application keeps its files.
 
-There is no installer. The application ships as one archive **per platform**; you unzip it wherever you
-like and run it. Nothing is registered, no services are added, and removing it is deleting the folder.
+There is no installer. The application ships as one archive **per platform** — `.zip` for Windows,
+`.tar.gz` for Linux and macOS; you unpack it wherever you like and run it. Nothing is registered, no services are added, and removing it is deleting the folder.
 
 ## What you need
 
@@ -22,9 +22,10 @@ like and run it. Nothing is registered, no services are added, and removing it i
 
 ## Download
 
-Take the latest archive from the
-[Releases page](https://github.com/nikolaygekht/ballistic.calculator.app.avalonia/releases) and unzip
-it into any folder **you can write to** — your home directory, `Documents`, a USB stick. Avoid
+Take the archive for your platform from the
+[Releases page](https://github.com/nikolaygekht/ballistic.calculator.app.avalonia/releases) — a **`.zip`**
+for Windows, a **`.tar.gz`** for Linux and macOS — and unpack it into any folder **you can write to**:
+your home directory, `Documents`, a USB stick. Avoid
 `C:\Program Files` and `/usr/local`: the application keeps its window layout in a file beside the
 executable, and in a read-only folder those settings are silently not remembered (see
 [Where your settings go](#where-your-settings-go)).
@@ -39,20 +40,21 @@ it has not seen before — *More info → Run anyway*.
 
 ## Linux
 
-The way that always works is to name the assembly, exactly as on macOS:
+Unpack with `tar` and run the launcher:
 
 ```bash
-cd /path/to/BallisticCalculator2
-dotnet BallisticCalculator2.dll     # or ReticleEditor.dll
+tar xzf BallisticCalculatorPortable-linux-x64.tar.gz
+cd BallisticCalculator2                 # wherever you unpacked it
+./BallisticCalculator2                  # the reticle editor is ./ReticleEditor
 ```
 
-The archive may also contain extension-less launchers, **`BallisticCalculator2`** and
-**`ReticleEditor`**. If yours has them they are the more convenient route, but unzip tools routinely drop
-the executable bit:
+The binaries have no extension: **`BallisticCalculator2`** and **`ReticleEditor`**. The archive is a
+`.tar.gz` precisely so they arrive **executable** — `tar` carries permissions where `zip` does not, so
+there is no `chmod` step. If you have somehow ended up with them non-executable, `chmod +x` them, or run
+the assembly through the runtime instead, which never needs a permission bit of its own:
 
 ```bash
-chmod +x BallisticCalculator2 ReticleEditor
-./BallisticCalculator2
+dotnet BallisticCalculator2.dll
 ```
 
 On a desktop distribution nothing else is needed. On a minimal or server install, the pieces usually
@@ -61,33 +63,22 @@ globalization) — install your distribution's `fontconfig` and `libicu` package
 
 ## macOS
 
-Take **`…-osx-arm64.zip`** on Apple Silicon or **`…-osx-x64.zip`** on an Intel Mac, and install the
-matching [.NET 8 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0).
-
-Start it by naming the **assembly**, not a launcher:
-
-```bash
-cd /path/to/BallisticCalculator2
-dotnet BallisticCalculator2.dll
-```
-
-and the reticle editor the same way:
+Take **`…-osx-arm64.tar.gz`** on Apple Silicon or **`…-osx-x64.tar.gz`** on an Intel Mac — getting this
+wrong is the single most common failure, see below — and install the matching
+[.NET 8 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0).
 
 ```bash
-dotnet ReticleEditor.dll
+tar xzf BallisticCalculatorPortable-osx-arm64.tar.gz
+cd BallisticCalculator2                 # wherever you unpacked it
+./BallisticCalculator2                  # the reticle editor is ./ReticleEditor
 ```
 
-The archive *does* contain a launcher — an extension-less `BallisticCalculator2` — and it works. It just
-needs its execute bit back first, because the archive is built on Windows in `.zip` format, which stores
-no Unix permissions:
+`tar` carries the execute bit, so the launcher runs as unpacked. The alternative, which needs no
+permission bit at all, is to name the assembly and let the runtime start it:
 
 ```bash
-chmod +x BallisticCalculator2 ReticleEditor
-./BallisticCalculator2
+dotnet BallisticCalculator2.dll         # or ReticleEditor.dll
 ```
-
-`dotnet BallisticCalculator2.dll` is listed first only because it needs nothing at all: `dotnet` is
-already executable, and a managed `.dll` has no permission bit of its own to lose.
 
 **The application is not notarised**, so `spctl --assess` reports it as rejected and Finder will refuse to
 open the launcher by double-click. Running it from Terminal is unaffected — macOS is far stricter about
@@ -109,7 +100,7 @@ archive to the machine comes first.
 |---|---|
 | `Bad CPU type in executable` | Wrong archive for the machine — an `osx-arm64` build on an Intel Mac, or an `osx-x64` build on Apple Silicon without Rosetta. Apple Silicon can run x64 under Rosetta; Intel can **never** run arm64 |
 | `dotnet` reports it cannot load the assembly | The same mismatch reached through `dotnet`: the runtime is one architecture and the build is pinned to the other |
-| `zsh: permission denied` | The launcher lost its execute bit in the `.zip` — `chmod +x` it |
+| `zsh: permission denied` | The launcher has no execute bit — unusual from a `.tar.gz`, but `chmod +x` fixes it |
 | `"…" cannot be opened because the developer cannot be verified` | A Finder double-click on an un-notarised binary. Launch it from Terminal instead, or clear the quarantine flag: `xattr -dr com.apple.quarantine .` |
 | `dotnet: command not found` | The runtime is not installed, or not on your `PATH`. It normally lives at `/usr/local/share/dotnet/dotnet`, which is not always symlinked into `/usr/local/bin` |
 
@@ -126,7 +117,7 @@ The one subdirectory that matters is **`data`**:
 | Path | Holds |
 |---|---|
 | `data/drg` | Custom drag tables (`.drg`) — a large set of radar-derived Lapua tables, plus others |
-| `data/reticle` | Reticle definitions (`.reticle`) — two dozen: measuring grids (Mil-Dot, MOA, H58, Leupold CCH and CMR-MIL), hunting and military pictures (German #4, PSO-1, an M16 iron sight), and a dozen-odd real optics with calibrated drop ladders (Trijicon ACOG, V-COG and Huron, Elcan Specter, Leupold CMR-W). `README.md` there indexes them with their calibration, and each reticle has a companion `.md` with the full detail |
+| `data/reticle` | Reticle definitions (`.reticle`) — **34**: 13 measuring grids (Mil-Dot, MOA, H58, Leupold CCH and CMR-MIL, six EOTech Vudu patterns, German #4, an M16 iron sight) and 21 real optics with calibrated drop ladders (Trijicon ACOG, V-COG and Huron, Elcan Specter, Leupold CMR-W and CM-R², four EOTech Vudu, PSO-1). `README.md` there indexes them with their calibration, and each reticle has a companion `.md` with the full detail |
 | `data/ammo` | The sample ammunition library (`.ammox` and legacy `.ammo`), organised by cartridge |
 | `data/dictionaries.xml` | The sight and barrel presets the application **ships with**. Your own copy is `user-dictionaries.xml` beside the executable; see [Updating](updating.md) |
 
@@ -183,7 +174,7 @@ A few things worth knowing on day one:
 
 ## Updating and removing
 
-To update, unzip the new archive over the old folder, or beside it. Unzipping *over* the folder is a
+To update, unpack the new archive over the old folder, or beside it. Unpacking *over* the folder is a
 merge: it replaces every file the archive contains and leaves your own files alone. Deleting `data`
 first does not — that takes your files with it. Your presets and window layout live outside `data` and
 are never at risk.

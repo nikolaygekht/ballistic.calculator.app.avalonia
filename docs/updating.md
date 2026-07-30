@@ -9,24 +9,24 @@ nav_order: 3.5
 update never costs you work you have done.
 
 There is no updater and no version check. You update the way you installed: take the newer archive from
-the [Releases page](https://github.com/nikolaygekht/ballistic.calculator.app.avalonia/releases) and unzip
+the [Releases page](https://github.com/nikolaygekht/ballistic.calculator.app.avalonia/releases) and unpack
 it over the folder you are already using.
 
 ## The one rule
 
 > **Everything inside `data` belongs to the release. Everything outside it belongs to you.**
 
-The archive contains the binaries and a complete `data` folder. Unzipping over your installation
+The archive contains the binaries and a complete `data` folder. Unpacking over your installation
 overwrites every file the archive contains and leaves every file it does not. So:
 
 - **A shipped file you edited is lost**, because the archive has a file of that name.
 - **A file of your own is kept**, because the archive has nothing to overwrite it with — *provided you
-  unzip over the folder rather than deleting it first.* Delete `data` and then unpack, and your files
+  unpack over the folder rather than deleting it first.* Delete `data` and then unpack, and your files
   go with it.
 
-That second point is the one people get wrong, and it is worth being precise about: an over-unzip is a
-merge, not a wipe. Your `my-scope.reticle` in `data/reticle` survives. Your tweak to the shipped
-`MILDOT.reticle` does not.
+That second point is the one people get wrong, and it is worth being precise about: unpacking over a
+folder is a merge, not a wipe. Your `my-scope.reticle` in `data/reticle` survives. Your tweak to the
+shipped `MILDOT.reticle` does not.
 
 ## What that means per kind of file
 
@@ -43,7 +43,7 @@ merge, not a wipe. Your `my-scope.reticle` in `data/reticle` survives. Your twea
 **The trap is that the Save dialogs start in `data`.** The reticle editor's Save opens in
 `data/reticle`, and drag tables and loads default to `data/drg` and `data/ammo`. That is
 convenient — it puts your work where the application looks — and it also puts your work in the folder an
-update rewrites. Your files survive an over-unzip, but nothing protects them if you ever delete the
+update rewrites. Your files survive unpacking over the folder, but nothing protects them if you ever delete the
 folder to start clean, and nothing warns you if you happen to name a file the way we name one.
 
 **The safe habit:** keep your own reticles, drag tables and loads in a folder of your own, outside the
@@ -51,8 +51,8 @@ installation. Both Open dialogs will happily browse there.
 
 ### A folder we have renamed stays behind
 
-Because an over-unzip only ever *adds and replaces*, a shipped folder that a release **renames** is left
-on disk under its old name. The sample ammunition folder was `data/legacy-ammo` and is now `data/ammo`,
+Because unpacking over a folder only ever *adds and replaces*, a shipped folder that a release **renames**
+is left on disk under its old name. The sample ammunition folder was `data/legacy-ammo` and is now `data/ammo`,
 so updating across that change leaves you with both: the new one, and the old one still holding the
 previous release's copy of the same files.
 
@@ -98,7 +98,7 @@ If a folder is read-only, the presets still load — they simply are not remembe
 
 ## Downgrading, and starting clean
 
-- **To go back to an older release**, unzip the older archive over the folder. Your `appstate.json` and
+- **To go back to an older release**, unpack the older archive over the folder. Your `appstate.json` and
   `user-dictionaries.xml` are not in the archive and carry over; if the older version does not
   understand something in them, delete the offending file and it will be recreated with defaults.
 - **To reset the presets completely**, delete `user-dictionaries.xml` — the next start recreates it from

@@ -79,16 +79,17 @@ the barrel azimuth and your latitude. Leave them out and those terms are simply 
 
 ## Download
 
-Grab the latest archive from [Releases](https://github.com/nikolaygekht/ballistic.calculator.app.avalonia/releases),
-unzip it into a folder you can write to, and run it. There is no installer.
+Grab the archive for your platform from [Releases](https://github.com/nikolaygekht/ballistic.calculator.app.avalonia/releases)
+— `.zip` for Windows, `.tar.gz` for Linux and macOS — unpack it into a folder you can write to, and run it.
+There is no installer.
 
 * **Windows** — run `BallisticCalculator2.exe` (the reticle editor is `ReticleEditor.exe`)
-* **Linux** — `dotnet BallisticCalculator2.dll`, or run `BallisticCalculator2` if your archive has it
-  (`chmod +x` it first if your unzip tool dropped the permission)
-* **macOS** — `dotnet BallisticCalculator2.dll`
+* **Linux** — `./BallisticCalculator2` (or `dotnet BallisticCalculator2.dll`)
+* **macOS** — `./BallisticCalculator2`, matching the archive to the machine: `osx-arm64` for Apple
+  Silicon, `osx-x64` for Intel
 
-Both platforms' binaries are in the same archive, alongside the shared `data` folder holding reticles, drag
-tables and the sample ammunition library — keep that folder beside the executable. The builds are
+One archive per platform, each holding that platform's binaries alongside the shared `data` folder of
+reticles, drag tables and the sample ammunition library — keep that folder beside the executable. The builds are
 framework-dependent, so the **[.NET 8 runtime](https://dotnet.microsoft.com/download/dotnet/8.0)** has to be
 installed; the plain runtime is enough, Avalonia does not need the Desktop Runtime.
 

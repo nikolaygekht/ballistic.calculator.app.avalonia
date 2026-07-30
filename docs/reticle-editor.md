@@ -25,13 +25,13 @@ Because the sight picture is only as truthful as the reticle behind it. The
 a target fits between them, where a moving-target lead sits. All of that is worthless if the marks are on
 the wrong subtensions.
 
-Two dozen reticles ship in `data/reticle` — measuring grids (`MILDOT`, `MOA-GRID`, `H58`, Leupold's `CCH`
-and `CMR-MIL`), hunting and military pictures (`GERMAN4`, `PSO-1`, an M16 iron sight), and a dozen-odd
-renderings of real optics with their drop ladders: Trijicon ACOGs, V-COGs and Hurons, Elcan Specters and
-Leupold CMR-Ws. `data/reticle/README.md` indexes them in two tables — load-calibrated and geometric — and
-each reticle has a companion `.md` beside it with the pattern and its calibration in full. They cover the
-common patterns, but your scope's reticle is quite possibly not among them, and this is what you use to
-describe it.
+**34** reticles ship in `data/reticle`: 13 measuring grids (`MILDOT`, `MOA-GRID`, `H58`, Leupold's `CCH`
+and `CMR-MIL`, six EOTech Vudu patterns, `GERMAN4` and an M16 iron sight) and 21 renderings of real optics
+with their drop ladders — Trijicon ACOGs, V-COGs and Hurons, Elcan Specters, Leupold `CMR-W` and `CM-R²`,
+four EOTech Vudus, and the `PSO-1`. `data/reticle/README.md` indexes them in two tables, load-calibrated
+and geometric, and each reticle has a companion `.md` beside it with the pattern and its calibration in
+full. They cover the common patterns, but your scope's reticle is quite possibly not among them, and this
+is what you use to describe it.
 
 Three other reasons people end up here:
 
@@ -86,8 +86,12 @@ The **View** menu holds three things worth knowing about:
   element list.
 - **Coordinate Display Units** — `Mil`, `MOA`, `in/100yd`, `cm/100m`. This changes only the **status bar
   readout**, not the reticle. It follows the reticle's own unit when you open a file.
-- **Highlight Current Item** — redraws the selected element in blue on top of the reticle, which is how you
-  find out which of forty lines you have selected.
+- **Highlight Current Item** — draws a **magenta halo** behind the selected element, several times its own
+  line width, with the element itself redrawn on top in its own colour. That is how you find out which of
+  forty lines you have selected. **On by default**; turn it off to see the reticle exactly as it will
+  appear. The halo rather than a recolour is deliberate: restating a 0.01 mil hairline as a 0.01 mil
+  hairline in another colour is invisible on a dense reticle, and magenta is used because blue already
+  marks the BDC points in the same preview.
 
 ## Files
 

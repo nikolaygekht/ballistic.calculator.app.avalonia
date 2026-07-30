@@ -10,3 +10,7 @@ TBD.txt
 .claude/settings.local.json
 Setup/content/
 *.zip
+# The Unix release archives, alongside the *.zip rule above — prepare.bat now writes .tar.gz for the
+# Linux and macOS builds, and the bare .tar is its intermediate.
+*.tar.gz
+*.tar

@@ -1,7 +1,15 @@
 @echo off
 setlocal
 
-rem Builds, stages, signs and zips one runtime identifier.
+rem Builds, stages, signs and archives one runtime identifier.
+rem
+rem   pack.bat <rid> <yes|no> [zip|targz]      the format defaults to zip
+rem
+rem zip is right for Windows and wrong for Unix: the format carries no permission bits, so the
+rem extension-less launchers arrive without the execute bit and need a chmod before they will run.
+rem 7-Zip's tar writer stamps mode 0777 on every entry, so a tar.gz extracts ready to run — at the
+rem cost of marking data files executable too, which is untidy and harmless. 7-Zip cannot do better;
+rem it has no idea which of these files are programs.
 rem
 rem Every fallible step is checked and the script exits non-zero, because a half-built release is worse
 rem than no release: a publish that silently failed leaves the previous build's files staged, and a
@@ -14,6 +22,14 @@ if "%~1" == "" (
 )
 if not "%~2" == "yes" if not "%~2" == "no" (
     echo ERROR: the second argument must be yes or no ^(sign, or do not sign^). Got "%~2".
+    exit /b 1
+)
+
+set "format=%~3"
+if "%format%" == "" set "format=zip"
+if not "%format%" == "zip" if not "%format%" == "targz" (
+    echo ERROR: the third argument must be zip or targz. Got "%~3".
+    echo        Usage: pack.bat ^<rid^> ^<yes^|no^> ^[zip^|targz^]
     exit /b 1
 )
 
@@ -66,28 +82,51 @@ if errorlevel 1 goto :signfailed
 cd ..
 :skipsign
 
-echo packing...
-cd content
-rem The mask is `*`, not `*.*`. 7-Zip's `*.*` matches only names that contain a dot, so it silently
-rem dropped the extension-less launchers -- BallisticCalculator2 and ReticleEditor -- from the Linux and
-rem macOS archives, which then held managed assemblies and native libraries but nothing to start.
+echo packing %~1 as %format%...
+
+rem Two notes that apply to both formats. The mask is `*`, not `*.*`: 7-Zip's `*.*` matches only names
+rem containing a dot, so it silently dropped the extension-less launchers -- BallisticCalculator2 and
+rem ReticleEditor -- from the Linux and macOS archives, which then held managed assemblies and native
+rem libraries but nothing to start. And `7z a` ADDS to an existing archive, so any previous one is
+rem deleted first: otherwise a re-run keeps entries that are no longer shipped (a renamed data folder,
+rem for instance). Archives are written to the parent, so one is never a candidate for adding to itself.
 rem
-rem Written straight to the parent, so the archive is never a candidate for adding to itself. `7z a`
-rem ADDS to an existing archive, so delete any previous one first: otherwise a re-run keeps entries that
-rem are no longer shipped (a renamed data folder, for instance).
-if exist "..\BallisticCaculatorPortable-%~1.zip" del "..\BallisticCaculatorPortable-%~1.zip"
-7z a -r "..\BallisticCaculatorPortable-%~1.zip" *
-rem 7-Zip: 0 = ok, 1 = warning (something was skipped), 2 and above = fatal. A skipped file is exactly
-rem the defect that shipped archives with no launcher in them, so anything but 0 stops here.
+rem 7-Zip exit codes: 0 = ok, 1 = warning (something was skipped), 2 and above = fatal. A skipped file is
+rem exactly the defect that shipped launcher-less archives, so anything but 0 stops here.
+
+if "%format%" == "targz" goto :packtargz
+
+set "archive=BallisticCalculatorPortable-%~1.zip"
+if exist "%archive%" del "%archive%"
+cd content
+7z a -r "..\%archive%" *
 if errorlevel 1 goto :packfailed
 cd ..
+goto :packed
 
-if not exist "BallisticCaculatorPortable-%~1.zip" (
+:packtargz
+rem Two steps rather than one pipe, deliberately: in `A | B` cmd reports only B's exit code, so a
+rem failing tar step would go unnoticed -- the whole point of this script is to fail loudly. The
+rem intermediate .tar lives in the parent so it cannot end up inside itself, and is deleted after.
+set "archive=BallisticCalculatorPortable-%~1.tar.gz"
+set "tarfile=BallisticCalculatorPortable-%~1.tar"
+if exist "%archive%" del "%archive%"
+if exist "%tarfile%" del "%tarfile%"
+cd content
+7z a -ttar "..\%tarfile%" *
+if errorlevel 1 goto :packfailed
+cd ..
+7z a -tgzip "%archive%" "%tarfile%"
+if errorlevel 1 goto :packfailed
+del "%tarfile%"
+
+:packed
+if not exist "%archive%" (
     echo ERROR: the archive for %~1 was not created.
     exit /b 1
 )
 
-echo done: BallisticCaculatorPortable-%~1.zip
+echo done: %archive%
 exit /b 0
 
 :copyfailed

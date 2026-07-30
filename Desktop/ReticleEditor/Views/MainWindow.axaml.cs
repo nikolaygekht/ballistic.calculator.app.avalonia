@@ -18,7 +18,10 @@ public partial class MainWindow : Window
 {
     private const double MinFontSize = 10;
     private const double MaxFontSize = 20;
-    private bool _highlightCurrentItem = false;
+    // On by default. Highlighting the selected element is how you tell which of forty lines you have
+    // selected, so it is not a preference to opt into; the menu item is there to turn it off while
+    // looking at the reticle as it will actually appear.
+    private bool _highlightCurrentItem = true;
     private ReticleDefinition? _currentReticle = null;
     private string? _currentFileName = null;
     private Models.CombinedElementsView? _elementsView = null;
@@ -58,6 +61,7 @@ public partial class MainWindow : Window
         // Create empty reticle by default
         _currentReticle = new ReticleDefinition();
         UpdateElementsList();
+        ShowHighlightState();
 
         // Hook up selection changed event
         ReticleItems.SelectionChanged += OnReticleItemsSelectionChanged;
@@ -596,13 +600,18 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>Puts the tick on the menu item in step with the flag. Called at start-up too, or the
+    /// menu would show no tick while highlighting was on.</summary>
+    private void ShowHighlightState()
+    {
+        if (HighlightMenuItem != null)
+            HighlightMenuItem.Icon = _highlightCurrentItem ? "\u2713" : null;
+    }
+
     private void OnToggleHighlight(object? sender, RoutedEventArgs e)
     {
         _highlightCurrentItem = !_highlightCurrentItem;
-        if (HighlightMenuItem != null)
-        {
-            HighlightMenuItem.Icon = _highlightCurrentItem ? "✓" : null;
-        }
+        ShowHighlightState();
         StatusArea.Text = _highlightCurrentItem ? "Highlighting enabled" : "Highlighting disabled";
 
         // Update overlay to show/hide highlighting
@@ -855,6 +864,33 @@ public partial class MainWindow : Window
         UpdateOverlay();
     }
 
+    /// <summary>
+    /// The selection colour. Not blue: this overlay already draws the BDC points in blue and dark blue,
+    /// and a selection that shares their colour is a selection you have to work out. Magenta appears
+    /// nowhere in a reticle, reads against both a light background and black lines, and is distinct for
+    /// the common forms of colour blindness in a way red-against-black is not.
+    /// </summary>
+    private const string HighlightColor = "magenta";
+
+    /// <summary>
+    /// How wide to draw the halo behind the selected element: several times the element's own width, but
+    /// never so thin that a hairline gets a hairline halo. Sized from the reticle rather than in absolute
+    /// units, so it looks the same on a 12 mrad reticle and a 350 MOA one.
+    /// </summary>
+    private Measurement<AngularUnit> HaloWidth(Measurement<AngularUnit>? elementWidth)
+    {
+        var floor = _currentReticle!.Size.X / 150;
+        if (elementWidth == null)
+            return floor;
+
+        var scaled = elementWidth.Value * 4;
+        return scaled.In(floor.Unit) > floor.Value ? scaled : floor;
+    }
+
+    /// <summary>Sets an element's colour, whatever concrete element type it is.</summary>
+    private static void SetColor(ReticleElement element, string color)
+        => element.GetType().GetProperty("Color")?.SetValue(element, color);
+
     private void UpdateOverlay()
     {
         if (_currentReticle == null)
@@ -874,7 +910,7 @@ public partial class MainWindow : Window
             {
                 // Determine color based on selection
                 bool isSelected = _highlightCurrentItem && ReferenceEquals(selectedItem, bdc);
-                string color = isSelected ? "blue" : "darkblue";
+                string color = isSelected ? HighlightColor : "darkblue";
 
                 // Draw circle at BDC position
                 overlayElements.Add(new ReticleCircle
@@ -899,22 +935,27 @@ public partial class MainWindow : Window
             }
         }
 
-        // Add highlighted selected element
-        if (_highlightCurrentItem && ReticleItems.SelectedItem != null)
+        // Highlight the selected element as a halo: the same geometry drawn far thicker in the highlight
+        // colour, with the element itself redrawn on top in its own colour. Recolouring the element in
+        // place -- what this did before -- is invisible in practice: a 0.01 mrad hairline restated as a
+        // 0.01 mrad hairline is the same shape in a different colour, and on a dense reticle there is
+        // nothing to notice. The halo shows outside the element's own footprint, so it reads at any line
+        // width, and the element stays legible rather than being painted over.
+        if (_highlightCurrentItem && ReticleItems.SelectedItem is ReticleElement element)
         {
-            var selectedItem = ReticleItems.SelectedItem;
+            var halo = element.Clone();
+            SetColor(halo, HighlightColor);
 
-            if (selectedItem is ReticleElement element)
+            var widthProperty = halo.GetType().GetProperty("LineWidth");
+            if (widthProperty != null)
             {
-                // Clone the element and change its color to blue
-                var clone = element.Clone();
-                var colorProperty = clone.GetType().GetProperty("Color");
-                if (colorProperty != null)
-                {
-                    colorProperty.SetValue(clone, "blue");
-                    overlayElements.Add(clone);
-                }
+                // Text has no line width and needs none: recolouring it is already conspicuous.
+                var current = (Measurement<AngularUnit>?)widthProperty.GetValue(halo);
+                widthProperty.SetValue(halo, HaloWidth(current));
             }
+
+            overlayElements.Add(halo);
+            overlayElements.Add(element.Clone());
         }
 
         ReticleCanvas.Overlay = overlayElements;

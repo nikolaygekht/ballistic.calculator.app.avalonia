@@ -1,6 +1,6 @@
 # BallisticCalculator2 — Project Status
 
-Last updated: 2026-07-29
+Last updated: 2026-07-30
 
 ## Overview
 
@@ -96,6 +96,33 @@ direct-UI-access controls (no MVVM/reactive) per `CLAUDE.md`. Trunk-based develo
 | ReticleEditor | Save / Save As implemented (Save falls back to Save As when unnamed; default folder `data/reticle`); fixed added elements not listing; **Move Up/Down** for elements and path sub-elements; **line-style editing** (Solid/Dashed/Dotted) on line/circle/rectangle/path. **Unsaved-changes guard**: a dirty flag set by every element operation, the Set button and any parameter-field edit; New / Open / Close prompt Save / Don't Save / Cancel; the title carries the file name plus `*`. Cleared only by a successful save, so a cancelled picker or failed write still blocks the operation. The dirty check compares field content against a snapshot taken when clean — a load's own control notifications would otherwise read as edits, and timing-based suppression could not tell them apart reliably. |
 | DebugApp / DebugApp1 | Controls / panels test harnesses. |
 | Tools/DependencyUpdater (`depupdate`) | Bumps PackageReference versions within declared ranges. |
+
+### Shipped reticle library (`data/reticle/`)
+
+**34 reticles**, every one with a companion `.md` and a row in `README.md`; both README tables sorted by
+name; `reticle.py check` reports **0 errors** across the folder.
+
+| Group | Count | Notes |
+|-------|------:|-------|
+| Measuring grids | 13 | `MILDOT`, `MOA-GRID`, `H58`, Leupold `CCH` and `CMR-MIL`, six EOTech Vudu patterns, `GERMAN4` + M16 iron sight (no marks) |
+| Load-calibrated ladders | 21 | Trijicon ACOG ×4, V-COG ×3, Huron ×3, Elcan Specter ×2, Leupold CMR-W ×2 + CM-R², EOTech Vudu ×4, `PSO-1` |
+
+Three batches were added on 2026-07-30: **Trijicon/Leupold** (ACOG TA31-762mm, both TA44s, Huron ×3, CMR-W
+×2, CM-R², CCH, CMR-MIL, VCOG ×2), then **EOTech Vudu** (SR1–SR5, LE5, HC3, BD1, MD1, MD2). `MOA-GRID` was
+rebuilt on **MILDOT's exact field of view** (12 × 12 mrad, graduated to ±14 MOA) so the two can be compared
+directly.
+
+**Documentation model.** Provenance lives in the per-reticle `.md`, **not** in an XML comment — comments do
+not survive a round-trip through the Reticle Editor. `README.md` states that convention. Each `.md` records
+which values are the manufacturer's printed dimensions, which were measured, and what was deliberately left
+out (CMR-W wind trees, `VUDU-SR1`'s undimensioned speed ring, cropped field-stop posts).
+
+**Two findings worth keeping.** Both Leupold **CMR-W** files line up at a **100 m zero** although Leupold
+publish 50 m — the same offset on two cartridges, so systematic. Trijicon's per-part sheets for the 5.56
+V-COG **55 gr and 77 gr are byte-identical**, so one file covers both part numbers rather than shipping a
+duplicate.
+
+Reticle sourcing/measurement method and the EOTech dimension survey are in `claude/vudu.md`.
 
 ### Test Summary
 

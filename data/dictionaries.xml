@@ -3,8 +3,8 @@
   <sights>
     <sight name=".22LR Iron Sight (US)" sight-height="0.5in" default-zero="25yd" />
     <sight name=".22LR Optics (US)" sight-height="1.5in" default-zero="25yd" />
-    <sight name="ACOG TA-32@Carry Handle" sight-height="3.5in" default-zero="100m" horizontal-click="0.5in/100yd" vertical-click="0.5in/100yd" />
-    <sight name="ACOG TA-32@M4" sight-height="2.8in" default-zero="100m" horizontal-click="0.5in/100yd" vertical-click="0.5in/100yd" />
+    <sight name="ACOG TA31@Carry Handle" sight-height="3.5in" default-zero="100m" horizontal-click="0.5in/100yd" vertical-click="0.5in/100yd" />
+    <sight name="ACOG TA31@M4" sight-height="2.4in" default-zero="100m" horizontal-click="0.5in/100yd" vertical-click="0.5in/100yd" />
     <sight name="AK Iron Sight" sight-height="5cm" default-zero="100m" />
     <sight name="Elcan Specter@M4" sight-height="2.9in" default-zero="100m" />
     <sight name="EOTech@M4" sight-height="2.6in" default-zero="100yd" />
