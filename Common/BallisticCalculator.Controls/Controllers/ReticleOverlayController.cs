@@ -69,7 +69,9 @@ public static class ReticleOverlayController
         Measurement<DistanceUnit> targetWidth,
         Measurement<DistanceUnit> targetHeight,
         Measurement<DistanceUnit> targetDistance,
-        double reticleScale = 1.0)
+        double reticleScale = 1.0,
+        Measurement<AngularUnit>? offsetX = null,
+        Measurement<AngularUnit>? offsetY = null)
     {
         if (targetWidth.Value < 0.01 || targetHeight.Value < 0.01 ||
             targetDistance.Value < 0.01)
@@ -82,11 +84,19 @@ public static class ReticleOverlayController
         var angularWidth = CalculateAngularSize(targetWidth, targetDistance, reticleScale);
         var angularHeight = CalculateAngularSize(targetHeight, targetDistance, reticleScale);
 
+        // The offset moves the box away from the hold, in the reticle's own coordinates: X positive to
+        // the RIGHT, Y positive UP. It is not divided by reticleScale, because it names a place on the
+        // reticle rather than a trajectory angle to be projected onto it. The point is to let a target
+        // be parked on a ranging feature — the stadia at the lower left of the Specter reticles, say —
+        // so the scale can actually be tried against a target of known size.
+        var centerX = -item.WindageAdjustment / reticleScale + (offsetX ?? Measurement<AngularUnit>.ZERO);
+        var centerY = item.DropAdjustment / reticleScale + (offsetY ?? Measurement<AngularUnit>.ZERO);
+
         return new ReticleRectangle
         {
             TopLeft = new ReticlePosition(
-                -item.WindageAdjustment / reticleScale - angularWidth / 2,
-                item.DropAdjustment / reticleScale + angularHeight / 2),
+                centerX - angularWidth / 2,
+                centerY + angularHeight / 2),
             Size = new ReticlePosition(angularWidth, angularHeight),
             Color = "red",
         };
@@ -113,7 +123,9 @@ public static class ReticleOverlayController
         Measurement<DistanceUnit> targetDistance,
         Measurement<VelocityUnit> targetSpeed,
         Measurement<AngularUnit> movingDirection,
-        double reticleScale = 1.0)
+        double reticleScale = 1.0,
+        Measurement<AngularUnit>? offsetX = null,
+        Measurement<AngularUnit>? offsetY = null)
     {
         if (targetWidth.Value < 0.01 || targetHeight.Value < 0.01 ||
             targetDistance.Value < 0.01)
@@ -134,8 +146,11 @@ public static class ReticleOverlayController
         // Lead is another hold-off the shooter applies in the direction of the target's motion, so
         // it composes with the same sign: a target crossing to the left (positive lead) means hold
         // left of the target (reticle-left, negative X). Drop is unchanged (lead is horizontal only).
-        var centerX = -item.WindageAdjustment / reticleScale - lead / reticleScale;
-        var centerY = item.DropAdjustment / reticleScale;
+        // The same offset as the static box, so the two stay together when one is parked on a
+        // ranging feature.
+        var centerX = -item.WindageAdjustment / reticleScale - lead / reticleScale
+                      + (offsetX ?? Measurement<AngularUnit>.ZERO);
+        var centerY = item.DropAdjustment / reticleScale + (offsetY ?? Measurement<AngularUnit>.ZERO);
 
         return new ReticleRectangle
         {

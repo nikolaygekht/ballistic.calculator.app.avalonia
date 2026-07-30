@@ -36,14 +36,14 @@ direct-UI-access controls (no MVVM/reactive) per `CLAUDE.md`. Trunk-based develo
 | HitProbabilityCalculator | **New.** Wraps `Tools.HitProbability` — `ShotData` + `HitProbabilityInputs` → `HitProbabilityEstimate` (probability, impacts, shots-to-hit, mean and 90% radial miss), with the `ShootingPosition` presets (Supported 1/1, Prone 2/2, Kneeling 4/3, Standing 5/4, Custom) and `SampleImpacts` for thinning the plot. Shots bounded 1000…50 000. Carries the shot's geometry but **not** its dialed clicks: the library models the come-up itself, so a pre-dialed scope would count the hold twice. |
 | BcConversionCalculator | **New.** Converts a BC between standard tables at a reference velocity, returning the reference Mach and a transonic flag with it — the number is exact only at that reference. Refuses form factors and GC on either side. |
 | DragTableBuilder / DrgMetadata | **New.** Builds `GC` tables from a BC-vs-Mach curve or radar readings, validating first (≥1 knot / ≥3 strictly-decreasing readings, positive weight and diameter) with user-facing messages. `NormalizeCurve` converts knots quoted against another standard table at their own Mach. |
-| DataFolders | **New.** Standard folders next to the exe: `data/reticle`, `data/legacy-ammo`, `data/drg`. |
+| DataFolders | **New.** Standard folders next to the exe: `data/reticle`, `data/ammo`, `data/drg`. |
 | MeasurementSystem, ChartTrajectory, DropBase, TrajectoryChartMode | Shared enums/models. |
 
 ### Panels Library (`Common/BallisticCalculator.Panels/`)
 
 | Panel | Notes |
 |-------|-------|
-| AmmoPanel / AmmoLibraryRecordPanel | Ammunition entry + library load/save (default folder `data/legacy-ammo`). **Custom drag table (GC): Browse `.drg` / Clear** row — fills BC=(1,GC)+form factor, weight, diameter and **bullet length**, converted to the panel's units (the format stores SI), and fills empty **name/source** from the header; `CustomTableFileName` round-trips. Only positive values are copied, since pre-1.1.11.2 files store the unused slots as 0. |
+| AmmoPanel / AmmoLibraryRecordPanel | Ammunition entry + library load/save (default folder `data/ammo`). **Custom drag table (GC): Browse `.drg` / Clear** row — fills BC=(1,GC)+form factor, weight, diameter and **bullet length**, converted to the panel's units (the format stores SI), and fills empty **name/source** from the header; `CustomTableFileName` round-trips. Only positive values are copied, since pre-1.1.11.2 files store the unused slots as 0. |
 | WindPanel / MultiWindPanel / AtmospherePanel | Wind (single/multi) and atmosphere entry. |
 | RiflePanel | **Now sight height + H/V clicks + rifling only.** Sight & barrel **dictionary preset dropdowns** (a sight preset fills height/clicks and suggests the zero distance). |
 | ZeroPanel | **New.** The Zero tab: zero distance, impact offset (V/H), zeroing shot angle, and the zero ammo/atmosphere/wind sub-panels. |
@@ -56,7 +56,7 @@ direct-UI-access controls (no MVVM/reactive) per `CLAUDE.md`. Trunk-based develo
 | (both editors) | Stacked header (Name / Source / Weight / Diameter / Length, one field per row), a two-column `DataGrid`, an entry row, and Add / Change / Delete / Sort / Load Csv + Save Drg / Close. Editing is explicit: select a row to load it, `Change` writes it back. CSV files must carry their units — a bare number is refused rather than assumed. |
 | BcConverterPanel | **New.** Converts a BC between standard tables (G1 ↔ G7) at a reference velocity. **GC is offered on neither side** — the source control sets `AllowCustomTable="False"` and the destination list is `BcConversionCalculator.StandardTables`. Source BC / Destination Table / Reference Velocity → a read-only Target BC that follows the inputs — no Convert button, because the point is watching the answer move with the reference. `Set Atmosphere` (the same shell dialog the velocities editor uses) sets only the speed of sound. Always states the reference Mach and the air; warns below Mach 1.5. |
 
-| HitProbabilityPanel | **New.** Monte-Carlo hit probability for the active shot: target distance + vital zone, group size (1σ per axis), a shooting-position combo that fills two always-editable spread multipliers (`NumericUpDown`), the range/wind estimation errors, the ammunition's MV deviation (a separate group — it is ammo quality, not a shooter error), and Shots/Seed — every plain number is a `NumericUpDown`, though **not** clipped to its bounds (Avalonia's default), so an out-of-range shot count is reported rather than silently rewritten. **Runs on the Estimate button only**: it is cheap enough to run live (~28 ms at 10 000 shots) but the inputs are guesses, and a probability from untouched defaults would imply they had been considered. A shown result persists when inputs change, so two set-ups can be compared. Target distance defaults to 300 yd/m, not the shot's maximum. Shows the probability, shots-to-hit at 50/75/90/95/98%, a ScottPlot impact scatter with the vital zone drawn to scale and **equal axis scaling**, and the mean / 90% radial miss. States that group size is 1σ (≈¼ of extreme spread) and that a correct come-up is assumed. |
+| HitProbabilityPanel | **New.** Monte-Carlo hit probability for the active shot: target distance + vital zone, group size (1σ per axis), a shooting-position combo that fills two always-editable spread multipliers (`NumericUpDown`), the range/wind estimation errors, the ammunition's MV deviation (a separate group — it is ammo quality, not a shooter error), and Shots/Seed — every plain number is a `NumericUpDown`, though **not** clipped to its bounds (Avalonia's default), so an out-of-range shot count is reported rather than silently rewritten. **Runs on the Estimate button only**: it is cheap enough to run live (~28 ms at 10 000 shots) but the inputs are guesses, and a probability from untouched defaults would imply they had been considered. A shown result persists when inputs change, so two set-ups can be compared. Target distance defaults to 300 yd/m, not the shot's maximum. Shows the probability, shots-to-hit at 50/75/90/95/98%, a ScottPlot impact scatter with the vital zone drawn to scale and **equal axis scaling**, and the mean / 90% radial miss. States that group size is 1σ (≈¼ of extreme spread) and that a correct come-up is assumed. A failed estimate is reported, not thrown (2026-07-30): `Explain` maps `ZeroRangeCantBeReachedException` and `TrajectoryCannotBeCalculatedException` to sentences saying where to fix it, shows the library's own `ArgumentException` message as it stands, and names anything else by type so it can be reported. Before this only `ArgumentException` was caught, so an unzeroable shot reached the app's exception dialog as a stack trace. |
 
 ### Main Desktop Application (`Desktop/BallisticCalculator/`)
 
@@ -178,7 +178,7 @@ Desktop/
 ├── DebugApp/, DebugApp1/, ReticleEditor/ (+ ReticleEditor.Tests)
 Tools/
 └── DependencyUpdater/ (depupdate console tool)
-data/  (dictionaries.xml, reticle/, legacy-ammo/, drg/ — copied next to the binaries)
+data/  (dictionaries.xml, reticle/, ammo/, drg/ — copied next to the binaries)
 ```
 
 ## Next Steps
@@ -190,8 +190,9 @@ From **`claude/07-25-plan.md`** (1.1.11 `Tools` namespace):
    `claude/Archive/07-26-drg-plan.md`. Two editors under Tools → Approximate Drag Table, with all-or-nothing CSV
    import and full header metadata. Interactive smoke pass still to do.
 3. ~~Tools menu → **Hit probability** (`Tools.HitProbability`).~~ **Done** (2026-07-27) — see
-   `claude/07-27-hit-probability-plan.md`. Interactive smoke pass still to do; the proposed error-budget
-   defaults (range 2%, wind 30%, MV 0.7%) and the 1 MOA group default are judgement calls awaiting review.
+   `claude/07-27-hit-probability-plan.md`. Interactive smoke pass still to do. The error-budget defaults
+   (range 2%, wind 30%, MV 0.7%) and the 1 MOA group default were **reviewed and accepted** (2026-07-30),
+   checked against another ballistic calculator: <https://ptosis.ch/ebalka/ebalka.html>.
 4. ~~Tools menu → **BC converter** (`Tools.BallisticCoefficientConverter`).~~ **Done** (2026-07-27).
    `BcConversionCalculator` + `BcConverterPanel` + `BcConverterDialog`: Source BC / Destination Table /
    Reference Velocity → a live read-only Target BC. A converted BC is exact only at its reference — ~1% at
@@ -203,7 +204,7 @@ From **`claude/07-25-plan.md`** (1.1.11 `Tools` namespace):
 
 | Item | Where |
 |------|-------|
-| `data/drg/Lapua/308-lapua n558 11,0g (170gr) naturalis_radar.drg` cannot be opened — its header has a period where a comma belongs (`.007830. .03370`), so `DrgDragTable.Open` throws. One-character data typo, pre-existing. | shipped data |
+| ~~`data/drg/Lapua/308-lapua n558 11,0g (170gr) naturalis_radar.drg` cannot be opened.~~ **Fixed** (2026-07-30): the header had a period where a comma belonged (`.007830. .03370`). `ShippedDrgLibraryTests` now opens every shipped `.drg` from the source tree, so the next such typo fails a test instead of a hand check. | shipped data |
 | A deliberately-broken CSV set to exercise the import rejection paths (the four real samples are all clean). | test data |
 | Library wart: with a null `Source`, `Save` writes literal `0` and `Open` reports `"0"`. The app filters it, so nothing is user-visible. | BallisticCalculator.Net |
 

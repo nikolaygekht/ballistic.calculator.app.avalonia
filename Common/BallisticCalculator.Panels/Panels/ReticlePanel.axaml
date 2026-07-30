@@ -65,6 +65,22 @@
                      IsCheckedChanged="OnDisplayModeChanged"
                      FontSize="{DynamicResource AppFontSize}"/>
 
+        <!-- Where Near stops and Far starts. It follows the shot's zero until you change it, which is
+             right for a centrefire zeroed at 100 and wrong for a .22 LR or a subsonic load, where most
+             of the interesting trajectory is on one side of that. -->
+        <StackPanel x:Name="BdcSplitPanel" x:FieldModifier="internal"
+                    Spacing="4" IsEnabled="False" Margin="0,4,0,0">
+          <Grid ColumnDefinitions="70,*">
+            <TextBlock Grid.Column="0" Text="Split at:"
+                       VerticalAlignment="Center"
+                       ToolTip.Tip="Marks nearer than this are Near BDC, the rest are Far BDC"
+                       FontSize="{DynamicResource AppFontSize}"/>
+            <controls:MeasurementControl Grid.Column="1"
+                       x:Name="BdcSplitControl" x:FieldModifier="internal"
+                       FontSize="{DynamicResource AppFontSize}"/>
+          </Grid>
+        </StackPanel>
+
         <Separator Margin="0,4"/>
 
         <!-- Target controls -->
@@ -117,6 +133,29 @@
                        FontSize="{DynamicResource AppFontSize}"/>
             <controls:MeasurementControl Grid.Column="1"
                        x:Name="TargetDistanceControl" x:FieldModifier="internal"
+                       FontSize="{DynamicResource AppFontSize}"/>
+          </Grid>
+
+          <!-- Optional offset, so the box can be parked somewhere other than the hold — on a
+               reticle's ranging stadia, for instance, to try the scale against a known target size.
+               Reticle convention: X positive right, Y positive up. -->
+          <Grid ColumnDefinitions="70,*">
+            <TextBlock Grid.Column="0" Text="Offset H:"
+                       VerticalAlignment="Center"
+                       ToolTip.Tip="Moves the target box sideways from the hold. Positive is right; leave empty for none"
+                       FontSize="{DynamicResource AppFontSize}"/>
+            <controls:MeasurementControl Grid.Column="1"
+                       x:Name="TargetOffsetHControl" x:FieldModifier="internal"
+                       FontSize="{DynamicResource AppFontSize}"/>
+          </Grid>
+
+          <Grid ColumnDefinitions="70,*">
+            <TextBlock Grid.Column="0" Text="Offset V:"
+                       VerticalAlignment="Center"
+                       ToolTip.Tip="Moves the target box up or down from the hold. Positive is up; leave empty for none"
+                       FontSize="{DynamicResource AppFontSize}"/>
+            <controls:MeasurementControl Grid.Column="1"
+                       x:Name="TargetOffsetVControl" x:FieldModifier="internal"
                        FontSize="{DynamicResource AppFontSize}"/>
           </Grid>
 

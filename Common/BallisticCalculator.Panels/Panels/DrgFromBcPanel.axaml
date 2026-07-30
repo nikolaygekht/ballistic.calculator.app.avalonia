@@ -13,147 +13,158 @@
     </Style>
   </UserControl.Styles>
 
-  <StackPanel Spacing="4">
+  <!-- The action row docks to the bottom so Save and Close stay reachable however short the
+       dialog is; only the form above them scrolls. They used to be the last children of one big
+       scrolled StackPanel, and shrinking the dialog pushed them past the scroll extent where no
+       amount of scrolling reached them. The status line rides with them, so the result of a Save
+       is visible without scrolling back down. -->
+  <DockPanel>
 
-    <!-- Header: one field per row, all the same width -->
-    <Grid ColumnDefinitions="90,*">
-      <TextBlock Grid.Column="0" Text="Name" VerticalAlignment="Center"
+    <StackPanel DockPanel.Dock="Bottom" Spacing="4" Margin="0,4,0,0">
+      <TextBlock x:Name="StatusText" x:FieldModifier="internal"
+                 TextWrapping="Wrap" MinHeight="32"
                  FontSize="{DynamicResource AppFontSize}"/>
-      <TextBox Grid.Column="1" x:Name="NameBox" x:FieldModifier="internal"
-               FontSize="{DynamicResource AppFontSize}"/>
-    </Grid>
 
-    <Grid ColumnDefinitions="90,*">
-      <TextBlock Grid.Column="0" Text="Source" VerticalAlignment="Center"
-                 FontSize="{DynamicResource AppFontSize}"/>
-      <TextBox Grid.Column="1" x:Name="SourceBox" x:FieldModifier="internal"
-               FontSize="{DynamicResource AppFontSize}"/>
-    </Grid>
-
-    <Grid ColumnDefinitions="90,*">
-      <TextBlock Grid.Column="0" Text="Weight" VerticalAlignment="Center"
-                 FontSize="{DynamicResource AppFontSize}"/>
-      <controls:MeasurementControl Grid.Column="1" x:Name="WeightControl" x:FieldModifier="internal"
-                                   FontSize="{DynamicResource AppFontSize}"/>
-    </Grid>
-
-    <Grid ColumnDefinitions="90,*">
-      <TextBlock Grid.Column="0" Text="Diameter" VerticalAlignment="Center"
-                 FontSize="{DynamicResource AppFontSize}"/>
-      <controls:MeasurementControl Grid.Column="1" x:Name="DiameterControl" x:FieldModifier="internal"
-                                   FontSize="{DynamicResource AppFontSize}"/>
-    </Grid>
-
-    <Grid ColumnDefinitions="90,*">
-      <TextBlock Grid.Column="0" Text="Length" VerticalAlignment="Center"
-                 FontSize="{DynamicResource AppFontSize}"/>
-      <controls:MeasurementControl Grid.Column="1" x:Name="LengthControl" x:FieldModifier="internal"
-                                   FontSize="{DynamicResource AppFontSize}"/>
-    </Grid>
-
-    <TextBlock Text="Weight and diameter are required — the curve is scaled by the bullet's sectional density."
-               Foreground="Gray" TextWrapping="Wrap"
-               FontSize="{DynamicResource AppFontSize}"/>
-
-    <Grid ColumnDefinitions="90,Auto,*">
-      <TextBlock Grid.Column="0" Text="Base table" VerticalAlignment="Center"
-                 FontSize="{DynamicResource AppFontSize}"/>
-      <ComboBox Grid.Column="1" x:Name="BaseTableCombo" x:FieldModifier="internal" Width="90"
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+        <Button x:Name="SaveButton" x:FieldModifier="internal" Content="Save Drg" Click="OnSave" Width="90"
                 FontSize="{DynamicResource AppFontSize}"/>
-      <TextBlock Grid.Column="2" Text="the standard curve the knots scale"
-                 VerticalAlignment="Center" Margin="8,0,0,0" Foreground="Gray"
-                 FontSize="{DynamicResource AppFontSize}"/>
-    </Grid>
+        <Button x:Name="CloseButton" x:FieldModifier="internal" Content="Close" Click="OnClose" Width="90"
+                FontSize="{DynamicResource AppFontSize}"/>
+      </StackPanel>
+    </StackPanel>
 
-    <Separator/>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+      <StackPanel Spacing="4">
 
-    <!-- Knots. Fixed, resizable, right-aligned columns — see DrgFromVelocitiesPanel: star columns
-         take the width the vertical scroll bar needs, and the bar never appears (D-002). -->
-    <DataGrid x:Name="KnotsGrid" x:FieldModifier="internal"
-              x:DataType="models:BcKnotEditModel"
-              AutoGenerateColumns="False"
-              Height="170"
-              IsReadOnly="True"
-              CanUserReorderColumns="False"
-              CanUserResizeColumns="True"
-              CanUserSortColumns="False"
-              GridLinesVisibility="All"
-              HeadersVisibility="Column"
-              SelectionMode="Single"
-              FontSize="{DynamicResource AppFontSize}">
-      <DataGrid.Columns>
-        <DataGridTextColumn Header="Mach" Binding="{Binding MachText}" Width="150" CellStyleClasses="rightAlign"/>
-        <DataGridTextColumn Header="BC" Binding="{Binding BcText}" Width="150" CellStyleClasses="rightAlign"/>
-      </DataGrid.Columns>
-    </DataGrid>
-
-    <!-- Entry fields for the selected/new knot, one per row like the header above. Mach and velocity are
-         the same knot said two ways and mirror each other through the air below; only the Mach is stored,
-         because a .drg curve is keyed by Mach. -->
-    <Grid ColumnDefinitions="90,*">
-      <TextBlock Grid.Column="0" Text="BC" VerticalAlignment="Center"
-                 FontSize="{DynamicResource AppFontSize}"/>
-      <!-- A knot must name a standard curve: GC is refused on Add, so it is not offered in the first place. -->
-      <controls:BallisticCoefficientControl Grid.Column="1" x:Name="BcControl" x:FieldModifier="internal"
-                                            AllowCustomTable="False"
-                                            FontSize="{DynamicResource AppFontSize}"/>
-    </Grid>
-
-    <Grid ColumnDefinitions="90,*">
-      <TextBlock Grid.Column="0" Text="Mach" VerticalAlignment="Center"
-                 FontSize="{DynamicResource AppFontSize}"/>
-      <!-- A bare NumericUpDown is shorter than the composite controls above and below, which carry a unit
-           combo. Matching the neighbour keeps the three rows on one rhythm, and tracks the app font size
-           rather than pinning a pixel height. -->
-      <NumericUpDown Grid.Column="1" x:Name="MachControl" x:FieldModifier="internal"
-                     Increment="0.1" Minimum="0" FormatString="0.###"
-                     HorizontalContentAlignment="Right"
-                     MinHeight="{Binding #VelocityControl.Bounds.Height}"
+        <!-- Header: one field per row, all the same width -->
+        <Grid ColumnDefinitions="90,*">
+          <TextBlock Grid.Column="0" Text="Name" VerticalAlignment="Center"
                      FontSize="{DynamicResource AppFontSize}"/>
-    </Grid>
+          <TextBox Grid.Column="1" x:Name="NameBox" x:FieldModifier="internal"
+                   FontSize="{DynamicResource AppFontSize}"/>
+        </Grid>
 
-    <Grid ColumnDefinitions="90,*">
-      <TextBlock Grid.Column="0" Text="Velocity" VerticalAlignment="Center"
-                 FontSize="{DynamicResource AppFontSize}"/>
-      <controls:MeasurementControl Grid.Column="1" x:Name="VelocityControl" x:FieldModifier="internal"
-                                   FontSize="{DynamicResource AppFontSize}"/>
-    </Grid>
+        <Grid ColumnDefinitions="90,*">
+          <TextBlock Grid.Column="0" Text="Source" VerticalAlignment="Center"
+                     FontSize="{DynamicResource AppFontSize}"/>
+          <TextBox Grid.Column="1" x:Name="SourceBox" x:FieldModifier="internal"
+                   FontSize="{DynamicResource AppFontSize}"/>
+        </Grid>
 
-    <Grid ColumnDefinitions="90,*,Auto">
-      <TextBlock Grid.Column="0" Text="Air" VerticalAlignment="Center"
-                 FontSize="{DynamicResource AppFontSize}"/>
-      <TextBlock Grid.Column="1" x:Name="AtmosphereText" x:FieldModifier="internal"
-                 VerticalAlignment="Center" TextWrapping="Wrap" Foreground="Gray"
-                 FontSize="{DynamicResource AppFontSize}"/>
-      <Button Grid.Column="2" x:Name="AtmosphereButton" x:FieldModifier="internal"
-              Content="Set Atmosphere" Click="OnSetAtmosphere" Width="130"
-              FontSize="{DynamicResource AppFontSize}"/>
-    </Grid>
+        <Grid ColumnDefinitions="90,*">
+          <TextBlock Grid.Column="0" Text="Weight" VerticalAlignment="Center"
+                     FontSize="{DynamicResource AppFontSize}"/>
+          <controls:MeasurementControl Grid.Column="1" x:Name="WeightControl" x:FieldModifier="internal"
+                                       FontSize="{DynamicResource AppFontSize}"/>
+        </Grid>
 
-    <StackPanel Orientation="Horizontal" Spacing="6">
-      <Button x:Name="AddButton" x:FieldModifier="internal" Content="Add" Click="OnAdd" Width="70"
-              FontSize="{DynamicResource AppFontSize}"/>
-      <Button x:Name="ChangeButton" x:FieldModifier="internal" Content="Change" Click="OnChange" Width="70"
-              FontSize="{DynamicResource AppFontSize}"/>
-      <Button x:Name="DeleteButton" x:FieldModifier="internal" Content="Delete" Click="OnDelete" Width="70"
-              FontSize="{DynamicResource AppFontSize}"/>
-      <Button x:Name="SortButton" x:FieldModifier="internal" Content="Sort" Click="OnSort" Width="70"
-              FontSize="{DynamicResource AppFontSize}"/>
-      <Button x:Name="ImportButton" x:FieldModifier="internal" Content="Load Csv" Click="OnImport" Width="90"
-              FontSize="{DynamicResource AppFontSize}"/>
-    </StackPanel>
+        <Grid ColumnDefinitions="90,*">
+          <TextBlock Grid.Column="0" Text="Diameter" VerticalAlignment="Center"
+                     FontSize="{DynamicResource AppFontSize}"/>
+          <controls:MeasurementControl Grid.Column="1" x:Name="DiameterControl" x:FieldModifier="internal"
+                                       FontSize="{DynamicResource AppFontSize}"/>
+        </Grid>
 
-    <TextBlock x:Name="StatusText" x:FieldModifier="internal"
-               TextWrapping="Wrap" MinHeight="32"
-               FontSize="{DynamicResource AppFontSize}"/>
+        <Grid ColumnDefinitions="90,*">
+          <TextBlock Grid.Column="0" Text="Length" VerticalAlignment="Center"
+                     FontSize="{DynamicResource AppFontSize}"/>
+          <controls:MeasurementControl Grid.Column="1" x:Name="LengthControl" x:FieldModifier="internal"
+                                       FontSize="{DynamicResource AppFontSize}"/>
+        </Grid>
 
-    <!-- Actions -->
-    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
-      <Button x:Name="SaveButton" x:FieldModifier="internal" Content="Save Drg" Click="OnSave" Width="90"
-              FontSize="{DynamicResource AppFontSize}"/>
-      <Button x:Name="CloseButton" x:FieldModifier="internal" Content="Close" Click="OnClose" Width="90"
-              FontSize="{DynamicResource AppFontSize}"/>
-    </StackPanel>
+        <TextBlock Text="Weight and diameter are required — the curve is scaled by the bullet's sectional density."
+                   Foreground="Gray" TextWrapping="Wrap"
+                   FontSize="{DynamicResource AppFontSize}"/>
 
-  </StackPanel>
+        <Grid ColumnDefinitions="90,Auto,*">
+          <TextBlock Grid.Column="0" Text="Base table" VerticalAlignment="Center"
+                     FontSize="{DynamicResource AppFontSize}"/>
+          <ComboBox Grid.Column="1" x:Name="BaseTableCombo" x:FieldModifier="internal" Width="90"
+                    FontSize="{DynamicResource AppFontSize}"/>
+          <TextBlock Grid.Column="2" Text="the standard curve the knots scale"
+                     VerticalAlignment="Center" Margin="8,0,0,0" Foreground="Gray"
+                     FontSize="{DynamicResource AppFontSize}"/>
+        </Grid>
+
+        <Separator/>
+
+        <!-- Knots. Fixed, resizable, right-aligned columns — see DrgFromVelocitiesPanel: star columns
+             take the width the vertical scroll bar needs, and the bar never appears (D-002). -->
+        <DataGrid x:Name="KnotsGrid" x:FieldModifier="internal"
+                  x:DataType="models:BcKnotEditModel"
+                  AutoGenerateColumns="False"
+                  Height="170"
+                  IsReadOnly="True"
+                  CanUserReorderColumns="False"
+                  CanUserResizeColumns="True"
+                  CanUserSortColumns="False"
+                  GridLinesVisibility="All"
+                  HeadersVisibility="Column"
+                  SelectionMode="Single"
+                  FontSize="{DynamicResource AppFontSize}">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="Mach" Binding="{Binding MachText}" Width="150" CellStyleClasses="rightAlign"/>
+            <DataGridTextColumn Header="BC" Binding="{Binding BcText}" Width="150" CellStyleClasses="rightAlign"/>
+          </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Entry fields for the selected/new knot, one per row like the header above. Mach and velocity are
+             the same knot said two ways and mirror each other through the air below; only the Mach is stored,
+             because a .drg curve is keyed by Mach. -->
+        <Grid ColumnDefinitions="90,*">
+          <TextBlock Grid.Column="0" Text="BC" VerticalAlignment="Center"
+                     FontSize="{DynamicResource AppFontSize}"/>
+          <!-- A knot must name a standard curve: GC is refused on Add, so it is not offered in the first place. -->
+          <controls:BallisticCoefficientControl Grid.Column="1" x:Name="BcControl" x:FieldModifier="internal"
+                                                AllowCustomTable="False"
+                                                FontSize="{DynamicResource AppFontSize}"/>
+        </Grid>
+
+        <Grid ColumnDefinitions="90,*">
+          <TextBlock Grid.Column="0" Text="Mach" VerticalAlignment="Center"
+                     FontSize="{DynamicResource AppFontSize}"/>
+          <!-- A bare NumericUpDown is shorter than the composite controls above and below, which carry a unit
+               combo. Matching the neighbour keeps the three rows on one rhythm, and tracks the app font size
+               rather than pinning a pixel height. -->
+          <NumericUpDown Grid.Column="1" x:Name="MachControl" x:FieldModifier="internal"
+                         Increment="0.1" Minimum="0" FormatString="0.###"
+                         HorizontalContentAlignment="Right"
+                         MinHeight="{Binding #VelocityControl.Bounds.Height}"
+                         FontSize="{DynamicResource AppFontSize}"/>
+        </Grid>
+
+        <Grid ColumnDefinitions="90,*">
+          <TextBlock Grid.Column="0" Text="Velocity" VerticalAlignment="Center"
+                     FontSize="{DynamicResource AppFontSize}"/>
+          <controls:MeasurementControl Grid.Column="1" x:Name="VelocityControl" x:FieldModifier="internal"
+                                       FontSize="{DynamicResource AppFontSize}"/>
+        </Grid>
+
+        <Grid ColumnDefinitions="90,*,Auto">
+          <TextBlock Grid.Column="0" Text="Air" VerticalAlignment="Center"
+                     FontSize="{DynamicResource AppFontSize}"/>
+          <TextBlock Grid.Column="1" x:Name="AtmosphereText" x:FieldModifier="internal"
+                     VerticalAlignment="Center" TextWrapping="Wrap" Foreground="Gray"
+                     FontSize="{DynamicResource AppFontSize}"/>
+          <Button Grid.Column="2" x:Name="AtmosphereButton" x:FieldModifier="internal"
+                  Content="Set Atmosphere" Click="OnSetAtmosphere" Width="130"
+                  FontSize="{DynamicResource AppFontSize}"/>
+        </Grid>
+
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <Button x:Name="AddButton" x:FieldModifier="internal" Content="Add" Click="OnAdd" Width="70"
+                  FontSize="{DynamicResource AppFontSize}"/>
+          <Button x:Name="ChangeButton" x:FieldModifier="internal" Content="Change" Click="OnChange" Width="70"
+                  FontSize="{DynamicResource AppFontSize}"/>
+          <Button x:Name="DeleteButton" x:FieldModifier="internal" Content="Delete" Click="OnDelete" Width="70"
+                  FontSize="{DynamicResource AppFontSize}"/>
+          <Button x:Name="SortButton" x:FieldModifier="internal" Content="Sort" Click="OnSort" Width="70"
+                  FontSize="{DynamicResource AppFontSize}"/>
+          <Button x:Name="ImportButton" x:FieldModifier="internal" Content="Load Csv" Click="OnImport" Width="90"
+                  FontSize="{DynamicResource AppFontSize}"/>
+        </StackPanel>
+      </StackPanel>
+    </ScrollViewer>
+
+  </DockPanel>
 </UserControl>

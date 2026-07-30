@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
 using AwesomeAssertions;
+using BallisticCalculator;
 using BallisticCalculator.Panels.Panels;
 using BallisticCalculator.Reticle;
 using BallisticCalculator.Reticle.Data;
@@ -90,6 +91,144 @@ public class ReticlePanelTests
         panel.Reticle.Size.X.In(AngularUnit.MRad).Should().BeApproximately(12, 1e-9);
         panel.Reticle.BulletDropCompensator.Should().NotBeEmpty();
         panel.ReticleNameText.Text.Should().Contain("Mil-Dot");
+    }
+
+    #endregion
+
+    #region The Near/Far BDC split
+
+    private static ShotData ShotZeroedAt(double yards) => new()
+    {
+        Ammunition = new AmmunitionLibraryEntry
+        {
+            Name = "test",
+            Ammunition = new Ammunition(
+                new Measurement<WeightUnit>(40, WeightUnit.Grain),
+                new BallisticCoefficient(0.125, DragTableId.G1),
+                new Measurement<VelocityUnit>(1050, VelocityUnit.FeetPerSecond)),
+        },
+        Weapon = new Rifle(
+            new Sight(new Measurement<DistanceUnit>(1.5, DistanceUnit.Inch),
+                      Measurement<AngularUnit>.ZERO, Measurement<AngularUnit>.ZERO),
+            new ZeroingParameters(new Measurement<DistanceUnit>(yards, DistanceUnit.Yard), null, null)),
+    };
+
+    [AvaloniaFact]
+    public void BdcSplit_ShouldDefaultToTheShotsZero()
+    {
+        // The default is unchanged behaviour: the split is the zero, which for a centrefire is the
+        // 100 yd everyone saw before this control existed.
+        var panel = new ReticlePanel { ShotData = ShotZeroedAt(100) };
+
+        panel.BdcSplit.In(DistanceUnit.Yard).Should().BeApproximately(100, 1e-6);
+        panel.BdcSplitControl.GetValue<DistanceUnit>()!.Value.In(DistanceUnit.Yard)
+             .Should().BeApproximately(100, 1e-6);
+    }
+
+    [AvaloniaFact]
+    public void BdcSplit_ShouldFollowANonStandardZero()
+    {
+        // A .22 LR zeroed at 50 yd splits at 50, not at a hardcoded 100.
+        var panel = new ReticlePanel { ShotData = ShotZeroedAt(50) };
+
+        panel.BdcSplit.In(DistanceUnit.Yard).Should().BeApproximately(50, 1e-6);
+    }
+
+    [AvaloniaFact]
+    public void BdcSplit_WhenTheUserSetsOne_ShouldBeUsed()
+    {
+        var panel = new ReticlePanel { ShotData = ShotZeroedAt(100) };
+
+        panel.BdcSplitControl.SetValue(new Measurement<DistanceUnit>(60, DistanceUnit.Yard));
+
+        panel.BdcSplit.In(DistanceUnit.Yard).Should().BeApproximately(60, 1e-6);
+    }
+
+    [AvaloniaFact]
+    public void BdcSplit_WhenCleared_ShouldFallBackToTheZero()
+    {
+        var panel = new ReticlePanel { ShotData = ShotZeroedAt(75) };
+
+        panel.BdcSplitControl.Value = null;
+
+        panel.BdcSplit.In(DistanceUnit.Yard).Should().BeApproximately(75, 1e-6);
+    }
+
+    [AvaloniaFact]
+    public void BdcSplit_WhenCleared_ShouldFollowTheZeroAgainAndShowIt()
+    {
+        // Clearing the field is how the user hands the split back. It must not stay frozen at the value
+        // they had typed, and it must not sit empty either — the box shows the zero it is following.
+        var panel = new ReticlePanel { ShotData = ShotZeroedAt(100) };
+        panel.BdcSplitControl.SetValue(new Measurement<DistanceUnit>(60, DistanceUnit.Yard));
+        panel.OnBdcSplitChanged(panel.BdcSplitControl, EventArgs.Empty);
+
+        panel.BdcSplitControl.Value = null;
+        panel.OnBdcSplitChanged(panel.BdcSplitControl, EventArgs.Empty);
+
+        panel.BdcSplitControl.GetValue<DistanceUnit>()!.Value.In(DistanceUnit.Yard)
+             .Should().BeApproximately(100, 1e-6, "the box shows the zero it has gone back to following");
+
+        panel.ShotData = ShotZeroedAt(250);
+
+        panel.BdcSplit.In(DistanceUnit.Yard).Should().BeApproximately(250, 1e-6,
+            "and it follows the zero again from here on");
+    }
+
+    [AvaloniaFact]
+    public void BdcSplit_ShouldFollowTheMeasurementSystem()
+    {
+        var panel = new ReticlePanel { ShotData = ShotZeroedAt(100) };
+
+        panel.MeasurementSystem = MeasurementSystem.Metric;
+
+        panel.BdcSplitControl.GetValue<DistanceUnit>()!.Value.Unit.Should().Be(DistanceUnit.Meter);
+    }
+
+    [AvaloniaFact]
+    public void BdcSplit_SwitchingUnits_ShouldNotCountAsTheUserOverridingIt()
+    {
+        // Converting the field into the new unit raises Changed on the control. If that were taken for a
+        // user override, the split would stop following the zero after any Ctrl+Shift+M.
+        var panel = new ReticlePanel { ShotData = ShotZeroedAt(100) };
+
+        panel.MeasurementSystem = MeasurementSystem.Metric;
+        panel.ShotData = ShotZeroedAt(300);
+
+        panel.BdcSplit.In(DistanceUnit.Yard).Should().BeApproximately(300, 1e-6,
+            "the split still follows the zero, because switching units is not a choice about the split");
+    }
+
+    [AvaloniaFact]
+    public void BdcSplit_OnceTheUserSetsIt_ShouldSurviveAChangeOfShot()
+    {
+        // Editing the shot must not silently discard a split chosen for this load.
+        var panel = new ReticlePanel { ShotData = ShotZeroedAt(100) };
+        panel.BdcSplitControl.SetValue(new Measurement<DistanceUnit>(60, DistanceUnit.Yard));
+        // Headless Avalonia raises no change event for a programmatic SetValue; in the app typing or the
+        // spinner does, and that is what marks the split as the user's own.
+        panel.OnBdcSplitChanged(panel.BdcSplitControl, EventArgs.Empty);
+
+        panel.ShotData = ShotZeroedAt(200);
+
+        panel.BdcSplit.In(DistanceUnit.Yard).Should().BeApproximately(60, 1e-6);
+    }
+
+    [AvaloniaFact]
+    public void BdcSplitPanel_ShouldBeEnabledOnlyForTheBdcOverlays()
+    {
+        var panel = new ReticlePanel { ShotData = ShotZeroedAt(100) };
+
+        panel.BdcSplitPanel.IsEnabled.Should().BeFalse("None is selected to start with");
+
+        panel.RadioFarBdc.IsChecked = true;
+        panel.BdcSplitPanel.IsEnabled.Should().BeTrue();
+
+        panel.RadioNearBdc.IsChecked = true;
+        panel.BdcSplitPanel.IsEnabled.Should().BeTrue();
+
+        panel.RadioTarget.IsChecked = true;
+        panel.BdcSplitPanel.IsEnabled.Should().BeFalse();
     }
 
     #endregion

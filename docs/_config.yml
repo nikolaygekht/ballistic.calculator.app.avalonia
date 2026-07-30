@@ -11,7 +11,7 @@
 #     Pretty permalinks would move pages to /about/ and break every one of those links.
 
 title: Ballistic Calculator 2
-description: User guide — a free, open-source ballistic calculator for Windows and Linux
+description: User guide — a free, open-source ballistic calculator for Windows, Linux and macOS
 theme: jekyll-theme-slate
 
 url: https://nikolaygekht.github.io

@@ -25,11 +25,13 @@ Because the sight picture is only as truthful as the reticle behind it. The
 a target fits between them, where a moving-target lead sits. All of that is worthless if the marks are on
 the wrong subtensions.
 
-Ten reticles ship in `data/reticle` — grids (`MILDOT`, `H58`, `MOA-GRID`), hunting and military pictures
-(`GERMAN4`, `PSO-1`, an M16 iron sight) and four renderings of real optics with calibrated drop ladders
-(`ACOG-TA31`, `ACOG-TA648`, `VCOG16-300BLK`, `SPECTER-5.56`); `data/reticle/README.md` describes them. They
-cover the common patterns, but your scope's reticle is quite possibly not among them, and this is what you
-use to describe it.
+Two dozen reticles ship in `data/reticle` — measuring grids (`MILDOT`, `MOA-GRID`, `H58`, Leupold's `CCH`
+and `CMR-MIL`), hunting and military pictures (`GERMAN4`, `PSO-1`, an M16 iron sight), and a dozen-odd
+renderings of real optics with their drop ladders: Trijicon ACOGs, V-COGs and Hurons, Elcan Specters and
+Leupold CMR-Ws. `data/reticle/README.md` indexes them in two tables — load-calibrated and geometric — and
+each reticle has a companion `.md` beside it with the pattern and its calibration in full. They cover the
+common patterns, but your scope's reticle is quite possibly not among them, and this is what you use to
+describe it.
 
 Three other reasons people end up here:
 

@@ -9,9 +9,8 @@
         WindowStartupLocation="CenterOwner"
         CanResize="true">
 
-  <!-- Scrolls so the dialog stays usable on a short screen; the grid inside keeps its own height. -->
-  <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="12">
-    <panels:DrgFromVelocitiesPanel x:Name="EditorPanel" x:FieldModifier="internal"
-                                   FontSize="{DynamicResource AppFontSize}"/>
-  </ScrollViewer>
+  <!-- The panel does its own scrolling, because it owns the action row it has to keep pinned below
+       the scrolled area. A ScrollViewer here would nest inside that one and re-hide the buttons. -->
+  <panels:DrgFromVelocitiesPanel x:Name="EditorPanel" x:FieldModifier="internal" Margin="12"
+                                 FontSize="{DynamicResource AppFontSize}"/>
 </Window>

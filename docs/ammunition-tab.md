@@ -61,7 +61,7 @@ The minimum is three numbers, and for most factory ammunition all three are prin
    [below](#when-diameter-and-length-are-needed).
 6. Optionally fill the descriptive block at the bottom, then press **Save**.
 
-**Save** writes an `.ammox` file — by default into the `data/legacy-ammo` folder beside the application,
+**Save** writes an `.ammox` file — by default into the `data/ammo` folder beside the application,
 under the load's name — and stores the whole record: the three required numbers, the drag table,
 diameter and length if you set them, a reference to the `.drg` file if you attached one, and all four
 descriptive fields. Saving does not close the dialog and does not affect the shot; it is purely so you
@@ -73,7 +73,7 @@ is a folder the application cannot write to — see
 
 ## Loading a load you already have
 
-**`Load`**, the button beside the name, opens a file dialog on `data/legacy-ammo` and accepts:
+**`Load`**, the button beside the name, opens a file dialog on `data/ammo` and accepts:
 
 - **`.ammox`** — what this application saves.
 - **`.ammo`** — the format of the original WinForms *Ballistic Calculator .NET*. Its sample library

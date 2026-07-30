@@ -208,6 +208,86 @@ public class ShotDataPanelValidationTests
 
     #endregion
 
+    #region The zero distance, and which tab gets blamed for it
+
+    [AvaloniaFact]
+    public void ShotData_WithAZeroingBlockCarryingNoDistance_ShouldTakeItFromTheRiflesZero()
+    {
+        // The <zeroing> block is the source of truth, but the distance is mirrored on the rifle's own
+        // ZeroingParameters. The fallback used to be all-or-nothing, so a block that existed *without* a
+        // distance blanked the Zero tab even though the rifle knew the zero — and OK then refused the
+        // shot, naming the Rifle tab, whose every field was filled in.
+        var shot = CreateShotData();
+        shot.Zeroing = new ZeroingData
+        {
+            ShotAngle = new Measurement<AngularUnit>(0, AngularUnit.Degree),
+            // Distance deliberately absent, while Weapon.Zero.Distance is 100 yd
+        };
+
+        var panel = new ShotDataPanel { MeasurementSystem = MeasurementSystem.Imperial, ShotData = shot };
+
+        panel.ZeroSubPanel.ZeroDistance.Should().NotBeNull("the rifle's own zero supplies it");
+        panel.ZeroSubPanel.ZeroDistance!.Value.In(DistanceUnit.Yard).Should().BeApproximately(100, 1e-6);
+
+        var (built, _, incomplete, problems) = panel.Validate();
+        built!.Weapon.Should().NotBeNull();
+        incomplete.Should().BeEmpty();
+        problems.Should().BeEmpty();
+    }
+
+    [AvaloniaFact]
+    public void ShotData_WithAZeroingBlockCarryingNoDistance_ShouldNotDisturbTheRestOfTheBlock()
+    {
+        // Filling the gap must copy the block rather than replace it.
+        var shot = CreateShotData();
+        shot.Zeroing = new ZeroingData
+        {
+            ShotAngle = new Measurement<AngularUnit>(12, AngularUnit.Degree),
+            Wind = new Wind(new Measurement<VelocityUnit>(5, VelocityUnit.MilesPerHour),
+                            new Measurement<AngularUnit>(90, AngularUnit.Degree)),
+        };
+
+        var panel = new ShotDataPanel { MeasurementSystem = MeasurementSystem.Imperial, ShotData = shot };
+
+        var zeroing = panel.ZeroSubPanel.Zeroing!;
+        zeroing.ShotAngle!.Value.In(AngularUnit.Degree).Should().BeApproximately(12, 1e-6);
+        zeroing.Wind.Should().NotBeNull();
+    }
+
+    [AvaloniaFact]
+    public void Validate_WithNoZeroDistance_ShouldBlameTheZeroTabAndNotTheRifle()
+    {
+        // BuildRifle returns null for a missing sight *or* a missing zero distance, and the Rifle tab was
+        // reported for both. Naming the one tab that is complete is the worst possible message.
+        var panel = new ShotDataPanel { MeasurementSystem = MeasurementSystem.Imperial };
+        panel.ShotData = CreateShotData();
+        panel.ZeroSubPanel.ZeroDistanceControl.Value = null;
+
+        var (_, empty, incomplete, _) = panel.Validate();
+
+        panel.RifleSubPanel.Sight.Should().NotBeNull("the Rifle tab is complete");
+        incomplete.Should().NotContain("Rifle");
+        empty.Should().NotContain("Rifle");
+        incomplete.Should().Contain("Zero");
+    }
+
+    [AvaloniaFact]
+    public void Validate_WithNoSightHeight_ShouldStillBlameTheRifleTab()
+    {
+        // The other half: when the sight really is the missing piece, Rifle is the right answer.
+        var panel = new ShotDataPanel { MeasurementSystem = MeasurementSystem.Imperial };
+        panel.ShotData = CreateShotData();
+        panel.RifleSubPanel.SightHeightControl.Value = null;
+
+        var (_, empty, incomplete, _) = panel.Validate();
+
+        (incomplete.Contains("Rifle") || empty.Contains("Rifle")).Should().BeTrue();
+        incomplete.Should().NotContain("Zero");
+        empty.Should().NotContain("Zero");
+    }
+
+    #endregion
+
     private static ShotData CreateShotData(bool withClicks = true)
     {
         Measurement<AngularUnit>? click = withClicks

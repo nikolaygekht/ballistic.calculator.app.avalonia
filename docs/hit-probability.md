@@ -77,7 +77,7 @@ group with a supported one.
 | Field | What it is |
 |---|---|
 | **Range** — estimation error (1σ, %) | How well you know the distance, as a percentage of it |
-| **Wind** — estimation error (1σ, %) | How well you know the wind, as a percentage of its speed |
+| **Wind** — estimation error (1σ, %) | How well you know the wind, as a percentage of its speed — **inert unless the shot has wind**, see the warning below |
 | **Ammunition** — MV deviation (1σ, %) | How consistently the load leaves the barrel, as a percentage of muzzle velocity |
 
 The first two are **your** errors; the third is the **ammunition's** property, not a mistake you make. A
@@ -86,6 +86,20 @@ ammunition sits under 1 %; a mixed lot can be several times that.
 
 For the first two, be honest rather than flattering. A laser rangefinder is a fraction of a percent; a guess
 at 600 yd across a valley can be 10 %. Wind is worse: if you cannot tell 8 mph from 12, that is 20 %.
+
+Each of the three is a percentage **of something**, and under each field the dialog shows what it currently
+comes to — `= ±6.0 m at this range`, `= ±19 ft/s of 2,700 ft/s`. Read those rather than the percentages: a
+percentage of nothing is nothing.
+
+> ⚠️ **The wind error does nothing unless the shot has wind.** What it scales is the *drift the wind causes*,
+> so with no wind on the trajectory window's shot there is no drift to be wrong about, and the field changes
+> the answer by exactly zero however high you set it. The dialog says so in place of the absolute figure —
+> **no wind on this shot — this changes nothing**. To make your wind call part of the estimate, set the wind
+> on the shot first (Parameters tab), then come back.
+>
+> Two milder versions of the same trap: a pure head- or tailwind causes almost no drift, so a large error on
+> it also costs almost nothing; and the wind that counts is the one covering the target's distance, which on
+> a shot with several wind segments need not be the first one.
 
 ### Simulation
 

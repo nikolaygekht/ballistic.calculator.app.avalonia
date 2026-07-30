@@ -8,7 +8,7 @@ nav_order: 2
 **Goal of this article:** decide whether this application answers your question — and understand what
 kind of answer it gives — before you spend an evening typing loads into it.
 
-Ballistic Calculator 2 is a free, open-source external-ballistics solver for **Windows and Linux**. You
+Ballistic Calculator 2 is a free, open-source external-ballistics solver for **Windows, Linux and macOS**. You
 describe a projectile, a rifle, the air and the wind; it computes the trajectory and reports it as a
 table, a chart, a sight picture through your own reticle, and a summary of the shot's useful ranges.
 
@@ -35,7 +35,7 @@ solver closely; what 4DOF adds is the projectile's angular motion, not a better 
 than approximating angular motion, this application concentrates on letting you supply, or build, the
 actual curve.
 
-**Truly cross-platform.** One codebase, native builds for Windows and Linux, no emulation layer. Every
+**Truly cross-platform.** One codebase, native builds for Windows, Linux and macOS, no emulation layer. Every
 release ships both.
 
 **Android next.** The calculation and domain layers carry no desktop UI dependencies, so a touch-first

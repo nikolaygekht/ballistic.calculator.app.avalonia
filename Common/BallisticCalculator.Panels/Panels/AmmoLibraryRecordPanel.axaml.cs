@@ -207,7 +207,7 @@ public partial class AmmoLibraryRecordPanel : UserControl
         {
             Title = "Load Ammunition",
             DefaultExtension = "ammox",
-            InitialDirectory = DataFolders.LegacyAmmo,
+            InitialDirectory = DataFolders.Ammo,
             Filters =
             {
                 new Services.FileDialogFilter("Ammunition Files", "ammox", "ammo"),
@@ -245,7 +245,7 @@ public partial class AmmoLibraryRecordPanel : UserControl
         {
             Title = "Save Ammunition",
             DefaultExtension = "ammox",
-            InitialDirectory = DataFolders.LegacyAmmo,
+            InitialDirectory = DataFolders.Ammo,
             InitialFileName = string.IsNullOrWhiteSpace(entry.Name) ? "ammunition" : entry.Name,
             Filters = { new Services.FileDialogFilter("Ammunition Files", "ammox") }
         };

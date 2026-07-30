@@ -5,7 +5,7 @@ nav_order: 1
 
 # Ballistic Calculator 2 — user guide
 
-A free, open-source ballistic calculator for **Windows and Linux**, built on Avalonia UI. This is its
+A free, open-source ballistic calculator for **Windows, Linux and macOS**, built on Avalonia UI. This is its
 user guide: how to describe a load, zero it, run it, and read the answer — plus what the numbers mean
 and where they stop being trustworthy.
 
@@ -43,6 +43,8 @@ planned** — the structure is listed in full so you can see what is coming and 
 - [What Ballistic Calculator 2 is](about.md) — what it computes, what it does not, and the risk notice
 - [Installation and first run](installation.md) — download to running app, and what it stores where
 - [Your first trajectory](first-trajectory.md) — the imperial/metric choice, the six tabs, pressing OK
+- [Updating the application](updating.md) — what a new release replaces, what it keeps, and how your
+  presets survive it
 
 **Building and running a shot** — one article per tab of the Shot Parameters dialog, in tab order
 
@@ -96,7 +98,8 @@ planned** — the structure is listed in full so you can see what is coming and 
 
 - Units and measurement systems — every unit the app accepts, and the angular-unit choice
 - File formats — `.drg`, ammunition, reticles and the saved shot, by hand
-- What the model does and does not include — how far to trust the numbers
+- [What the model includes](what-the-model-includes.md) — which effects are computed, which are
+  approximated, which are absent, and the risk notice in full
 - [Known problems](known-problems.md) — what is known, what is ours, and what is the platform's fault
 - Troubleshooting and FAQ — the recurring stumbles, each pointing at the article that explains it
 - [Recommended reading](recommended-reading.md) — the ballistics this guide deliberately does not teach

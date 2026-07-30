@@ -65,9 +65,9 @@ Three behaviours worth knowing:
   no longer matches the preset it came from, so a preset stays named while it is still true and stops
   claiming credit as soon as you change something.
 - **You can add your own.** `Tools → Edit Sights…` and `Tools → Edit Barrels…` edit the same dictionary
-  and save it back to `data/dictionaries.xml`. Worth doing once for each rifle you actually shoot; note
-  that a new release brings its own copy of the `data` folder, so keep a copy of yours (see
-  [Installation](installation.md#updating-and-removing)).
+  and save it to `user-dictionaries.xml`, beside the executable. Worth doing once for each rifle you
+  actually shoot — and an update cannot overwrite it, though it will add any new presets a release brings
+  (see [Updating the application](updating.md)).
 
 ## Click values buy you two things
 

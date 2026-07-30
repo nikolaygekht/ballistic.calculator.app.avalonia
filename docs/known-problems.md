@@ -62,17 +62,6 @@ setting cannot reach into another program's dialog, and should not.
 **What to do.** Change the font size in your desktop settings if the file dialogs are hard to read. Every
 window the application draws itself does follow the application font size.
 
-## One shipped drag table cannot be opened
-
-**What you see.** Browsing to
-`data/drg/Lapua/308-lapua n558 11,0g (170gr) naturalis_radar.drg` reports an error instead of loading.
-
-**Why.** That file's header has a period where a comma belongs — a one-character typo in the shipped data,
-not a fault in the reader. Every other shipped `.drg` opens.
-
-**What to do.** Nothing you need to; the file is not referenced by any shipped load. If you want it, open it
-in a text editor and fix the separator on the first line.
-
 ## The reticle editor has no undo
 
 **What you see.** An element you edited or deleted cannot be brought back.

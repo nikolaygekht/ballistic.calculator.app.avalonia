@@ -178,7 +178,7 @@ public partial class RiflePanel : UserControl
         RiflingDirectionCombo.SelectedIndex = 0;
     }
 
-    private void LoadDictionary() => SetDictionary(BallisticDictionary.LoadDefault());
+    private void LoadDictionary() => SetDictionary(BallisticDictionary.LoadForUse());
 
     /// <summary>Replaces the preset dictionary and repopulates the preset combos.</summary>
     internal void SetDictionary(BallisticDictionary dictionary)

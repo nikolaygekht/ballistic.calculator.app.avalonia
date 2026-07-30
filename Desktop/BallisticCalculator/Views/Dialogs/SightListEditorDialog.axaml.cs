@@ -37,7 +37,7 @@ public partial class SightListEditorDialog : Window
         VClickControl.Minimum = 0;
         ApplyUnits();
 
-        var dictionary = BallisticDictionary.LoadDefault();
+        var dictionary = BallisticDictionary.LoadForUse();
         _barrels = dictionary.Barrels;
         foreach (var s in dictionary.Sights)
             _sights.Add(new SightEditModel
@@ -135,6 +135,35 @@ public partial class SightListEditorDialog : Window
         NameBox.SelectAll();
     }
 
+    /// <summary>
+    /// Replaces the sight list with the shipped presets, leaving the barrels alone — each editor owns one
+    /// list, and a reset must not undo the user's work in the other one.
+    /// <para>
+    /// This is the way back from a list that has drifted, because the start-up top-up only ever *adds*
+    /// shipped entries it cannot find by name: it will not correct an entry the user has edited, and it
+    /// re-adds one they deleted. Nothing is written until OK, so Cancel undoes a reset.
+    /// </para>
+    /// </summary>
+    internal void OnReset(object? sender, RoutedEventArgs e)
+    {
+        var shipped = BallisticDictionary.LoadShipped();
+        if (shipped.Sights.Count == 0)
+            return;
+
+        _sights.Clear();
+        foreach (var s in shipped.Sights)
+            _sights.Add(new SightEditModel
+            {
+                Name = s.Name,
+                SightHeight = s.SightHeight,
+                DefaultZero = s.DefaultZero,
+                HorizontalClick = s.HorizontalClick,
+                VerticalClick = s.VerticalClick,
+            });
+
+        EntriesList.SelectedIndex = 0;
+    }
+
     private void OnDelete(object? sender, RoutedEventArgs e)
     {
         if (Current is not { } m) return;
@@ -168,7 +197,7 @@ public partial class SightListEditorDialog : Window
 
         try
         {
-            new BallisticDictionary(entries, _barrels).SaveDefault();
+            new BallisticDictionary(entries, _barrels).SaveUser();
         }
         catch (System.Exception ex)
         {

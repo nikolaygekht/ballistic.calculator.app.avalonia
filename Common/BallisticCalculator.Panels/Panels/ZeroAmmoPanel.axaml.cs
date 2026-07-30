@@ -131,7 +131,7 @@ public partial class ZeroAmmoPanel : UserControl
         {
             Title = "Load Ammunition for Zero",
             DefaultExtension = "ammox",
-            InitialDirectory = DataFolders.LegacyAmmo,
+            InitialDirectory = DataFolders.Ammo,
             Filters =
             {
                 new Services.FileDialogFilter("Ammunition Files", "ammox", "ammo"),

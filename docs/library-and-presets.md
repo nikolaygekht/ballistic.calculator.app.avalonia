@@ -10,14 +10,14 @@ nav_order: 24
 
 | What | Where it lives | How it is edited |
 |---|---|---|
-| **Loads** | One `.ammox` file per load, anywhere (`data/legacy-ammo` by default) | `Load` / `Save` on the Ammunition tab |
-| **Sight presets** | Entries in `data/dictionaries.xml` | `Tools → Edit Sights…` |
+| **Loads** | One `.ammox` file per load, anywhere (`data/ammo` by default) | `Load` / `Save` on the Ammunition tab |
+| **Sight presets** | Entries in `user-dictionaries.xml`, beside the executable | `Tools → Edit Sights…` |
 | **Barrel presets** | The same file | `Tools → Edit Barrels…` |
 
 ## The ammunition library is a folder of files
 
 There is no library window and no database: a saved load is a **file**, and the "library" is whichever
-folder you keep them in. The application defaults to `data/legacy-ammo`, where the shipped sample
+folder you keep them in. The application defaults to `data/ammo`, where the shipped sample
 cartridges live.
 
 **Saving.** Fill in the [Ammunition tab](ammunition-tab.md#entering-a-load-by-hand-and-keeping-it) and press
@@ -41,13 +41,16 @@ Three things worth knowing about a folder-of-files library:
   to fill that field in.
 - **Keep your own files out of `data`.** A new release brings its own `data` folder and an overwrite can
   take your saves with it, so a folder of your own beside it — or anywhere else — is safer. See
-  [updating](installation.md#updating-and-removing).
+  [Updating the application](updating.md).
 
 ## Sight presets
 
 `Tools → Edit Sights…` edits the named sights that fill the [Rifle tab](rifle-tab.md#presets-and-where-they-come-from)'s
-dropdown. A list on the left, the selected entry's fields on the right, **Add** and **Delete** beneath, and
-**OK** / **Cancel**.
+dropdown. A list on the left, the selected entry's fields on the right, **Add**, **Delete** and **Reset**
+beneath, and **OK** / **Cancel**.
+
+**Reset** replaces the sight list with the presets the application ships with, leaving your barrels alone.
+It only changes what is on screen — nothing is written until **OK**, so **Cancel** undoes it.
 
 | Field | What it does |
 |---|---|
@@ -65,7 +68,8 @@ depends on the mount, which is part of the rifle.
 
 ## Barrel presets
 
-`Tools → Edit Barrels…` is the same shape, with two fields:
+`Tools → Edit Barrels…` is the same shape — including its own **Reset**, which restores the shipped
+barrels and leaves your sights alone — with two fields:
 
 | Field | What it does |
 |---|---|
@@ -76,18 +80,25 @@ depends on the mount, which is part of the rifle.
 Both matter: the rate scales spin drift, the direction decides which way it goes. See
 [the twist](rifle-tab.md#the-barrel-what-the-twist-actually-buys).
 
-## One file, and it is shipped
+## One file, and an update cannot touch it
 
-Both editors read and write the **same** file, `data/dictionaries.xml`, and saving from either writes the
-whole thing. Two consequences:
+Both editors read and write the **same** file, and saving from either writes the whole thing — sights and
+barrels together. That file is **`user-dictionaries.xml`, beside the executable**, not the
+`data/dictionaries.xml` that ships with the application. Three consequences:
 
-- **It is plain XML and easy to read.** `<sight name="…" sight-height="2.6in" default-zero="100yd"
+- **It is plain XML and easy to read.** `<sight name="…" sight-height="2.6in" default-zero="100m"
   horizontal-click="0.1mil" vertical-click="0.1mil" />` — you can hand-edit or version it if you prefer.
   Units are written out, and any angular unit is accepted for clicks: the shipped file mixes `0.1mil`,
   `0.25moa` and `0.5in/100yd`.
-- **A new release replaces it.** The file ships with the application, so an upgrade brings the standard
-  presets back and your additions go. Keep a copy of yours somewhere outside `data`, and merge it back after
-  an update.
+- **An update cannot overwrite it.** No release archive contains a file of that name. `data/dictionaries.xml`
+  *is* replaced by every update, but the application only ever reads it: on first run to create your copy,
+  and afterwards to add presets your file does not have yet.
+- **New shipped presets appear; your entries are never modified.** Matching is by name. The flip side is
+  that a *corrected* shipped preset will not reach an entry you already carry, and a shipped preset you
+  delete reappears on the next start. **Reset** in either editor replaces that one list with the shipped
+  presets — nothing is saved until OK, so Cancel undoes it.
+
+[Updating the application](updating.md) covers this and the rest of what a release replaces.
 
 ## Which dialog opens in which units
 

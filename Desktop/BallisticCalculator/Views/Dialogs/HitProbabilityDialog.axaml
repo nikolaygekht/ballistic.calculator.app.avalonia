@@ -9,7 +9,9 @@
         WindowStartupLocation="CenterOwner"
         CanResize="true">
 
-  <!-- No ScrollViewer: the plot must take the space it is given, and the inputs are a fixed-height column. -->
+  <!-- No ScrollViewer here: the plot must take the space it is given, so the whole dialog must not
+       scroll as one. The input column is taller than this window and scrolls on its own, inside the
+       panel. -->
   <panels:HitProbabilityPanel x:Name="EstimatorPanel" x:FieldModifier="internal" Margin="12"
                               FontSize="{DynamicResource AppFontSize}"/>
 </Window>

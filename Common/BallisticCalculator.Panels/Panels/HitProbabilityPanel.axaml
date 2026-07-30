@@ -10,7 +10,13 @@
   <Grid ColumnDefinitions="Auto,12,*" RowDefinitions="*,Auto">
 
     <!-- ── Inputs ───────────────────────────────────────────────────────────────────── -->
-    <StackPanel Grid.Row="0" Grid.Column="0" Spacing="4" Width="290">
+    <!-- The column is a fixed width and scrolls: five sections of fields are taller than the dialog
+         at its minimum height, and the results and the plot to the right must not be squeezed to
+         make room for them. Width lives on the ScrollViewer so the scroll bar comes out of the 290
+         rather than being added to it. -->
+    <ScrollViewer Grid.Row="0" Grid.Column="0" Width="290"
+                  VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="4">
 
       <TextBlock Text="Target" FontWeight="SemiBold" FontSize="{DynamicResource AppFontSize}"/>
 
@@ -61,30 +67,43 @@
       <TextBlock Text="Estimation error (1σ, %)" FontWeight="SemiBold"
                  FontSize="{DynamicResource AppFontSize}"/>
 
-      <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+      <!-- Each percentage is echoed underneath as what it actually amounts to. A percentage of a
+           quantity that is zero is zero, and the wind error is the case that bites: with no wind on
+           the shot there is no drift for it to scale, so the field reads as if it mattered while
+           changing nothing. -->
+      <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto">
         <TextBlock Grid.Row="0" Grid.Column="0" Text="Range" VerticalAlignment="Center"
                    Margin="0,0,8,0" FontSize="{DynamicResource AppFontSize}"/>
         <NumericUpDown Grid.Row="0" Grid.Column="1" x:Name="RangeErrorInput" x:FieldModifier="internal"
                        Minimum="0" Maximum="100" Increment="1" FormatString="0.##"
                        FontSize="{DynamicResource AppFontSize}"/>
+        <TextBlock Grid.Row="1" Grid.Column="1" x:Name="RangeErrorAbsText" x:FieldModifier="internal"
+                   Text="" Foreground="Gray" TextWrapping="Wrap" Margin="0,2,0,0"
+                   FontSize="{DynamicResource AppFontSize}"/>
 
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="Wind" VerticalAlignment="Center"
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Wind" VerticalAlignment="Center"
                    Margin="0,8,8,0" FontSize="{DynamicResource AppFontSize}"/>
-        <NumericUpDown Grid.Row="1" Grid.Column="1" x:Name="WindErrorInput" x:FieldModifier="internal"
+        <NumericUpDown Grid.Row="2" Grid.Column="1" x:Name="WindErrorInput" x:FieldModifier="internal"
                        Minimum="0" Maximum="100" Increment="1" FormatString="0.##"
                        Margin="0,8,0,0" FontSize="{DynamicResource AppFontSize}"/>
+        <TextBlock Grid.Row="3" Grid.Column="1" x:Name="WindErrorAbsText" x:FieldModifier="internal"
+                   Text="" Foreground="Gray" TextWrapping="Wrap" Margin="0,2,0,0"
+                   FontSize="{DynamicResource AppFontSize}"/>
       </Grid>
 
       <Separator/>
       <TextBlock Text="Ammunition" FontWeight="SemiBold" FontSize="{DynamicResource AppFontSize}"/>
 
       <!-- Not an estimation error: this is how consistently the ammunition leaves the barrel. -->
-      <Grid ColumnDefinitions="Auto,*">
-        <TextBlock Grid.Column="0" Text="MV deviation (1σ, %)" VerticalAlignment="Center"
+      <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="MV deviation (1σ, %)" VerticalAlignment="Center"
                    Margin="0,0,8,0" FontSize="{DynamicResource AppFontSize}"/>
-        <NumericUpDown Grid.Column="1" x:Name="MvDeviationInput" x:FieldModifier="internal"
+        <NumericUpDown Grid.Row="0" Grid.Column="1" x:Name="MvDeviationInput" x:FieldModifier="internal"
                        Minimum="0" Maximum="10" Increment="0.1" FormatString="0.##"
                        FontSize="{DynamicResource AppFontSize}"/>
+        <TextBlock Grid.Row="1" Grid.Column="1" x:Name="MvDeviationAbsText" x:FieldModifier="internal"
+                   Text="" Foreground="Gray" TextWrapping="Wrap" Margin="0,2,0,0"
+                   FontSize="{DynamicResource AppFontSize}"/>
       </Grid>
 
       <Separator/>
@@ -110,6 +129,7 @@
                  Foreground="Gray" TextWrapping="Wrap" Margin="0,4,0,0"
                  FontSize="{DynamicResource AppFontSize}"/>
     </StackPanel>
+    </ScrollViewer>
 
     <!-- ── Results ──────────────────────────────────────────────────────────────────── -->
     <Grid Grid.Row="0" Grid.Column="2" RowDefinitions="Auto,Auto,Auto,*,Auto">

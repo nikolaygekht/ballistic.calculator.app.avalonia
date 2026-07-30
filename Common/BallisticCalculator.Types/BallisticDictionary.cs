@@ -48,21 +48,108 @@ public sealed class BallisticDictionary
     public static BallisticDictionary Empty { get; } =
         new(Array.Empty<SightDictionaryEntry>(), Array.Empty<BarrelDictionaryEntry>());
 
-    /// <summary>The standard location: <c>data/dictionaries.xml</c> next to the executable.</summary>
-    public static string DefaultPath =>
+    /// <summary>
+    /// The presets that ship with the application: <c>data/dictionaries.xml</c>. An update replaces this
+    /// file wholesale, so nothing the user owns may live in it — the app only ever reads it.
+    /// </summary>
+    public static string ShippedPath =>
         Path.Combine(AppContext.BaseDirectory, "data", "dictionaries.xml");
 
     /// <summary>
-    /// Loads the dictionary from <see cref="DefaultPath"/>, returning <see cref="Empty"/> if the file
-    /// is missing or cannot be read/parsed. Never throws.
+    /// The user's own presets, <c>user-dictionaries.xml</c> beside the executable — the same place
+    /// <c>appstate.json</c> lives, so the application stays portable and an update cannot overwrite it.
+    /// This is the only dictionary file the editors write.
     /// </summary>
-    public static BallisticDictionary LoadDefault()
+    public static string UserPath =>
+        Path.Combine(AppContext.BaseDirectory, "user-dictionaries.xml");
+
+    /// <summary>
+    /// The presets the application works with: the user's file, created from the shipped one when it does
+    /// not exist yet and topped up with any shipped entries it has not seen. Never throws.
+    /// <para>
+    /// Entries the user already has are left <b>exactly</b> as they are, so an update cannot overwrite
+    /// their edits. The cost of that rule is that it cannot deliver a correction to an entry either, and
+    /// that a shipped entry the user deleted comes back on the next start — <b>Reset to Defaults</b> in
+    /// the editors is the escape hatch for a list that has drifted.
+    /// </para>
+    /// </summary>
+    public static BallisticDictionary LoadForUse() => LoadForUse(ShippedPath, UserPath);
+
+    /// <summary>As <see cref="LoadForUse()"/>, against explicit paths (the seam the tests use).</summary>
+    public static BallisticDictionary LoadForUse(string shippedPath, string userPath)
+    {
+        var shipped = ReadOrEmpty(shippedPath);
+
+        if (!File.Exists(userPath))
+        {
+            // A missing shipped file means a broken or partial install; do not answer it by writing an
+            // empty user dictionary, which would then look like a deliberately emptied list forever.
+            if (shipped.Sights.Count == 0 && shipped.Barrels.Count == 0)
+                return shipped;
+
+            TrySave(shipped, userPath);
+            return shipped;
+        }
+
+        var user = ReadOrEmpty(userPath);
+        var merged = AddMissing(user, shipped);
+
+        // Only write when the top-up actually added something, so an ordinary start touches no files.
+        if (merged.Sights.Count != user.Sights.Count || merged.Barrels.Count != user.Barrels.Count)
+            TrySave(merged, userPath);
+
+        return merged;
+    }
+
+    /// <summary>
+    /// The shipped presets alone, for <b>Reset to Defaults</b>. Each editor owns one list, so a reset
+    /// replaces that list and leaves the other one as the user has it.
+    /// </summary>
+    public static BallisticDictionary LoadShipped() => ReadOrEmpty(ShippedPath);
+
+    /// <summary>Saves to <see cref="UserPath"/>. The editors' only write path.</summary>
+    public void SaveUser() => SaveUser(UserPath);
+
+    /// <summary>As <see cref="SaveUser()"/>, to an explicit path (the seam the tests use).</summary>
+    public void SaveUser(string path)
+    {
+        var dir = Path.GetDirectoryName(path);
+        if (!string.IsNullOrEmpty(dir))
+            Directory.CreateDirectory(dir);
+        Save(path);
+    }
+
+    /// <summary>
+    /// <paramref name="user"/> plus every shipped entry it has no entry of that name for. Matching is by
+    /// name, case-insensitively; an entry the user already has is copied across untouched, whether or not
+    /// they have edited it.
+    /// </summary>
+    public static BallisticDictionary AddMissing(BallisticDictionary user, BallisticDictionary shipped)
+    {
+        ArgumentNullException.ThrowIfNull(user);
+        ArgumentNullException.ThrowIfNull(shipped);
+
+        var sights = user.Sights.ToList();
+        var haveSight = new HashSet<string>(sights.Select(s => s.Name), StringComparer.OrdinalIgnoreCase);
+        sights.AddRange(shipped.Sights.Where(s => haveSight.Add(s.Name)));
+
+        var barrels = user.Barrels.ToList();
+        var haveBarrel = new HashSet<string>(barrels.Select(b => b.Name), StringComparer.OrdinalIgnoreCase);
+        barrels.AddRange(shipped.Barrels.Where(b => haveBarrel.Add(b.Name)));
+
+        sights.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCultureIgnoreCase));
+        barrels.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCultureIgnoreCase));
+
+        return new BallisticDictionary(sights, barrels);
+    }
+
+    private static BallisticDictionary ReadOrEmpty(string path)
     {
         try
         {
-            if (!File.Exists(DefaultPath))
+            if (!File.Exists(path))
                 return Empty;
-            using var stream = File.OpenRead(DefaultPath);
+            using var stream = File.OpenRead(path);
             return Load(stream);
         }
         catch
@@ -71,13 +158,20 @@ public sealed class BallisticDictionary
         }
     }
 
-    /// <summary>Saves the dictionary to <see cref="DefaultPath"/> (creating the folder if needed).</summary>
-    public void SaveDefault()
+    /// <summary>
+    /// Writes the user's file, swallowing failure: an install folder the user cannot write to must not
+    /// stop the application, it just means the presets are not remembered (as with <c>appstate.json</c>).
+    /// </summary>
+    private static void TrySave(BallisticDictionary dictionary, string path)
     {
-        var dir = Path.GetDirectoryName(DefaultPath);
-        if (!string.IsNullOrEmpty(dir))
-            Directory.CreateDirectory(dir);
-        Save(DefaultPath);
+        try
+        {
+            dictionary.SaveUser(path);
+        }
+        catch
+        {
+            // Nothing to do and nothing worth saying at load time; the editors report their own failures.
+        }
     }
 
     public void Save(string path)

@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -176,11 +177,199 @@ public class BallisticDictionaryTests
     }
 
     [Fact]
-    public void LoadDefault_MissingFile_ReturnsEmpty_DoesNotThrow()
+    public void LoadForUse_MissingFiles_ReturnsEmpty_DoesNotThrow()
     {
-        // In the test host there is no data/dictionaries.xml next to the assembly; LoadDefault must
-        // degrade gracefully to an empty dictionary rather than throw.
-        var act = () => BallisticDictionary.LoadDefault();
+        // A broken or partial install must degrade to an empty dictionary rather than throw.
+        var act = () => BallisticDictionary.LoadForUse(
+            Path.Combine(Path.GetTempPath(), $"no-such-shipped-{Guid.NewGuid():N}.xml"),
+            Path.Combine(Path.GetTempPath(), $"no-such-user-{Guid.NewGuid():N}.xml"));
+
         act.Should().NotThrow();
+        act().Sights.Should().BeEmpty();
     }
+
+    #region Shipped vs user: keeping the user's edits across an update
+
+    private static BallisticDictionary FromXml(string xml)
+    {
+        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
+        return BallisticDictionary.Load(stream);
+    }
+
+    private const string Shipped = """
+        <dictionary>
+            <sights>
+                <sight name="Optics Mil" sight-height="3in" default-zero="100m" />
+                <sight name="Iron" sight-height="5cm" default-zero="100m" />
+                <sight name="Brand New Optic" sight-height="2in" default-zero="100m" />
+            </sights>
+            <barrels>
+                <barrel name="AK-74" step="200mm" direction="Right" />
+                <barrel name="Brand New Barrel" step="8in" direction="Right" />
+            </barrels>
+        </dictionary>
+        """;
+
+    [Fact]
+    public void AddMissing_ShouldAddShippedEntriesTheUserDoesNotHave()
+    {
+        var user = LoadSample();
+
+        var merged = BallisticDictionary.AddMissing(user, FromXml(Shipped));
+
+        merged.Sights.Select(s => s.Name).Should().Contain("Brand New Optic");
+        merged.Barrels.Select(b => b.Name).Should().Contain("Brand New Barrel");
+    }
+
+    [Fact]
+    public void AddMissing_ShouldNotTouchAnEntryTheUserAlreadyHas()
+    {
+        // The rule is add-only. "Optics Mil" ships with a 100 m default zero and the user's copy says
+        // 100 yd; theirs survives, which is the whole point — an update cannot overwrite their work.
+        var user = LoadSample();
+
+        var merged = BallisticDictionary.AddMissing(user, FromXml(Shipped));
+
+        var optic = merged.Sights.Single(s => s.Name == "Optics Mil");
+        optic.DefaultZero!.Value.In(DistanceUnit.Yard).Should().BeApproximately(100, 1e-6);
+        optic.HorizontalClick.Should().NotBeNull("the user's own clicks must survive too");
+    }
+
+    [Fact]
+    public void AddMissing_ShouldNotDuplicateAnEntryDifferingOnlyInCase()
+    {
+        var user = FromXml("""
+            <dictionary><sights>
+                <sight name="OPTICS MIL" sight-height="9in" />
+            </sights><barrels/></dictionary>
+            """);
+
+        var merged = BallisticDictionary.AddMissing(user, FromXml(Shipped));
+
+        merged.Sights.Count(s => s.Name.Equals("optics mil", StringComparison.OrdinalIgnoreCase))
+              .Should().Be(1);
+        merged.Sights.Single(s => s.Name == "OPTICS MIL").SightHeight.In(DistanceUnit.Inch)
+              .Should().BeApproximately(9, 1e-6, "the user's entry wins, not the shipped one");
+    }
+
+    [Fact]
+    public void AddMissing_ShouldKeepEntriesTheUserAddedThemselves()
+    {
+        var user = FromXml("""
+            <dictionary><sights>
+                <sight name="My Own Scope" sight-height="1.8in" />
+            </sights><barrels/></dictionary>
+            """);
+
+        var merged = BallisticDictionary.AddMissing(user, FromXml(Shipped));
+
+        merged.Sights.Select(s => s.Name).Should().Contain("My Own Scope");
+        merged.Sights.Should().HaveCount(4, "their own entry plus the three shipped ones");
+    }
+
+    #endregion
+
+    #region The user file on disk
+
+    /// <summary>A scratch pair of paths; the user file deliberately does not exist yet.</summary>
+    private static (string Shipped, string User, string Dir) Scratch(string shippedXml)
+    {
+        var dir = Path.Combine(Path.GetTempPath(), $"dict-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(dir);
+        var shipped = Path.Combine(dir, "dictionaries.xml");
+        File.WriteAllText(shipped, shippedXml);
+        return (shipped, Path.Combine(dir, "user-dictionaries.xml"), dir);
+    }
+
+    [Fact]
+    public void LoadForUse_FirstRun_ShouldCreateTheUserFileFromTheShippedOne()
+    {
+        var (shipped, user, dir) = Scratch(Shipped);
+        try
+        {
+            var loaded = BallisticDictionary.LoadForUse(shipped, user);
+
+            File.Exists(user).Should().BeTrue("the first run seeds the user's own copy");
+            loaded.Sights.Should().HaveCount(3);
+        }
+        finally { Directory.Delete(dir, true); }
+    }
+
+    [Fact]
+    public void LoadForUse_ShouldTopUpTheUserFileWithNewShippedEntries()
+    {
+        var (shipped, user, dir) = Scratch(Shipped);
+        try
+        {
+            File.WriteAllText(user, Sample);   // an older user file, without the two new entries
+
+            var loaded = BallisticDictionary.LoadForUse(shipped, user);
+
+            loaded.Sights.Select(s => s.Name).Should().Contain("Brand New Optic");
+            loaded.Barrels.Select(b => b.Name).Should().Contain("Brand New Barrel");
+
+            // and the top-up is persisted, not recomputed on every start
+            BallisticDictionary.LoadForUse(Path.Combine(dir, "gone.xml"), user)
+                               .Sights.Select(s => s.Name).Should().Contain("Brand New Optic");
+        }
+        finally { Directory.Delete(dir, true); }
+    }
+
+    [Fact]
+    public void LoadForUse_ShouldNeverWriteToTheShippedFile()
+    {
+        var (shipped, user, dir) = Scratch(Shipped);
+        try
+        {
+            var before = File.ReadAllText(shipped);
+            File.WriteAllText(user, Sample);
+
+            BallisticDictionary.LoadForUse(shipped, user);
+
+            File.ReadAllText(shipped).Should().Be(before,
+                "an update replaces the shipped file, so nothing the user owns may be written into it");
+        }
+        finally { Directory.Delete(dir, true); }
+    }
+
+    [Fact]
+    public void LoadForUse_WithNoShippedFile_ShouldNotCreateAnEmptyUserFile()
+    {
+        // A partial install must not leave behind an empty user dictionary, which would then look
+        // forever like a list the user had deliberately emptied.
+        var dir = Path.Combine(Path.GetTempPath(), $"dict-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(dir);
+        try
+        {
+            var user = Path.Combine(dir, "user-dictionaries.xml");
+
+            BallisticDictionary.LoadForUse(Path.Combine(dir, "missing.xml"), user);
+
+            File.Exists(user).Should().BeFalse();
+        }
+        finally { Directory.Delete(dir, true); }
+    }
+
+    [Fact]
+    public void LoadForUse_ShouldLeaveADeletedShippedEntryOutUntilTheNextStart()
+    {
+        // Documenting the accepted cost of the add-only rule: a shipped entry the user deletes comes
+        // back, because "absent" and "never seen" are the same state. Reset in the editors is the
+        // escape hatch, and the manual says so.
+        var (shipped, user, dir) = Scratch(Shipped);
+        try
+        {
+            BallisticDictionary.LoadForUse(shipped, user);
+
+            var trimmed = BallisticDictionary.LoadForUse(shipped, user);
+            var kept = trimmed.Sights.Where(s => s.Name != "Iron").ToList();
+            new BallisticDictionary(kept, trimmed.Barrels).SaveUser(user);
+
+            BallisticDictionary.LoadForUse(shipped, user)
+                               .Sights.Select(s => s.Name).Should().Contain("Iron");
+        }
+        finally { Directory.Delete(dir, true); }
+    }
+
+    #endregion
 }

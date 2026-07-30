@@ -1,6 +1,6 @@
 # Ballistic Calculator 2
 
-A free, open-source ballistic calculator for **Windows and Linux**, built on Avalonia UI.
+A free, open-source ballistic calculator for **Windows, Linux and macOS**, built on Avalonia UI.
 
 This is the successor to the WinForms [Ballistic Calculator .NET](https://github.com/nikolaygekht/ballistic.calculator.app),
 rewritten from the ground up to be genuinely cross-platform rather than Windows-with-Wine. The trajectory
@@ -24,7 +24,7 @@ the projectile's own Cd curve tracks a 4DOF solver closely; what a 4DOF model ad
 motion, not a better drag model. So rather than approximating that, this calculator lets you supply or build
 the actual curve.
 
-**Truly cross-platform.** One codebase, native builds for Windows and Linux, no emulation layer. Each release
+**Truly cross-platform.** One codebase, native builds for Windows, Linux and macOS, no emulation layer. Each release
 ships both.
 
 **Android next.** The shared calculation and domain layers (`Common/`) carry no desktop UI dependencies, so a
@@ -83,7 +83,9 @@ Grab the latest archive from [Releases](https://github.com/nikolaygekht/ballisti
 unzip it into a folder you can write to, and run it. There is no installer.
 
 * **Windows** — run `BallisticCalculator2.exe` (the reticle editor is `ReticleEditor.exe`)
-* **Linux** — run `BallisticCalculator2` (`chmod +x` it first if your unzip tool dropped the permission)
+* **Linux** — `dotnet BallisticCalculator2.dll`, or run `BallisticCalculator2` if your archive has it
+  (`chmod +x` it first if your unzip tool dropped the permission)
+* **macOS** — `dotnet BallisticCalculator2.dll`
 
 Both platforms' binaries are in the same archive, alongside the shared `data` folder holding reticles, drag
 tables and the sample ammunition library — keep that folder beside the executable. The builds are

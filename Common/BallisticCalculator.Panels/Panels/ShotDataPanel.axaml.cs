@@ -85,8 +85,15 @@ public partial class ShotDataPanel : UserControl
                 RifleSubPanel.Sight = value.Weapon.Sight;
                 RifleSubPanel.Rifling = value.Weapon.Rifling;
 
-                // Zeroing is the source of truth; fall back to Weapon.Zero for older data.
-                ZeroSubPanel.Zeroing = value.Zeroing ?? ZeroingFromWeapon(value.Weapon);
+                // Zeroing is the source of truth; fall back to Weapon.Zero for older data. The fallback
+                // has to be per-field as well as whole-object: a <zeroing> block that exists but carries
+                // no distance used to blank the Zero tab even though the rifle's own zero knew it, and OK
+                // then refused the shot. The distance is the one field mirrored in both places.
+                var zeroing = value.Zeroing ?? ZeroingFromWeapon(value.Weapon);
+                if (zeroing.Distance == null && value.Weapon.Zero?.Distance != null)
+                    zeroing = WithDistance(zeroing, value.Weapon.Zero.Distance);
+
+                ZeroSubPanel.Zeroing = zeroing;
             }
             else
             {
@@ -122,6 +129,22 @@ public partial class ShotDataPanel : UserControl
 
         return new Rifle(sight, zero, RifleSubPanel.Rifling);
     }
+
+    /// <summary>
+    /// A copy of <paramref name="zeroing"/> carrying <paramref name="distance"/>. Copied rather than
+    /// mutated: the object belongs to the caller's <see cref="ShotData"/>, and filling a gap in the view
+    /// is no reason to edit the model behind it.
+    /// </summary>
+    private static ZeroingData WithDistance(ZeroingData zeroing, Measurement<DistanceUnit>? distance) => new()
+    {
+        Distance = distance,
+        Ammunition = zeroing.Ammunition,
+        Atmosphere = zeroing.Atmosphere,
+        VerticalOffset = zeroing.VerticalOffset,
+        HorizontalOffset = zeroing.HorizontalOffset,
+        Wind = zeroing.Wind,
+        ShotAngle = zeroing.ShotAngle,
+    };
 
     /// <summary>Fallback for older data that has no &lt;zeroing&gt; block: reconstruct it from the rifle's zero.</summary>
     private static ZeroingData ZeroingFromWeapon(Rifle weapon) => new()
@@ -180,16 +203,21 @@ public partial class ShotDataPanel : UserControl
         var rifle = BuildRifle();
         if (rifle == null)
         {
-            // A missing rifle can be caused by either the Rifle panel (sight) or the Zero panel
-            // (zero distance) being empty/incomplete.
-            if (RifleSubPanel.IsEmpty) emptyPanels.Add("Rifle");
-            else incompletePanels.Add("Rifle");
-
-            if (ZeroSubPanel.ZeroDistance == null)
+            // A missing rifle has two possible causes — the sight (Rifle tab) or the zero distance
+            // (Zero tab) — and each must be blamed only for its own. Reporting "Rifle" whenever the
+            // rifle failed to build named the Rifle tab for a missing zero distance, which sent the
+            // user to stare at a tab whose every field was filled in.
+            if (RifleSubPanel.Sight == null)
             {
-                if (ZeroSubPanel.IsEmpty) emptyPanels.Add("Zero");
-                else incompletePanels.Add("Zero");
+                if (RifleSubPanel.IsEmpty) emptyPanels.Add("Rifle");
+                else incompletePanels.Add("Rifle");
             }
+
+            // The zero distance has no default, so an empty Zero tab cannot be waved through with
+            // "use default values?" the way Weather and Parameters can — there is nothing to default it
+            // to, and the shot would fail to calculate a moment later. It blocks either way.
+            if (ZeroSubPanel.ZeroDistance == null)
+                incompletePanels.Add("Zero");
         }
 
         var parameters = ParametersSubPanel.Parameters;

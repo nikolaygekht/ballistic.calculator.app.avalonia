@@ -25,10 +25,16 @@
 
       <!-- Left: list + add/delete -->
       <DockPanel Grid.Column="0" Margin="0,0,12,0">
+        <!-- Reset replaces this list with the shipped one. It only changes what is on screen, so
+             Cancel still undoes it — nothing is written until OK. -->
         <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="6" Margin="0,6,0,0">
           <Button Content="Add" Click="OnAdd" Width="70"
                   FontSize="{DynamicResource AppFontSize}"/>
           <Button Content="Delete" Click="OnDelete" Width="70"
+                  FontSize="{DynamicResource AppFontSize}"/>
+          <Button x:Name="ResetButton" x:FieldModifier="internal"
+                  Content="Reset" Click="OnReset" Width="70"
+                  ToolTip.Tip="Replace this list with the presets the application ships with"
                   FontSize="{DynamicResource AppFontSize}"/>
         </StackPanel>
         <ListBox x:Name="EntriesList" x:FieldModifier="internal"

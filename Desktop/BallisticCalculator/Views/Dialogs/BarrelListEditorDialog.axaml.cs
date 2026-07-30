@@ -31,7 +31,7 @@ public partial class BarrelListEditorDialog : Window
         StepControl.Minimum = 0;
         ApplyUnits();
 
-        var dictionary = BallisticDictionary.LoadDefault();
+        var dictionary = BallisticDictionary.LoadForUse();
         _sights = dictionary.Sights;
         foreach (var b in dictionary.Barrels)
             _barrels.Add(new BarrelEditModel { Name = b.Name, Step = b.Step, Direction = b.Direction });
@@ -100,6 +100,28 @@ public partial class BarrelListEditorDialog : Window
         NameBox.SelectAll();
     }
 
+    /// <summary>
+    /// Replaces the barrel list with the shipped presets, leaving the sights alone — each editor owns one
+    /// list, and a reset must not undo the user's work in the other one.
+    /// <para>
+    /// This is the way back from a list that has drifted, because the start-up top-up only ever *adds*
+    /// shipped entries it cannot find by name: it will not correct an entry the user has edited, and it
+    /// re-adds one they deleted. Nothing is written until OK, so Cancel undoes a reset.
+    /// </para>
+    /// </summary>
+    internal void OnReset(object? sender, RoutedEventArgs e)
+    {
+        var shipped = BallisticDictionary.LoadShipped();
+        if (shipped.Barrels.Count == 0)
+            return;
+
+        _barrels.Clear();
+        foreach (var b in shipped.Barrels)
+            _barrels.Add(new BarrelEditModel { Name = b.Name, Step = b.Step, Direction = b.Direction });
+
+        EntriesList.SelectedIndex = 0;
+    }
+
     private void OnDelete(object? sender, RoutedEventArgs e)
     {
         if (Current is not { } m) return;
@@ -131,7 +153,7 @@ public partial class BarrelListEditorDialog : Window
 
         try
         {
-            new BallisticDictionary(_sights, entries).SaveDefault();
+            new BallisticDictionary(_sights, entries).SaveUser();
         }
         catch (System.Exception ex)
         {

@@ -199,6 +199,78 @@ public class ReticleOverlayControllerTests
 
     #endregion
 
+    #region The optional target offset
+
+    /// <summary>
+    /// The offset exists so a target of known size can be parked on a reticle's ranging feature — the
+    /// stadia at the lower left of the Specter reticles, for instance — and the scale actually tried.
+    /// Reticle convention: X positive right, Y positive up.
+    /// </summary>
+    [Fact]
+    public void CreateTargetOverlay_WithAnOffset_ShouldMoveTheBoxByExactlyThat()
+    {
+        var calculator = CreateCalculator();
+        var width = new Measurement<DistanceUnit>(6, DistanceUnit.Inch);
+        var height = new Measurement<DistanceUnit>(6, DistanceUnit.Inch);
+        var distance = new Measurement<DistanceUnit>(200, DistanceUnit.Yard);
+
+        var plain = (ReticleRectangle)ReticleOverlayController.CreateTargetOverlay(
+            calculator, width, height, distance)!;
+        var moved = (ReticleRectangle)ReticleOverlayController.CreateTargetOverlay(
+            calculator, width, height, distance, 1.0,
+            new Measurement<AngularUnit>(-25, AngularUnit.MOA),
+            new Measurement<AngularUnit>(-60, AngularUnit.MOA))!;
+
+        (moved.TopLeft!.X - plain.TopLeft!.X).In(AngularUnit.MOA).Should().BeApproximately(-25, 1e-6);
+        (moved.TopLeft.Y - plain.TopLeft.Y).In(AngularUnit.MOA).Should().BeApproximately(-60, 1e-6);
+        moved.Size!.X.Should().Be(plain.Size!.X, "an offset moves the box, it does not resize it");
+        moved.Size.Y.Should().Be(plain.Size.Y);
+    }
+
+    [Fact]
+    public void CreateTargetOverlay_WithNoOffset_ShouldBeUnchanged()
+    {
+        // The parameters are optional and default to no movement, so every existing caller is unaffected.
+        var calculator = CreateCalculator();
+        var width = new Measurement<DistanceUnit>(6, DistanceUnit.Inch);
+        var height = new Measurement<DistanceUnit>(6, DistanceUnit.Inch);
+        var distance = new Measurement<DistanceUnit>(200, DistanceUnit.Yard);
+
+        var plain = (ReticleRectangle)ReticleOverlayController.CreateTargetOverlay(
+            calculator, width, height, distance)!;
+        var explicitZero = (ReticleRectangle)ReticleOverlayController.CreateTargetOverlay(
+            calculator, width, height, distance, 1.0,
+            Measurement<AngularUnit>.ZERO, Measurement<AngularUnit>.ZERO)!;
+
+        explicitZero.TopLeft!.X.Should().Be(plain.TopLeft!.X);
+        explicitZero.TopLeft.Y.Should().Be(plain.TopLeft.Y);
+    }
+
+    [Fact]
+    public void CreateMovingTargetOverlay_WithAnOffset_ShouldMoveWithTheStaticBox()
+    {
+        // The dashed aim-off box has to travel with the target it belongs to, or the lead is read
+        // against nothing.
+        var calculator = CreateCalculator();
+        var width = new Measurement<DistanceUnit>(6, DistanceUnit.Inch);
+        var height = new Measurement<DistanceUnit>(6, DistanceUnit.Inch);
+        var distance = new Measurement<DistanceUnit>(200, DistanceUnit.Yard);
+        var speed = new Measurement<VelocityUnit>(10, VelocityUnit.MilesPerHour);
+        var direction = new Measurement<AngularUnit>(90, AngularUnit.Degree);
+
+        var plain = ReticleOverlayController.CreateMovingTargetOverlay(
+            calculator, width, height, distance, speed, direction)!;
+        var moved = ReticleOverlayController.CreateMovingTargetOverlay(
+            calculator, width, height, distance, speed, direction, 1.0,
+            new Measurement<AngularUnit>(-25, AngularUnit.MOA),
+            new Measurement<AngularUnit>(-60, AngularUnit.MOA))!;
+
+        (moved.TopLeft!.X - plain.TopLeft!.X).In(AngularUnit.MOA).Should().BeApproximately(-25, 1e-6);
+        (moved.TopLeft.Y - plain.TopLeft.Y).In(AngularUnit.MOA).Should().BeApproximately(-60, 1e-6);
+    }
+
+    #endregion
+
     #region CreateTargetOverlay
 
     [Fact]

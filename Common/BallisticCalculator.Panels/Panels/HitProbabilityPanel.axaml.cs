@@ -78,7 +78,14 @@ public partial class HitProbabilityPanel : UserControl
     public ShotData? ShotData
     {
         get => _shotData;
-        set => _shotData = value;
+        set
+        {
+            _shotData = value;
+
+            // The wind and muzzle velocity the percentages are percentages *of* both live on the shot,
+            // so the absolute figures beside those fields change with it.
+            UpdateDeviationHints();
+        }
     }
 
     /// <summary>The last successful estimate; null while the inputs cannot produce one.</summary>
@@ -134,6 +141,14 @@ public partial class HitProbabilityPanel : UserControl
         PositionCombo.SelectionChanged += (_, _) => OnPositionSelected();
         SpreadHInput.ValueChanged += (_, _) => SyncPositionToSpreads();
         SpreadVInput.ValueChanged += (_, _) => SyncPositionToSpreads();
+
+        // The absolute figures under the percentages are arithmetic on the inputs, not results of the
+        // simulation, so they keep up as the user types for the same reason the position and the spread
+        // multipliers do.
+        DistanceControl.Changed += (_, _) => UpdateDeviationHints();
+        RangeErrorInput.ValueChanged += (_, _) => UpdateDeviationHints();
+        WindErrorInput.ValueChanged += (_, _) => UpdateDeviationHints();
+        MvDeviationInput.ValueChanged += (_, _) => UpdateDeviationHints();
     }
 
     /// <summary>
@@ -155,6 +170,83 @@ public partial class HitProbabilityPanel : UserControl
 
         if (GroupControl.IsEmpty)
             GroupControl.SetValue(new Measurement<AngularUnit>(1, AngularUnit.MOA).To(_angularUnits));
+
+        UpdateDeviationHints();
+    }
+
+    #endregion
+
+    #region What the percentages amount to
+
+    /// <summary>
+    /// Echoes each 1σ percentage as the absolute figure it stands for, in the unit it was entered in.
+    /// <para>
+    /// The wind row is the reason this exists. The library's model scales the <b>drift the wind causes</b>
+    /// by the wind error, so on a shot with no wind there is nothing to scale and the field changes the
+    /// answer by exactly nothing — while still reading like a live input. The same is true of any of the
+    /// three whose base quantity is zero, so all three say what they come to.
+    /// </para>
+    /// </summary>
+    /// <remarks>
+    /// Internal rather than private for the same reason <c>BcConverterPanel.Recalculate</c> is: a
+    /// programmatic <c>SetValue</c> raises no change event in headless Avalonia, so a test has to call
+    /// this itself. In the app the control events above do the calling.
+    /// </remarks>
+    internal void UpdateDeviationHints()
+    {
+        var culture = CultureInfo.CurrentCulture;
+
+        var distance = DistanceControl.IsEmpty ? null : DistanceControl.GetValue<DistanceUnit>();
+        RangeErrorAbsText.Text = Fraction(RangeErrorInput) is { } rangeFraction && distance != null
+            ? $"= ±{(distance.Value * rangeFraction).ToString("ND", culture)} at this range"
+            : "";
+
+        var wind = WindAtTarget(distance);
+        WindErrorAbsText.Text = wind == null
+            ? "no wind on this shot — this changes nothing"
+            : Fraction(WindErrorInput) is { } windFraction
+                ? $"= ±{(wind.Velocity * windFraction).ToString("ND", culture)} of a " +
+                  $"{wind.Velocity.ToString("ND", culture)} wind"
+                : "";
+
+        var muzzleVelocity = _shotData?.Ammunition?.Ammunition?.MuzzleVelocity;
+        MvDeviationAbsText.Text = muzzleVelocity == null
+            ? ""
+            : Fraction(MvDeviationInput) is { } mvFraction
+                ? $"= ±{(muzzleVelocity.Value * mvFraction).ToString("ND", culture)} of " +
+                  $"{muzzleVelocity.Value.ToString("ND", culture)}"
+                : "";
+    }
+
+    /// <summary>A percentage field as a plain fraction, or null when it has been cleared.</summary>
+    private static double? Fraction(NumericUpDown input) =>
+        input.Value == null ? (double?)null : (double)input.Value.Value / 100.0;
+
+    /// <summary>
+    /// The wind that reaches the target, or null when the shot has none that would move the bullet.
+    /// Winds are segmented by maximum range, so the one that matters is the first whose segment covers
+    /// the target; the last one in the array runs to the end.
+    /// </summary>
+    private Wind? WindAtTarget(Measurement<DistanceUnit>? distance)
+    {
+        var winds = _shotData?.Winds;
+        if (winds == null || winds.Length == 0)
+            return null;
+
+        Wind? applicable = null;
+        foreach (var wind in winds)
+        {
+            applicable = wind;
+
+            if (wind.MaximumRange == null || distance == null ||
+                wind.MaximumRange.Value.In(DistanceUnit.Meter) >= distance.Value.In(DistanceUnit.Meter))
+                break;
+        }
+
+        // A wind of zero speed is the same as no wind for this purpose: nothing for the error to scale.
+        return applicable != null && applicable.Velocity.In(VelocityUnit.MetersPerSecond) > 0
+            ? applicable
+            : null;
     }
 
     #endregion
@@ -233,14 +325,45 @@ public partial class HitProbabilityPanel : UserControl
         {
             _estimate = HitProbabilityCalculator.Estimate(_shotData, inputs);
         }
-        catch (ArgumentException ex)
+        catch (Exception ex)
         {
-            Clear(ex.Message);
+            Clear(Explain(ex));
             return;
         }
 
         Show(_estimate, inputs);
     }
+
+    /// <summary>
+    /// A sentence for a failed estimate. Whether a load can be zeroed at all, or whether a set of numbers
+    /// integrates, is the calculation's own answer rather than a property of the input, so no validation
+    /// here can prevent either — the estimate has to be able to fail and say so.
+    /// </summary>
+    /// <remarks>
+    /// The sibling mapping for the main window is <c>ShotCalculator.Explain</c>; the advice differs because
+    /// this dialog cannot edit the shot. Anything unrecognised is named rather than smoothed over: it is a
+    /// fault worth reporting, and the status line is all this panel has to report it with — the app's
+    /// exception dialog, with its stack trace and Copy button, is no longer reached from here.
+    /// </remarks>
+    internal static string Explain(Exception ex) => ex switch
+    {
+        ZeroRangeCantBeReachedException =>
+            "This load cannot be zeroed at the shot's zero distance, so there is no come-up to estimate " +
+            "from. Fix the zero in the trajectory window — zero it closer, or give the load a faster " +
+            "muzzle velocity.",
+
+        TrajectoryCannotBeCalculatedException =>
+            "The trajectory cannot be calculated from these numbers. Check the shot's ballistic " +
+            "coefficient, bullet weight and muzzle velocity — a zero or absurd one is the usual cause — " +
+            "and the muzzle velocity deviation entered here.",
+
+        // The library states its own argument faults well enough to show as they are: a non-positive
+        // ballistic coefficient arrives as ArgumentOutOfRangeException, an unresolved .drg for a GC
+        // coefficient as ArgumentNullException.
+        ArgumentException => ex.Message,
+
+        _ => $"The estimate failed: {ex.GetType().Name}: {ex.Message}",
+    };
 
     private bool TryReadInputs(out HitProbabilityInputs inputs, out string problem)
     {

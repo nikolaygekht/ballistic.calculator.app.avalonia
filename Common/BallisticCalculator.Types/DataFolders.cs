@@ -15,8 +15,8 @@ public static class DataFolders
     /// <summary>Reticle definitions (<c>.reticle</c>).</summary>
     public static string Reticles => Path.Combine(Root, "reticle");
 
-    /// <summary>Legacy and current ammunition files (<c>.ammo</c> / <c>.ammox</c>).</summary>
-    public static string LegacyAmmo => Path.Combine(Root, "legacy-ammo");
+    /// <summary>Ammunition files — both formats, <c>.ammox</c> and the legacy <c>.ammo</c>.</summary>
+    public static string Ammo => Path.Combine(Root, "ammo");
 
     /// <summary>Radar/custom drag tables (<c>.drg</c>).</summary>
     public static string Drg => Path.Combine(Root, "drg");
