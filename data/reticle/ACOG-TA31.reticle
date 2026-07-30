@@ -1,0 +1,33 @@
+<!-- Trijicon TA31 (ACOG 4x32) chevron BDC.
+     Chevron tip = 100 m zero; chevron base = 300 m hold and 19 in (silhouette
+     shoulders) at 300 m; the lines below are 400..800 m, each 19 in wide at its
+     own range. Ladder computed for M855 62gr, BC 0.151 G7, 3050 fps (20" barrel), 1:7 RH,
+     2.4 in sight height, ICAO sea level, 100 m zero. -->
+<reticle name="TA31-style 5.56 chevron BDC" size-x="16moa" size-y="40moa" zero-x="8moa" zero-y="4moa">
+  <elements>
+    <reticle-path fill="true" color="red">
+      <elements>
+        <reticle-path-move-to position-x="0moa" position-y="0moa" />
+        <reticle-path-line-to position-x="2.765moa" position-y="-4.073moa" />
+        <reticle-path-line-to position-x="1.865moa" position-y="-4.073moa" />
+        <reticle-path-line-to position-x="0moa" position-y="-1.326moa" />
+        <reticle-path-line-to position-x="-1.865moa" position-y="-4.073moa" />
+        <reticle-path-line-to position-x="-2.765moa" position-y="-4.073moa" />
+      </elements>
+    </reticle-path>
+    <reticle-line start-x="0moa" start-y="-4.073moa" end-x="0moa" end-y="-33.188moa" line-width="0.3moa" line-color="black" />
+    <reticle-line start-x="-2.074moa" start-y="-7.496moa" end-x="2.074moa" end-y="-7.496moa" line-width="0.3moa" line-color="black" />
+    <reticle-line start-x="-1.659moa" start-y="-11.801moa" end-x="1.659moa" end-y="-11.801moa" line-width="0.3moa" line-color="black" />
+    <reticle-line start-x="-1.383moa" start-y="-17.236moa" end-x="1.383moa" end-y="-17.236moa" line-width="0.3moa" line-color="black" />
+    <reticle-line start-x="-1.185moa" start-y="-24.212moa" end-x="1.185moa" end-y="-24.212moa" line-width="0.3moa" line-color="black" />
+    <reticle-line start-x="-1.037moa" start-y="-33.188moa" end-x="1.037moa" end-y="-33.188moa" line-width="0.3moa" line-color="black" />
+  </elements>
+  <bdc>
+    <bdc position-x="0moa" position-y="-4.073moa" text-offset="3.2moa" text-height="1.4moa" />
+    <bdc position-x="0moa" position-y="-7.496moa" text-offset="3.2moa" text-height="1.4moa" />
+    <bdc position-x="0moa" position-y="-11.801moa" text-offset="3.2moa" text-height="1.4moa" />
+    <bdc position-x="0moa" position-y="-17.236moa" text-offset="3.2moa" text-height="1.4moa" />
+    <bdc position-x="0moa" position-y="-24.212moa" text-offset="3.2moa" text-height="1.4moa" />
+    <bdc position-x="0moa" position-y="-33.188moa" text-offset="3.2moa" text-height="1.4moa" />
+  </bdc>
+</reticle>

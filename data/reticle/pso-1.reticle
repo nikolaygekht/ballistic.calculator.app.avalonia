@@ -1,43 +1,95 @@
-<reticle name="PSO-1" size-x="64mil" size-y="64mil" zero-x="32mil" zero-y="32mil">
+<!-- PSO-1 (SVD), in Soviet thousandths (ths = 1/6000 circle = 1.0472 mrad = 3.6 MOA),
+     which is what the scope is graduated in - one windage mark and one drum click of
+     0.5 ths. A 5 cm/100 m click is 0.4775 ths, 4.5% under half a thousandth.
+     The main chevron is the aiming mark for whatever range the elevation drum is dialled
+     to (100..1000 m). The three chevrons below it are long-range holds used ONLY with the
+     drum set to 10 (1000 m): they are then 1100, 1200 and 1300 m.
+     Dialling to 1000 m is 30 vertical clicks (30 x 0.5 ths = 15 ths) up from the 100 m
+     setting. To read the chevrons as 1100/1200/1300 in the app, either set the zero to
+     1000 m, or keep the 100 m zero and enter 30 V-clicks on the Parameters tab with the
+     sight's vertical click set to 0.5 ths on the Rifle tab.
+     Note the drum was cut to the issue firing tables: this model puts the 1000 m come-up
+     at 14.0 ths (28 clicks) rather than 15, about 1 ths less. That affects where the main
+     chevron lands, not the spacing of the three below it.
+     Those three come from a trajectory: 57-N-323S LPS ball 9.6 g, BC 0.400 G1, 830 m/s,
+     65 mm sight height, 1:320 mm RH, ICAO sea level - hold(R) minus hold(1000 m).
+     Lower left is the stadiametric rangefinder: put the target's feet on the horizontal
+     base line and its head on the curve; the numbers are hundreds of metres, 2 nearest
+     the centre and 10 at the far left. Heights are the true 1.7 m subtension.
+     Layout follows the canonical PSO-1 drawing; the circle is the drawn field boundary,
+     not an etched element: it is sized to enclose the etching, while the real 6 deg field is
+     50 ths in radius. -->
+<reticle name="PSO-1 (LPS ball, thousandths)" size-x="79ths" size-y="79ths" zero-x="39.5ths" zero-y="39.5ths">
   <elements>
-    <reticle-circle center-x="0mil" center-y="0mil" radius="32mil" fill="false" line-width="0.2mil" color="black" />
-    <reticle-line start-x="12mil" start-y="0mil" end-x="32mil" end-y="0mil" line-width="0.4mil" line-color="black" />
-    <reticle-line start-x="-12mil" start-y="0mil" end-x="-32mil" end-y="0mil" line-width="0.4mil" line-color="black" />
-    <reticle-line start-x="0mil" start-y="-13mil" end-x="0mil" end-y="-32mil" line-width="0.4mil" line-color="black" />
-    <reticle-line start-x="0mil" start-y="0mil" end-x="-0.4mil" end-y="-1mil" line-width="0.2mil" line-color="black" />
-    <reticle-line start-x="0mil" start-y="0mil" end-x="0.4mil" end-y="-1mil" line-width="0.2mil" line-color="black" />
-    <reticle-line start-x="0mil" start-y="-3.4mil" end-x="-0.4mil" end-y="-4.4mil" line-width="0.2mil" line-color="black" />
-    <reticle-line start-x="0mil" start-y="-3.4mil" end-x="0.4mil" end-y="-4.4mil" line-width="0.2mil" line-color="black" />
-    <reticle-line start-x="0mil" start-y="-7.1mil" end-x="-0.4mil" end-y="-8.1mil" line-width="0.2mil" line-color="black" />
-    <reticle-line start-x="0mil" start-y="-7.1mil" end-x="0.4mil" end-y="-8.1mil" line-width="0.2mil" line-color="black" />
-    <reticle-line start-x="0mil" start-y="-11.2mil" end-x="-0.4mil" end-y="-12.2mil" line-width="0.2mil" line-color="black" />
-    <reticle-line start-x="0mil" start-y="-11.2mil" end-x="0.4mil" end-y="-12.2mil" line-width="0.2mil" line-color="black" />
-    <reticle-line start-x="1mil" start-y="0mil" end-x="1mil" end-y="-1mil" line-width="0.2mil" line-color="black" />
-    <reticle-line start-x="2mil" start-y="0mil" end-x="2mil" end-y="-1mil" line-width="0.2mil" line-color="black" />
-    <reticle-line start-x="3mil" start-y="0mil" end-x="3mil" end-y="-1mil" line-width="0.2mil" line-color="black" />
-    <reticle-line start-x="4mil" start-y="0mil" end-x="4mil" end-y="-1mil" line-width="0.2mil" line-color="black" />
-    <reticle-line start-x="5mil" start-y="0mil" end-x="5mil" end-y="-2mil" line-width="0.2mil" line-color="black" />
-    <reticle-line start-x="6mil" start-y="0mil" end-x="6mil" end-y="-1mil" line-width="0.2mil" line-color="black" />
-    <reticle-line start-x="7mil" start-y="0mil" end-x="7mil" end-y="-1mil" line-width="0.2mil" line-color="black" />
-    <reticle-line start-x="8mil" start-y="0mil" end-x="8mil" end-y="-1mil" line-width="0.2mil" line-color="black" />
-    <reticle-line start-x="9mil" start-y="0mil" end-x="9mil" end-y="-1mil" line-width="0.2mil" line-color="black" />
-    <reticle-line start-x="10mil" start-y="0mil" end-x="10mil" end-y="-2mil" line-width="0.2mil" line-color="black" />
-    <reticle-line start-x="-1mil" start-y="0mil" end-x="-1mil" end-y="-1mil" line-width="0.2mil" line-color="black" />
-    <reticle-line start-x="-2mil" start-y="0mil" end-x="-2mil" end-y="-1mil" line-width="0.2mil" line-color="black" />
-    <reticle-line start-x="-3mil" start-y="0mil" end-x="-3mil" end-y="-1mil" line-width="0.2mil" line-color="black" />
-    <reticle-line start-x="-4mil" start-y="0mil" end-x="-4mil" end-y="-1mil" line-width="0.2mil" line-color="black" />
-    <reticle-line start-x="-5mil" start-y="0mil" end-x="-5mil" end-y="-2mil" line-width="0.2mil" line-color="black" />
-    <reticle-line start-x="-6mil" start-y="0mil" end-x="-6mil" end-y="-1mil" line-width="0.2mil" line-color="black" />
-    <reticle-line start-x="-7mil" start-y="0mil" end-x="-7mil" end-y="-1mil" line-width="0.2mil" line-color="black" />
-    <reticle-line start-x="-8mil" start-y="0mil" end-x="-8mil" end-y="-1mil" line-width="0.2mil" line-color="black" />
-    <reticle-line start-x="-9mil" start-y="0mil" end-x="-9mil" end-y="-1mil" line-width="0.2mil" line-color="black" />
-    <reticle-line start-x="-10mil" start-y="0mil" end-x="-10mil" end-y="-2mil" line-width="0.2mil" line-color="black" />
-    <reticle-text position-x="-10mil" position-y="-4mil" text-height="2mil" text="10" anchor="Center" text-color="black" />
-    <reticle-text position-x="10mil" position-y="-4mil" text-height="2mil" text="10" anchor="Center" text-color="black" />
+    <reticle-circle center-x="0ths" center-y="0ths" radius="38.5ths" fill="false" line-width="0.2ths" color="black" />
+    <reticle-line start-x="-11.98ths" start-y="0ths" end-x="-31.81ths" end-y="0ths" line-width="0.4ths" line-color="black" />
+    <reticle-line start-x="11.98ths" start-y="0ths" end-x="31.81ths" end-y="0ths" line-width="0.4ths" line-color="black" />
+    <reticle-line start-x="0ths" start-y="-12.77ths" end-x="0ths" end-y="-32.71ths" line-width="0.4ths" line-color="black" />
+    <reticle-line start-x="-1ths" start-y="0ths" end-x="-1ths" end-y="-1ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-2ths" start-y="0ths" end-x="-2ths" end-y="-1ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-3ths" start-y="0ths" end-x="-3ths" end-y="-1ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-4ths" start-y="0ths" end-x="-4ths" end-y="-1ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-5ths" start-y="0ths" end-x="-5ths" end-y="-2ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-6ths" start-y="0ths" end-x="-6ths" end-y="-1ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-7ths" start-y="0ths" end-x="-7ths" end-y="-1ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-8ths" start-y="0ths" end-x="-8ths" end-y="-1ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-9ths" start-y="0ths" end-x="-9ths" end-y="-1ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-10ths" start-y="0ths" end-x="-10ths" end-y="-2ths" line-width="0.2ths" line-color="black" />
+    <reticle-text position-x="-10ths" position-y="-4ths" text-height="2ths" text="10" anchor="Center" text-color="black" />
+    <reticle-line start-x="1ths" start-y="0ths" end-x="1ths" end-y="-1ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="2ths" start-y="0ths" end-x="2ths" end-y="-1ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="3ths" start-y="0ths" end-x="3ths" end-y="-1ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="4ths" start-y="0ths" end-x="4ths" end-y="-1ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="5ths" start-y="0ths" end-x="5ths" end-y="-2ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="6ths" start-y="0ths" end-x="6ths" end-y="-1ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="7ths" start-y="0ths" end-x="7ths" end-y="-1ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="8ths" start-y="0ths" end-x="8ths" end-y="-1ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="9ths" start-y="0ths" end-x="9ths" end-y="-1ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="10ths" start-y="0ths" end-x="10ths" end-y="-2ths" line-width="0.2ths" line-color="black" />
+    <reticle-text position-x="10ths" position-y="-4ths" text-height="2ths" text="10" anchor="Center" text-color="black" />
+    <reticle-line start-x="0ths" start-y="0ths" end-x="-0.604ths" end-y="-1ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="0ths" start-y="0ths" end-x="0.604ths" end-y="-1ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="0ths" start-y="-3.165ths" end-x="-0.271ths" end-y="-4.04ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="0ths" start-y="-3.165ths" end-x="0.271ths" end-y="-4.04ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="0ths" start-y="-6.716ths" end-x="-0.271ths" end-y="-7.591ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="0ths" start-y="-6.716ths" end-x="0.271ths" end-y="-7.591ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="0ths" start-y="-10.65ths" end-x="-0.271ths" end-y="-11.525ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="0ths" start-y="-10.65ths" end-x="0.271ths" end-y="-11.525ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-5.01ths" start-y="-19.854ths" end-x="-32.01ths" end-y="-19.854ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-5.31ths" start-y="-11.737ths" end-x="-6.96ths" end-y="-13.361ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-6.96ths" start-y="-13.361ths" end-x="-8.61ths" end-y="-14.443ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-8.61ths" start-y="-14.443ths" end-x="-10.26ths" end-y="-15.216ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-10.26ths" start-y="-15.216ths" end-x="-11.91ths" end-y="-15.796ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-11.91ths" start-y="-15.796ths" end-x="-13.56ths" end-y="-16.247ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-13.56ths" start-y="-16.247ths" end-x="-15.21ths" end-y="-16.607ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-15.21ths" start-y="-16.607ths" end-x="-16.86ths" end-y="-16.902ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-16.86ths" start-y="-16.902ths" end-x="-18.51ths" end-y="-17.148ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-18.51ths" start-y="-17.148ths" end-x="-20.16ths" end-y="-17.356ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-20.16ths" start-y="-17.356ths" end-x="-21.81ths" end-y="-17.535ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-21.81ths" start-y="-17.535ths" end-x="-23.46ths" end-y="-17.689ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-23.46ths" start-y="-17.689ths" end-x="-25.11ths" end-y="-17.825ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-25.11ths" start-y="-17.825ths" end-x="-26.76ths" end-y="-17.944ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-26.76ths" start-y="-17.944ths" end-x="-28.41ths" end-y="-18.05ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-28.41ths" start-y="-18.05ths" end-x="-30.06ths" end-y="-18.145ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-30.06ths" start-y="-18.145ths" end-x="-31.71ths" end-y="-18.231ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-5.31ths" start-y="-11.337ths" end-x="-5.31ths" end-y="-9.537ths" line-width="0.2ths" line-color="black" />
+    <reticle-text position-x="-5.31ths" position-y="-9.037ths" text-height="2ths" text="2" anchor="Center" text-color="black" />
+    <reticle-line start-x="-8.61ths" start-y="-14.043ths" end-x="-8.61ths" end-y="-13.143ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-11.91ths" start-y="-15.396ths" end-x="-11.91ths" end-y="-13.596ths" line-width="0.2ths" line-color="black" />
+    <reticle-text position-x="-11.91ths" position-y="-13.096ths" text-height="2ths" text="4" anchor="Center" text-color="black" />
+    <reticle-line start-x="-15.21ths" start-y="-16.207ths" end-x="-15.21ths" end-y="-15.307ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-18.51ths" start-y="-16.748ths" end-x="-18.51ths" end-y="-14.948ths" line-width="0.2ths" line-color="black" />
+    <reticle-text position-x="-18.51ths" position-y="-14.448ths" text-height="2ths" text="6" anchor="Center" text-color="black" />
+    <reticle-line start-x="-21.81ths" start-y="-17.135ths" end-x="-21.81ths" end-y="-16.235ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-25.11ths" start-y="-17.425ths" end-x="-25.11ths" end-y="-15.625ths" line-width="0.2ths" line-color="black" />
+    <reticle-text position-x="-25.11ths" position-y="-15.125ths" text-height="2ths" text="8" anchor="Center" text-color="black" />
+    <reticle-line start-x="-28.41ths" start-y="-17.65ths" end-x="-28.41ths" end-y="-16.75ths" line-width="0.2ths" line-color="black" />
+    <reticle-line start-x="-31.71ths" start-y="-17.831ths" end-x="-31.71ths" end-y="-16.031ths" line-width="0.2ths" line-color="black" />
+    <reticle-text position-x="-31.71ths" position-y="-15.531ths" text-height="2ths" text="10" anchor="Center" text-color="black" />
   </elements>
   <bdc>
-    <bdc position-x="0mil" position-y="-3.4mil" text-offset="0.5mil" text-height="1.5mil" />
-    <bdc position-x="0mil" position-y="-7.1mil" text-offset="0.5mil" text-height="1.5mil" />
-    <bdc position-x="0mil" position-y="-11.2mil" text-offset="0.5mil" text-height="1.5mil" />
+    <bdc position-x="0ths" position-y="-3.162ths" text-offset="1.5ths" text-height="2ths" />
+    <bdc position-x="0ths" position-y="-6.714ths" text-offset="1.5ths" text-height="2ths" />
+    <bdc position-x="0ths" position-y="-10.647ths" text-offset="1.5ths" text-height="2ths" />
   </bdc>
 </reticle>

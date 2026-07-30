@@ -1,0 +1,46 @@
+<!-- Elcan Specter 1-4X 5.56
+     Ladder computed for M855 62gr, BC 0.151 G7, 2800 fps (16" barrel), 1:7 RH,
+     2.9 in sight height, ICAO sea level, 100 m zero. -->
+<reticle name="Specter 1-4x 5.56 BDC" size-x="140moa" size-y="190moa" zero-x="70moa" zero-y="77moa">
+  <elements>
+    <reticle-line start-x="17.2moa" start-y="0moa" end-x="70moa" end-y="0moa" line-width="5moa" line-color="black" />
+    <reticle-line start-x="-17.2moa" start-y="0moa" end-x="-70moa" end-y="0moa" line-width="5moa" line-color="black" />
+    <reticle-line start-x="0moa" start-y="17moa" end-x="0moa" end-y="77moa" line-width="5moa" line-color="black" />
+    <reticle-line start-x="0moa" start-y="-80moa" end-x="0moa" end-y="-113moa" line-width="2moa" line-color="black" />
+    <reticle-line start-x="-17.2moa" start-y="0moa" end-x="17.2moa" end-y="0moa" line-width="0.5moa" line-color="black" />
+    <reticle-line start-x="0moa" start-y="17.2moa" end-x="0moa" end-y="-22moa" line-width="0.5moa" line-color="black" />
+    <reticle-line start-x="-3.5moa" start-y="-4.9moa" end-x="3.5moa" end-y="-4.9moa" line-width="0.5moa" line-color="black" />
+    <reticle-line start-x="-2.5moa" start-y="-8.9moa" end-x="2.5moa" end-y="-8.9moa" line-width="0.5moa" line-color="black" />
+    <reticle-line start-x="-2moa" start-y="-14.4moa" end-x="2moa" end-y="-14.4moa" line-width="0.5moa" line-color="black" />
+    <reticle-line start-x="-1moa" start-y="-21.2moa" end-x="1moa" end-y="-21.2moa" line-width="0.5moa" line-color="black" />
+    <reticle-circle center-x="0moa" center-y="-30moa" radius="3.5moa" fill="false" line-width="0.25moa" color="black" />
+    <reticle-line start-x="-3moa" start-y="-30moa" end-x="-7moa" end-y="-30moa" line-width="0.25moa" line-color="black" />
+    <reticle-line start-x="3moa" start-y="-30moa" end-x="7moa" end-y="-30moa" line-width="0.25moa" line-color="black" />
+    <reticle-circle center-x="0moa" center-y="-41moa" radius="3moa" fill="false" line-width="0.25moa" color="black" />
+    <reticle-line start-x="-3moa" start-y="-41moa" end-x="-7moa" end-y="-41moa" line-width="0.25moa" line-color="black" />
+    <reticle-line start-x="3moa" start-y="-41moa" end-x="7moa" end-y="-41moa" line-width="0.25moa" line-color="black" />
+    <reticle-circle center-x="0moa" center-y="-53.3moa" radius="2.8moa" fill="false" line-width="0.25moa" color="black" />
+    <reticle-line start-x="-3moa" start-y="-53.3moa" end-x="-7moa" end-y="-53.3moa" line-width="0.25moa" line-color="black" />
+    <reticle-line start-x="3moa" start-y="-53.3moa" end-x="7moa" end-y="-53.3moa" line-width="0.25moa" line-color="black" />
+    <reticle-circle center-x="0moa" center-y="-68.5moa" radius="2.3moa" fill="false" line-width="0.25moa" color="black" />
+    <reticle-line start-x="-3moa" start-y="-68.5moa" end-x="-7moa" end-y="-68.5moa" line-width="0.25moa" line-color="black" />
+    <reticle-line start-x="3moa" start-y="-68.5moa" end-x="7moa" end-y="-68.5moa" line-width="0.25moa" line-color="black" />
+    <reticle-text position-x="5moa" position-y="-5.5moa" text-height="2moa" text="3" anchor="Left" text-color="black" />
+    <reticle-text position-x="5moa" position-y="-15.5moa" text-height="2moa" text="5" anchor="Left" text-color="black" />
+    <reticle-text position-x="5moa" position-y="-22moa" text-height="2moa" text="6" anchor="Left" text-color="black" />
+    <reticle-text position-x="-13moa" position-y="-31moa" text-height="2moa" text="7" anchor="Left" text-color="black" />
+    <reticle-text position-x="-13moa" position-y="-41moa" text-height="2moa" text="8" anchor="Left" text-color="black" />
+    <reticle-text position-x="-13moa" position-y="-53.5moa" text-height="2moa" text="9" anchor="Left" text-color="black" />
+    <reticle-text position-x="-13moa" position-y="-68moa" text-height="2moa" text="10" anchor="Left" text-color="black" />
+  </elements>
+  <bdc>
+    <bdc position-x="0moa" position-y="-4.9moa" text-offset="10moa" text-height="2moa" />
+    <bdc position-x="0moa" position-y="-9moa" text-offset="10moa" text-height="2moa" />
+    <bdc position-x="0moa" position-y="-14.4moa" text-offset="10moa" text-height="2moa" />
+    <bdc position-x="0moa" position-y="-21.2moa" text-offset="10moa" text-height="2moa" />
+    <bdc position-x="0moa" position-y="-30moa" text-offset="10moa" text-height="2moa" />
+    <bdc position-x="0moa" position-y="-41moa" text-offset="10moa" text-height="2moa" />
+    <bdc position-x="0moa" position-y="-53.5moa" text-offset="10moa" text-height="2moa" />
+    <bdc position-x="0moa" position-y="-68.5moa" text-offset="10moa" text-height="2moa" />
+  </bdc>
+</reticle>

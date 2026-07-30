@@ -1,28 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <dictionary>
-    <sights>
-        <sight name=".22LR Iron Sight (US)" sight-height="0.5in" default-zero="25yd" />
-        <sight name=".22LR Optics (US)" sight-height="1.5in" default-zero="25yd" />
-        <sight name="Standard Optics (High, Mil)" sight-height="3in" default-zero="100yd" horizontal-click="0.1mil" vertical-click="0.1mil" />
-        <sight name="Standard Optics (High, Moa)" sight-height="3in" default-zero="100yd" horizontal-click="0.25moa" vertical-click="0.25moa" />
-        <sight name="Elcan Specter@M4" sight-height="2.9in" default-zero="100yd" />
-        <sight name="EOTech@M4" sight-height="2.6in" default-zero="100yd" />
-        <sight name="ACOG TA-32@M4" sight-height="2.8in" default-zero="100yd" horizontal-click="0.5in/100yd" vertical-click="0.5in/100yd" />
-        <sight name="ACOG TA-32@Carry Handle" sight-height="3.5in" default-zero="100yd" horizontal-click="0.5in/100yd" vertical-click="0.5in/100yd" />
-        <sight name="AK Iron Sight" sight-height="5cm" default-zero="100m" />
-        <sight name="M16 Iron Sight" sight-height="2.6in" default-zero="300yd" horizontal-click="0.5in/100yd" vertical-click="1in/100yd" />
-        <sight name="PSO-1 Optics" sight-height="65mm" default-zero="100m" horizontal-click="5cm/100m" vertical-click="5cm/100m" />
-    </sights>
-    <barrels>
-        <barrel name="AK-47" step="240mm" direction="Right" />
-        <barrel name="AK-74" step="200mm" direction="Right" />
-        <barrel name="Barret 82A1" step="15in" direction="Right" />
-        <barrel name="M16A1" step="12in" direction="Right" />
-        <barrel name="M16A3/M4" step="7in" direction="Right" />
-        <barrel name="FN SCAR 17S" step="12in" direction="Right" />
-        <barrel name="FN SCAR 16S" step="7in" direction="Right" />
-        <barrel name="FN P90" step="9in" direction="Right" />
-        <barrel name="Ruger 10/22" step="16in" direction="Right" />
-        <barrel name="Ruger Mini-14" step="9in" direction="Right" />
-        <barrel name="M24" step="12in" direction="Right" />
-    </barrels>
+  <sights>
+    <sight name=".22LR Iron Sight (US)" sight-height="0.5in" default-zero="25yd" />
+    <sight name=".22LR Optics (US)" sight-height="1.5in" default-zero="25yd" />
+    <sight name="ACOG TA-32@Carry Handle" sight-height="3.5in" default-zero="100yd" horizontal-click="0.5in/100yd" vertical-click="0.5in/100yd" />
+    <sight name="ACOG TA-32@M4" sight-height="2.8in" default-zero="100yd" horizontal-click="0.5in/100yd" vertical-click="0.5in/100yd" />
+    <sight name="AK Iron Sight" sight-height="5cm" default-zero="100m" />
+    <sight name="Elcan Specter@M4" sight-height="2.9in" default-zero="100yd" />
+    <sight name="EOTech@M4" sight-height="2.6in" default-zero="100yd" />
+    <sight name="M16 Iron Sight" sight-height="2.6in" default-zero="300yd" horizontal-click="0.5in/100yd" vertical-click="1in/100yd" />
+    <sight name="PSO-1 Optics" sight-height="65mm" default-zero="100m" horizontal-click="5cm/100m" vertical-click="5cm/100m" />
+    <sight name="Standard Optics (High, Mil)" sight-height="3in" default-zero="100yd" horizontal-click="0.1mil" vertical-click="0.1mil" />
+    <sight name="Standard Optics (High, Moa)" sight-height="3in" default-zero="100yd" horizontal-click="0.25moa" vertical-click="0.25moa" />
+  </sights>
+  <barrels>
+    <barrel name="Mosin-Nagant" step="240mm" direction="Right" />
+    <barrel name="SVD (early)" step="320mm" direction="Right" />
+    <barrel name="SVD (late)" step="240mm" direction="Right" />
+    <barrel name="AK-47" step="240mm" direction="Right" />
+    <barrel name="AK-74" step="200mm" direction="Right" />
+    <barrel name="Barret 82A1" step="15in" direction="Right" />
+    <barrel name="FN P90" step="9in" direction="Right" />
+    <barrel name="FN SCAR 16S" step="7in" direction="Right" />
+    <barrel name="FN SCAR 17S" step="12in" direction="Right" />
+    <barrel name="M16A1" step="12in" direction="Right" />
+    <barrel name="M16A3/M4" step="7in" direction="Right" />
+    <barrel name="M24" step="12in" direction="Right" />
+    <barrel name="Ruger 10/22" step="16in" direction="Right" />
+    <barrel name="Ruger Mini-14" step="9in" direction="Right" />
+    <barrel name="M2 Browning" step="15in" direction="Right" />
+  </barrels>
 </dictionary>
