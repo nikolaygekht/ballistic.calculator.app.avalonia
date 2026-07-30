@@ -1,16 +1,16 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
+using Avalonia;
 using BallisticCalculator.Reticle.Data;
 using BallisticCalculator.Serialization;
 using Gehtsoft.Measurements;
 using ReticleEditor.Utilities;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System;
 
 namespace ReticleEditor.Views;
 
@@ -24,9 +24,24 @@ public partial class MainWindow : Window
     private Models.CombinedElementsView? _elementsView = null;
     private AngularUnit _coordinateDisplayUnit = AngularUnit.Mil;
 
+    private const string BaseTitle = "Reticle Editor";
+
+    private bool _isDirty;
+    private bool _closeConfirmed;
+    private bool _promptOpen;
+
+    /// <summary>
+    /// The parameter fields as they stood when the document was last clean. Filling those controls makes
+    /// them raise Changed — partly synchronously, partly posted to the dispatcher — so the echo of a load
+    /// is told from a real edit by comparing content rather than by timing.
+    /// </summary>
+    private string _cleanFields = "";
+
     public MainWindow()
     {
         InitializeComponent();
+
+        UnsavedChangesPrompt = ShowUnsavedChangesPromptAsync;
 
         // Initialize measurement controls with AngularUnit type and default to Mil
         ReticleWidth.UnitType = typeof(Gehtsoft.Measurements.AngularUnit);
@@ -56,9 +71,191 @@ public partial class MainWindow : Window
         // Load and apply saved window state
         LoadWindowState();
 
-        // Save state when closing
+        // Save state when closing — and, since 2026-07-29, guard the document first
         Closing += OnWindowClosing;
+
+        // Watch the parameter fields: a typed-but-uncommitted name or size is still work to lose.
+        WireDirtyTracking();
+        MarkClean();
     }
+
+    #region Unsaved changes (finding F-6)
+
+    /// <summary>True when the document holds changes that are not in a file.</summary>
+    internal bool IsDirty => _isDirty;
+
+    /// <summary>
+    /// Asks the user what to do about unsaved changes. A property so tests can answer it — the production
+    /// implementation is a modal window, which a headless run cannot dismiss.
+    /// </summary>
+    internal Func<Task<UnsavedChangesChoice>> UnsavedChangesPrompt { get; set; }
+
+    /// <summary>Replaces the Save As file picker in tests (a picker cannot be answered headless).</summary>
+    internal Func<Task>? SaveAsOverride { get; set; }
+
+    private void WireDirtyTracking()
+    {
+        // The property change rather than TextChanged: the routed event does not reach a control that is
+        // not in a visual tree, which makes it untestable and is a fragile thing to depend on anyway.
+        ReticleName.PropertyChanged += (_, e) =>
+        {
+            if (e.Property == TextBox.TextProperty)
+                OnParameterFieldChanged();
+        };
+
+        ReticleWidth.Changed += (_, _) => OnParameterFieldChanged();
+        ReticleHeight.Changed += (_, _) => OnParameterFieldChanged();
+        ZeroOffsetX.Changed += (_, _) => OnParameterFieldChanged();
+        ZeroOffsetY.Changed += (_, _) => OnParameterFieldChanged();
+    }
+
+    /// <summary>
+    /// A parameter field changed. Only this path needs the content check: a load fills these controls and
+    /// their notifications must not read as the user typing. Everything else that dirties the document is a
+    /// direct call from a command, which can never be an echo.
+    /// </summary>
+    private void OnParameterFieldChanged()
+    {
+        if (FieldSnapshot() != _cleanFields)
+            MarkDirty();
+    }
+
+    /// <summary>The parameter fields as one comparable string.</summary>
+    private string FieldSnapshot() =>
+        string.Join("|",
+            ReticleName.Text,
+            ReticleWidth.GetValue<AngularUnit>()?.ToString() ?? "",
+            ReticleHeight.GetValue<AngularUnit>()?.ToString() ?? "",
+            ZeroOffsetX.GetValue<AngularUnit>()?.ToString() ?? "",
+            ZeroOffsetY.GetValue<AngularUnit>()?.ToString() ?? "");
+
+    private void MarkDirty()
+    {
+        if (_isDirty)
+            return;
+
+        _isDirty = true;
+        UpdateTitle();
+    }
+
+    private void MarkClean()
+    {
+        _isDirty = false;
+        _cleanFields = FieldSnapshot();
+        UpdateTitle();
+    }
+
+    /// <summary>The title names the file and marks unsaved changes with an asterisk.</summary>
+    private void UpdateTitle()
+    {
+        var name = string.IsNullOrEmpty(_currentFileName)
+            ? "(unsaved)"
+            : System.IO.Path.GetFileName(_currentFileName);
+
+        Title = $"{BaseTitle} — {name}{(_isDirty ? " *" : "")}";
+    }
+
+    /// <summary>
+    /// True when it is safe to throw the current document away. Prompts only when there is something to
+    /// lose; a Save that does not happen — a cancelled picker, a failed write — leaves the document dirty
+    /// and therefore stops the operation, because proceeding would lose the work the user asked to keep.
+    /// </summary>
+    internal async Task<bool> ConfirmDiscardChangesAsync()
+    {
+        if (!_isDirty)
+            return true;
+
+        // One prompt at a time, whatever asks. Not a fix for anything observed — the prompt "vanishing and
+        // coming back" on Linux under WSLg turned out to be that platform's modal handling (Windows shows
+        // one dialog and merely flashes it when the owner is clicked) — but a guard that can open twice is
+        // a guard whose answer is ambiguous, and key repeat or a double-clicked menu item would do it.
+        if (_promptOpen)
+            return false;
+
+        _promptOpen = true;
+        try
+        {
+            return await AskAndActAsync();
+        }
+        finally
+        {
+            _promptOpen = false;
+        }
+    }
+
+    private async Task<bool> AskAndActAsync()
+    {
+        switch (await UnsavedChangesPrompt())
+        {
+            case UnsavedChangesChoice.Save:
+                await SaveAsync();
+                return !_isDirty;
+
+            case UnsavedChangesChoice.Discard:
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
+    /// <summary>The Save / Don't Save / Cancel prompt.</summary>
+    private async Task<UnsavedChangesChoice> ShowUnsavedChangesPromptAsync()
+    {
+        var choice = UnsavedChangesChoice.Cancel;
+
+        var name = string.IsNullOrEmpty(_currentFileName)
+            ? "this reticle"
+            : System.IO.Path.GetFileName(_currentFileName);
+
+        var dialog = new Window
+        {
+            Title = "Unsaved changes",
+            Width = 420,
+            SizeToContent = SizeToContent.Height,
+            MinHeight = 140,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            CanResize = false,
+        };
+
+        // MinWidth rather than Width: the labels are laid out in the app font, which the user can grow, and
+        // a fixed 90 px clipped "Don't Save" as soon as they did.
+        var saveButton = new Button { Content = "Save", MinWidth = 90, Padding = new Thickness(12, 4), IsDefault = true };
+        var discardButton = new Button { Content = "Don't Save", MinWidth = 90, Padding = new Thickness(12, 4) };
+        var cancelButton = new Button { Content = "Cancel", MinWidth = 90, Padding = new Thickness(12, 4), IsCancel = true };
+
+        saveButton.Click += (_, _) => { choice = UnsavedChangesChoice.Save; dialog.Close(); };
+        discardButton.Click += (_, _) => { choice = UnsavedChangesChoice.Discard; dialog.Close(); };
+        cancelButton.Click += (_, _) => { choice = UnsavedChangesChoice.Cancel; dialog.Close(); };
+
+        dialog.Content = new DockPanel
+        {
+            Children =
+            {
+                new StackPanel
+                {
+                    Orientation = Avalonia.Layout.Orientation.Horizontal,
+                    HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+                    Spacing = 10,
+                    Margin = new Thickness(0, 10),
+                    [DockPanel.DockProperty] = Dock.Bottom,
+                    Children = { saveButton, discardButton, cancelButton },
+                },
+                new TextBlock
+                {
+                    Text = $"{name} has changes that have not been saved.\n\nSave them?",
+                    TextWrapping = TextWrapping.Wrap,
+                    Margin = new Thickness(15),
+                    VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
+                },
+            },
+        };
+
+        await dialog.ShowDialog(this);
+        return choice;
+    }
+
+    #endregion
 
     #region Window State Management
 
@@ -85,8 +282,26 @@ public partial class MainWindow : Window
         }
     }
 
-    private void OnWindowClosing(object? sender, WindowClosingEventArgs e)
+    /// <summary>
+    /// Guards the document before the window goes. The event cannot be awaited, so an unsaved document
+    /// cancels the close, asks, and closes again once answered — <see cref="_closeConfirmed"/> is what
+    /// stops the second pass from asking twice.
+    /// </summary>
+    private async void OnWindowClosing(object? sender, WindowClosingEventArgs e)
     {
+        if (!_closeConfirmed && _isDirty)
+        {
+            e.Cancel = true;
+
+            if (await ConfirmDiscardChangesAsync())
+            {
+                _closeConfirmed = true;
+                Close();
+            }
+
+            return;
+        }
+
         SaveWindowState();
     }
 
@@ -158,8 +373,14 @@ public partial class MainWindow : Window
     // File Menu
     private async void OnFileNew(object? sender, RoutedEventArgs e)
     {
+        if (!await ConfirmDiscardChangesAsync())
+        {
+            StatusArea.Text = "New reticle cancelled";
+            return;
+        }
+
         // Create a new reticle with default values
-        _currentReticle = new ReticleDefinition
+        LoadReticle(new ReticleDefinition
         {
             Name = "New Reticle",
             Size = new ReticlePosition
@@ -172,19 +393,39 @@ public partial class MainWindow : Window
                 X = new Measurement<AngularUnit>(5, AngularUnit.Mil),
                 Y = new Measurement<AngularUnit>(5, AngularUnit.Mil)
             }
-        };
+        }, fileName: null);
 
-        _currentFileName = null;
+        StatusArea.Text = "New reticle created";
+    }
+
+    /// <summary>
+    /// Makes <paramref name="reticle"/> the document and refreshes everything that shows it. The document
+    /// starts clean: what is on screen is what is in the file (or, for a new reticle, nothing worth
+    /// keeping yet).
+    /// </summary>
+    internal void LoadReticle(ReticleDefinition? reticle, string? fileName)
+    {
+        _currentReticle = reticle;
+        _currentFileName = fileName;
+
         UpdateReticleControls();
         UpdateElementsList();
         UpdateReticlePreview();
         UpdateElementButtonStates();
-        StatusArea.Text = "New reticle created";
-        await Task.CompletedTask;
+
+        // Last, so the snapshot it takes is of the loaded values: any later echo from those controls then
+        // compares equal and does not dirty the document.
+        MarkClean();
     }
 
     private async void OnFileOpen(object? sender, RoutedEventArgs e)
     {
+        if (!await ConfirmDiscardChangesAsync())
+        {
+            StatusArea.Text = "Open cancelled";
+            return;
+        }
+
         var storageProvider = StorageProvider;
         if (storageProvider == null) return;
 
@@ -210,13 +451,7 @@ public partial class MainWindow : Window
                 try
                 {
                     // Load reticle from file using BallisticXmlDeserializer
-                    _currentReticle = BallisticXmlDeserializer.ReadFromFile<ReticleDefinition>(path);
-                    _currentFileName = path;
-
-                    UpdateReticleControls();
-                    UpdateElementsList();
-                    UpdateReticlePreview();
-                    UpdateElementButtonStates();
+                    LoadReticle(BallisticXmlDeserializer.ReadFromFile<ReticleDefinition>(path), path);
 
                     StatusArea.Text = $"Opened: {System.IO.Path.GetFileName(path)}";
                 }
@@ -240,7 +475,7 @@ public partial class MainWindow : Window
 
         if (string.IsNullOrEmpty(_currentFileName))
         {
-            await SaveAsAsync();
+            await (SaveAsOverride?.Invoke() ?? SaveAsAsync());
             return;
         }
 
@@ -303,7 +538,11 @@ public partial class MainWindow : Window
         }
     }
 
-    private void SaveToFile(string path)
+    /// <summary>
+    /// Writes the document. The dirty flag is cleared only on a successful write — a failed save leaves
+    /// the document unsaved, which is what the close guard needs to know.
+    /// </summary>
+    internal void SaveToFile(string path)
     {
         if (_currentReticle == null)
             return;
@@ -315,6 +554,7 @@ public partial class MainWindow : Window
         {
             BallisticXmlSerializer.SerializeToFile(_currentReticle, path);
             StatusArea.Text = $"Saved: {System.IO.Path.GetFileName(path)}";
+            MarkClean();
         }
         catch (System.Exception ex)
         {
@@ -503,9 +743,13 @@ public partial class MainWindow : Window
 
     #region Reticle Management
 
-    private void OnSetReticleParameters(object? sender, RoutedEventArgs e)
+    private void OnSetReticleParameters(object? sender, RoutedEventArgs e) => SetReticleParameters();
+
+    /// <summary>Commits the parameter fields into the document — what the <b>Set</b> button does.</summary>
+    internal void SetReticleParameters()
     {
         CommitReticleParameters();
+        MarkDirty();
         UpdateReticlePreview();
         UpdateElementButtonStates();
         StatusArea.Text = "Reticle parameters updated";
@@ -803,20 +1047,30 @@ public partial class MainWindow : Window
             return;
         }
 
+        AddElement(newElement);
+        StatusArea.Text = $"Added new {newElement.GetType().Name}";
+    }
+
+    /// <summary>Adds an element (or BDC point) to the document and selects it.</summary>
+    internal void AddElement(object newElement)
+    {
+        if (_currentReticle == null) return;
+
         // Add to appropriate collection
         if (newElement is ReticleElement element)
             _currentReticle.Elements.Add(element);
         else if (newElement is ReticleBulletDropCompensatorPoint bdc)
             _currentReticle.BulletDropCompensator.Add(bdc);
+        else
+            return;
 
+        MarkDirty();
         RefreshElementsList();
         UpdateReticlePreview();
 
         // Select newly added item
         if (_elementsView != null && _elementsView.Count > 0)
             ReticleItems.SelectedIndex = _elementsView.Count - 1;
-
-        StatusArea.Text = $"Added new {newElement.GetType().Name}";
     }
 
     private async void OnEditElement(object? sender, RoutedEventArgs e)
@@ -844,13 +1098,17 @@ public partial class MainWindow : Window
             return;
         }
 
+        MarkDirty();
         RefreshElementsList();
         UpdateReticlePreview();
 
         StatusArea.Text = $"Edited {selectedElement.GetType().Name}";
     }
 
-    private void OnDeleteElement(object? sender, RoutedEventArgs e)
+    private void OnDeleteElement(object? sender, RoutedEventArgs e) => DeleteSelectedElement();
+
+    /// <summary>Removes the selected element (or BDC point) from the document.</summary>
+    internal void DeleteSelectedElement()
     {
         if (_currentReticle == null) return;
 
@@ -886,6 +1144,7 @@ public partial class MainWindow : Window
             }
         }
 
+        MarkDirty();
         RefreshElementsList();
         UpdateReticlePreview();
 
@@ -925,6 +1184,7 @@ public partial class MainWindow : Window
 
         if (clone == null) return;
 
+        MarkDirty();
         RefreshElementsList();
         UpdateReticlePreview();
 
@@ -985,6 +1245,7 @@ public partial class MainWindow : Window
             return;
         }
 
+        MarkDirty();
         UpdateReticlePreview();
         StatusArea.Text = $"Moved {selected.GetType().Name} {(delta < 0 ? "up" : "down")}";
     }

@@ -15,8 +15,8 @@
         <!-- Menu Bar -->
         <Menu DockPanel.Dock="Top" FontSize="{DynamicResource AppFontSize}">
             <MenuItem Header="_File">
-                <MenuItem Header="_New" Click="OnFileNew" InputGesture="Ctrl+N" />
-                <MenuItem Header="_Open..." Click="OnFileOpen" InputGesture="Ctrl+O" />
+                <MenuItem x:Name="MenuFileNew" Header="_New" Click="OnFileNew" InputGesture="Ctrl+N" />
+                <MenuItem x:Name="MenuFileOpen" Header="_Open..." Click="OnFileOpen" InputGesture="Ctrl+O" />
                 <MenuItem Header="_Save" Click="OnFileSave" InputGesture="Ctrl+S" />
                 <MenuItem Header="Save _As..." Click="OnFileSaveAs" InputGesture="Ctrl+Shift+S" />
                 <Separator />
