@@ -36,6 +36,16 @@ model, muzzle velocity (and the barrel it implies), twist, sight height, atmosph
 inputs to reproduce it: enter them in the dialog and the labels the application draws should land on the
 etched ranges.
 
+Most of those loads are in the shipped ammunition library, so `Load` on the Ammunition tab saves the typing:
+
+| Reticle | Library entry | |
+|---|---|---|
+| `ACOG-TA31` | `.223/XM855 Ammo` | exactly the ladder's load (BC 0.151 G7, 3050 ft/s, 20 in) |
+| `SPECTER-5.56` | `.223/XM855 Ammo` | same bullet — change the muzzle velocity to 2800 ft/s for the 16 in barrel |
+| `ACOG-TA648` | `50BMG M2` | 710 gr at 2830 ft/s against the ladder's 709 at 2810 |
+| `VCOG16-300BLK` | `.300 AAC/.300 AAC 115gr` and `.300 AAC 208gr Hornady` | 2295 and 1020 ft/s against the ladder's 2330 and 1010 — close enough that the marks land where they should |
+| `PSO-1` | `7.62x54/57N323S` | the LPS ball the chevrons were computed from |
+
 ---
 
 ## The files
