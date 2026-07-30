@@ -62,7 +62,7 @@ The one subdirectory that matters is **`data`**:
 | Path | Holds |
 |---|---|
 | `data/drg` | Custom drag tables (`.drg`) — a large set of radar-derived Lapua tables, plus others |
-| `data/reticle` | Reticle definitions (`.reticle`) — Mil-Dot, MOA, BDC, chevron, German #4, PSO-1, segmented, and an M16 iron-sight picture |
+| `data/reticle` | Reticle definitions (`.reticle`) — Mil-Dot, H58 and MOA grids, German #4, PSO-1, an M16 iron-sight picture, and four real optics with calibrated drop ladders (Trijicon TA31, TA648 and V-COG 300 BLK, Elcan Specter). `README.md` there describes each one and its calibration |
 | `data/legacy-ammo` | The sample ammunition library (`.ammo` / `.ammox`), organised by cartridge |
 | `data/dictionaries.xml` | The sight and barrel presets |
 

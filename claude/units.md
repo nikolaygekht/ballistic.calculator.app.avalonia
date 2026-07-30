@@ -6,7 +6,13 @@ the handful of decisions that need a yes before the work starts.
 
 ## The three rules
 
-1. **A dialog is either imperial or metric — never both.** No field opts out.
+1. **A dialog is either imperial or metric — never both.** No field opts out. **One carve-out, settled
+   2026-07-29:** a value *loaded from a file* keeps the units it was saved in. A load saved as `0.308 in`
+   or `3.4 g` is the author's own record of that load, and restating it in the window's system would throw
+   that record away — the same reasoning as precision transparency. So an imperial window showing a metric
+   loaded ammunition is correct, not a bug (see `07-28.md` F-3, closed as not-a-defect). The exception to
+   the exception: a `.drg` header stores SI (kg / m) as an artefact of the file format, carrying no user
+   intent, so those values *are* converted to the panel's units on load.
 2. **Angular units are a separate axis.** MOA / mil / mrad / thousandths / in-100yd / cm-100m is the
    user's own choice (View → Angular Units) and does **not** follow the measurement system. Scope
    clicks in the sight dictionary are always mil. This is deliberate: a metric shooter with an MOA

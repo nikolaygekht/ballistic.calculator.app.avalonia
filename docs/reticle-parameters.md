@@ -29,7 +29,7 @@ drawn. It is not your scope's field of view and it is not related to magnificati
 angular space your drawing needs.
 
 **Zero** places the aiming point within that rectangle, measured from the **top-left corner**, X rightwards
-and Y downwards. For the shipped Mil-Dot reticle the size is 12 × 12 mil and the zero is 6 / 6 mil: dead
+and Y downwards. For the shipped Mil-Dot reticle the size is 12 × 12 mrad and the zero is 6 / 6 mrad: dead
 centre.
 
 **Element coordinates are then measured from the zero point** — and this is the flip that catches people:
@@ -37,7 +37,7 @@ centre.
 - **X is positive to the right**, negative to the left.
 - **Y is positive upwards**, negative downwards.
 
-So a drop mark 2 mil below the crosshair is at `Y = −2`, and the shipped Mil-Dot file draws its crosshair as
+So a drop mark 2 mrad below the crosshair is at `Y = −2`, and the shipped Mil-Dot file draws its crosshair as
 a line from `(−5, 0)` to `(5, 0)` and another from `(0, −5)` to `(0, 5)`, with a circle centred on `(0, 0)`.
 
 That is two different conventions in one dialog — the zero measured from a corner, the elements measured

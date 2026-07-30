@@ -97,6 +97,7 @@ planned** — the structure is listed in full so you can see what is coming and 
 - Units and measurement systems — every unit the app accepts, and the angular-unit choice
 - File formats — `.drg`, ammunition, reticles and the saved shot, by hand
 - What the model does and does not include — how far to trust the numbers
+- [Known problems](known-problems.md) — what is known, what is ours, and what is the platform's fault
 - Troubleshooting and FAQ — the recurring stumbles, each pointing at the article that explains it
 - [Recommended reading](recommended-reading.md) — the ballistics this guide deliberately does not teach
 

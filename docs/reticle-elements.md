@@ -49,7 +49,7 @@ Elements are drawn in the order they appear, so **later elements cover earlier o
 | Field | Notes |
 |---|---|
 | **Start Point** X / Y, **End Point** X / Y | Both ends, in reticle coordinates |
-| **Line Width** | Angular, like everything else. In the shipped Mil-Dot, `0.01 mil` is the hairline crosshair and `0.2 mil` the heavy outer bars |
+| **Line Width** | Angular, like everything else. In the shipped Mil-Dot, `0.01 mrad` is the hairline crosshair and `0.2 mrad` the heavy outer bars |
 | **Style** | `Solid`, `Dashed` or `Dotted` |
 | **Color** | 28 named colours, from `black` and `white` through `gray`, `red`, `darkblue`, `gold` and the rest |
 

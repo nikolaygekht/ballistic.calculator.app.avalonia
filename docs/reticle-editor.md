@@ -25,9 +25,11 @@ Because the sight picture is only as truthful as the reticle behind it. The
 a target fits between them, where a moving-target lead sits. All of that is worthless if the marks are on
 the wrong subtensions.
 
-Nine reticles ship in `data/reticle` — `mildot`, `h58`, `moa`, `bdc`, `chevron`, `german4`, `pso-1`,
-`segmented` and an M16 iron-sight picture — and they cover the common patterns. Your scope's reticle is
-quite possibly not among them, and this is what you use to describe it.
+Ten reticles ship in `data/reticle` — grids (`MILDOT`, `H58`, `MOA-GRID`), hunting and military pictures
+(`GERMAN4`, `PSO-1`, an M16 iron sight) and four renderings of real optics with calibrated drop ladders
+(`ACOG-TA31`, `ACOG-TA648`, `VCOG16-300BLK`, `SPECTER-5.56`); `data/reticle/README.md` describes them. They
+cover the common patterns, but your scope's reticle is quite possibly not among them, and this is what you
+use to describe it.
 
 Three other reasons people end up here:
 
@@ -45,6 +47,23 @@ It is not a drawing program. There is **no freehand, no dragging, no zoom or pan
 element is described by numbers you type — an angular position, an angular size — and the preview shows the
 result. That sounds austere, and it is the right trade: a reticle is a measuring instrument, and 1.5 mil
 means 1.5 mil, not "about here".
+
+## Letting an AI assistant draw it instead
+
+A busy reticle is a lot of typing — a mil-dot grid is dozens of elements, each with its own coordinates.
+If you use **Claude Code** or **Codex**, there is a skill that writes the file for you:
+[**reticle-designer**](https://github.com/gehtsoft-usa/BallisticCalculator1/tree/main/SKILL/SKILLS/reticle-designer),
+in the original BallisticCalculator repository.
+
+You describe the reticle in plain language — the angular units, the field of view, the central aiming
+feature, hash spacing, a holdover ladder or wind grid, labels and colours, or simply the name of a
+commercial reticle to imitate (H58, TReMoR, MOAR) — and it emits a `.reticle` file in the same BXml format
+this editor reads, plus an SVG preview and a subtension table to check it against.
+
+Drop the result into `data/reticle` and it opens here like any other file, so the editor becomes the place
+you *adjust* a generated reticle rather than the place you type every element by hand. Worth knowing about
+before you hand-write the XML yourself: the format ignores what it does not understand, so a typo is a
+silently missing element rather than an error.
 
 ## The window
 
@@ -81,9 +100,17 @@ immediately available to the sight picture.
 | `Ctrl+S` | Save |
 | `Ctrl+Shift+S` | Save As |
 
-**Nothing warns you about unsaved changes.** `File → New` replaces what you are working on without asking,
-and closing the window does not prompt either. Save early and often, and use `Save As` before an
-experiment.
+**Unsaved changes are guarded.** `File → New`, `File → Open` and closing the window all ask first when the
+reticle has changes that are not in a file, offering **Save**, **Don't Save** and **Cancel**. Cancel leaves
+the drawing exactly as it was; so does picking Save and then cancelling the file picker. The window title
+carries the file name and an asterisk while there are unsaved changes:
+
+```
+Reticle Editor — mildot.reticle *
+```
+
+The editor has **no undo**, so `Save As` before an experiment remains the safe habit — the guard protects
+you from losing the drawing, not from changing it.
 
 ## Next
 

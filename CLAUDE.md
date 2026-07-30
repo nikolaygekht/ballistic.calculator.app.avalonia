@@ -15,7 +15,7 @@ Create a new version of the BallisticCalculator application using **Avalonia UI*
   - Provides generic `Measurement<T>` struct where T is a unit enum (DistanceUnit, VelocityUnit, WeightUnit, etc.)
   - Static method: `Measurement<T>.GetUnitNames()` returns `Tuple<T, string>[]` for populating unit lists
 
-- **BallisticCalculator** (NuGet **1.1.12**; the `PackageReference`s pin exact versions, they are not ranges):
+- **BallisticCalculator** (NuGet **1.1.13**; the `PackageReference`s pin exact versions, they are not ranges):
   Core ballistic calculation library.
   Source at `/mnt/d/develop/components/BusinessSpecificComponents/BallisticCalculator.Net/`.
   - Provides `BallisticCoefficient` struct, `DragTableId` enum, and the calculation engine.
@@ -40,7 +40,16 @@ Create a new version of the BallisticCalculator application using **Avalonia UI*
     pressure, and only for calls that passed a humidity). New `Atmosphere.DensityAltitude` — the
     standard-atmosphere altitude matching this air's density; note its baseline is the ICAO sea-level density,
     **not** `Atmosphere.StandardDensity` (they differ ~0.005%, about 1.9 ft, and are not interchangeable).
-  - Consult the `ballistic-calculator` skill before using this API; it reflects the 1.1.12 surface.
+  - **Named failures (1.1.13):** the engine now raises its own exception types instead of a bare
+    `InvalidOperationException`, so the UI can tell a bad input from a bug:
+    `ZeroRangeCantBeReachedException` (the load cannot reach the zero distance) and
+    `TrajectoryCannotBeCalculatedException` (the numbers do not integrate — a zero BC, weight or muzzle
+    velocity). Both derive from `InvalidOperationException`, so catch them **before** any broader handler.
+    Mapped to user-facing sentences in `ShotCalculator.Explain`; everything else keeps its stack trace.
+  - **`MilDotReticle`** is built in **milliradians** (12 mrad across, zero at 6 mrad, marks on whole mrad) —
+    note `AngularUnit.Mil` is the military mil, 1/6400 of a circle, and ~1.9 % off a milliradian.
+  - Consult the `ballistic-calculator` skill before using this API; it describes the **1.1.13+** surface,
+    including both named exceptions and `MilDotReticle` in milliradians.
 
 ### Original Implementation
 - **Old WinForms Application**: `/mnt/d/develop/homeapps.projects/BallisticCalculator1/`
@@ -76,7 +85,7 @@ BallisticCalculator2/
 ### Core domain helpers (`Common/BallisticCalculator.Types/`)
 
 - **`ShotTrajectoryCalculator`** — the ONLY place that turns a `ShotData` into a trajectory. `Calculate`
-  (display, uses configured step/max) and `CalculateFine` (2.5 m step, ≥1500 m). Table/chart use the
+  (display, uses configured step/max) and `CalculateFine` (2.5 m step, ≥3000 m). Table/chart use the
   coarse trajectory; reticle + summary share one fine trajectory. Add new consumers here, don't
   re-implement the calc.
 - **`ZeroingData`** owns all zeroing inputs (distance, zero ammo/atmosphere, V/H offsets, wind, shot

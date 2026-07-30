@@ -22,12 +22,14 @@ size printed underneath.*
 
 The view starts empty — the name reads **(none)** and there is nothing to draw on.
 
-- **`Mil-Dot`** loads the shipped `mildot.reticle` in one click — enough for most purposes. Its dots are
-  spaced at whole **milliradians**, as a mil-dot reticle's should be.
-- **`Load…`** opens the `data/reticle` folder, which ships with several: `mildot`, `h58` (a
-  milliradian grid for high magnification), `moa`, `bdc`, `chevron`, `german4`, `pso-1`, `segmented`, and
-  an M16 iron-sight picture. Your own reticles, built in the separate **Reticle Editor** application, live
-  here too.
+- **`Mil-Dot`** draws a standard mil-dot reticle in one click — 12 × 12 mrad, dots at whole
+  **milliradians**, as a mil-dot reticle's should be. It is built in, so there is no file to find.
+- **`Load…`** opens the `data/reticle` folder, which ships with ten: `MILDOT`, `H58` (a milliradian grid
+  for high magnification), `MOA-GRID`, `GERMAN4`, `PSO-1`, an M16 iron-sight picture, and four renderings of
+  real optics with their drop ladders computed for a stated load — `ACOG-TA31` and `SPECTER-5.56` (5.56),
+  `ACOG-TA648` (.50 BMG) and `VCOG16-300BLK` (300 BLK, supersonic and subsonic). `data/reticle/README.md`
+  lists what each one is and, where the marks are load-calibrated, exactly which load. Your own reticles,
+  built in the separate **Reticle Editor** application, live here too.
 
 The name of the loaded reticle is shown under the buttons, and the reticle stays loaded while you change
 overlays.
@@ -49,7 +51,9 @@ The reticle alone. Useful for checking a reticle you have just built, or for see
 
 Blue distance labels at the points **past your zero**, each sitting at the elevation where that range's
 hold falls in the reticle. This turns your reticle into a bullet-drop compensator for *this* load: the
-labels say which mark is 400, which is 500, and so on.
+labels say which mark is 400 yd, which is 500 yd, and so on. Each label carries its unit — `552yd` or
+`505m` — so a printed sight picture cannot be misread as the other system; the unit follows the window's
+measurement system, like everything else on the tab.
 
 ### Near BDC
 
@@ -57,8 +61,10 @@ The same labelling for the stretch **before the zero**, where the bullet is stil
 line. This is the part shooters usually forget: with a 300 yd zero, a 100 yd target is not on the
 crosshair either, and the near marks tell you by how much.
 
-Both BDC overlays are computed from a **fine trajectory** — 2.5 m steps, out to at least 1,500 m —
-independently of the `Step` you set for the table. Making the table coarser will not coarsen the marks.
+Both BDC overlays are computed from a **fine trajectory** — 2.5 m steps, out to at least 3,000 m (or your
+`Maximum Distance` if you set it further) — independently of the `Step` you set for the table. Making the
+table coarser will not coarsen the marks. Loads that run out of speed sooner stop where the bullet stops:
+the engine ends a run below 50 ft/s or past 10,000 ft of drop, so marks simply cease past that point.
 
 ### Target
 

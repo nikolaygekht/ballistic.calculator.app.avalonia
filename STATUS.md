@@ -1,11 +1,11 @@
 # BallisticCalculator2 — Project Status
 
-Last updated: 2026-07-27
+Last updated: 2026-07-29
 
 ## Overview
 
 Avalonia rewrite of the WinForms BallisticCalculator. Core trajectory math comes from the
-**BallisticCalculator 1.1.12** NuGet package (+ Gehtsoft.Measurements 1.1.18); the app is action-driven with
+**BallisticCalculator 1.1.13** NuGet package (+ Gehtsoft.Measurements 1.1.18); the app is action-driven with
 direct-UI-access controls (no MVVM/reactive) per `CLAUDE.md`. Trunk-based development (commit to `main`).
 
 ## Completed
@@ -49,8 +49,8 @@ direct-UI-access controls (no MVVM/reactive) per `CLAUDE.md`. Trunk-based develo
 | ZeroPanel | **New.** The Zero tab: zero distance, impact offset (V/H), zeroing shot angle, and the zero ammo/atmosphere/wind sub-panels. |
 | ParametersPanel | Max range, step, shot angle; V/H clicks → ShotDrop/WindageAdjustment; Coriolis (azimuth dial + latitude N/S). Azimuth dial height matches the azimuth/latitude block. |
 | SummaryPanel | Compact left-aligned readout: zero adj, target size, bottom- & center-aimed dead-zone spans, near/far zero, subsonic. |
-| ReticlePanel | BDC + target overlay; **moving-target** section (enable + direction dial synced with a numeric degrees input + speed); shows target angular size + lead in the current angular unit; target size up to 10000; wider (325) data panel. |
-| ShotDataPanel | TabControl: **Ammunition / Weather / Wind / Rifle / Zero / Parameters**; assembles the library `Rifle` from Rifle+Zero tabs; `Validate()`. |
+| ReticlePanel | BDC + target overlay (mark labels carry their unit — `552yd` / `505m`); **moving-target** section (enable + direction dial synced with a numeric degrees input + speed); shows target angular size + lead in the current angular unit; target size up to 10000; wider (325) data panel. The **Mil-Dot** button builds the library's `MilDotReticle` (milliradians, 12 mrad across). |
+| ShotDataPanel | TabControl: **Ammunition / Weather / Wind / Rifle / Zero / Parameters**; assembles the library `Rifle` from Rifle+Zero tabs; `Validate()` returns **(shotData, emptyPanels, incompletePanels, problems)**. `problems` collects the named faults from every tab in one pass — `AmmoPanel.Problems()` (missing field, form factor without diameter, unresolvable `.drg`), `ZeroPanel.Problems()` (a ticked override that is not filled in) and `ParametersPanel.Problems()` (clicks with no click size) — so the dialog reports all of them at once instead of one per OK. |
 | DrgFromBcPanel | **New.** Builds a `.drg` from a BC-vs-Mach curve. Knots are always keyed by Mach; each knot's coefficient is entered with `BallisticCoefficientControl` (`AllowCustomTable="False"` — a GC knot was already refused on Add, so it is no longer offered) and keeps its own drag table, so a mixed G1/G7 curve is normalized on save (converted at each knot's own Mach, count reported). Load Csv adopts the base table when every coefficient names the same one. |
 | DrgFromVelocitiesPanel | **New.** Builds a `.drg` from measured downrange velocities. `Set Atmosphere` (the shell's dialog) sets the air the data was measured in — it drives the recovered drag, and the current conditions are named in the status line. |
 | (both editors) | Stacked header (Name / Source / Weight / Diameter / Length, one field per row), a two-column `DataGrid`, an entry row, and Add / Change / Delete / Sort / Load Csv + Save Drg / Close. Editing is explicit: select a row to load it, `Change` writes it back. CSV files must carry their units — a bare number is refused rather than assumed. |
@@ -75,6 +75,16 @@ direct-UI-access controls (no MVVM/reactive) per `CLAUDE.md`. Trunk-based develo
 - `TrajectoryView` tabs: Table, Chart, Reticle, Summary. Coarse display trajectory + one shared **fine**
   trajectory (reticle + summary). `AngularUnits` now also flows to the reticle panel.
 - `ShotParametersDialog` (wraps `ShotDataPanel`), `CompareView`, CSV export, About dialog.
+- **Error reporting.** Two of the engine's failures are named types as of 1.1.13 —
+  `ZeroRangeCantBeReachedException` and `TrajectoryCannotBeCalculatedException` — and
+  `ShotCalculator.Explain` maps those to a sentence shown in a plain `MessageDialog`: they are the user's to
+  fix, and a bad input dressed up with a stack trace reads as a crash. Everything the engine has *not* named
+  keeps the stack trace, because that is the thing worth reporting.
+- **`ExceptionDialog`** shows what the app was doing, the exception message, and the whole
+  exception chain with stack traces in a read-only monospace box, with **Copy**. Every calculation call site
+  goes through `ShotCalculator.TryCalculate` (exceptions returned, not thrown) and shows it; so do the
+  open and save paths, which used to write to `Console.Error` where nobody saw them. This is the net under
+  validation, not a substitute for it — see `claude/07-28.md`.
 - Persistence: `.trajectory` (BXml); `<zeroing>` element with migration of older files.
 - **`data/` folder is copied next to the binaries** (csproj `Content` link), so presets/reticles/ammo/drg
   ship with the app; open/save dialogs default to the matching `data/*` subfolder.
@@ -83,7 +93,7 @@ direct-UI-access controls (no MVVM/reactive) per `CLAUDE.md`. Trunk-based develo
 
 | App | Notes |
 |-----|-------|
-| ReticleEditor | Save / Save As implemented (Save falls back to Save As when unnamed; default folder `data/reticle`); fixed added elements not listing; **Move Up/Down** for elements and path sub-elements; **line-style editing** (Solid/Dashed/Dotted) on line/circle/rectangle/path. |
+| ReticleEditor | Save / Save As implemented (Save falls back to Save As when unnamed; default folder `data/reticle`); fixed added elements not listing; **Move Up/Down** for elements and path sub-elements; **line-style editing** (Solid/Dashed/Dotted) on line/circle/rectangle/path. **Unsaved-changes guard**: a dirty flag set by every element operation, the Set button and any parameter-field edit; New / Open / Close prompt Save / Don't Save / Cancel; the title carries the file name plus `*`. Cleared only by a successful save, so a cancelled picker or failed write still blocks the operation. The dirty check compares field content against a snapshot taken when clean — a load's own control notifications would otherwise read as edits, and timing-based suppression could not tell them apart reliably. |
 | DebugApp / DebugApp1 | Controls / panels test harnesses. |
 | Tools/DependencyUpdater (`depupdate`) | Bumps PackageReference versions within declared ranges. |
 
@@ -91,10 +101,11 @@ direct-UI-access controls (no MVVM/reactive) per `CLAUDE.md`. Trunk-based develo
 
 | Project | Tests | Status |
 |---------|------:|--------|
-| BallisticCalculator.Controls.Tests | 309 | passing |
-| BallisticCalculator.Panels.Tests | 369 | passing |
-| ReticleEditor.Tests | 66 | passing |
-| **Total** | **744** | |
+| BallisticCalculator.Controls.Tests | 319 | passing |
+| BallisticCalculator.Panels.Tests | 513 | passing |
+| BallisticCalculator.Tests (desktop app) | 38 | passing |
+| ReticleEditor.Tests | 89 | passing |
+| **Total** | **959** | |
 
 Types-layer classes are tested from these suites (there is no separate `Types.Tests`); the four real CSV
 exports live in `Panels.Tests/TestData/` so no test depends on a path outside the repo.
@@ -104,7 +115,7 @@ exports live in `Panels.Tests/TestData/` so no test depends on a path outside th
 ### Trajectory calculation — one source of truth
 `ShotTrajectoryCalculator` is the only place that turns a `ShotData` into a trajectory. Table/chart use the
 coarse display trajectory; reticle + summary share one **fine** trajectory (`CalculateFine`: 2.5 m step,
-≥1500 m). GC ("custom") coefficients have no built-in curve, so `CustomDragTableLoader` supplies the `.drg`
+≥3000 m). GC ("custom") coefficients have no built-in curve, so `CustomDragTableLoader` supplies the `.drg`
 `DragTable` to **both** `CalculateZeroParameters` and `Calculate`.
 
 ### Rifle vs Zero split

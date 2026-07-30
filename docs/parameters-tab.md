@@ -48,7 +48,7 @@ wait.
 Two related things that surprise people:
 
 - **The reticle and summary views do not use your step at all.** They run their own fine trajectory
-  internally — 2.5 m out to at least 1,500 m — because BDC marks and the point-blank corridor need
+  internally — 2.5 m out to at least 3,000 m — because BDC marks and the point-blank corridor need
   resolution the table's step cannot give. Changing the step will not move them.
 - **The table can stop before your maximum range.** The solver abandons a shot once the bullet falls below
   **50 ft/s** or has dropped more than **10,000 ft**, so a subsonic load asked for 2,000 yd simply ends
@@ -82,9 +82,10 @@ That makes them useful in two situations: checking a dialled solution ("I have 2
 me at 700?"), and working a hold-over from a partial dial.
 
 **They need click values on the [Rifle tab](rifle-tab.md#click-values-buy-you-two-things).** A click count
-means nothing without a click size, and if that field is empty the count is **silently ignored** — no
-warning, no effect, the solution comes back as if you had dialled nothing. If dialling clicks appears to
-change nothing, that is why.
+means nothing without a click size, so OK refuses the shot and says which field is missing — *"V-Clicks are
+dialled, but the sight has no vertical click size — fill in Vertical click on the Rifle tab."* Several of
+the shipped sight presets (`EOTech@M4`, `Elcan Specter@M4`, the two .22LR entries) carry no click values,
+which is what makes it easy to have a count without a size.
 
 ## The Coriolis effect: two effects, and when they are worth it
 
@@ -120,7 +121,7 @@ disagreed on a still day, this is a candidate.
 
 ## Things that catch people out
 
-- **Dialled clicks with no click size.** Silently ignored; the Rifle tab is where the fix is.
+- **Dialled clicks with no click size.** OK reports it; the Rifle tab is where the fix is.
 - **The table ending short of the maximum range.** The load ran out of velocity, or dropped 10,000 ft.
 - **Expecting a finer step to give a better answer.** It gives more rows of the same answer.
 - **Expecting a finer step to change the reticle or summary.** Those views use their own fine trajectory.

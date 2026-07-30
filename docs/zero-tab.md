@@ -175,12 +175,16 @@ afternoon differed from the shot you are computing, one number is the whole trut
 
 ## Things that catch people out
 
-- **A ticked group with a field missing is silently ignored.** Tick *Other ammunition for zero*, forget
-  the weight, and the shot computes with the zero using the **shot's** ammunition instead. Nothing warns
-  you, because the group reads as "nothing entered" rather than as "half entered".
+- **A ticked group needs all of its fields.** Tick *Other ammunition for zero* and forget the weight and
+  OK reports it — *"Other ammunition for zero: Bullet weight is not specified."* Until that check existed
+  the group read as "nothing entered" rather than "half entered", and the shot quietly computed with the
+  zero using the **shot's** ammunition.
 - **Unchecked means "same as the shot", not "standard".** The most common misreading of this tab.
 - **A zero distance the load cannot reach.** Ask a subsonic pistol load for a 1,000 yd zero and the
-  calculation fails rather than returning a very silly number.
+  calculation refuses rather than returning a very silly number: *"This load cannot reach the zero
+  distance"*, with what to change — zero it closer, or give it more velocity or a better coefficient. It is
+  a plain message, not a crash report, because it is a number you can fix rather than a fault in the
+  application.
 - **The sight preset overwrites the zero distance.** Pick the preset first, then set the distance.
 - **The tab scrolls.** The zero atmosphere and the zeroing wind are below the fold; if you cannot find
   them, scroll.

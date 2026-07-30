@@ -154,7 +154,10 @@ and `.drg` files usually carry them.
 
 The third is a hard stop rather than a quiet omission, and the case that catches people is the middle
 one in disguise: attaching a `.drg` whose header has no diameter. `Browse…` fills the field when the
-file carries it — check that it did, and type it in when it did not.
+file carries it — check that it did, and type it in when it did not. **OK will tell you** if you did not:
+*"Bullet diameter is required when the ballistic coefficient is a form factor."* The same check covers a
+GC coefficient whose `.drg` cannot be found — opening someone else's saved shot that names a table you do
+not have — and names the file it went looking for.
 
 ## Caliber, bullet type, barrel length and source are notes, not inputs
 
@@ -180,7 +183,7 @@ it.
   Always take the table from the same place as the number.
 - **Muzzle velocity after a `Browse…`.** The field is left empty on purpose, and an empty required
   field is easy to walk past.
-- **Diameter with the form-factor switch on.** Required, including for every `.drg` shot.
+- **Diameter with the form-factor switch on.** Required, including for every `.drg` shot — OK says so.
 - **A blank name.** Legal, but the window title goes with it.
 - **Units after a `Load`.** The file's own, not the window's.
 
