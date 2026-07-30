@@ -55,7 +55,7 @@ that is the only reliable way to settle it, exactly as it settled the units for
 | Zero | **100 m** — printed on the sheet |
 | Magnification | fixed 4× |
 | Sight height | not published |
-| Library entry | `.308 Win/7.62x51 BPN` (146.6 gr at 810 m/s) is the nearest shipped .308 |
+| Library entry | none shipped for this ladder — Trijicon publish neither bullet weight nor velocity |
 
 ## Two reproduction notes
 

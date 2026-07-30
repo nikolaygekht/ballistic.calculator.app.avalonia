@@ -1,0 +1,36 @@
+<reticle name="EOTech Vudu SR-1 (FFP, mrad) - crosshair only" size-x="12mrad" size-y="12mrad" zero-x="6mrad" zero-y="6mrad">
+  <elements>
+    <!-- fine crosshair, 0.05 mrad lines; hashes on whole milliradians 1..5, 0.8 mrad long -->
+    <reticle-line start-x="-5.4mrad" start-y="0mrad" end-x="5.4mrad" end-y="0mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="0mrad" start-y="5.4mrad" end-x="0mrad" end-y="-5.4mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-1mrad" start-y="-0.4mrad" end-x="-1mrad" end-y="0.4mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.4mrad" start-y="-1mrad" end-x="0.4mrad" end-y="-1mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="1mrad" start-y="-0.4mrad" end-x="1mrad" end-y="0.4mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.4mrad" start-y="1mrad" end-x="0.4mrad" end-y="1mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-2mrad" start-y="-0.4mrad" end-x="-2mrad" end-y="0.4mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.4mrad" start-y="-2mrad" end-x="0.4mrad" end-y="-2mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="2mrad" start-y="-0.4mrad" end-x="2mrad" end-y="0.4mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.4mrad" start-y="2mrad" end-x="0.4mrad" end-y="2mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-3mrad" start-y="-0.4mrad" end-x="-3mrad" end-y="0.4mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.4mrad" start-y="-3mrad" end-x="0.4mrad" end-y="-3mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="3mrad" start-y="-0.4mrad" end-x="3mrad" end-y="0.4mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.4mrad" start-y="3mrad" end-x="0.4mrad" end-y="3mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-4mrad" start-y="-0.4mrad" end-x="-4mrad" end-y="0.4mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.4mrad" start-y="-4mrad" end-x="0.4mrad" end-y="-4mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="4mrad" start-y="-0.4mrad" end-x="4mrad" end-y="0.4mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.4mrad" start-y="4mrad" end-x="0.4mrad" end-y="4mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-5mrad" start-y="-0.4mrad" end-x="-5mrad" end-y="0.4mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.4mrad" start-y="-5mrad" end-x="0.4mrad" end-y="-5mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="5mrad" start-y="-0.4mrad" end-x="5mrad" end-y="0.4mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.4mrad" start-y="5mrad" end-x="0.4mrad" end-y="5mrad" line-width="0.05mrad" line-color="red" />
+    <!-- 0.29 mrad (1 MOA) centre dot -->
+    <reticle-circle center-x="0mrad" center-y="0mrad" radius="0.145mrad" fill="true" line-width="0.02mrad" color="red" />
+  </elements>
+  <bdc>
+    <bdc position-x="0mrad" position-y="-1mrad" text-offset="1.6mrad" text-height="0.4mrad" />
+    <bdc position-x="0mrad" position-y="-2mrad" text-offset="1.6mrad" text-height="0.4mrad" />
+    <bdc position-x="0mrad" position-y="-3mrad" text-offset="1.6mrad" text-height="0.4mrad" />
+    <bdc position-x="0mrad" position-y="-4mrad" text-offset="1.6mrad" text-height="0.4mrad" />
+    <bdc position-x="0mrad" position-y="-5mrad" text-offset="1.6mrad" text-height="0.4mrad" />
+  </bdc>
+</reticle>

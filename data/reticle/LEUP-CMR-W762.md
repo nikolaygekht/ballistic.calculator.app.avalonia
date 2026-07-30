@@ -29,7 +29,7 @@ and 8×, which is its own way of saying no single frame is the whole reticle.
 | Focal plane | first (FFP) |
 | Sight height | not published by Leupold |
 | Atmosphere | not published by Leupold |
-| Library entry | `.308 Win/7.62x51 BPN` is a 7.62 match load but **146.6 gr at 810 m/s** — for this ladder set a **175 gr** bullet at **2575 ft/s** |
+| Library entry | none shipped — enter the designation load: **175 gr at 2575 ft/s** |
 | Leupold's stated basis | a 175 gr round at 2575 ft/s with a **50 m zero** |
 
 ### The zero: 50 m published, 100 m in practice

@@ -37,13 +37,13 @@ on a 1-6× anyway.
 | Focal plane | first (FFP) |
 | Sight height | not published by Leupold |
 | Atmosphere | not published by Leupold |
-| Library entry | `.223/XM855 Ammo`, unchanged at its own 3050 ft/s |
+| Library entry | `.223/XM855 Ammo (20in)`, unchanged at its own 3050 ft/s |
 | Leupold's stated basis | a 62 gr round at **2970 ft/s** with a **50 m zero** |
 
 ### The zero: 50 m published, 100 m in practice
 
 Leupold states this reticle is "based on a .223/5.56 62 gr round at 2970 FPS" with "a 50 meter zero".
-Tested in this application against the shipped `.223/XM855 Ammo` entry, the labels land on the etched
+Tested in this application against the shipped `.223/XM855 Ammo (20in)` entry, the labels land on the etched
 ranges at a **100 m zero**, not a 50 m one — so 100 m is what to enter.
 
 The **7.62 sibling behaves identically** — [LEUP-CMR-W762](LEUP-CMR-W762.md) also lines up at 100 m

@@ -1,0 +1,25 @@
+<reticle name="EOTech Vudu HC3 (SFP at 8x, MOA)" size-x="42moa" size-y="32moa" zero-x="21moa" zero-y="13moa">
+  <elements>
+    <!-- 0.5 MOA illuminated centre dot -->
+    <!-- horizontal: plain 0.25 MOA line, no graduation; heavy posts outboard of 16 MOA -->
+    <reticle-line start-x="-16moa" start-y="0moa" end-x="16moa" end-y="0moa" line-width="0.25moa" line-color="black" />
+    <reticle-line start-x="-16moa" start-y="0moa" end-x="-20moa" end-y="0moa" line-width="0.9moa" line-color="black" />
+    <reticle-line start-x="16moa" start-y="0moa" end-x="20moa" end-y="0moa" line-width="0.9moa" line-color="black" />
+    <!-- upper vertical 0.5 MOA thick; lower stem 0.25 MOA, heavy post at the bottom -->
+    <reticle-line start-x="0moa" start-y="12moa" end-x="0moa" end-y="0moa" line-width="0.5moa" line-color="black" />
+    <reticle-line start-x="0moa" start-y="0moa" end-x="0moa" end-y="-14moa" line-width="0.25moa" line-color="black" />
+    <reticle-line start-x="0moa" start-y="-14moa" end-x="0moa" end-y="-18moa" line-width="0.9moa" line-color="black" />
+    <!-- four holdover bars at 2, 5, 8.5 and 12.5 MOA - 2 MOA wide, 0.25 MOA thick -->
+    <reticle-line start-x="-1moa" start-y="-2moa" end-x="1moa" end-y="-2moa" line-width="0.25moa" line-color="black" />
+    <reticle-line start-x="-1moa" start-y="-5moa" end-x="1moa" end-y="-5moa" line-width="0.25moa" line-color="black" />
+    <reticle-line start-x="-1moa" start-y="-8.5moa" end-x="1moa" end-y="-8.5moa" line-width="0.25moa" line-color="black" />
+    <reticle-line start-x="-1moa" start-y="-12.5moa" end-x="1moa" end-y="-12.5moa" line-width="0.25moa" line-color="black" />
+    <reticle-circle center-x="0moa" center-y="0moa" radius="0.25moa" fill="true" line-width="0.05moa" color="red" />
+  </elements>
+  <bdc>
+    <bdc position-x="0moa" position-y="-2moa" text-offset="-7moa" text-height="1moa" />
+    <bdc position-x="0moa" position-y="-5moa" text-offset="-7moa" text-height="1moa" />
+    <bdc position-x="0moa" position-y="-8.5moa" text-offset="-7moa" text-height="1moa" />
+    <bdc position-x="0moa" position-y="-12.5moa" text-offset="-7moa" text-height="1moa" />
+  </bdc>
+</reticle>

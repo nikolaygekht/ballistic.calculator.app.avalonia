@@ -22,7 +22,7 @@ zero 8 MOA from the left edge and 4 MOA from the top.
 | Sight height | 2.4 in |
 | Atmosphere | ICAO sea level |
 | Zero | 100 m |
-| Library entry | `.223/XM855 Ammo` — exactly this load |
+| Library entry | `.223/XM855 Ammo (20in)` — exactly this load |
 
 ## The marks
 
@@ -37,6 +37,6 @@ zero 8 MOA from the left edge and 4 MOA from the top.
 
 ## In the app
 
-Load `.223/XM855 Ammo` on the Ammunition tab, set the 100 m zero and 2.4 in sight height, and the
+Load `.223/XM855 Ammo (20in)` on the Ammunition tab, set the 100 m zero and 2.4 in sight height, and the
 *Far BDC* overlay should label these six marks with the ranges above. Anything else behind the glass
 and the labels move — correctly; see the README on how marks are labelled.

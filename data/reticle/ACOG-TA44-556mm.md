@@ -29,7 +29,7 @@ confirms.
 ### Metres, unlike the 9 mm sibling
 
 This reticle is graduated in **hundreds of metres**, established by running it in the application: with
-`.223/XM855 Ammo` at a **100 m zero** the four marks label **384 / 502 / 618 / 728 m** against the etched
+`.223/XM855 Ammo (20in)` at a **100 m zero** the four marks label **384 / 502 / 618 / 728 m** against the etched
 400 / 500 / 600 / 700 — within 4% at every rung.
 
 That is worth spelling out because the [9 mm RTR](ACOG-TA44-9mm.md) is in **yards**, proven by its own
@@ -54,7 +54,7 @@ meaning into them that Trijicon has not published.
 | Zero | **100 m** — not published by Trijicon, but this is what puts the labels on the etched ranges |
 | Magnification | fixed 1.5× |
 | Sight height | not published |
-| Library entry | `.223/XM855 Ammo`, unchanged, with a 100 m zero — labels the ladder 384/502/618/728 m |
+| Library entry | `.223/XM855 Ammo (20in)`, unchanged, with a 100 m zero — labels the ladder 384/502/618/728 m |
 
 ## Nothing was measured
 

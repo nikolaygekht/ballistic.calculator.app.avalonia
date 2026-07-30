@@ -1,0 +1,32 @@
+<reticle name="EOTech Vudu SR-3 (.223 75gr) (FFP, mrad)" size-x="14mrad" size-y="12mrad" zero-x="7mrad" zero-y="4mrad">
+  <elements>
+    <!-- speed ring: 2.15 mrad outer diameter, 0.3 mrad thick, open 2 mrad at the bottom -->
+    <reticle-path fill="false" line-width="0.3mrad" color="red">
+      <elements>
+        <reticle-path-move-to position-x="0.860mrad" position-y="-0.340mrad" />
+        <reticle-path-arc radius="0.925mrad" clockwise="false" major-arc="true" position-x="-0.860mrad" position-y="-0.340mrad" />
+      </elements>
+    </reticle-path>
+    <!-- 0.44 mrad (1.5 MOA) centre dot -->
+    <reticle-circle center-x="0mrad" center-y="0mrad" radius="0.22mrad" fill="true" line-width="0.02mrad" color="red" />
+    <!-- reference ticks on the horizontal at 4 and 6 mrad (13.75 and 20.63 MOA) -->
+    <reticle-line start-x="-4mrad" start-y="-0.4mrad" end-x="-4mrad" end-y="0.4mrad" line-width="0.07mrad" line-color="black" />
+    <reticle-line start-x="4mrad" start-y="-0.4mrad" end-x="4mrad" end-y="0.4mrad" line-width="0.07mrad" line-color="black" />
+    <reticle-line start-x="-6mrad" start-y="-0.4mrad" end-x="-6mrad" end-y="0.4mrad" line-width="0.07mrad" line-color="black" />
+    <reticle-line start-x="6mrad" start-y="-0.4mrad" end-x="6mrad" end-y="0.4mrad" line-width="0.07mrad" line-color="black" />
+    <!-- vertical spine connecting the BDC bars - from the '4' bar to the '6' bar only, nothing above it -->
+    <reticle-line start-x="0mrad" start-y="-2mrad" end-x="0mrad" end-y="-4.1mrad" line-width="0.07mrad" line-color="black" />
+    <!-- BDC bars, 0.07 mrad thick; width is not published - drawn 1.0 mrad -->
+    <reticle-line start-x="-0.5mrad" start-y="-2mrad" end-x="0.5mrad" end-y="-2mrad" line-width="0.07mrad" line-color="black" />
+    <reticle-text position-x="0.75mrad" position-y="-2.22mrad" text-height="0.5mrad" text="4" anchor="Left" text-color="black" />
+    <reticle-line start-x="-0.5mrad" start-y="-3mrad" end-x="0.5mrad" end-y="-3mrad" line-width="0.07mrad" line-color="black" />
+    <reticle-text position-x="0.75mrad" position-y="-3.22mrad" text-height="0.5mrad" text="5" anchor="Left" text-color="black" />
+    <reticle-line start-x="-0.5mrad" start-y="-4.1mrad" end-x="0.5mrad" end-y="-4.1mrad" line-width="0.07mrad" line-color="black" />
+    <reticle-text position-x="0.75mrad" position-y="-4.32mrad" text-height="0.5mrad" text="6" anchor="Left" text-color="black" />
+  </elements>
+  <bdc>
+    <bdc position-x="0mrad" position-y="-2mrad" text-offset="-3.2mrad" text-height="0.45mrad" />
+    <bdc position-x="0mrad" position-y="-3mrad" text-offset="-3.2mrad" text-height="0.45mrad" />
+    <bdc position-x="0mrad" position-y="-4.1mrad" text-offset="-3.2mrad" text-height="0.45mrad" />
+  </bdc>
+</reticle>

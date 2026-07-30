@@ -23,7 +23,7 @@ Etched numerals 3, 5, 6, 7, 8, 9, 10 are hundreds of metres.
 | Sight height | 2.9 in |
 | Atmosphere | ICAO sea level |
 | Zero | 100 m |
-| Library entry | `.223/XM855 Ammo` — same bullet; **change the muzzle velocity to 2800 ft/s** for the 16 in barrel |
+| Library entry | `.223/XM855 Ammo (16in)` — exactly this load, 2800 ft/s for the 16 in barrel |
 
 ## The marks
 
@@ -43,6 +43,7 @@ Every `<bdc>` anchor sits exactly on the element it labels, and the etched numer
 
 ## In the app
 
-Load `.223/XM855 Ammo`, **lower** the muzzle velocity to 2800 ft/s, sight height 2.9 in, 100 m zero.
+Load `.223/XM855 Ammo (16in)`, sight height 2.9 in, 100 m zero — the entry already carries the
+2800 ft/s this ladder was computed for.
 Left at the library's 3050 ft/s (the 20 in barrel) the same marks label *longer* ranges — correct
 arithmetic for a flatter load, not an error.

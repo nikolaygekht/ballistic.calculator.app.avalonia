@@ -1,0 +1,59 @@
+<reticle name="EOTech Vudu MD1 (FFP, mrad)" size-x="14mrad" size-y="14mrad" zero-x="7mrad" zero-y="7mrad">
+  <elements>
+    <!-- fine crosshair, 0.05 mrad lines, graduated every 0.5 mrad to 5 mrad -->
+    <reticle-line start-x="-5mrad" start-y="0mrad" end-x="5mrad" end-y="0mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="0mrad" start-y="5mrad" end-x="0mrad" end-y="-5mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.5mrad" start-y="-0.15mrad" end-x="-0.5mrad" end-y="0.15mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.15mrad" start-y="-0.5mrad" end-x="0.15mrad" end-y="-0.5mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="0.5mrad" start-y="-0.15mrad" end-x="0.5mrad" end-y="0.15mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.15mrad" start-y="0.5mrad" end-x="0.15mrad" end-y="0.5mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-1mrad" start-y="-0.25mrad" end-x="-1mrad" end-y="0.25mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.25mrad" start-y="-1mrad" end-x="0.25mrad" end-y="-1mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="1mrad" start-y="-0.25mrad" end-x="1mrad" end-y="0.25mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.25mrad" start-y="1mrad" end-x="0.25mrad" end-y="1mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-1.5mrad" start-y="-0.15mrad" end-x="-1.5mrad" end-y="0.15mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.15mrad" start-y="-1.5mrad" end-x="0.15mrad" end-y="-1.5mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="1.5mrad" start-y="-0.15mrad" end-x="1.5mrad" end-y="0.15mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.15mrad" start-y="1.5mrad" end-x="0.15mrad" end-y="1.5mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-2mrad" start-y="-0.25mrad" end-x="-2mrad" end-y="0.25mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.25mrad" start-y="-2mrad" end-x="0.25mrad" end-y="-2mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="2mrad" start-y="-0.25mrad" end-x="2mrad" end-y="0.25mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.25mrad" start-y="2mrad" end-x="0.25mrad" end-y="2mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-2.5mrad" start-y="-0.15mrad" end-x="-2.5mrad" end-y="0.15mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.15mrad" start-y="-2.5mrad" end-x="0.15mrad" end-y="-2.5mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="2.5mrad" start-y="-0.15mrad" end-x="2.5mrad" end-y="0.15mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.15mrad" start-y="2.5mrad" end-x="0.15mrad" end-y="2.5mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-3mrad" start-y="-0.25mrad" end-x="-3mrad" end-y="0.25mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.25mrad" start-y="-3mrad" end-x="0.25mrad" end-y="-3mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="3mrad" start-y="-0.25mrad" end-x="3mrad" end-y="0.25mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.25mrad" start-y="3mrad" end-x="0.25mrad" end-y="3mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-3.5mrad" start-y="-0.15mrad" end-x="-3.5mrad" end-y="0.15mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.15mrad" start-y="-3.5mrad" end-x="0.15mrad" end-y="-3.5mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="3.5mrad" start-y="-0.15mrad" end-x="3.5mrad" end-y="0.15mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.15mrad" start-y="3.5mrad" end-x="0.15mrad" end-y="3.5mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-4mrad" start-y="-0.25mrad" end-x="-4mrad" end-y="0.25mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.25mrad" start-y="-4mrad" end-x="0.25mrad" end-y="-4mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="4mrad" start-y="-0.25mrad" end-x="4mrad" end-y="0.25mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.25mrad" start-y="4mrad" end-x="0.25mrad" end-y="4mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-4.5mrad" start-y="-0.15mrad" end-x="-4.5mrad" end-y="0.15mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.15mrad" start-y="-4.5mrad" end-x="0.15mrad" end-y="-4.5mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="4.5mrad" start-y="-0.15mrad" end-x="4.5mrad" end-y="0.15mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.15mrad" start-y="4.5mrad" end-x="0.15mrad" end-y="4.5mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-5mrad" start-y="-0.25mrad" end-x="-5mrad" end-y="0.25mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.25mrad" start-y="-5mrad" end-x="0.25mrad" end-y="-5mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="5mrad" start-y="-0.25mrad" end-x="5mrad" end-y="0.25mrad" line-width="0.05mrad" line-color="red" />
+    <reticle-line start-x="-0.25mrad" start-y="5mrad" end-x="0.25mrad" end-y="5mrad" line-width="0.05mrad" line-color="red" />
+    <!-- heavy posts on all four arms, outboard of 5 mrad -->
+    <reticle-line start-x="-5mrad" start-y="0mrad" end-x="-7mrad" end-y="0mrad" line-width="0.5mrad" line-color="black" />
+    <reticle-line start-x="5mrad" start-y="0mrad" end-x="7mrad" end-y="0mrad" line-width="0.5mrad" line-color="black" />
+    <reticle-line start-x="0mrad" start-y="5mrad" end-x="0mrad" end-y="7mrad" line-width="0.5mrad" line-color="black" />
+    <reticle-line start-x="0mrad" start-y="-5mrad" end-x="0mrad" end-y="-7mrad" line-width="0.5mrad" line-color="black" />
+  </elements>
+  <bdc>
+    <bdc position-x="0mrad" position-y="-1mrad" text-offset="1.4mrad" text-height="0.35mrad" />
+    <bdc position-x="0mrad" position-y="-2mrad" text-offset="1.4mrad" text-height="0.35mrad" />
+    <bdc position-x="0mrad" position-y="-3mrad" text-offset="1.4mrad" text-height="0.35mrad" />
+    <bdc position-x="0mrad" position-y="-4mrad" text-offset="1.4mrad" text-height="0.35mrad" />
+    <bdc position-x="0mrad" position-y="-5mrad" text-offset="1.4mrad" text-height="0.35mrad" />
+  </bdc>
+</reticle>

@@ -1,0 +1,28 @@
+# This is a Windows-first repository: every text file is CRLF in the working tree, always.
+#
+# Enforced here rather than left to whatever tool last wrote a file. Editors, scripts and anything
+# running under WSL will happily write bare LF -- Python's open() in text mode does it by default -- and
+# a batch file is the one place it can actually bite, because cmd.exe has historically been unreliable
+# about `goto` and multi-line blocks in an LF-only script. Pinning it in git means a fresh clone is
+# correct no matter what produced the file.
+#
+# git stores LF internally and converts on checkout, so this costs nothing in the history and keeps
+# diffs clean.
+* text=auto eol=crlf
+
+# Binaries git must not touch or try to convert.
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.ico    binary
+*.icns   binary
+*.dll    binary
+*.exe    binary
+*.pdb    binary
+*.so     binary
+*.dylib  binary
+*.zip    binary
+*.gz     binary
+*.tar    binary
+*.7z     binary

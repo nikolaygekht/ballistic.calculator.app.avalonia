@@ -1,0 +1,35 @@
+<reticle name="EOTech Vudu BD1 (SFP, MOA)" size-x="30moa" size-y="30moa" zero-x="15moa" zero-y="15moa">
+  <elements>
+    <!-- 20 MOA open centre: heavy posts start at 10 MOA on all four arms -->
+    <reticle-line start-x="-10moa" start-y="0moa" end-x="10moa" end-y="0moa" line-width="0.25moa" line-color="black" />
+    <reticle-line start-x="0moa" start-y="10moa" end-x="0moa" end-y="0moa" line-width="0.25moa" line-color="black" />
+    <!-- below centre the stem is broken: it runs centre -> first circle, then circle to circle -->
+    <reticle-line start-x="0moa" start-y="-0moa" end-x="0moa" end-y="-1.5moa" line-width="0.25moa" line-color="black" />
+    <reticle-line start-x="0moa" start-y="-2.5moa" end-x="0moa" end-y="-3.5moa" line-width="0.25moa" line-color="black" />
+    <reticle-line start-x="0moa" start-y="-4.5moa" end-x="0moa" end-y="-5.5moa" line-width="0.25moa" line-color="black" />
+    <reticle-line start-x="0moa" start-y="-6.5moa" end-x="0moa" end-y="-7.5moa" line-width="0.25moa" line-color="black" />
+    <reticle-line start-x="0moa" start-y="-8.5moa" end-x="0moa" end-y="-10moa" line-width="0.25moa" line-color="black" />
+    <reticle-line start-x="-10moa" start-y="0moa" end-x="-14moa" end-y="0moa" line-width="0.9moa" line-color="black" />
+    <reticle-line start-x="10moa" start-y="0moa" end-x="14moa" end-y="0moa" line-width="0.9moa" line-color="black" />
+    <reticle-line start-x="0moa" start-y="10moa" end-x="0moa" end-y="14moa" line-width="0.9moa" line-color="black" />
+    <reticle-line start-x="0moa" start-y="-10moa" end-x="0moa" end-y="-14moa" line-width="0.9moa" line-color="black" />
+    <!-- horizontal reference hashes at 2 and 4 MOA -->
+    <reticle-line start-x="-2moa" start-y="-0.6moa" end-x="-2moa" end-y="0.6moa" line-width="0.25moa" line-color="black" />
+    <reticle-line start-x="2moa" start-y="-0.6moa" end-x="2moa" end-y="0.6moa" line-width="0.25moa" line-color="black" />
+    <reticle-line start-x="-4moa" start-y="-0.6moa" end-x="-4moa" end-y="0.6moa" line-width="0.25moa" line-color="black" />
+    <reticle-line start-x="4moa" start-y="-0.6moa" end-x="4moa" end-y="0.6moa" line-width="0.25moa" line-color="black" />
+    <!-- four ballistic holdover circles at 2, 4, 6 and 8 MOA, 1.0 MOA across -->
+    <reticle-circle center-x="0moa" center-y="-2moa" radius="0.5moa" fill="false" line-width="0.2moa" color="black" />
+    <reticle-circle center-x="0moa" center-y="-4moa" radius="0.5moa" fill="false" line-width="0.2moa" color="black" />
+    <reticle-circle center-x="0moa" center-y="-6moa" radius="0.5moa" fill="false" line-width="0.2moa" color="black" />
+    <reticle-circle center-x="0moa" center-y="-8moa" radius="0.5moa" fill="false" line-width="0.2moa" color="black" />
+    <!-- 0.25 MOA centre dot -->
+    <reticle-circle center-x="0moa" center-y="0moa" radius="0.125moa" fill="true" line-width="0.05moa" color="red" />
+  </elements>
+  <bdc>
+    <bdc position-x="0moa" position-y="-2moa" text-offset="-6moa" text-height="0.9moa" />
+    <bdc position-x="0moa" position-y="-4moa" text-offset="-6moa" text-height="0.9moa" />
+    <bdc position-x="0moa" position-y="-6moa" text-offset="-6moa" text-height="0.9moa" />
+    <bdc position-x="0moa" position-y="-8moa" text-offset="-6moa" text-height="0.9moa" />
+  </bdc>
+</reticle>
