@@ -43,12 +43,12 @@ computed from what you type:
 
 $$\mathrm{SD} = \frac{w_{\text{gr}}}{7000\,d_{\text{in}}^{2}} \quad \left[\frac{\mathrm{lb}}{\mathrm{in}^{2}}\right]$$
 
-**Form factor** `i` is the shape term. It compares this bullet's drag coefficient to that of a
-*reference* projectile — a standard shape whose `C_d(M)` curve has been measured once and tabulated:
+**Form factor** $i$ is the shape term. It compares this bullet's drag coefficient to that of a
+*reference* projectile — a standard shape whose $C_d(M)$ curve has been measured once and tabulated:
 
 $$C_{d,\text{bullet}}(M) = i \cdot C_{d,\text{table}}(M)$$
 
-A sleeker bullet than the reference has `i < 1`; a blunter one has `i > 1`. The assumption buried in
+A sleeker bullet than the reference has $i < 1$; a blunter one has $i > 1$. The assumption buried in
 that single line is the important one: it says the bullet's drag curve has the **same shape** as the
 reference curve, differing only by a constant multiplier. That assumption is what fails at some
 velocities, and it is the reason for everything in the second half of this article.

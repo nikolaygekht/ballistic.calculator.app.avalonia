@@ -1,0 +1,13 @@
+---
+layout: default
+---
+{% if page.content contains '$' %}
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']], processEscapes: true }
+  };
+</script>
+<script type="text/javascript" id="MathJax-script" async src="https://jsdelivr.net"></script>
+{% endif %}
+
+{{ content }}
