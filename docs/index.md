@@ -94,6 +94,18 @@ planned** — the structure is listed in full so you can see what is coming and 
 - [Reticle elements](reticle-elements.md) — the six element types, and what draw order decides
 - [Reticle paths](reticle-paths.md) — move-to, line-to and arc, for shapes the other types cannot make
 
+**How the calculation works** — the mathematics, for readers who want to check a number rather than
+take it on trust
+
+- [The ballistic coefficient](method/ballistic-coefficient.md) — the drag law itself, what a BC divides,
+  and why one number cannot describe a bullet at every velocity
+- [The 3DOF point-mass model](method/3dof-model.md) — the two forces that are integrated, the frame they
+  are written in, and how the state becomes a row of the table
+- [The empirical corrections](method/empirical-corrections.md) — spin drift, aerodynamic jump and earth
+  rotation: added to the trajectory rather than integrated with it, and why
+- [Integration modes](method/integration.md) — Euler against midpoint Runge-Kutta, the internal step, and
+  measured figures for what the choice is worth
+
 **Reference**
 
 - Units and measurement systems — every unit the app accepts, and the angular-unit choice

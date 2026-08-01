@@ -1,6 +1,5 @@
 ---
 title: The empirical corrections
-nav_exclude: true
 math: true
 ---
 

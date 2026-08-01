@@ -1,6 +1,5 @@
 ---
 title: Integration modes — Euler and midpoint RK2
-nav_exclude: true
 math: true
 ---
 

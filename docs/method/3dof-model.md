@@ -1,6 +1,5 @@
 ---
 title: The 3DOF point-mass model
-nav_exclude: true
 math: true
 ---
 

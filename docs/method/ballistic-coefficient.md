@@ -1,6 +1,5 @@
 ---
 title: The ballistic coefficient
-nav_exclude: true
 math: true
 ---
 
