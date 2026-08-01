@@ -1,6 +1,7 @@
 ---
 title: Integration modes — Euler and midpoint RK2
 nav_exclude: true
+math: true
 ---
 
 # Integration modes — Euler and midpoint RK2
@@ -14,7 +15,7 @@ physics. The equations being discretized are in [the 3DOF model](3dof-model.md);
 afterwards are the same in both schemes and are covered in
 [the empirical corrections](empirical-corrections.md).
 
-Inline symbols are written in `code` style; displayed formulae are LaTeX.
+Mathematical symbols are set as inline math; code identifiers, literal values and units stay in `code` style.
 
 ## Why there is a step at all
 
@@ -31,7 +32,7 @@ many rows the table has. The integration step is derived from it, and is always 
 
 1. Halve the output step.
 2. If the result still exceeds `MaximumCalculationStepSize` (default **1 m**), divide it by a power of
-   ten until it does — specifically by `10^(order − maxOrder + 1)`, comparing decimal orders of
+   ten until it does — specifically by $10^{(\text{order} - \text{maxOrder} + 1)}$, comparing decimal orders of
    magnitude.
 
 The powers-of-ten quantization means the internal step changes in decade jumps rather than
@@ -52,7 +53,7 @@ you ask for is not what decides how accurately they were computed** — the cap 
 - The step that would cross an output range is shortened so the row lands on the requested distance
   rather than up to one full step past it. That costs roughly one short step per row.
 
-Time comes from distance via the current horizontal velocity, `Δt = Δs / v_x`, quantized to a 100 ns
+Time comes from distance via the current horizontal velocity, $\Delta t = \Delta s / v_x$, quantized to a 100 ns
 tick. The step is constant in *distance*, so it grows in *time* as the bullet slows.
 
 ## The two schemes
@@ -75,7 +76,7 @@ One acceleration evaluation per step. It is *semi-implicit* (symplectic) rather 
 Euler because the position update uses the **already updated** velocity — cheap, and better behaved
 than using the old one.
 
-Local truncation error is `O(Δt²)`, global error `O(Δt)`: **halve the step, halve the error.** This was
+Local truncation error is $O(\Delta t^2)$, global error $O(\Delta t)$: **halve the step, halve the error.** This was
 the original engine's only scheme.
 
 ### Midpoint Runge–Kutta (RK2)
@@ -91,9 +92,9 @@ $$\mathbf{v}_{n+1} = \mathbf{v}_n + \mathbf{a}_2\,\Delta t, \qquad
 
 Two evaluations per step: probe half a step forward, then use the acceleration found *there* for the
 whole step. Position advances on the midpoint velocity, which is the matching second-order estimate for
-`r' = v`.
+$\mathbf{r}' = \mathbf{v}$.
 
-Global error is `O(Δt²)`: **halve the step, quarter the error.** The extra evaluation costs about 2× per
+Global error is $O(\Delta t^2)$: **halve the step, quarter the error.** The extra evaluation costs about 2× per
 step and buys an entire order of convergence, which is a good trade whenever the step can then be
 lengthened — and it can.
 
@@ -169,15 +170,15 @@ Two caveats for anyone driving the library directly:
   [the 3DOF model](3dof-model.md#stopping) exist for that case.
 - **A higher-order scheme is not the next improvement.** RK4 would cost two more drag evaluations per
   step to reduce an error that is already three orders of magnitude below the drag data's. Better
-  `C_d(M)` is always the better investment — see
+  $C_d(M)$ is always the better investment — see
   [the ballistic coefficient](ballistic-coefficient.md#where-a-single-bc-breaks-down).
 
 ## Summary
 
 - The output step is halved and then decade-quantized down to the `MaximumCalculationStepSize` cap; rows
   requested and accuracy delivered are nearly independent.
-- Semi-implicit Euler: one drag evaluation, error `O(Δt)`.
-- Midpoint RK2: two drag evaluations, error `O(Δt²)`.
+- Semi-implicit Euler: one drag evaluation, error $O(\Delta t)$.
+- Midpoint RK2: two drag evaluations, error $O(\Delta t^2)$.
 - Measured, RK2 at a 10× coarser step is both faster and far more accurate than the Euler default it
   replaced; the application always uses it.
 - Numerical error is the least of the errors in a ballistic solution, and should be kept that way rather

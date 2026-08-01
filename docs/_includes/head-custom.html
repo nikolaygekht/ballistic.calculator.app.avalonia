@@ -1,0 +1,58 @@
+<!--
+  Additions to the <head> of every page.
+
+  This file is the theme's own extension point: slate's layout ends its head section with an
+  include of head-custom.html, which is empty in the theme and meant to be overridden here.
+
+  Do NOT put this in _layouts/default.html. A site-local layout does not extend the theme's
+  layout of the same name, it REPLACES it - and `layout: default` inside that file then refers
+  to itself rather than to the theme, so the page loses the entire slate wrapper (header,
+  stylesheet, footer) and renders as bare content.
+-->
+
+{% if page.math %}
+<!--
+  MathJax 2, deliberately, rather than 3.
+
+  Kramdown does not leave $$...$$ in the HTML: it converts display math into
+  <script type="math/tex; mode=display"> elements. MathJax 3 has no notion of those and
+  renders nothing; MathJax 2 reads them natively AND scans the text for the delimiters
+  configured below, so the math renders whichever of the two forms it arrives in. Single-dollar
+  inline math is never touched by kramdown, so it reaches the browser as plain text and is
+  picked up by the tex2jax scan.
+
+  Loaded only where the front matter says `math: true`. The tempting guard - checking whether
+  the content contains a dollar sign - does not work, because by the time a layout renders,
+  kramdown has already replaced those delimiters with the script tags above.
+-->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      processEscapes: true,
+      // Nothing inside code is ever math: backticked identifiers, units and stray dollar
+      // signs stay literal.
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    'HTML-CSS': { linebreaks: { automatic: true } },
+    CommonHTML: { linebreaks: { automatic: true } }
+  });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+{% endif %}
+
+<!--
+  Mermaid: renders a ```mermaid fence on the site the way GitHub already renders it in the
+  repository view. A module script is deferred by definition, so the document is parsed before
+  the selector runs, and the import only happens on a page that actually has a diagram.
+-->
+<script type="module">
+  if (document.querySelector('code.language-mermaid')) {
+    import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs')
+      .then(async ({ default: mermaid }) => {
+        mermaid.initialize({ startOnLoad: false, theme: 'default' });
+        await mermaid.run({ querySelector: 'code.language-mermaid' });
+      });
+  }
+</script>

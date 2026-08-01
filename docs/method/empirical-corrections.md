@@ -1,6 +1,7 @@
 ---
 title: The empirical corrections
 nav_exclude: true
+math: true
 ---
 
 # The empirical corrections — spin drift, aerodynamic jump, earth rotation
@@ -11,7 +12,7 @@ added to it afterwards, where each formula comes from, and what each one needs f
 [The 3DOF model](3dof-model.md) integrates two forces, drag and gravity. Everything else in the reported
 drop and windage arrives here.
 
-Inline symbols are written in `code` style; displayed formulae are LaTeX.
+Mathematical symbols are set as inline math; code identifiers, literal values and units stay in `code` style.
 
 ## What "applied at output" means
 
@@ -42,30 +43,30 @@ The four are mutually independent and simply sum. Two are horizontal, two are ve
 ## The gyroscopic stability coefficient
 
 Both spin corrections are scaled by the **Miller twist-rate stability coefficient**, computed once at the
-muzzle. With `w` in grains, `d` in inches, and `t` and `L` the twist and the bullet length expressed in
-calibres (`t = twist/d`, `L = length/d`):
+muzzle. With $w$ in grains, $d$ in inches, and $t$ and $L$ the twist and the bullet length expressed in
+calibres ($t = \text{twist}/d$, $L = \text{length}/d$):
 
 $$S_g = \frac{30\,w}{t^{2}\,d^{3}\,L\,(1+L^{2})}\cdot\left(\frac{V_0}{2800}\right)^{1/3}\cdot\frac{T_F+460}{519}\cdot\frac{29.92}{P}$$
 
-with `T_F` in Fahrenheit and `P` in inches of mercury. The three factors are, in order: Miller's base
+with $T_F$ in Fahrenheit and $P$ in inches of mercury. The three factors are, in order: Miller's base
 formula from the bullet's geometry and mass, a velocity correction normalised to 2800 ft/s, and an air
 correction normalised to standard sea-level conditions.
 
-Two things about `S_g` in this engine:
+Two things about $S_g$ in this engine:
 
-- **It needs three inputs — twist, diameter and length.** Miss any one of them and `S_g` cannot be
+- **It needs three inputs — twist, diameter and length.** Miss any one of them and $S_g$ cannot be
   computed, so spin drift and aerodynamic jump are both **silently absent** from the answer. Not zero
   because physics says so; simply not there. This is the most common reason two solvers disagree on
   windage at long range.
 - **It is computed at the muzzle and never updated.** The corrections below use that muzzle value for the
-  whole flight. The *reported* `S_g` column is different: it is grown downrange as
+  whole flight. The *reported* $S_g$ column is different: it is grown downrange as
 
 $$S_g(x) = S_g\left(\frac{V_0}{\lvert\mathbf{v}\rvert}\right)^{1.25}$$
 
   because spin decays more slowly than forward velocity, so stability rises with range. That growth is
   displayed but not fed back into the drift.
 
-`S_g` is also never judged. A bullet that comes out marginally stabilised — `S_g` near or below 1.4 — is
+$S_g$ is also never judged. A bullet that comes out marginally stabilised — $S_g$ near or below 1.4 — is
 treated exactly like one that flies perfectly, because a point mass cannot be unstable. Nothing warns
 you.
 
@@ -78,9 +79,9 @@ supplied by Litz's approximation:
 
 $$\Delta z_{\text{drift}} = 1.25\,(S_g + 1.2)\;t_{\text{flight}}^{1.83}\;\cdot s_{\text{twist}}\cdot\cos\alpha$$
 
-The result is in **inches** with time of flight in seconds. `s_twist` is `−1` for a right-hand twist —
+The result is in **inches** with time of flight in seconds. $s_{\text{twist}}$ is $-1$ for a right-hand twist —
 drift to the right, which is negative in the left-positive convention of the
-[frame](3dof-model.md#the-frame) — and `+1` for a left-hand one. The `cos α` projects it for an inclined
+[frame](3dof-model.md#the-frame) — and $+1$ for a left-hand one. The $\cos\alpha$ projects it for an inclined
 shot.
 
 Note what it depends on: **time of flight, not range.** A slower bullet drifts more at the same distance,
@@ -101,7 +102,7 @@ then persists as a constant **angle**. From Litz, *Applied Ballistics* Eq. 5.4:
 
 $$\Delta y'\;[\mathrm{MOA}] = \left(0.01\,S_g - 0.0024\,L + 0.032\right)\,W_\perp\cdot s_{\text{twist}}$$
 
-with `L` the bullet length in calibres and `W_⊥` the crosswind in mph, positive from the right. Only the
+with $L$ the bullet length in calibres and $W_\perp$ the crosswind in mph, positive from the right. Only the
 **first wind zone** contributes, because the jump happens at the muzzle — a wind that starts 300 yards
 downrange produces none of it.
 
@@ -120,9 +121,9 @@ is completely independent of which way you are facing:
 
 $$\Delta z_{\text{Coriolis}} = -\,\Omega\sin\phi\;R\,t_{\text{flight}}, \qquad \Omega = 7.2921159\times10^{-5}\ \mathrm{rad/s}$$
 
-The sign is carried by `sin φ`: positive latitudes (northern hemisphere) deflect the bullet **right**,
+The sign is carried by $\sin\phi$: positive latitudes (northern hemisphere) deflect the bullet **right**,
 which is why the term is subtracted in the left-positive windage convention. It vanishes at the equator
-and is largest at the poles. The product `R·t` means it grows roughly with the square of range.
+and is largest at the poles. The product $R\,t$ means it grows roughly with the square of range.
 
 ## Earth rotation, term two: vertical (Eötvös)
 
@@ -133,7 +134,7 @@ the shot:
 
 $$\frac{g_{\text{eff}}}{g} = 1 - \frac{2\,\Omega\cos\phi\,\sin(Az)\,V_0}{g}$$
 
-East (`sin Az > 0`) lifts the bullet — less drop; west lowers it; due north or south cancels it entirely.
+East ($\sin Az > 0$) lifts the bullet — less drop; west lowers it; due north or south cancels it entirely.
 Note it uses the **muzzle** velocity, not the current one.
 
 Because this is a modification of *gravity*, it may only act on the part of the trajectory that gravity
@@ -142,8 +143,8 @@ produced: the fall below the no-gravity bore line. So the fall is scaled and the
 $$y_{\text{bore}} = x\tan\theta - h, \qquad y_{\text{eff}} = y_{\text{bore}} + (y - y_{\text{bore}})\cdot\frac{g_{\text{eff}}}{g}$$
 
 Scaling the fall rather than the whole ordinate is what keeps the launch geometry untouched — in
-particular the exact `−h` drop at the muzzle, where the fall is zero and the correction must therefore do
-nothing. The integrator's own `y` is never modified; `y_eff` is a display quantity, computed per row.
+particular the exact $-h$ drop at the muzzle, where the fall is zero and the correction must therefore do
+nothing. The integrator's own $y$ is never modified; $y_{\text{eff}}$ is a display quantity, computed per row.
 
 **Latitude alone is a valid input.** Give latitude without a bearing and you get the horizontal term
 correctly and the vertical term not at all, which is the honest answer when you do not know which way you
@@ -153,7 +154,7 @@ are facing.
 
 For a typical centrefire rifle load at long range, these effects rank roughly:
 
-1. **Spin drift** — inches, growing with `t^1.83`; the largest of the four, and the one most often missing
+1. **Spin drift** — inches, growing with $t^{1.83}$; the largest of the four, and the one most often missing
    from a comparison because of the bullet-length requirement.
 2. **Aerodynamic jump** — a fraction of a MOA per 10 mph of crosswind, constant in angle.
 3. **Horizontal Coriolis** — inches at 1000 yd and beyond, negligible closer.
@@ -174,7 +175,7 @@ average out over a string of shots the way a wind misjudgement does — not beca
   three they are silently absent.
 - Coriolis is two independent effects: horizontal from latitude alone, vertical from latitude and bearing
   together.
-- `S_g` is computed at the muzzle, used constant, reported grown, and never judged.
+- $S_g$ is computed at the muzzle, used constant, reported grown, and never judged.
 
 ---
 
