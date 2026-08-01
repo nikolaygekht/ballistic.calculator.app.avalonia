@@ -113,6 +113,8 @@ take it on trust
 - [What the model includes](what-the-model-includes.md) — which effects are computed, which are
   approximated, which are absent, and the risk notice in full
 - [Known problems](known-problems.md) — what is known, what is ours, and what is the platform's fault
+- [Release notes](release-notes/index.md) — every release, what it contains and what was known to be wrong
+  with it at the time
 - Troubleshooting and FAQ — the recurring stumbles, each pointing at the article that explains it
 - [Recommended reading](recommended-reading.md) — the ballistics this guide deliberately does not teach
 
