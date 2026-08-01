@@ -91,7 +91,7 @@ Two forces, and that is all: **drag along the air-relative velocity, and constan
   velocity the drag law sees, not as a force of its own. A tailwind reduces drag; a crosswind produces a
   lateral component of drag which is what pushes the bullet sideways.
 - $C_d(M)$ — read from the drag table at the local Mach number. See
-  [the ballistic coefficient](ballistic-coefficient.md) for the drag term in full, including `PIR`.
+  [the ballistic coefficient](ballistic-coefficient.md) for the drag term in full, including $\mathrm{PIR}$.
 - $g$ — `9.80665 m/s²`, constant. No altitude variation.
 - $c$ — the local speed of sound, so $M$ is evaluated against the air the bullet is *currently* in.
 
@@ -185,7 +185,7 @@ The run ends at the first of:
 |---|---|
 | requested maximum range reached | one calculation step past `MaximumDistance` |
 | output row array full | `MaximumDistance / Step + 1` rows |
-| velocity floor | `\|v\| < 50 ft/s`, **or** `v_x < 50 ft/s` |
+| velocity floor | $\lvert\mathbf{v}\rvert < 50\ \mathrm{ft/s}$, **or** $v_x < 50\ \mathrm{ft/s}$ |
 | drop floor | more than `10 000 ft` below the sight line |
 | non-finite velocity | raises `TrajectoryCannotBeCalculatedException` |
 | a step that does not advance $x$ | raises `TrajectoryCannotBeCalculatedException` |

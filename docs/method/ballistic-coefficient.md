@@ -67,16 +67,16 @@ decelerates half as fast; that is not a rule of thumb, it is the equation.
 
 Its units are mass over area — `lb/in²` here — which is why a BC is not dimensionless and why
 comparing one to a drag coefficient is a category error. The G1 reference projectile is one inch in
-diameter and one pound in mass, so its own BC is exactly `1.0 lb/in²`; every published BC is
+diameter and one pound in mass, so its own BC is exactly $1.0\ \mathrm{lb/in^2}$; every published BC is
 effectively "this bullet's retardation, as a fraction of that standard bullet's".
 
 ## What the engine actually evaluates
 
-In code the constants are folded together. `PIR` is the fixed part of the coefficient:
+In code the constants are folded together. $\mathrm{PIR}$ is the fixed part of the coefficient:
 
 $$\mathrm{PIR} = \frac{\pi}{8}\cdot\frac{\rho_0}{144} = 2.08551\times10^{-4}$$
 
-with `ρ₀ = 0.076474 lb/ft³`, the standard sea-level air density, and the `144` converting the BC's
+with $\rho_0 = 0.076474\ \mathrm{lb/ft^3}$, the standard sea-level air density, and the $144$ converting the BC's
 square inches into square feet so the result comes out in `ft/s²`. Air density enters as a
 dimensionless ratio to that standard — the **density factor** $\rho/\rho_0$, which the
 [Weather tab](../weather-tab.md) inputs produce. The acceleration is then
@@ -104,7 +104,7 @@ The `BallisticCoefficient` value carries a type, and the two are not interchange
 
 | Type | What you supply | What the engine computes |
 |---|---|---|
-| **Coefficient** | the published BC, e.g. `0.223 G7` | used as-is: `BC = 0.223` |
+| **Coefficient** | the published BC, e.g. `0.223 G7` | used as-is: $\mathrm{BC} = 0.223$ |
 | **Form factor** | the shape factor $i$, e.g. `1.05 G7` | $\mathrm{BC} = \mathrm{SD}/i$, from the bullet's weight and diameter |
 
 The coefficient path needs nothing but the number. The form-factor path **requires** the bullet weight
@@ -189,7 +189,7 @@ reference velocity, and the engine's converter asks for one rather than pretendi
 
 - Drag acceleration is $(\pi/8)\,\rho\,v^2\,C_d(M)/\mathrm{BC}$. The BC is a divisor of drag, nothing more.
 - $\mathrm{BC} = \mathrm{SD}/i$: sectional density carries the mass and the calibre, the form factor carries the shape.
-- Units are `lb/in²`; the G1 standard projectile is 1 inch and 1 lb, hence `BC = 1`.
+- Units are $\mathrm{lb/in^2}$; the G1 standard projectile is 1 inch and 1 lb, hence $\mathrm{BC} = 1$.
 - A BC is meaningless without its drag table, because $i$ is measured against that table's reference.
 - One scalar BC assumes the bullet's drag curve is a constant multiple of the reference's. When that
   assumption hurts, replace the scalar with a curve — a multi-BC profile or a measured `.drg`.

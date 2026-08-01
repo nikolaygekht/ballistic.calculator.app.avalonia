@@ -165,7 +165,7 @@ comparison, lower the cap to 0.1 m to get the historical accuracy back.
 
 Two caveats for anyone driving the library directly:
 
-- **The dangerous end of the step range is the large one, not the small one.** `Δt = Δs/v_x` means a
+- **The dangerous end of the step range is the large one, not the small one.** $\Delta t = \Delta s / v_x$ means a
   coarse cap combined with a very slow projectile produces a long step in time; the guards described in
   [the 3DOF model](3dof-model.md#stopping) exist for that case.
 - **A higher-order scheme is not the next improvement.** RK4 would cost two more drag evaluations per
