@@ -20,8 +20,8 @@ Mathematical symbols are set as inline math; code identifiers, literal values an
 
 ## Three degrees of freedom
 
-The projectile is a **point with mass**. Its state is six numbers — three of position, three of
-velocity — and the model advances them through time:
+The projectile is a **point with mass**. Its state is six numbers — a position $\mathbf{r}$ and a velocity
+$\mathbf{v}$, three components each — and the model advances them through time:
 
 $$\mathbf{r} = (x, y, z), \qquad \mathbf{v} = (v_x, v_y, v_z)$$
 
@@ -66,7 +66,10 @@ where the two launch angles accumulate everything that tilts the barrel:
 
 $$\theta = \underbrace{\theta_{\text{zero}}}_{\text{elevation that zeroes the rifle}} + \underbrace{\theta_{\text{dialled}}}_{\text{clicks on the turret}} + \underbrace{\alpha}_{\text{shot angle}}$$
 
-$$\psi = \psi_{\text{zero}} + \psi_{\text{dialled}}$$
+$$\psi = \underbrace{\psi_{\text{zero}}}_{\text{windage that zeroes the rifle}} + \underbrace{\psi_{\text{dialled}}}_{\text{windage clicks on the turret}}$$
+
+$\theta$ is the elevation of the bore above the horizontal and $\psi$ its horizontal offset, positive to
+the left; $V_0$ is the muzzle velocity and $h$ the sight height.
 
 The shot angle enters here, as part of the launch direction, rather than as a rotation of gravity.
 
@@ -90,9 +93,16 @@ Two forces, and that is all: **drag along the air-relative velocity, and constan
 - $\mathbf{w}$ — the wind vector. Drag depends on motion through the *air*, so wind enters by shifting the
   velocity the drag law sees, not as a force of its own. A tailwind reduces drag; a crosswind produces a
   lateral component of drag which is what pushes the bullet sideways.
-- $C_d(M)$ — read from the drag table at the local Mach number. See
-  [the ballistic coefficient](ballistic-coefficient.md) for the drag term in full, including $\mathrm{PIR}$.
+- $\mathbf{v}_a$ — the air-relative velocity, which is what drag acts along, and $M$ the Mach number it
+  corresponds to.
+- $C_d(M)$ — read from the drag table at the local Mach number.
+- $k = \mathrm{PIR}/\mathrm{BC}$ — the drag scale: the ballistic coefficient and the fixed constant
+  $\mathrm{PIR}$ that carries the frontal-area geometry and the unit conversions. See
+  [the ballistic coefficient](ballistic-coefficient.md) for this term in full.
+- $\rho/\rho_0$ — the **density factor**: the air's density as a fraction of the standard sea-level value
+  $\rho_0$, which is the form the drag law needs it in.
 - $g$ — `9.80665 m/s²`, constant. No altitude variation.
+- $\hat{\mathbf{y}}$ — the vertical unit vector, so gravity acts straight down and nowhere else.
 - $c$ — the local speed of sound, so $M$ is evaluated against the air the bullet is *currently* in.
 
 Note that the acceleration depends on **velocity alone**; position enters only through the atmosphere,
@@ -108,12 +118,18 @@ and what energy is computed from.
 
 Three published columns are functions of that magnitude only:
 
-$$M_{\text{reported}} = \frac{\lvert\mathbf{v}\rvert}{c}, \qquad E = \tfrac{1}{2}m\lvert\mathbf{v}\rvert^{2}$$
+$$M_{\text{reported}} = \frac{\lvert\mathbf{v}\rvert}{c}, \qquad E = \tfrac{1}{2}\,m\,\lvert\mathbf{v}\rvert^{2}$$
 
-$$\text{OGW} = w^{2}\,\lvert\mathbf{v}\rvert^{3}\cdot1.5\times10^{-12}\ \mathrm{lb}$$
+$$\text{OGW} = w_{\text{gr}}^{2}\,\lvert\mathbf{v}\rvert^{3}\cdot1.5\times10^{-12}\ \mathrm{lb}$$
 
-with $\mathbf{w}$ in grains and the velocity in ft/s for the last one. Note the reported Mach uses $\lvert\mathbf{v}\rvert$, while
-the drag lookup inside the step uses $\lvert\mathbf{v}_a\rvert$; in calm air they are identical.
+- $M_{\text{reported}}$ — the Mach column
+- $E$ — kinetic energy, from the bullet mass $m$
+- $\text{OGW}$ — Optimal Game Weight, an empirical formula taking the bullet weight $w_{\text{gr}}$ in **grains**
+  and $\lvert\mathbf{v}\rvert$ in **ft/s**. Note that $w_{\text{gr}}$, a weight, is a different quantity from the wind
+  vector $\mathbf{w}$ above
+
+Note the reported Mach uses $\lvert\mathbf{v}\rvert$, while the drag lookup inside the step uses
+$\lvert\mathbf{v}_a\rvert$; in calm air they are identical.
 
 Velocity decay is not modelled by any formula — it is whatever the integration produces. There is no
 retardation coefficient, no $v(x)$ approximation, no Pejsa-style closed form: velocity falls out of
@@ -135,6 +151,10 @@ $$w_x = W_{\text{range}}\cos\theta$$
 $$w_y = -W_{\text{range}}\sin\theta\,\cos\kappa + W_{\text{cross}}\sin\kappa$$
 
 $$w_z = W_{\text{cross}}\cos\kappa + W_{\text{range}}\sin\theta\,\sin\kappa$$
+
+$W_{\text{range}}$ and $W_{\text{cross}}$ are the head/tail and cross parts of the wind, and
+$w_x, w_y, w_z$ are the components of $\mathbf{w}$ along the three axes of the frame — the vector that
+enters the equations of motion above.
 
 A head- or tailwind on an inclined shot therefore acquires a vertical component, and a cant mixes the
 range and cross components into each other — both fall straight out of the rotation, with no special
@@ -215,8 +235,10 @@ reported: `Drop` is this perpendicular figure, `DropFlat` the plain vertical one
 
 $$\theta_{\text{adj}} = \arctan\!\left(\frac{\text{drop}}{R}\right)$$
 
-and the same for windage. This is a true angle, not the small-angle approximation, and it is what the
-click columns are derived from.
+where $\theta_{\text{adj}}$ is that correction, $R = x/\cos\alpha$ the line-of-sight distance to the row
+being reported, and $\text{drop}$ the figure above. The same expression gives the windage adjustment from
+the windage. This is a true angle, not
+the small-angle approximation, and it is what the click columns are derived from.
 
 **Reference lines.** Two straight lines are reported alongside, both linear in $x$: the line of sight
 $x\tan\alpha$, and the line of departure (the bore line) $x\tan\theta - h$. The chart's two-curve mode draws the
@@ -228,6 +250,9 @@ The launch angle $\theta_{\text{zero}}$ is not given, it is found. The engine ru
 distance and corrects the launch angles by Newton steps until the impact lands on the aim point:
 
 $$\theta \leftarrow \theta + \arctan\!\left(\frac{\text{miss}}{D}\right)$$
+
+where $D$ is the zero distance and $\text{miss}$ how far the impact at that distance falls short of the aim
+point — the target offset less the computed drop, in the same perpendicular convention as above.
 
 The linear miss over the zero distance is, to first order, exactly the angular correction needed, so
 convergence takes a handful of passes; the loop allows up to 100 and a default tolerance of **0.1 mm**.

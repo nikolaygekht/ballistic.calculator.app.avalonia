@@ -62,7 +62,12 @@ Both advance the same state with the same acceleration function
 
 $$\mathbf{a}(\mathbf{v}) = -\,k\,\frac{\rho}{\rho_0}\,C_d(M)\,\lvert\mathbf{v}_a\rvert\,\mathbf{v}_a - g\hat{\mathbf{y}}$$
 
-and differ only in where that function is sampled inside the step. Note it depends on velocity alone —
+— the drag scale $k$, the density factor $\rho/\rho_0$, the drag coefficient $C_d(M)$ at the air-relative
+Mach number, the air-relative velocity $\mathbf{v}_a$ and gravity $g$, all exactly as defined in
+[the equations of motion](3dof-model.md#the-equations-of-motion) — and differ only in where that function
+is sampled inside the step. Below, $\mathbf{v}_n$ and $\mathbf{r}_n$ are the velocity and position at the
+start of a step, $n+1$ the same at its end, and $\Delta t$ the step length in time. Note the acceleration
+depends on velocity alone —
 position enters only through the atmosphere, which is held fixed across a step — which is why both
 schemes are written on the velocity.
 
@@ -89,6 +94,9 @@ $$\mathbf{a}_2 = \mathbf{a}(\mathbf{v}_m)$$
 
 $$\mathbf{v}_{n+1} = \mathbf{v}_n + \mathbf{a}_2\,\Delta t, \qquad
 \mathbf{r}_{n+1} = \mathbf{r}_n + \mathbf{v}_m\,\Delta t$$
+
+$\mathbf{a}_1$ is the acceleration at the start of the step, $\mathbf{v}_m$ the velocity half a step later
+— the **midpoint**, hence the name — and $\mathbf{a}_2$ the acceleration there.
 
 Two evaluations per step: probe half a step forward, then use the acceleration found *there* for the
 whole step. Position advances on the midpoint velocity, which is the matching second-order estimate for

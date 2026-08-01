@@ -20,6 +20,7 @@ A projectile in air feels a drag force opposing its motion through that air:
 
 $$F_d = \tfrac{1}{2}\,\rho\,v^2\,C_d(M)\,A$$
 
+- $F_d$ — the drag force
 - $\rho$ — air density
 - $v$ — speed **relative to the air**, not relative to the ground
 - $C_d(M)$ — the drag coefficient, which is a function of Mach number $M$, not a constant
@@ -28,6 +29,9 @@ $$F_d = \tfrac{1}{2}\,\rho\,v^2\,C_d(M)\,A$$
 What moves the bullet is acceleration, so divide by mass:
 
 $$a_d = \frac{F_d}{m} = \frac{\pi}{8}\,\rho\,v^2\,C_d(M)\,\frac{d^2}{m}$$
+
+- $a_d$ — the deceleration drag produces
+- $m$ — the projectile's mass
 
 Everything about *this particular bullet* has collapsed into two groups: its shape, which lives in
 $C_d(M)$, and the ratio $d^2/m$, which is pure geometry and mass. The ballistic coefficient is the
@@ -43,6 +47,10 @@ In the engine's units that is grains converted to pounds over square inches, whi
 computed from what you type:
 
 $$\mathrm{SD} = \frac{w_{\text{gr}}}{7000\,d_{\text{in}}^{2}} \quad \left[\frac{\mathrm{lb}}{\mathrm{in}^{2}}\right]$$
+
+- $w_{\text{gr}}$ — the bullet weight in **grains**, as entered on the Ammunition tab
+- $d_{\text{in}}$ — the bullet diameter in **inches**
+- $7000$ — grains per pound, so the quotient comes out in `lb/in²`
 
 **Form factor** $i$ is the shape term. It compares this bullet's drag coefficient to that of a
 *reference* projectile — a standard shape whose $C_d(M)$ curve has been measured once and tabulated:
@@ -79,13 +87,15 @@ $$\mathrm{PIR} = \frac{\pi}{8}\cdot\frac{\rho_0}{144} = 2.08551\times10^{-4}$$
 with $\rho_0 = 0.076474\ \mathrm{lb/ft^3}$, the standard sea-level air density, and the $144$ converting the BC's
 square inches into square feet so the result comes out in `ft/s²`. Air density enters as a
 dimensionless ratio to that standard — the **density factor** $\rho/\rho_0$, which the
-[Weather tab](../weather-tab.md) inputs produce. The acceleration is then
+[Weather tab](../weather-tab.md) inputs produce. The acceleration, now written as the vector
+$\mathbf{a}_d$ rather than the scalar $a_d$, is then
 
 $$\mathbf{a}_d = -\,\mathrm{PIR}\cdot\frac{\rho}{\rho_0}\cdot\frac{C_d(M)}{\mathrm{BC}}\cdot
 \lvert\mathbf{v}_a\rvert\;\mathbf{v}_a$$
 
 written with the velocity vector rather than the speed, because drag acts *along* the air-relative
-velocity $\mathbf{v}_a = \mathbf{v} - \mathbf{w}$: it is $\lvert\mathbf{v}_a\rvert\,\mathbf{v}_a$ that carries both the $v^2$ magnitude and the direction.
+velocity $\mathbf{v}_a = \mathbf{v} - \mathbf{w}$ — the projectile's velocity $\mathbf{v}$ less the wind vector
+$\mathbf{w}$ — and it is $\lvert\mathbf{v}_a\rvert\,\mathbf{v}_a$ that carries both the $v^2$ magnitude and the direction.
 This is the drag term of the equations of motion in [the 3DOF model](3dof-model.md).
 
 Two details of the lookup are worth knowing:
@@ -124,6 +134,9 @@ From $\mathrm{BC} = \mathrm{SD}/i$, sectional density is a property of the bulle
 
 $$\frac{\mathrm{BC}_{G1}}{\mathrm{BC}_{G7}} = \frac{i_{G7}}{i_{G1}}$$
 
+where $\mathrm{BC}_{G1}$ and $\mathrm{BC}_{G7}$ are the one bullet's coefficients against the two tables, and
+$i_{G1}$, $i_{G7}$ its form factors against their two reference shapes.
+
 The ratio near 2.0 says nothing about the bullet and everything about the two reference projectiles:
 the G7 standard is a long boat-tailed shape that a modern match bullet resembles closely, so $i_{G7}$
 lands near 1; the G1 standard is a blunt flat-based shape that it does not resemble at all, so $i_{G1}$
@@ -150,6 +163,11 @@ Given BC quoted at several Mach numbers, the engine stops treating BC as a scala
 projectile's own drag curve on the base table's Mach grid:
 
 $$C_{d,\text{own}}(M) = \frac{C_{d,\text{base}}(M)}{\mathrm{BC}(M)}\cdot\mathrm{SD}$$
+
+- $C_{d,\text{own}}(M)$ — the projectile's own drag coefficient, the curve being built
+- $C_{d,\text{base}}(M)$ — the standard curve it is derived from, G1 or G7 or another
+- $\mathrm{BC}(M)$ — the effective BC at that Mach number, from the quoted knots
+- $\mathrm{SD}$ — the sectional density, from the bullet weight and diameter as above
 
 $\mathrm{BC}(M)$ is interpolated linearly between the supplied knots and held flat beyond the end ones. The
 resulting table is then run with a **form factor of exactly 1**, which the factory stamps into the

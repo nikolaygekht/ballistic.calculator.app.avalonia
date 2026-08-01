@@ -43,14 +43,24 @@ The four are mutually independent and simply sum. Two are horizontal, two are ve
 ## The gyroscopic stability coefficient
 
 Both spin corrections are scaled by the **Miller twist-rate stability coefficient**, computed once at the
-muzzle. With $w$ in grains, $d$ in inches, and $t$ and $L$ the twist and the bullet length expressed in
-calibres ($t = \text{twist}/d$, $L = \text{length}/d$):
+muzzle:
 
-$$S_g = \frac{30\,w}{t^{2}\,d^{3}\,L\,(1+L^{2})}\cdot\left(\frac{V_0}{2800}\right)^{1/3}\cdot\frac{T_F+460}{519}\cdot\frac{29.92}{P}$$
+$$S_g = \frac{30\,w_{\text{gr}}}{t^{2}\,d_{\text{in}}^{3}\,L\,(1+L^{2})}\cdot\left(\frac{V_0}{2800}\right)^{1/3}\cdot\frac{T_F+460}{519}\cdot\frac{29.92}{P}$$
 
-with $T_F$ in Fahrenheit and $P$ in inches of mercury. The three factors are, in order: Miller's base
-formula from the bullet's geometry and mass, a velocity correction normalised to 2800 ft/s, and an air
-correction normalised to standard sea-level conditions.
+- $S_g$ — the stability coefficient, dimensionless; above 1 the bullet is gyroscopically stable
+- $w_{\text{gr}}$ — bullet weight in **grains**
+- $d_{\text{in}}$ — bullet diameter in **inches**
+- $t$ — the twist expressed in **calibres**, $t = \text{twist}/d_{\text{in}}$: inches of barrel per turn,
+  divided by the diameter
+- $L$ — the bullet length in **calibres**, $L = \text{length}/d_{\text{in}}$
+- $V_0$ — muzzle velocity in **ft/s**
+- $T_F$ — air temperature in **Fahrenheit**, $P$ — pressure in **inches of mercury**
+- $30$ — Miller's empirical constant, which carries the units of the first factor
+
+The three factors are, in order: Miller's base formula from the bullet's geometry and mass, a velocity
+correction normalised to 2800 ft/s, and an air correction normalised to standard sea-level conditions —
+where $519 = 59 + 460$ is 59 °F in Rankine and 29.92 inHg is standard pressure, so both fractions are 1
+in standard air.
 
 Two things about $S_g$ in this engine:
 
@@ -63,6 +73,8 @@ Two things about $S_g$ in this engine:
 
 $$S_g(x) = S_g\left(\frac{V_0}{\lvert\mathbf{v}\rvert}\right)^{1.25}$$
 
+  where $S_g(x)$ is the value reported at downrange distance $x$ and $\lvert\mathbf{v}\rvert$ the velocity
+  there, both from the integrated trajectory,
   because spin decays more slowly than forward velocity, so stability rises with range. That growth is
   displayed but not fed back into the drift.
 
@@ -79,10 +91,12 @@ supplied by Litz's approximation:
 
 $$\Delta z_{\text{drift}} = 1.25\,(S_g + 1.2)\;t_{\text{flight}}^{1.83}\;\cdot s_{\text{twist}}\cdot\cos\alpha$$
 
-The result is in **inches** with time of flight in seconds. $s_{\text{twist}}$ is $-1$ for a right-hand twist —
-drift to the right, which is negative in the left-positive convention of the
-[frame](3dof-model.md#the-frame) — and $+1$ for a left-hand one. The $\cos\alpha$ projects it for an inclined
-shot.
+- $\Delta z_{\text{drift}}$ — the lateral displacement, in **inches**, added to the reported windage
+- $S_g$ — the muzzle stability coefficient above; $1.25$ and $1.2$ are Litz's fitted constants
+- $t_{\text{flight}}$ — time of flight to that row, in **seconds**
+- $s_{\text{twist}}$ — the twist sign: $-1$ for a right-hand twist, drift to the right, which is negative in
+  the left-positive convention of the [frame](3dof-model.md#the-frame); $+1$ for a left-hand one
+- $\alpha$ — the shot angle, so $\cos\alpha$ projects the drift for an inclined shot
 
 Note what it depends on: **time of flight, not range.** A slower bullet drifts more at the same distance,
 and the exponent 1.83 means drift grows appreciably faster than linearly — a few inches at 500 yd,
@@ -102,13 +116,19 @@ then persists as a constant **angle**. From Litz, *Applied Ballistics* Eq. 5.4:
 
 $$\Delta y'\;[\mathrm{MOA}] = \left(0.01\,S_g - 0.0024\,L + 0.032\right)\,W_\perp\cdot s_{\text{twist}}$$
 
-with $L$ the bullet length in calibres and $W_\perp$ the crosswind in mph, positive from the right. Only the
-**first wind zone** contributes, because the jump happens at the muzzle — a wind that starts 300 yards
-downrange produces none of it.
+- $\Delta y'$ — the jump **angle**, in MOA; the same for every range
+- $S_g$ and $L$ — the stability coefficient and the bullet length in calibres, as above
+- $W_\perp$ — the crosswind component in **mph**, positive from the right
+- $s_{\text{twist}}$ — the same twist sign as for spin drift
+
+Only the **first wind zone** contributes to $W_\perp$, because the jump happens at the muzzle — a wind that
+starts 300 yards downrange produces none of it.
 
 Being an angle, it becomes a vertical offset **linear in range**:
 
 $$\Delta\text{drop} = \Delta y' \cdot R$$
+
+with $R$ the line-of-sight distance to the row, and the result added to the reported drop.
 
 That linearity is the signature to look for: a 10 mph full-value crosswind might lift the impact a
 fraction of a MOA, constant in angular terms at every distance, which is why it is easy to mistake for a
@@ -120,6 +140,11 @@ The rotating frame of the earth deflects a projectile sideways. This term depend
 is completely independent of which way you are facing:
 
 $$\Delta z_{\text{Coriolis}} = -\,\Omega\sin\phi\;R\,t_{\text{flight}}, \qquad \Omega = 7.2921159\times10^{-5}\ \mathrm{rad/s}$$
+
+- $\Delta z_{\text{Coriolis}}$ — the lateral displacement added to the reported windage
+- $\Omega$ — the earth's rotation rate, in radians per second
+- $\phi$ — the shooter's **latitude**, positive north
+- $R$ and $t_{\text{flight}}$ — the line-of-sight distance to the row and the time of flight to it
 
 The sign is carried by $\sin\phi$: positive latitudes (northern hemisphere) deflect the bullet **right**,
 which is why the term is subtracted in the left-positive windage convention. It vanishes at the equator
@@ -134,6 +159,13 @@ the shot:
 
 $$\frac{g_{\text{eff}}}{g} = 1 - \frac{2\,\Omega\cos\phi\,\sin(Az)\,V_0}{g}$$
 
+- $g_{\text{eff}}/g$ — the effective gravity as a fraction of the true value; dimensionless and constant
+  for the shot
+- $g$ — gravity, `9.80665 m/s²`, and $\Omega$, $\phi$ — as above
+- $Az$ — the barrel **azimuth**: the compass bearing of the shot, measured clockwise from north, so due
+  east is 90° and $\sin(Az) = 1$
+- $V_0$ — the muzzle velocity, in metres per second to match $g$
+
 East ($\sin Az > 0$) lifts the bullet — less drop; west lowers it; due north or south cancels it entirely.
 Note it uses the **muzzle** velocity, not the current one.
 
@@ -141,6 +173,11 @@ Because this is a modification of *gravity*, it may only act on the part of the 
 produced: the fall below the no-gravity bore line. So the fall is scaled and the ordinate rebuilt:
 
 $$y_{\text{bore}} = x\tan\theta - h, \qquad y_{\text{eff}} = y_{\text{bore}} + (y - y_{\text{bore}})\cdot\frac{g_{\text{eff}}}{g}$$
+
+- $y_{\text{bore}}$ — the vacuum bore line: where the bullet would be with no gravity at all
+- $x$, $y$, $\theta$, $h$ — as in the [3DOF frame](3dof-model.md#the-frame): downrange distance, vertical
+  ordinate, launch elevation and sight height
+- $y_{\text{eff}}$ — the ordinate the reported drop is then computed from
 
 Scaling the fall rather than the whole ordinate is what keeps the launch geometry untouched — in
 particular the exact $-h$ drop at the muzzle, where the fall is zero and the correction must therefore do
