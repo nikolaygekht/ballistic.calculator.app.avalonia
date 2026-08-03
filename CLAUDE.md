@@ -2,7 +2,8 @@
 
 ## Project Goal
 
-Create a new version of the BallisticCalculator application using **Avalonia UI** instead of WinForms. This is a complete rewrite that maintains the functionality of the original application while taking advantage of modern cross-platform UI technology.
+A cross-platform ballistic calculator built on **Avalonia UI**. It began as a rewrite of an older
+WinForms application; that application is archived and is **not** a reference for this work any more.
 
 ## Development Workflow
 
@@ -50,12 +51,6 @@ Create a new version of the BallisticCalculator application using **Avalonia UI*
     note `AngularUnit.Mil` is the military mil, 1/6400 of a circle, and ~1.9 % off a milliradian.
   - Consult the `ballistic-calculator` skill before using this API; it describes the **1.1.13+** surface,
     including both named exceptions and `MilDotReticle` in milliradians.
-
-### Original Implementation
-- **Old WinForms Application**: `/mnt/d/develop/homeapps.projects/BallisticCalculator1/`
-  - Reference for understanding control behavior patterns
-  - Good example of direct UI access pattern (no reactive properties)
-  - Use as reference for precision transparency and other WinForms patterns
 
 ## Project Structure
 
@@ -147,7 +142,7 @@ After struggling with Avalonia's reactive property system causing circular notif
 - Our app is **action-driven**: everything happens by explicit user interaction
 - Reactive frameworks add complexity we don't need
 
-**✅ USE: WinForms Direct UI Access Pattern**
+**✅ USE: Direct UI Access Pattern**
 ```csharp
 // Value property reads directly from UI on-demand (no stored state)
 public object? Value
@@ -265,7 +260,8 @@ public class MeasurementControl : UserControl
 1. **Start simple** - Implement the minimal working version first
 2. **Write tests first (TDD)** - Unit tests are your primary verification tool
 3. **Avoid premature abstraction** - Don't create interfaces/patterns until you need them
-4. **Reference WinForms** - When in doubt, check how the old app did it
+4. **Follow the existing panels and controls** - When in doubt, copy the pattern of the closest
+   existing control, panel or dialog in this repository
 
 ### For Controls
 
@@ -276,7 +272,7 @@ public class MeasurementControl : UserControl
 
 ### Spacing and Layout (Desktop)
 
-**Goal**: Match WinForms information density. Avalonia controls have more built-in padding than WinForms, so we use tighter spacing values to compensate.
+**Goal**: Keep a dense, desktop-grade information layout. Avalonia controls carry a lot of built-in padding, so we use tighter spacing values to compensate.
 
 - **StackPanel Spacing**: Use `Spacing="4"` for form field rows (labels + controls)
 - **Section padding**: Use `Padding="5"` on Border sections, not 10
@@ -299,7 +295,7 @@ public class MeasurementControl : UserControl
 **Why TDD matters here:**
 - One reason we rejected the reactive approach was that it made tests almost useless
 - With reactive properties, we had to debug everything manually despite having tests
-- Our simplified WinForms-style pattern makes tests reliable and meaningful
+- Our simplified direct-UI-access pattern makes tests reliable and meaningful
 - When tests pass, the code actually works (unlike with reactive complexity)
 
 ## Common Patterns
@@ -352,8 +348,8 @@ Before adding complexity, ask:
 - Do we actually need this abstraction?
 - Will this feature be used in multiple places?
 - Is there a simpler way?
-- How did the WinForms version handle this?
+- Does an existing control, panel or controller in this repository already solve this?
 
 ## Summary
 
-**Core Philosophy**: Build a functional, maintainable application using the simplest approach that works. Avoid framework complexity that doesn't serve our action-driven, desktop-focused use case. Reference the working WinForms implementation when uncertain.
+**Core Philosophy**: Build a functional, maintainable application using the simplest approach that works. Avoid framework complexity that doesn't serve our action-driven, desktop-focused use case. When uncertain, follow the patterns already established in this repository.

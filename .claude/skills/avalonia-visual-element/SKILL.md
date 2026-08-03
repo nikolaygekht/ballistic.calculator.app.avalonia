@@ -9,7 +9,7 @@ Follow these rules strictly when creating or modifying any visual element (contr
 
 ## Core Philosophy
 
-- **WinForms-style Direct UI Access** — no MVVM, no reactive patterns, no stored state between UI and model
+- **Direct UI Access** — no MVVM, no reactive patterns, no stored state between UI and model
 - **Action-driven** — everything happens by explicit user interaction
 - **KISS** — minimal working version first, no premature abstractions
 - **TDD** — write tests first, implement second
@@ -149,7 +149,7 @@ public partial class EditSomethingDialog : Window
 - **Precision transparency** — store original values; if user hasn't changed the display, return the original precise value
 - **Events over properties** — raise `Changed` event, let the application decide what to do
 
-### Value Access Pattern (WinForms-style)
+### Value Access Pattern (direct UI access)
 
 ```csharp
 // GET: always read from UI controls directly (no stored state)
