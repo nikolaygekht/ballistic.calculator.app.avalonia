@@ -90,9 +90,9 @@ planned** — the structure is listed in full so you can see what is coming and 
 
 - [Ammunition library and presets](library-and-presets.md) — stop re-typing loads, sights and barrels
 - [The reticle editor](reticle-editor.md) — what the separate editor application is for, and its window
-- [Reticle size and zero](reticle-parameters.md) — the coordinate space every element is placed in
-- [Reticle elements](reticle-elements.md) — the six element types, and what draw order decides
-- [Reticle paths](reticle-paths.md) — move-to, line-to and arc, for shapes the other types cannot make
+  - [Reticle size and zero](reticle-parameters.md) — the coordinate space every element is placed in
+  - [Reticle elements](reticle-elements.md) — the six element types, and what draw order decides
+  - [Reticle paths](reticle-paths.md) — move-to, line-to and arc, for shapes the other types cannot make
 
 **How the calculation works** — the mathematics, for readers who want to check a number rather than
 take it on trust

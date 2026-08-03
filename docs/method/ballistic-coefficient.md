@@ -1,5 +1,6 @@
 ---
 title: The ballistic coefficient
+nav_order: 26
 math: true
 ---
 
@@ -215,3 +216,5 @@ reference velocity, and the engine's converter asks for one rather than pretendi
 
 Next in this series: [The 3DOF point-mass model](3dof-model.md) — the equations of motion the drag
 term above sits inside.
+
+[← Contents](../index.md)

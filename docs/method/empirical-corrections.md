@@ -1,5 +1,6 @@
 ---
 title: The empirical corrections
+nav_order: 28
 math: true
 ---
 
@@ -217,3 +218,5 @@ average out over a string of shots the way a wind misjudgement does — not beca
 
 Next in this series: [Integration modes](integration.md) — how the equations of motion are discretized.
 Back to [the 3DOF model](3dof-model.md).
+
+[← Contents](../index.md)

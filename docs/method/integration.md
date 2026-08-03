@@ -1,5 +1,6 @@
 ---
 title: Integration modes — Euler and midpoint RK2
+nav_order: 29
 math: true
 ---
 
@@ -196,3 +197,5 @@ Two caveats for anyone driving the library directly:
 The series: [The ballistic coefficient](ballistic-coefficient.md) ·
 [The 3DOF point-mass model](3dof-model.md) · [The empirical corrections](empirical-corrections.md) ·
 Integration modes
+
+[← Contents](../index.md)

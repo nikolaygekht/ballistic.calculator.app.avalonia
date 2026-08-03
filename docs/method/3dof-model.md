@@ -1,5 +1,6 @@
 ---
 title: The 3DOF point-mass model
+nav_order: 27
 math: true
 ---
 
@@ -277,3 +278,5 @@ see [What the model includes](../what-the-model-includes.md).
 
 Next in this series: [The empirical corrections](empirical-corrections.md) — the four effects added to
 the integrated trajectory rather than integrated with it.
+
+[← Contents](../index.md)
