@@ -9,6 +9,8 @@
 # git stores LF internally and converts on checkout, so this costs nothing in the history and keeps
 # diffs clean.
 * text=auto eol=crlf
+*.yml text eol=lf
+Dockerfile text eol=lf
 
 # Binaries git must not touch or try to convert.
 *.png    binary
