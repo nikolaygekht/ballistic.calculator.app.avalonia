@@ -130,6 +130,8 @@ DEALINGS IN THE MATERIALS.
   library used throughout ([nuget](https://www.nuget.org/packages/Gehtsoft.Measurements))
 * [Ballistic Calculator .NET](https://github.com/nikolaygekht/ballistic.calculator.app) — the original WinForms
   application this one replaces
+* [Ballistic Tools](https://github.com/geladen-ch/ballistic-tools) A client-side external ballistics suite
+  as PWA from Alexandre Trofimov (Geladen).
 
 ## Third-party components
 
