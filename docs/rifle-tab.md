@@ -29,8 +29,10 @@ alt="The Rifle tab: sight preset, sight height, horizontal and vertical click va
 | Twist Rate | inch | mm | The distance the bullet travels in one full turn. Disabled until a direction is chosen |
 
 Click values are **angular and not tied to the measurement system** — a metric shooter with an MOA scope
-is perfectly normal. The boxes default to mils, and the unit dropdown beside each takes whatever your
-turret is marked in: `0.1 mil`, `0.25 moa`, `0.5 in/100yd`.
+is perfectly normal. The boxes default to `mil`, and the unit dropdown beside each takes whatever your
+turret is marked in: `0.1 mrad`, `0.25 moa`, `0.5 in/100yd`, `0.5 ths`. Note that `mil` in the
+dropdown is the **military mil**, 1/6400 of a circle — about 1.9 % smaller than a milliradian. A scope
+sold as "0.1 mil per click" is almost always milliradian: choose `mrad`.
 
 ## Sight height, and why it is not a detail
 
@@ -53,7 +55,7 @@ whole tab alone and the default is a **3 in sight height with no clicks and no r
 The two preset dropdowns read `data/dictionaries.xml`, the file that ships beside the application.
 Choosing a sight fills the height and both click values; choosing a barrel fills the direction and twist
 rate. The shipped list covers common service and sporting rifles — `M16A3/M4` at 1:7 in, `AK-74` at
-200 mm, `Standard Optics (High, Mil)` at 3 in with 0.1 mil clicks, `EOTech@M4` at 2.6 in, and so on.
+200 mm, `Standard Optics (High, Mil)` at 3 in with 0.1 mrad clicks, `EOTech@M4` at 2.6 in, and so on.
 
 Three behaviours worth knowing:
 

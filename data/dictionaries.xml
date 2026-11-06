@@ -9,8 +9,8 @@
     <sight name="Elcan Specter@M4" sight-height="2.9in" default-zero="100m" />
     <sight name="EOTech@M4" sight-height="2.6in" default-zero="100yd" />
     <sight name="M16 Iron Sight" sight-height="2.6in" default-zero="300yd" horizontal-click="0.5in/100yd" vertical-click="1in/100yd" />
-    <sight name="PSO-1 Optics" sight-height="65mm" default-zero="100m" horizontal-click="5cm/100m" vertical-click="5cm/100m" />
-    <sight name="Standard Optics (High, Mil)" sight-height="3in" default-zero="100yd" horizontal-click="0.1mil" vertical-click="0.1mil" />
+    <sight name="PSO-1 Optics" sight-height="65mm" default-zero="100m" horizontal-click="0.5ths" vertical-click="0.5ths" />
+    <sight name="Standard Optics (High, Mil)" sight-height="3in" default-zero="100yd" horizontal-click="0.1mrad" vertical-click="0.1mrad" />
     <sight name="Standard Optics (High, Moa)" sight-height="3in" default-zero="100yd" horizontal-click="0.25moa" vertical-click="0.25moa" />
   </sights>
   <barrels>

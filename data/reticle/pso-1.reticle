@@ -1,6 +1,7 @@
 <!-- PSO-1 (SVD), in Soviet thousandths (ths = 1/6000 circle = 1.0472 mrad = 3.6 MOA),
      which is what the scope is graduated in - one windage mark and one drum click of
-     0.5 ths. A 5 cm/100 m click is 0.4775 ths, 4.5% under half a thousandth.
+     0.5 ths - the shipped PSO-1 Optics preset uses 0.5ths. (A 5 cm/100 m click would be
+     0.4775 ths, 4.5% under half a thousandth.)
      The main chevron is the aiming mark for whatever range the elevation drum is dialled
      to (100..1000 m). The three chevrons below it are long-range holds used ONLY with the
      drum set to 10 (1000 m): they are then 1100, 1200 and 1300 m.

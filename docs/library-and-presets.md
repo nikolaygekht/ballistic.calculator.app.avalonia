@@ -87,8 +87,8 @@ barrels together. That file is **`user-dictionaries.xml`, beside the executable*
 `data/dictionaries.xml` that ships with the application. Three consequences:
 
 - **It is plain XML and easy to read.** `<sight name="…" sight-height="2.6in" default-zero="100m"
-  horizontal-click="0.1mil" vertical-click="0.1mil" />` — you can hand-edit or version it if you prefer.
-  Units are written out, and any angular unit is accepted for clicks: the shipped file mixes `0.1mil`,
+  horizontal-click="0.1mrad" vertical-click="0.1mrad" />` — you can hand-edit or version it if you prefer.
+  Units are written out, and any angular unit is accepted for clicks: the shipped file mixes `0.1mrad`,
   `0.25moa` and `0.5in/100yd`.
 - **An update cannot overwrite it.** No release archive contains a file of that name. `data/dictionaries.xml`
   *is* replaced by every update, but the application only ever reads it: on first run to create your copy,

@@ -1,8 +1,9 @@
 # PSO-1 — SVD, and the one reticle here that needs the turret dialled
 
 Drawn in **Soviet thousandths**, which is what the scope is graduated in: 1 ths = 1/6000 of a circle =
-1.0472 mrad = 3.6 MOA. One windage mark and one drum click are both 0.5 ths. (A 5 cm/100 m click would
-be 0.4775 ths, 4.5 % under half a thousandth — the real drum is the coarser one.)
+1.0472 mrad = 3.6 MOA. One windage mark and one drum click are both 0.5 ths, and the shipped `PSO-1 Optics`
+sight preset uses exactly that: `0.5ths` (0.524 mrad). Until 2026-11 it said `5cm/100m`, which is
+0.4775 ths — 4.5 % under half a thousandth; the real drum is the coarser one.
 
 Field of view 79 × 79 ths. The circle is the **drawn field boundary, not an etched element** — it is
 sized to enclose the etching, while the real 6° field is 50 ths in radius. Layout follows the
