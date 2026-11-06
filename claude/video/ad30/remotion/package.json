@@ -1,0 +1,23 @@
+{
+  "name": "bc2-ad-30s",
+  "private": true,
+  "description": "Ballistic Calculator 2 - 30 s ad (16:9 and 9:16)",
+  "scripts": {
+    "studio": "remotion studio",
+    "render:h": "remotion render Ad16x9 out/ballistic-calculator-2-16x9.mp4",
+    "render:v": "remotion render Ad9x16 out/ballistic-calculator-2-9x16.mp4",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "5.3.0",
+    "@fontsource-variable/jetbrains-mono": "5.3.0",
+    "@remotion/cli": "4.0.537",
+    "react": "19.1.10",
+    "react-dom": "19.1.10",
+    "remotion": "4.0.537"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "typescript": "5.9.3"
+  }
+}

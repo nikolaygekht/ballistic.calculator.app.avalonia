@@ -1,6 +1,9 @@
 # Ballistic Calculator 2 — video demo scripts
 
-A **playlist of eight episodes**, three to five minutes each, about thirty-two minutes in total.
+A **playlist that grows**: episodes 1–7 build one shot step by step, and from episode 8 on each episode is a
+**special case**. The cards carry no "N of M" (decided 2026-11-04), since episodes are added as we go. For now
+the plan stops at episode 9; later topics already in view: the Reticle Editor and the reticle-designer skill,
+building `.drg` drag tables (Tools), and hit probability.
 Everything below is verified against the application's own `ShotTrajectoryCalculator`; every number is
 cross-referenced in `demo-numbers.md`, whose section numbers match the episode numbers.
 
@@ -59,8 +62,8 @@ ammunition, and every wind zone — does come back.
 | Slot | Length | Produced how |
 |---|---|---|
 | Title card | 3 s | graphic, per episode |
-| Cold open | 8 s | **one audio file and one clip, reused verbatim on all eight** |
-| Recap | ~10 s | footage of `File → Open` and the restored table; narration per episode |
+| Cold open | 8 s | **one audio file and one clip, reused verbatim on every episode** |
+| Recap | ~10 s | footage of `Trajectory → Open` and the restored table; narration per episode |
 | Body | — | the episode script |
 | Next up | ~8 s | narration per episode, over the last frame of the body |
 | End card | 5 s | graphic, per episode |
@@ -75,8 +78,7 @@ bullet's radar curve, so episode 6 changes the drag model without changing the b
 | Weight | 11.3 g | 175 gr |
 | Ballistic coefficient | 0.253 G7 | 0.253 G7 |
 | Muzzle velocity | 790 m/s | 2600 ft/s |
-| Sight height | 50 mm | 2 in |
-| Click value | 0.1 mrad | 0.1 mrad |
+| Rifle / sight | Tigr (civilian SVD) · Sight Preset **PSO-1 Optics**: 65 mm, 0.5 ths clicks | AR-style .308 · Sight Preset **Standard Optics (High, Mil)**: 3 in, 0.1 mrad clicks |
 | Zero | 300 m | 300 yd |
 | Range / step | 1000 m / 100 m | 1000 yd / 100 yd |
 
@@ -86,7 +88,7 @@ Set **`View → Angular Units → Milliradian`** before recording. Every angular
 
 # Shared assets — produce once
 
-## The cold open  (8 s, identical on all eight episodes)
+## The cold open  (8 s, identical on every episode)
 
 {ACTION: the application's main window, empty. Neutral wallpaper, no icons, no taskbar clutter.}
 
@@ -100,14 +102,16 @@ macOS.
 
 ```
 Next  →  Episode N:  <title of the next episode>
-Downloads and the user guide: <link>
+Download:    github.com/nikolaygekht/ballistic.calculator.app.avalonia/releases
+User guide:  nikolaygekht.github.io/ballistic.calculator.app.avalonia
 ```
 
 On episode 8 the card reads instead:
 
 ```
-Downloads · source · user guide
-<links>
+Download:    github.com/nikolaygekht/ballistic.calculator.app.avalonia/releases
+Source:      github.com/nikolaygekht/ballistic.calculator.app.avalonia
+User guide:  nikolaygekht.github.io/ballistic.calculator.app.avalonia
 ```
 }
 
@@ -115,117 +119,142 @@ Downloads · source · user guide
 
 # Episode 1 — Your first trajectory
 
-{CARD 3 s: `Ballistic Calculator 2   ·   1 of 8   ·   Your First Trajectory`}
+{CARD 3 s: `Ballistic Calculator 2   ·   Episode 1   ·   Your First Trajectory`}
 
 {ACTION: the shared cold open clip.}
 
-## What the series does  (~30 s)
+Remade 2026-11-04 in the episode 2+ style (voice on every action, values spoken as typed) with the ammunition
+library added. As produced: `build/ep01/record.py`, clips in `build/ep01/audio`. Numbers: `demo-numbers.md` §1. The
+take writes `Documents\Ballistic Calculator demo\Lapua Scenar-L 11.3 g.ammox`.
 
-{ACTION: stay on the empty main window.}
+## Intro
 
-VOICE:
-In this series we build one shot, step by step. We start with the smallest possible trajectory, in this
-episode. Then we save it, and after that every episode takes that same saved shot and adds exactly one
-thing to it. Weather. Wind. The small effects that only matter far away.
-
-At the end we turn everything on at once, and then we do something most free calculators cannot do. We
-zero a rifle with one cartridge, and shoot a completely different one.
-
-Eight short episodes. Let us start.
-
-## Body — the smallest trajectory, in metric  (~3 min)
-
-{ACTION: `Trajectory → New → Metric`. The Shot Parameters dialog opens on the Ammunition tab.}
+{ACTION: the empty main window.}
 
 VOICE:
-Everything begins here. Trajectory, New. The application asks one question first: metric or imperial.
+In this episode we calculate a simple trajectory: one rifle, one load, and no wind. Let's start.
 
-I will choose metric. This choice belongs to the window, not to the program. You can open a second
-window in imperial at the same time. And you can convert a finished window later.
+## Body, part one — a new trajectory and the load
 
-{HOLD 2 s on the six tab headers.}
-
-VOICE:
-One dialog describes the whole shot. Six tabs. Only the first one is required. The rest have sensible
-defaults.
-
-{FILL — silence. Ammunition tab: Weight `11.3` g · Ballistic coefficient `0.253`, table `G7` ·
-Muzzle velocity `790` m/s. Leave the name, diameter and length empty for now.}
+{ACTION: `Trajectory` on "Trajectory", hover `New` on "New", then `Metric`.}
 
 VOICE:
-The Ammunition tab needs three numbers. The weight of the bullet. Its ballistic coefficient, which
-describes how well it cuts the air. And the speed it leaves the barrel.
+Everything starts here: Trajectory, New. First, the program asks: metric or imperial?
 
-Eleven point three grams. Zero point two five three, on the G seven drag table. Seven hundred ninety
-metres per second.
-
-That is the only tab you cannot skip.
-
-{ACTION: click the **Rifle** tab.}
-
-{FILL — silence. Rifle tab: Sight height `50` mm · Vertical click `0.1` mrad · Horizontal click
-`0.1` mrad. Leave the barrel group empty.}
+{ACTION: click **Metric**; the Shot Parameters dialog opens on the Ammunition tab.}
 
 VOICE:
-The Rifle tab describes the sight. How high the scope sits above the barrel: fifty millimetres. And
-how much one click of the turret moves the point of impact: zero point one milliradian.
+I choose metric. This setting is for this window only, not for the whole program. You can open another window in imperial at the same time, and you can switch a window to the other system later.
 
-Sight height matters at every distance. Please do not guess it.
-
-{ACTION: click the **Zero** tab.}
-
-{FILL — silence. Zero tab: Distance `300` m.}
+{ACTION: sweep the six tab headers, back to Ammunition.}
 
 VOICE:
-The Zero tab asks where the rifle is sighted in. Three hundred metres.
+One dialog describes the whole shot. It has six tabs, but only the first one is required.
 
-Notice what it does not ask for. It never asks for the angle of your scope. It calculates that angle
-from the zero you give it.
-
-{ACTION: click the **Parameters** tab.}
-
-{FILL — silence. Parameters tab: Maximum distance `1000` m · Step `100` m.}
+{ACTION: type `Lapua Scenar-L 11.3 g` in Name.}
 
 VOICE:
-The Parameters tab asks how far to compute, and how often to print a line. One thousand metres, in
-steps of one hundred.
+On the Ammunition tab, first a name, so we can find this load later: Lapua Scenar L, eleven point three grams.
 
-Now press OK.
-
-{ACTION: press **OK**. If the dialog offers defaults for the untouched Weather and Wind tabs, accept
-them. The trajectory window opens on the Table view.}
-
-{HOLD 4 s on the full table.}
+{ACTION: type `11.3` in Weight (g).}
 
 VOICE:
-There is the answer. One line for every hundred metres.
+The bullet weight is eleven point three grams.
 
-At three hundred metres the drop is zero. That is our zero, so the bullet is exactly on the line of
-sight.
-
-At one hundred metres the bullet is sixteen centimetres high. This surprises people. The bullet is
-still climbing towards the sight line, so a close target is above your crosshair, not below it.
-
-{ACTION: move the mouse slowly down the Drop column to the last row.}
+{ACTION: type `0.253` in BC, pick `G7`.}
 
 VOICE:
-And at one thousand metres, the bullet has fallen twelve metres below the line of sight. Twelve
-metres. Two seconds of flight.
+The ballistic coefficient shows how well the bullet keeps its speed. It is zero point two five three, on the G seven table.
 
-{ACTION: `Ctrl+C` or `View → Show → Chart`. Choose **Drop** in the variable selector.}
-
-{HOLD 3 s.}
+{ACTION: type `790` in Muzzle Vel. (m/s).}
 
 VOICE:
-The same shot as a curve. You can chart velocity, Mach number, drop, windage or energy.
+And the muzzle velocity, the speed of the bullet when it leaves the barrel: seven hundred ninety metres per second.
 
-The curve is not a parabola. It gets steeper and steeper, because the bullet keeps losing speed.
+VOICE:
+This is the only tab you can't skip.
+
+## Body, part two — the ammunition library
+
+{ACTION: point at **Load**, press it: `data/ammo` with its calibre folders; point at `.308 Win`.}
+
+VOICE:
+You don't want to type a load every time. The program keeps loads as files. Load opens a small library of sample loads that comes with the program, sorted by calibre.
+
+{ACTION: **Cancel**.}
+
+VOICE:
+Here it is. We don't need one now. Cancel.
+
+{ACTION: **Save**: the dialog opens in `data/ammo` with the name filled in; type `E:\ngeht\Documents\Ballistic Calculator demo\Lapua Scenar-L 11.3 g`, **Save**.}
+
+VOICE:
+Save keeps our load as a file. The program suggests its own folder, and the name of the load as the file name. I keep my own loads in my own folder, because a new version of the program can replace this one. Save.
+
+## Body, part three — rifle, zero, range
+
+{ACTION: **Rifle** tab, Sight Preset → `PSO-1 Optics`.}
+
+VOICE:
+On the Rifle tab we describe the scope. Our rifle is a Tigr, the civilian S V D, in three oh eight, with the P S O one scope. The program has a list of common sights, so I just pick it.
+
+{ACTION: point at Sight Height (65 mm), then H Click and V Click (0.5 ths).}
+
+VOICE:
+It fills two things. Sight height, how high the scope is above the barrel: sixty-five millimetres. And the click value, how much one click of the turret moves the point of impact: half a thousandth.
+
+VOICE:
+Sight height matters at every distance. For your own rifle, measure it. Don't guess.
+
+{ACTION: **Zero** tab; point at the suggested 100 m, type `300`.}
+
+VOICE:
+On the Zero tab we set the zero distance: the distance where the bullet hits the point of aim. The sight preset suggested one hundred metres. We use three hundred.
+
+{ACTION: **Parameters** tab: `1000` in Max Range, `100` in Step, **OK**.}
+
+VOICE:
+On the Parameters tab: how far to calculate, one thousand metres, and the step between the lines of the table, one hundred. Now OK.
+
+{ACTION: the *Confirm* box "Weather not filled. Use default values?"; **Yes** on "Yes".}
+
+VOICE:
+We did not fill the Weather tab, so the program offers the default weather: sea level, fifteen degrees Celsius, normal pressure, and seventy-eight percent humidity. That is fine for now. We will change the weather in episode three. Yes.
+
+## Body, part four — the result
+
+VOICE:
+Here is the result. One line for every hundred metres.
+
+{ACTION: point at the 300 m drop.}
+
+VOICE:
+At three hundred metres the drop is zero. This is our zero distance, so the bullet is exactly on the line of sight.
+
+{ACTION: point at the 100 m drop.}
+
+VOICE:
+At one hundred metres the bullet is fifteen centimetres above the line of sight.
+
+{ACTION: move down the Drop column to 1000 m (−1208.66 cm).}
+
+VOICE:
+And at one thousand metres the bullet is twelve metres below the line of sight. Twelve metres, after two seconds of flight.
+
+{ACTION: the **Chart** tab (Drop).}
+
+VOICE:
+This is the same shot as a chart. You can show velocity, Mach number, drop, windage or energy.
+
+{ACTION: point at the **Reticle** tab header; do not open it.}
+
+VOICE:
+There is one more view: the Reticle tab. It shows the trajectory through your scope. We will use it in the next episode.
 
 ## Next up
 
 VOICE:
-Next, the same shot in imperial — the other three ways this program can show you a trajectory, and the
-file we are going to reuse for the rest of the series.
+In the next episode: the same shot in imperial, the Reticle and Summary views, and the file we will use for the rest of the series.
 
 {CARD 5 s: `Next → Episode 2: Table, chart, reticle, summary`}
 
@@ -233,101 +262,112 @@ file we are going to reuse for the rest of the series.
 
 # Episode 2 — Table, chart, reticle, summary
 
-{CARD 3 s: `Ballistic Calculator 2   ·   2 of 8   ·   Table, Chart, Reticle, Summary`}
+{CARD 3 s: `Ballistic Calculator 2   ·   Episode 2   ·   Table, Chart, Reticle, Summary`}
 
 {ACTION: the shared cold open clip.}
 
 ## Recap  (~12 s)
 
-{ACTION: the metric window from episode 1, on the Table view. Hold 3 s.}
+{ACTION: the app starts empty. `Trajectory → Open` → `bc2-demo-metric` (episode 1's shot, saved off
+camera into the demo folder). Hold 2.5 s on the table.}
 
 VOICE:
-In the first episode we built this. A three oh eight rifle, an eleven point three gram bullet, zeroed at
-three hundred metres, and twelve metres of drop at one thousand.
+In the first episode we built this: a Tigr with the P S O one scope, an eleven point three gram
+bullet, a zero at three hundred metres, and twelve metres of drop at one thousand.
 
-Now the same load again, in imperial. I want you to see both, because the numbers in the rest of this
-series are in yards and inches.
+{ACTION, on the voice below: `Trajectory → New → Imperial`. A second dialog opens.}
+
+VOICE:
+Now the same load in imperial, on a different rifle: an A R style rifle in three oh eight, with a
+standard scope on a high mount. The rest of the series uses yards and inches, so I want you to see
+both.
 
 ## Body, part one — the same shot in imperial  (~1 min 10 s)
 
-{ACTION: `Trajectory → New → Imperial`. A second dialog opens.}
+Each value is spoken **while it is typed** (a silent fill followed by narration about it put the words a
+minute behind the picture). One short clip per field.
 
-{FILL — silence, fast. Ammunition: `175` gr · `0.253` `G7` · `2600` ft/s. Rifle: sight `2` in,
-clicks `0.1` mrad. Zero: `300` yd. Parameters: `1000` yd, step `100` yd. Press **OK** and accept the
-default tabs.}
+{ACTION: type `175` in Weight.}
+VOICE: The bullet is one hundred seventy-five grains.
 
-{HOLD 3 s on the table.}
+{ACTION: type `0.253`, pick `G7`, then type `2600` in Muzzle Velocity.}
+VOICE: The same coefficient, and two thousand six hundred feet per second.
+
+{ACTION: Rifle tab, open Sight Preset. On the voice: pick **Standard Optics (High, Mil)**, then point at
+the sight height (3 in) and the clicks (0.1 mrad).}
+VOICE: The scope is the standard one from the list: three inches above the barrel, zero point one milliradian per
+click.
+
+{ACTION: Zero tab; type `300`.}
+VOICE: And the zero is at three hundred yards.
+
+{FILL — silent: Parameters `1000` yd, step `100` yd. **OK**, accept the default weather.}
+
+{HOLD 2.5 s on the table. Point at the last row's drop, then its hold.}
 
 VOICE:
-One hundred seventy-five grains. Two thousand six hundred feet per second. A three hundred yard zero.
-
-At one thousand yards this bullet falls three hundred sixty-three inches. That is about thirty feet.
-The hold is ten point zero eight milliradians.
+At one thousand yards the drop is three hundred sixty inches. That's thirty feet. The hold is ten
+milliradians.
 
 {ACTION: point at the Mach column, last row.}
 
 VOICE:
-Look at the Mach column. One point zero one. This bullet is about to go subsonic at one thousand
-yards. That is the distance where groups usually open up.
+Look at the Mach column: one point zero one. At one thousand yards this bullet is almost subsonic.
+Around this point, accuracy usually gets worse.
 
-## Body, part two — the other three views  (~1 min 50 s)
+## Body, part two — the summary and the reticle  (~1 min 50 s)
 
-{ACTION: `View → Show → Summary`.}
-
-{HOLD 3 s.}
+{ACTION, on the voice below: click the **Summary** tab; point at each value as it is named.}
 
 VOICE:
-The Summary view says it exactly. It gives the point blank range, the near and far zero, and the
-distance where the bullet drops below the speed of sound. For this load, one thousand and seventeen
-yards.
+The Summary view shows it exactly. Here you see the point blank range, the near and far zero, and the
+distance where the bullet becomes subsonic. For this load, it's one thousand and fourteen yards.
 
-{ACTION: `Ctrl+R` or `View → Show → Reticle`. Click the **Mil-Dot** button. Select **Far BDC** in the
-Display group.}
-
-{HOLD 4 s on the sight picture.}
+{ACTION, on the voice below: click the **Reticle** tab; click **Mil-Dot** on "I click Mil-Dot"; select
+**Far BDC** (Display group) on "choose Far B D C".}
 
 VOICE:
-And this is the third view. Your scope.
+And here is the third view: your scope.
 
-I clicked Mil-Dot, which is built in. Then I chose Far B D C. The blue labels tell you what each mark
-in your reticle is worth, for this load.
+I click Mil-Dot, which is built into the program, and choose Far B D C. The blue labels show the
+distance for each mark of the reticle, for this load.
 
 {ACTION: move the mouse slowly down the vertical stalk, dot by dot.}
 
 VOICE:
-The first dot below the centre is about four hundred and five yards. The second dot is four hundred
-ninety-eight. The third is five hundred eighty. The fourth is six hundred fifty-six. The fifth is
-seven hundred twenty-five.
+The first dot below the centre is about four hundred and six yards. The second one is four hundred
+ninety-nine. The third is five hundred eighty-two. The fourth is six hundred fifty-seven.
 
-That is your reticle turned into a range card. Remember those numbers — in episode seven we come back
-to this exact picture, and every one of them will have moved.
+So the reticle works like a range card. Remember these numbers. In episode seven we come back to this
+picture, and every one of them will change.
 
-{ACTION: point at the bottom post.}
+{ACTION: point at the thick bottom post.}
 
 VOICE:
-And it stops. This reticle runs out at about seven hundred eighty-seven yards. Past that you must use
-the turret. It is better to know that at home than on the hill.
+Below the fourth dot there is only the thick post. So past about seven hundred twenty-five yards, you
+need the turret. It's good to know this before you go to the range.
 
-The application ships with thirty-four reticles, and you can draw your own.
+The program comes with thirty-four reticles, and you can also create your own.
 
 ## Body, part three — save it  (~35 s)
 
-{ACTION: `File → Save As…`, type `bc2-demo`, save. Hold 2 s on the window title now showing the file
-name.}
+VOICE:
+One more thing before we finish. The rest of the series depends on it.
+
+{ACTION, on the voice below: `Trajectory` on "Trajectory", `Save As` on "Save As", type `bc2-demo` and
+save during the next sentence; point at the window title (`bc2-demo`) on "Every next episode opens this file".}
 
 VOICE:
-One more thing before we finish, and it is the reason the rest of this series works.
+Trajectory, Save As. This saves the whole shot to a file: the ammunition, the rifle, the zero, the weather,
+the wind, and all the settings on the six tabs.
 
-File, Save As. This writes the whole shot to a file: the ammunition, the rifle, the zero, the weather,
-the wind, every parameter on all six tabs.
-
-Every episode from here on opens this same file and adds exactly one thing to it. So every number you
-see will be a comparison against the table we just built, and nothing else.
+Every next episode opens this file and adds one thing to it. So every number you see will be compared
+with the table we just made.
 
 ## Next up
 
 VOICE:
-Next, the two things that change every shot you take: the weather, and the wind.
+Next time: the two things that change every shot — the weather and the wind.
 
 {CARD 5 s: `Next → Episode 3: Weather and wind`}
 
@@ -335,197 +375,258 @@ Next, the two things that change every shot you take: the weather, and the wind.
 
 # Episode 3 — Weather and wind
 
-{CARD 3 s: `Ballistic Calculator 2   ·   3 of 8   ·   Weather and Wind`}
+{CARD 3 s: `Ballistic Calculator 2   ·   Episode 3   ·   Weather and Wind`}
 
 {ACTION: the shared cold open clip.}
 
-## Recap  (~12 s)
+Rules from episode 2: the voice starts when the action starts, one short clip per action, no silent
+fill followed by narration. Numbers: `demo-numbers.md` §3 (read from the app).
 
-{ACTION: `File → Open` → `bc2-demo.trajectory`. Hold 3 s on the restored table.}
+## Recap  (~20 s)
 
-VOICE:
-File, Open. This is the baseline we saved in episode two. A one hundred seventy-five grain Scenar-L,
-two thousand six hundred feet per second, zeroed at three hundred yards. Three hundred sixty-three
-inches of drop at one thousand.
-
-And so far, this bullet has been flying in perfectly standard air. Nobody shoots in standard air.
-
-## Body, part one — weather  (~1 min 45 s)
-
-{ACTION: `Ctrl+E` → **Weather** tab.}
+{ACTION, on the voice below: the app starts empty. `Trajectory` on "Trajectory", `Open` on "Open", pick
+`bc2-demo`, open it.}
 
 VOICE:
-The standard atmosphere means sea level and fifty-nine degrees Fahrenheit. Your air is almost never
-that.
+Trajectory, Open. This is the file we saved in episode two: the A R style rifle in three oh eight, a one
+hundred seventy-five grain bullet at two thousand six hundred feet per second, and a zero at three
+hundred yards.
 
-This is a February range day. One thousand feet above the sea, and forty degrees.
-
-{FILL — silence. Weather tab: Altitude `1000` ft · Pressure `28.9` inHg (station) · Temperature
-`40` °F · Humidity `60` %. Press **OK**.}
-
-{HOLD 3 s on the table.}
+{ACTION: point at the drop in the last row.}
 
 VOICE:
-Two things about this tab cause more wrong answers than anything else in the program.
+At one thousand yards the drop is three hundred sixty inches. But this was calculated in the default
+weather: sea level and fifty-nine degrees Fahrenheit. Today we change the weather, and then we add wind.
 
-First, the pressure must be the pressure where you are standing. Not the sea level pressure from the
-weather report. There is a switch for that, so read it carefully.
+## Body, part one — weather  (~1 min 30 s)
 
-Second, altitude and pressure are not two ways of saying the same thing. Give it both.
-
-{ACTION: point at the 1000 yd row.}
+{ACTION, on the voice: `View` → `Edit Parameters`. The dialog opens. Click the **Weather** tab.}
 
 VOICE:
-Now here is the honest answer. The drop at one thousand yards went from three hundred sixty-three
-inches to three hundred sixty-one and a half. One and a half inches.
-
-That is not a disappointment, it is the physics. This air is colder than standard, which makes it
-denser, and it is a thousand feet higher, which makes it thinner. The two nearly cancel.
-
-Weather matters enormously. But it matters when the temperature and the altitude pull the *same* way —
-and you will see exactly that in episode five.
-
-## Body, part two — wind  (~1 min 40 s)
-
-{ACTION: `Ctrl+E` → **Wind** tab.}
+View, Edit Parameters. This opens the same dialog again. The weather is on the Weather tab.
 
 VOICE:
-Now wind. Ten miles per hour, straight across, from the right.
+Let's take a cold day in February.
 
-{ACTION: on the wind dial, set direction to 90 degrees. Pause on the dial so the viewer sees it turn.}
+{ACTION: type `1000` in Altitude.}
+VOICE: The range is one thousand feet above sea level.
+
+{ACTION: type `28.9` in Pressure.}
+VOICE: The pressure is twenty-eight point nine inches of mercury.
+
+{ACTION: point at the Pressure field.}
+VOICE:
+This must be the pressure where you stand. A weather report usually gives the pressure corrected to sea
+level. Don't put that number here.
+
+{ACTION: type `40` in Temperature.}
+VOICE: The temperature is forty degrees.
+
+{ACTION: type `60` in Humidity, then press **OK**.}
+VOICE: And the humidity is sixty percent. OK.
+
+{HOLD 2 s on the table. On the voice: point at the drop in the last row.}
 
 VOICE:
-Watch the dial. Zero degrees is a wind that blows towards the target, from behind you. Ninety degrees
-blows from the right, across your path. Get this convention right before you trust any wind number.
-
-{FILL — silence. Wind: Velocity `10` mph · Direction `90` deg · leave the distance empty so it applies
-to the whole flight. Press **OK**.}
-
-{HOLD 3 s on the Windage column.}
+At one thousand yards the drop is now three hundred fifty-nine inches. Only about one inch less.
 
 VOICE:
-The Windage column was full of zeros. Now look at it.
+Why so small? Cold air is denser, so the bullet slows down faster. But the air at one thousand feet is
+thinner, so it slows down less. Here the two almost cancel each other.
 
-At six hundred yards the wind pushes the bullet thirty-one inches sideways. At one thousand yards, one
-hundred and four inches. Almost nine feet.
+In episode five you will see a case where the weather changes a lot.
 
-Wind is the hardest problem in long range shooting, and this is why. The drop you can look up. The
-wind you have to read.
+## Body, part two — wind  (~1 min 30 s)
 
-You can also add several wind zones along the flight path, each starting at its own distance.
-
-{ACTION: close the window **without saving**. If prompted, decline.}
+{ACTION, on the voice: `View` → `Edit Parameters`, then the **Wind** tab.}
 
 VOICE:
-And now I close this without saving. The baseline file stays exactly as it was, ready for the next
-episode.
+Now the wind. Edit Parameters again, and the Wind tab.
+
+{ACTION: type `10` in Velocity.}
+VOICE: Ten miles per hour.
+
+{ACTION: type `90` in Direction; the dial turns. Point at the dial.}
+VOICE:
+It blows from the right. On this dial, zero degrees is a wind from behind you, and ninety degrees is a
+wind from the right.
+
+{ACTION: point at the Distance checkbox, then at **Add Wind**. Press **OK** at the end.}
+VOICE:
+We leave the distance empty, so this wind blows along the whole way. If the wind is different at
+different distances, you can add more winds here. OK.
+
+{HOLD 2 s on the table. On the voice: point at Windage at 600 yd, then at 1000 yd.}
+
+VOICE:
+Before, the Windage column was all zeros. Now, at six hundred yards, the bullet moves thirty-one inches
+to the left. At one thousand yards, one hundred and four inches. That's almost nine feet.
+
+{ACTION: point at the wind correction (Wnd.Adj.) and its clicks in the last row.}
+
+VOICE:
+To correct for it, you need two point nine milliradians. That's twenty-nine clicks.
+
+VOICE:
+That's why wind is the hardest part of long range shooting. You can calculate the drop. The wind you
+have to read on the range.
+
+{ACTION, on the voice: close the trajectory window. The program does not ask about saving.}
+
+VOICE:
+Now I close this window without saving. The file from episode two stays as it was, and we open it again
+in the next episode.
 
 ## Next up
 
 VOICE:
-Next, the small effects. A spinning bullet slowly walks sideways. A pure sideways wind moves the impact
-up. And the Earth turns underneath the whole flight.
+Next time: three small effects that matter only far away. Spin drift, aerodynamic jump, and the
+Coriolis effect.
 
-{CARD 5 s: `Next → Episode 4: Spin drift, aerodynamic jump, Coriolis`}
+{CARD 5 s: `Next → Episode 4: The Effects That Only Matter Far Away`}
 
 ---
 
 # Episode 4 — Spin drift, aerodynamic jump, Coriolis
 
-{CARD 3 s: `Ballistic Calculator 2   ·   4 of 8   ·   The Effects That Only Matter Far Away`}
+{CARD 3 s: `Ballistic Calculator 2   ·   Episode 4   ·   The Effects That Only Matter Far Away`}
 
 {ACTION: the shared cold open clip.}
 
-## Recap  (~12 s)
+Rules from episode 2: the voice starts when the action starts, one short clip per action, no silent
+fill followed by narration. Numbers: `demo-numbers.md` §4 (read from the app). Windage in the table is
+signed, **positive is left**: −8.00 is eight inches to the right.
 
-{ACTION: `File → Open` → `bc2-demo.trajectory`. Hold 3 s.}
+## Recap  (~20 s)
 
-VOICE:
-The same baseline again, straight from the file. Standard air, no wind, three hundred sixty-three inches
-of drop at one thousand yards.
-
-This episode adds the three effects most free calculators leave out entirely.
-
-## Body, part one — spin drift, and why wind has to go back on  (~2 min 15 s)
-
-{ACTION: `Ctrl+E` → **Ammunition** tab.}
+{ACTION, on the voice below: the app starts empty. `Trajectory` on "Trajectory", `Open` on "Open", pick
+`bc2-demo`, open it.}
 
 VOICE:
-A bullet is a spinning gyroscope. Over a long flight it slowly walks sideways, in the direction of the
-spin. That is called spin drift.
+Trajectory, Open. The same file from episode two: standard weather, and no wind.
 
-To calculate it, the program needs the shape of the bullet and the twist of your barrel.
-
-{FILL — silence. Ammunition tab: Bullet diameter `0.308` in · Bullet length `1.394` in. Then the
-**Rifle** tab: Rifling twist `10` in per turn, direction **Right**. Press **OK**.}
-
-{HOLD 3 s on the Windage column.}
+{ACTION: point at the drop in the last row, then at the Windage column.}
 
 VOICE:
-Three tenths of an inch across. One point three nine four inches long. A one in ten right hand twist.
+At one thousand yards the drop is three hundred sixty inches, and the Windage column is all zeros.
+Today we add three small effects. You see them only far away.
 
-There was no wind in this file, so the Windage column was all zeros. Now, with no wind at all, the
-bullet lands eight inches to the right at one thousand yards. That is pure spin drift.
-
-{ACTION: point at the Drop column.}
+## Body, part one — spin drift  (~1 min 20 s)
 
 VOICE:
-And look at the Drop column. It has not changed. Not by a tenth of an inch.
+The first one is spin drift. A bullet spins, like a gyroscope. During a long flight it slowly moves to
+the side, in the direction of the spin.
 
-That is worth knowing, because there is a second effect hiding here, and it needs wind before it can
-exist at all.
-
-{ACTION: `Ctrl+E` → **Wind** tab.}
-
-{FILL — silence. Wind: Velocity `10` mph · Direction `90` deg, no distance limit. Press **OK**.}
-
-{HOLD 4 s.}
+{ACTION, on the voice: `View` → `Edit Parameters`. The dialog opens on the Ammunition tab.}
 
 VOICE:
-So I put the same ten mile per hour crosswind back on.
+View, Edit Parameters. For spin drift, the program needs the size of the bullet and the twist of the
+barrel.
 
-The wind alone would push this bullet one hundred and four inches left. Now it goes ninety-seven,
-because the spin drift is pushing right and partly cancelling it.
+{ACTION: type `0.308` in Diameter.}
+VOICE: The diameter is zero point three oh eight inches.
 
-And now watch the drop. Three hundred fifty-nine inches, instead of three hundred sixty-three. The
-bullet climbed four inches — from a wind blowing purely sideways.
+{ACTION: type `1.394` in Length.}
+VOICE: The length is one point three nine four inches.
 
-That is aerodynamic jump. The crosswind tips the nose at the muzzle, and a spinning bullet responds by
-moving vertically. It needs the twist, the diameter, the length *and* a crosswind. Take any one of them
-away and the program shows you nothing, because there is nothing to show.
+{ACTION: the **Rifle** tab, open Rifling, pick **Right**.}
+VOICE: On the Rifle tab, the rifling is right hand.
 
-## Body, part two — the Coriolis effect  (~1 min 30 s)
+{ACTION: type `10` in Twist Rate, then press **OK**.}
+VOICE: And the twist is one turn in ten inches. OK.
 
-{ACTION: close without saving. `File → Open` → `bc2-demo.trajectory` again. Then `Ctrl+E` →
-**Parameters** tab.}
-
-VOICE:
-Back to the clean baseline one more time, because the last effect has nothing to do with the wind.
-
-The Earth turns under the bullet while it flies. That is the Coriolis effect. It needs two things the
-program cannot know: which way your barrel points, and how far north or south you are.
-
-{FILL — silence. Parameters tab, Coriolis group: Barrel azimuth `90` deg (East) · Latitude `45` deg.
-Press **OK**.}
-
-{HOLD 3 s.}
+{HOLD 2 s on the table. On the voice: point at Windage in the last row.}
 
 VOICE:
-Ninety degrees, so we are shooting east. Latitude forty-five north.
+There is still no wind. But now, at one thousand yards, the bullet moves eight inches to the right.
+This is spin drift.
 
-At one thousand yards the bullet moves three inches to the right, and just under four inches up.
+{ACTION: point at the drop in the last row.}
 
-Shooting east lifts the impact. Shooting west lowers it by the same amount. North and south change
-nothing vertically at all.
+VOICE:
+And the drop did not change at all. Three hundred sixty inches, the same as before.
 
-Is four inches worth the trouble? At one thousand yards, on a small target, yes. At three hundred
-yards, no. Leave the two fields empty and the effect is simply not there.
+## Body, part two — aerodynamic jump  (~1 min)
+
+VOICE:
+The second effect is aerodynamic jump. It happens only when the wind blows from the side. A side wind
+turns the nose of a spinning bullet a little, and the bullet moves up or down. So for the jump, we need
+wind.
+
+{ACTION, on the voice: `View` → `Edit Parameters`, then the **Wind** tab.}
+
+VOICE:
+Edit Parameters, and the Wind tab.
+
+{ACTION: type `10` in Velocity.}
+VOICE: Ten miles per hour,
+
+{ACTION: type `90` in Direction, then press **OK**.}
+VOICE: from the right. OK.
+
+{HOLD 2 s on the table. On the voice: point at the drop in the last row.}
+
+VOICE:
+Look at the drop. Three hundred fifty-six and a half inches. Before the wind it was three hundred
+sixty. The bullet went four inches up, from a wind that blows from the side.
+
+VOICE:
+This is aerodynamic jump. The program needs all four: the diameter, the length, the twist, and a side
+wind. Without any one of them, there is no jump.
+
+## Body, part three — the Coriolis effect  (~1 min 30 s)
+
+{ACTION, on the voice: close the trajectory window. The program does not ask about saving.}
+
+VOICE:
+Now I close this window without saving.
+
+{ACTION, on the voice: `Trajectory` → `Open` → `bc2-demo` again.}
+
+VOICE:
+Trajectory, Open, the same file again. The last effect has nothing to do with the bullet or the wind.
+
+VOICE:
+The Earth turns while the bullet flies. This is the Coriolis effect. For it, the program needs two
+things: the direction you shoot, and how far north or south you are.
+
+{ACTION, on the voice: `View` → `Edit Parameters`, then the **Parameters** tab.}
+
+VOICE:
+Edit Parameters, and the Parameters tab.
+
+{ACTION: tick **Calculate Coriolis Effect**.}
+VOICE: I turn on Calculate Coriolis Effect.
+
+{ACTION: type `90` in Azimuth; the dial turns. Point at the dial.}
+VOICE: The azimuth is ninety degrees. We shoot to the east.
+
+{ACTION: type `45` in Latitude (N is already selected), then press **OK**.}
+VOICE: The latitude is forty-five degrees north. OK.
+
+{HOLD 2 s on the table. On the voice: point at Windage in the last row.}
+
+VOICE:
+At one thousand yards, the bullet moves three inches to the right.
+
+{ACTION: point at the drop in the last row.}
+
+VOICE:
+And it hits almost four inches higher. Three hundred fifty-seven inches, instead of three hundred sixty.
+
+VOICE:
+If you shoot to the west, it goes four inches lower instead. To the north or to the south, the drop
+does not change.
+
+VOICE:
+Is it worth it? At one thousand yards, on a small target, yes. At three hundred yards, no. If you
+leave Coriolis off, the program does not calculate it.
 
 ## Next up
 
 VOICE:
-Next, two situations straight off the range. What your table looks like after you have already dialled
-the turret. And what happens when you zeroed the rifle in winter and you are shooting in July.
+Next time: two situations from the range. What the table looks like when you have already dialled the
+turret. And a rifle zeroed in winter that you shoot in July.
 
 {CARD 5 s: `Next → Episode 5: Dialled clicks, and a winter zero in July`}
 
@@ -533,182 +634,325 @@ the turret. And what happens when you zeroed the rifle in winter and you are sho
 
 # Episode 5 — Dialled clicks, and a winter zero in July
 
-{CARD 3 s: `Ballistic Calculator 2   ·   5 of 8   ·   Dialled Clicks, and a Winter Zero in July`}
+{CARD 3 s: `Ballistic Calculator 2   ·   Episode 5   ·   Dialled Clicks, and a Winter Zero in July`}
 
 {ACTION: the shared cold open clip.}
 
-## Recap  (~12 s)
+Rules from episode 2: the voice starts when the action starts, one short clip per action, no silent
+fill followed by narration. Numbers: `demo-numbers.md` §5 (read from the app).
 
-{ACTION: `File → Open` → `bc2-demo.trajectory`. Hold 3 s, then point at the 800 yd row.}
+## Recap  (~15 s)
 
-VOICE:
-The baseline once more. And this time look at the eight hundred yard row: the hold is six point two
-four milliradians.
-
-## Body, part one — clicks already on the turret  (~1 min 30 s)
-
-{ACTION: `Ctrl+E` → **Parameters** tab.}
+{ACTION, on the voice below: the app starts empty. `Trajectory` on "Trajectory", `Open` on "Open", pick
+`bc2-demo`, open it.}
 
 VOICE:
-Our scope moves zero point one milliradian per click. Six point two four milliradians is sixty-two
-clicks up.
+Trajectory, Open. The same file from episode two.
 
-Suppose you have already dialled those sixty-two clicks. Now your whole table is wrong, because it
-still assumes the turret is at zero.
-
-{FILL — silence. Parameters tab: Shot drop adjustment `6.2` mrad — or enter 62 clicks, whichever the
-field expects. Press **OK**.}
-
-{HOLD 4 s on the table.}
+{ACTION: point at Hold in the 800 yd row, then at its Clicks.}
 
 VOICE:
-Tell the program what is on the turret, and the table changes to match.
+Look at the eight hundred yard row. The hold is six point one eight milliradians. One click of our
+scope is zero point one milliradian, so this is sixty-two clicks. The program shows them in the Clicks
+column.
 
-Now the eight hundred yard row reads zero. That is where the rifle is pointing.
-
-Everything closer is high. At four hundred yards the bullet is seventy-five inches above your
-crosshair — more than six feet. At three hundred yards, sixty-seven inches. Everything further is low.
-
-This is the table you actually want after you dial. And it is a good reminder of how much of the sky is
-above your crosshair when the turret is wound up.
-
-## Body, part two — zeroed in winter, shooting in summer  (~2 min)
-
-{ACTION: close without saving. `File → Open` → `bc2-demo.trajectory`. Then `Ctrl+E` → **Weather** tab.}
+## Body, part one — clicks already on the turret  (~1 min 15 s)
 
 VOICE:
-Clean baseline again. And now the number I promised you in episode three.
+Many shooters do not hold over at long range. They dial the turret. So let's say you dialled these
+sixty-two clicks up. The table does not know about it. It still thinks the turret is at zero.
 
-You zeroed this rifle in February, at forty degrees, a thousand feet up. Today is July, same range, and
-it is one hundred degrees. The rifle has not moved. The zero has not moved. But the air has.
-
-{FILL — silence. Weather tab: Altitude `1000` ft · Pressure `28.9` inHg · Temperature `100` °F ·
-Humidity `30` %. Press **OK**.}
-
-{HOLD 3 s.}
+{ACTION, on the voice: `View` → `Edit Parameters`, then the **Rifle** tab.}
 
 VOICE:
-First, today's air. One hundred degrees at a thousand feet.
+View, Edit Parameters, and the Rifle tab.
 
-The drop at one thousand yards is three hundred thirty-four inches. In February it was three hundred
-sixty-one and a half. Twenty-eight inches less.
-
-That is what weather is worth when the temperature and the altitude pull the same way. Hot air is thin
-air, and the bullet flies further before it falls.
-
-{ACTION: `Ctrl+E` → **Zero** tab. Open the zero atmosphere group.}
+{ACTION: point at V Click, then at H Click.}
 
 VOICE:
-But there is a second half to this, and almost every calculator gets it wrong.
+The size of one click is set here. V Click is zero point one milliradian, and H Click is the same. They
+came with the sight preset in episode two. Without them, the program cannot count clicks.
 
-The Zero tab has its own weather. Not today's air — the air the rifle was *zeroed* in. February.
-
-{FILL — silence. Zero tab, zero atmosphere: Altitude `1000` ft · Pressure `28.9` inHg · Temperature
-`40` °F · Humidity `60` %. Press **OK**.}
-
-{HOLD 4 s.}
+{ACTION, on the voice: the **Parameters** tab.}
 
 VOICE:
-Now the sight angle is computed in February air, and the flight is computed in July air, which is what
-actually happened.
+And now the Parameters tab.
 
-It is worth one and a quarter inches at one thousand yards. I am telling you the small number honestly,
-because most of that twenty-eight inches came from today's air, not from the air you zeroed in.
-
-{ACTION: point at the 300 yd row.}
+{ACTION: point at V-Clicks, then at H-Clicks.}
 
 VOICE:
-But look at the three hundred yard row. It is no longer zero. It reads four tenths of an inch high.
+V-Clicks is the number of clicks that are already on the turret. H-Clicks is the same for windage.
 
-The rifle is not quite zeroed at its own zero distance any more, because the day changed. That is a
-real thing that happens to real rifles, and this is the only free calculator I know that will show it
-to you.
+{ACTION: type `62` in V-Clicks, then press **OK**.}
+VOICE: Sixty-two clicks up, the number from the eight hundred yard row. OK.
 
-And the further out you zero, the more it is worth: at a six hundred yard zero, the same swap is worth
-six and a half inches.
+{HOLD 2 s on the table. On the voice: point at the drop in the 800 yd row.}
+
+VOICE:
+Now, at eight hundred yards, the drop is almost zero. This is where the rifle points now.
+
+{ACTION: point at the drop in the 400 yd row.}
+
+VOICE:
+Everything closer goes high. At four hundred yards, the bullet goes seventy-six inches above the
+crosshair. That's more than six feet.
+
+{ACTION: point at Hold in the last row.}
+
+VOICE:
+And at one thousand yards you still need to hold three point eight milliradians.
+
+VOICE:
+So after you dial, this table shows what is left to hold.
+
+{ACTION, on the voice: close the trajectory window. The program does not ask about saving.}
+
+VOICE:
+Now I close this window without saving.
+
+## Body, part two — zeroed in winter, shooting in July  (~2 min)
+
+{ACTION, on the voice: `Trajectory` → `Open` → `bc2-demo` again.}
+
+VOICE:
+Trajectory, Open, the same file again.
+
+VOICE:
+Now the second situation. You zeroed this rifle in February, in the weather from episode three: one
+thousand feet up, and forty degrees. Now it is July, on the same range, and it is one hundred degrees.
+
+{ACTION, on the voice: `View` → `Edit Parameters`, then the **Weather** tab.}
+
+VOICE:
+Edit Parameters, and the Weather tab.
+
+{ACTION: type `1000` in Altitude, then `28.9` in Pressure.}
+VOICE: The altitude and the pressure are the same as in February: one thousand feet, and twenty-eight point nine.
+
+{ACTION: type `100` in Temperature.}
+VOICE: The temperature is one hundred degrees.
+
+{ACTION: type `90` in Humidity, then press **OK**.}
+VOICE: And the humidity is ninety percent. OK.
+
+{HOLD 2 s on the table. On the voice: point at the drop in the last row.}
+
+VOICE:
+At one thousand yards the drop is now three hundred twenty-eight and a half inches. In February it was
+three hundred fifty-nine. That's thirty inches less. Hot air is thinner, so the bullet slows down less.
+
+VOICE:
+But this table is for a rifle zeroed today, in July. We changed only today's weather, and the program
+calculates the zero in the same air as the shot. Our rifle was zeroed in February. So let's tell the
+program that.
+
+{ACTION, on the voice: `View` → `Edit Parameters`, then the **Zero** tab, scroll down.}
+
+VOICE:
+Edit Parameters, and the Zero tab. The Zero tab has its own weather, down here.
+
+{ACTION: tick **Other atmosphere for zero**.}
+VOICE: I turn on Other atmosphere for zero. This is the air you zeroed the rifle in.
+
+{ACTION: type `1000` in Altitude, then `28.9` in Pressure.}
+VOICE: One thousand feet, and twenty-eight point nine, as before.
+
+{ACTION: type `40` in Temperature.}
+VOICE: Forty degrees.
+
+{ACTION: type `40` in Humidity, then press **OK**.}
+VOICE: And forty percent. Winter air is dry. OK.
+
+{HOLD 2 s on the table. On the voice: point at the drop in the last row.}
+
+VOICE:
+At one thousand yards the drop is three hundred twenty-seven inches. In February it was three hundred
+fifty-nine. So in July this rifle drops thirty-two inches less. And this is the number you need, because
+you do not zero your rifle again every time the weather changes.
+
+{ACTION: point at the drop in the 300 yd row.}
+
+VOICE:
+But look at three hundred yards. The drop is not zero any more. At the zero distance itself, the bullet
+hits almost half an inch high, because the air is not the same as on the day of the zero.
 
 ## Next up
 
 VOICE:
-Next, the feature this program was really built for. We throw the ballistic coefficient away and use
-the bullet's own measured drag curve instead.
+Next time: we stop using the ballistic coefficient. Instead, we use the measured drag curve of this
+bullet.
 
 {CARD 5 s: `Next → Episode 6: A measured drag curve instead of a BC`}
 
 ---
 
+
 # Episode 6 — A measured drag curve instead of a BC
 
-{CARD 3 s: `Ballistic Calculator 2   ·   6 of 8   ·   A Measured Drag Curve`}
+{CARD 3 s: `Ballistic Calculator 2   ·   Episode 6   ·   A Measured Drag Curve`}
 
 {ACTION: the shared cold open clip.}
 
-## Recap  (~12 s)
+As produced (`build/ep06/record.py`, clips in `build/ep06/audio`). Numbers: `demo-numbers.md` §6. Part-one cards are
+overlaid full frame after assembly (`overlay_cards.py`); PRB pictures carry "Image: PrecisionRifleBlog.com" and the
+article link goes into the YouTube description: https://precisionrifleblog.com/2019/06/09/g1-vs-g7-vs-custom-drag-models/
 
-{ACTION: `File → Open` → `bc2-demo.trajectory`. Hold 3 s on the Ammunition tab via `Ctrl+E`, pointing at
-the ballistic coefficient field, then OK back to the table.}
+## Recap
 
-VOICE:
-The clean baseline for the last time. Standard air, no wind, three hundred sixty-three inches at one
-thousand yards.
-
-Every number in this whole series has come out of one single field on the Ammunition tab: zero point
-two five three, G seven. In this episode we get rid of it.
-
-## Body — the measured curve  (~2 min 20 s)
-
-{ACTION: `Ctrl+E` → **Ammunition** tab.}
+{ACTION: `Trajectory` → `Open` → `bc2-demo` (its load is now named **Baseline G7**).}
 
 VOICE:
-A ballistic coefficient is not a property of your bullet. It is a number that says how much your bullet
-resembles a standard shape from nineteen forty. G one and G seven are two of those shapes.
+Trajectory, Open. The same file from episode two, one more time.
 
-Your bullet is not that shape. So the coefficient is only approximately right, and the error changes as
-the bullet slows down.
-
-The alternative is your bullet's own measured drag curve. Lapua publish radar measurements for their
-bullets, and this program ships them.
-
-{FILL — silence. Ammunition tab: change the drag table selector from `G7` to `GC` (custom), then load
-`data/drg/Lapua/30-lapua gb550 11,3g (175 gr) scenar-l_radar.drg`. Press **OK**.}
-
-{HOLD 4 s.}
+{ACTION: point at the 1000 yd drop.}
 
 VOICE:
-This is the same bullet. The same weight, the same speed, the same rifle, the same air. The only thing
-that changed is how the drag is described.
+At one thousand yards the drop is three hundred sixty inches. All the numbers in this series came from one number: the ballistic coefficient, zero point two five three, G seven.
 
-{ACTION: point at the 1000 yd drop cell, then the 800 yd velocity cell.}
+## Body, part one — what a BC is, and where drag curves come from
 
-VOICE:
-Three hundred seventy-one inches instead of three hundred sixty-three. Nearly nine inches more drop at
-one thousand yards, and at eight hundred yards the bullet is arriving twenty feet per second slower.
-
-Nine inches does not sound like much. On a small target at one thousand yards, it is the difference
-between a hit and a miss.
-
-And notice the direction of the error. The G seven coefficient was optimistic. If you had used the G one
-number from the box instead — zero point five oh five — you would be fourteen inches optimistic.
-
-The program supports all the standard curves — G one, G two, G five, G six, G seven, G eight, G I, G S
-and R A four. It also builds a curve for you from radar data, or from a set of coefficients at
-different speeds. Those tools are under the Tools menu.
-
-## Body, part two — save the radar version  (~25 s)
-
-{ACTION: `File → Save As…`, type `bc2-demo-radar`, save.}
+{ACTION: CARD `card-prb-profiles.png`.}
 
 VOICE:
-This one I am going to keep. Save As, a new name, next to the original.
+What is this number? It compares your bullet to a standard bullet. G one is an old standard, a bullet with a flat base. G seven is a newer one: a long bullet with a boat tail, much closer to a modern long range bullet.
 
-Now there are two files: the baseline with a coefficient, and this one with the measured curve. The
-last episode of the calculator half of this series opens this one.
+{ACTION: CARD `card-curves.png`.}
+
+VOICE:
+The drag of the standard bullet was measured at every speed. The coefficient takes this curve and only makes it bigger or smaller. Here is the G seven curve, made smaller for zero point two five three, and the G one curve for zero point five oh five.
+
+VOICE:
+And here, in blue, is the real drag of our bullet. Its shape is different. That's why one number cannot fit at every speed.
+
+{ACTION: CARD `card-prb-hornady.png`.}
+
+VOICE:
+And it is not only our bullet. Every bullet has its own curve. Here are four Hornady bullets against G seven. None of them follows it exactly.
+
+{ACTION: CARD `bc-along-flight.png`.}
+
+VOICE:
+Here is the real G seven coefficient of our bullet, along the whole flight. Near the muzzle it is zero point two five. At three hundred yards it falls to zero point two four. Near one thousand yards it goes up to almost zero point three. The box gives you one number for all of this.
+
+{ACTION: CARD `card-prb-radar.png`.}
+
+VOICE:
+So where do these curves come from? The maker shoots the bullet and follows it with a Doppler radar. The radar sees how fast the bullet slows down at every speed. From that, they get the drag of this exact bullet, without any standard bullet at all.
+
+VOICE:
+Some of these pictures are from the Precision Rifle Blog. It has a very good article about G one, G seven and measured drag curves. The link is in the description.
+
+{ACTION: the card goes away.}
+
+VOICE:
+Lapua measured its bullets this way. Some makers publish these curves, others keep them inside their own apps. You have to look for the file for your bullet yourself. I have the one for our bullet, the one hundred seventy-five grain Scenar L.
+
+{ACTION: `Tools` → `Approximate Drag Table`, point at `From BC Curve…`, then `From Measured Velocities…`; close the menu.}
+
+VOICE:
+If you cannot find a file for your bullet, the program can build a curve for you. Tools, Approximate Drag Table. From BC Curve makes one from several ballistic coefficients for different speeds. From Measured Velocities makes one from velocities measured at different distances.
+
+## Body, part two — a new trajectory on the radar curve
+
+{ACTION: `Trajectory` → `New` → `Imperial` (the first window stays as it is).}
+
+VOICE:
+Now let's use the file. I keep this window as it is, and make a new trajectory. Trajectory, New, Imperial.
+
+{ACTION: press **Browse…** beside Drag table.}
+
+VOICE:
+On the Ammunition tab, next to Drag table, I press Browse.
+
+{ACTION: type the demo folder into the file name box, Enter, click the `.drg`, **Open**.}
+
+VOICE:
+I go to my folder. Here is the file. Open.
+
+{ACTION: point at BC (`1.000 GC`), the table, **BC is Form Factor**, BC again.}
+
+VOICE:
+The coefficient is one, and the table is G C, a custom curve. And BC is Form Factor is on. So this number is not a ballistic coefficient any more. It is a form factor: how much more or less drag the bullet has than the curve. One means exactly as the curve says. If your bullets fly a little better than the curve, you can put zero point nine eight here.
+
+{ACTION: point at Name, Weight, Diameter, Length, Weight.}
+
+VOICE:
+The program also took the name, the weight, the diameter and the length from the file. The file says eleven point three grams. That's one hundred seventy-four point four grains, not one seventy-five.
+
+{ACTION: type `2600` in Muzzle Vel.}
+
+VOICE:
+The muzzle velocity is ours: two thousand six hundred feet per second. The file knows the bullet, not your rifle.
+
+{ACTION: **Rifle** tab, Sight Preset → `Standard Optics (High, Mil)`.}
+
+VOICE:
+On the Rifle tab, the same sight as in episode two: Standard Optics, High, Mil.
+
+{ACTION: **Zero** tab, `300`; **OK**; *Confirm* → **Yes** (standard weather).}
+
+VOICE:
+On the Zero tab, three hundred yards. OK, and standard weather, yes.
+
+{ACTION: point at the 1000 yd drop.}
+
+VOICE:
+At one thousand yards the drop is now three hundred seventy-one inches. That's ten inches more than with the coefficient.
+
+{ACTION: point at its Clicks.}
+
+VOICE:
+On the turret, that's three more clicks.
+
+## Body, part three — compare the two
+
+{ACTION: `View` → `Compare` → `Add` (the radar window).}
+
+VOICE:
+Now let's put both on one chart. View, Compare, Add.
+
+{ACTION: `Windows` → `1 Baseline G7`; `View` → `Compare` → `Add`.}
+
+VOICE:
+Windows, our first trajectory. View, Compare, Add again.
+
+{ACTION: point at ~500 yd, then the far end of the curves.}
+
+VOICE:
+Here are the two drop curves. Up to about five hundred yards they are almost the same. Further out they go apart, and at one thousand yards the gap is ten inches.
+
+{ACTION: `View` → `Chart` → `Velocity`.}
+
+VOICE:
+View, Chart, Velocity. Here the radar bullet is slower all the way.
+
+{ACTION: point at ~800 yd on the velocity chart.}
+
+VOICE:
+And at eight hundred yards the bullet is twenty-five feet per second slower. Remember the chart: in the first few hundred yards the real coefficient is worse than the box says. The bullet loses speed there, and it never gets it back.
+
+VOICE:
+And zero point two five three is a good number. It is the G seven number. With the G one number from the box, zero point five oh five, the error is sixteen inches.
+
+VOICE:
+Inside three hundred yards, a good coefficient is enough. Past eight hundred, the drag curve matters more than almost anything else, except your muzzle velocity.
+
+## Body, part four — save the radar version
+
+{ACTION: `Windows` → `2 .308 Lapua…`; `Trajectory` → `Save As`.}
+
+VOICE:
+This one I keep. Windows, the Lapua window. Trajectory, Save As.
+
+{ACTION: type `bc2-demo-radar`, **Save**.}
+
+VOICE:
+A new name: b c two demo radar. Save. The first file stays as it was.
 
 ## Next up
 
 VOICE:
-Because so far you have seen every effect on its own. Next, we turn all of them on at once — and look
-through the scope.
+Next time: we turn on everything at once, and look through the scope.
 
 {CARD 5 s: `Next → Episode 7: Everything at once`}
 
@@ -716,198 +960,412 @@ through the scope.
 
 # Episode 7 — Everything at once
 
-{CARD 3 s: `Ballistic Calculator 2   ·   7 of 8   ·   Everything At Once`}
+**Produced 2026-11-04** — `build/ep07/ep07.mp4` (5:14). Text below is exactly what was voiced (`build/ep07/clips.json`); q06b/q06c carry full-frame cards laid over in post (`build/ep07/overlay_cards.py`).
 
+{CARD 3 s: `Ballistic Calculator 2   ·   Episode 7   ·   Everything At Once`}
 {ACTION: the shared cold open clip.}
 
-## Recap  (~15 s)
+Numbers: `demo-numbers.md` §7 (read from the app 2026-11-04, `build/ep07/read_numbers.py`).
 
-{ACTION: `File → Open` → `bc2-demo-radar.trajectory`. Hold 3 s.}
+## Recap
+r01 {Trajectory → Open → bc2-demo-radar}
+Trajectory, Open. This time the file from episode six, with the measured drag curve.
 
-VOICE:
-Five episodes, five features, each one on its own against the same baseline. That was to show you what
-each one does. It is not how a range day works — out there they all arrive at once.
+r02 {point at the 1000 yd drop, then the windage}
+At one thousand yards the drop is three hundred seventy-one inches, and there is no windage at all.
 
-So this is the radar-curve file from episode six, and now I am going to put everything else on top of
-it.
+r03 {Reticle tab, Mil-Dot, Far BDC; point down the labels}
+And the scope: the Reticle tab, Mil-Dot, Far B D C. The dots below the centre are four hundred five, four ninety-six, five seventy-eight and six fifty-one yards. Remember these numbers.
 
-## Body, part one — build the real shot  (~1 min 20 s)
+r04 {back to the Table tab}
+Until now we added one effect at a time. Today we add them on top of each other, like on a real range day.
 
-{FILL — silence, sped up in editing. `Ctrl+E`, then, tab by tab:
-· **Weather**: Altitude `1000` ft · Pressure `28.9` inHg · Temperature `100` °F · Humidity `30` %
-· **Wind**: `10` mph · `90` deg, no distance limit
-· **Ammunition**: Bullet diameter `0.308` in · Bullet length `1.394` in
-· **Rifle**: Rifling `10` in, **Right**
-· **Parameters**: Barrel azimuth `90` deg · Latitude `45` deg
-· **Zero**: zero atmosphere `1000` ft · `28.9` inHg · `40` °F · `60` %
-Leave the shot drop adjustment empty — no clicks dialled. Press **OK**.}
+## Step 1 — spin drift
+e01 {View → Edit Parameters → Rifle tab}
+View, Edit Parameters, the Rifle tab.
 
-{HOLD 5 s on the table.}
+e02 {Rifling → Right}
+The drag file already gave us the diameter and the length of the bullet. So we only need the rifling: right hand,
 
-VOICE:
-July air on a February zero. A ten mile per hour crosswind. The bullet's real shape and a one in ten
-twist. Shooting east at forty-five degrees north. And the measured drag curve.
+e03 {Twist 10, OK}
+one turn in ten inches. OK.
 
-That is every feature in this series except the dialled clicks, in one shot.
+e04 {point at the 1000 yd windage, then drop}
+Spin drift: eight inches to the right. The drop did not change.
 
-{ACTION: point at the 1000 yd drop cell.}
+## Step 2 — Coriolis
+e05 {Edit Parameters → Parameters tab, tick Coriolis}
+Edit Parameters, the Parameters tab. Calculate Coriolis Effect,
 
-VOICE:
-Three hundred thirty-four inches of drop at one thousand yards.
+e06 {Azimuth 90}
+we shoot to the east,
 
-And here is the thing I want you to notice. Back in episode five, July air on its own gave us three
-hundred thirty-four inches too.
+e07 {Latitude 45, OK}
+at forty-five degrees north. OK.
 
-That is not the same answer arrived at twice. The radar curve added nine inches of drop. Aerodynamic
-jump and the Coriolis effect took about nine inches back off. They very nearly cancelled — this time,
-at this distance, in this wind, shooting in this direction.
+e08 {point at the drop, then the windage}
+The bullet hits almost four inches higher, and the drift to the right grows to eleven and a half inches.
 
-Turn the wind around, or shoot west instead of east, and they add up instead. This is exactly why you
-put the real numbers in rather than trusting a rule of thumb.
+## Step 3 — the weather from episode five
+e09 {Edit Parameters → Weather tab; 1000, 28.9, 100, 90}
+Now the weather from episode five. Edit Parameters, the Weather tab. July: one thousand feet, twenty-eight point nine, one hundred degrees, ninety percent.
 
-{ACTION: point at the 300 yd row, then the windage column.}
+e10 {Zero tab, scroll, tick Other atmosphere for zero}
+And the Zero tab: the rifle was zeroed in February.
 
-VOICE:
-Two more things. At three hundred yards the bullet is now nearly two inches high — the rifle is not
-zeroed where it thinks it is. And the wind is worth eighty-three inches instead of one hundred and
-four, because the spin drift is fighting it.
+e11 {1000, 28.9, 40, 40, OK}
+One thousand feet, twenty-eight point nine, forty degrees, forty percent. OK.
 
-## Body, part two — the same reticle, re-labelled  (~1 min 40 s)
+e12 {point at the 1000 yd drop}
+Three hundred thirty-three inches: thirty-four inches less than before.
 
-{ACTION: `Ctrl+R` → Reticle view → **Mil-Dot** → **Far BDC**.}
+## Step 4 — the wind, and aerodynamic jump
+e13 {Edit Parameters → Wind tab; 10, 90, OK}
+And last, the wind. Edit Parameters, the Wind tab. Ten miles per hour, from the right. OK.
 
-{HOLD 5 s on the sight picture.}
+e14 {point at the 1000 yd windage}
+The wind takes the bullet eighty-two inches to the left.
 
-VOICE:
-And now the part that makes all of this concrete. The same Mil-Dot reticle from episode two. The same
-scope. The same glass.
+e15 {point at the 1000 yd drop}
+And look at the drop: three hundred twenty-nine, four inches less than without the wind. This is aerodynamic jump from episode four. It needs everything together: the bullet's shape, the twist, and the wind.
 
-{ACTION: move the mouse slowly down the vertical stalk, dot by dot.}
+e16 {point at the 300 yd drop}
+And at three hundred yards, our zero distance, the bullet is now almost two inches high.
 
-VOICE:
-In episode two, the first dot below the centre was four hundred and five yards. Now it is about four
-hundred and twenty-five.
+e17
+Some effects add up, some cancel each other. You cannot guess that. You put the real numbers in.
 
-The second dot was four hundred ninety-eight. Now about five hundred seventeen. The third was five
-hundred eighty, now about six hundred. And the bottom of the reticle, which ran out at seven hundred
-eighty-seven yards, now reaches past eight hundred and fifteen.
+## The scope
+q01 {Reticle tab (still Mil-Dot, Far BDC); point down the labels}
+The Reticle tab again. Four hundred five is now four hundred twenty-eight. Four ninety-six is five twenty-two. Five seventy-eight is six oh seven. And six fifty-one is six eighty-four. Every dot is worth twenty to thirty yards more.
 
-{HOLD 3 s.}
+q02 {Near BDC; point at the labels}
+Near B D C shows the distances before the zero. The scope sits three inches above the barrel, so at very short range the bullet is still below the line of sight. At twenty-two yards you hold one milliradian high, at twelve yards four.
 
-VOICE:
-Every mark in your scope is worth twenty to thirty yards more than it was, and not one thing about the
-scope changed. Only the day, the air, the wind and an honest drag curve.
+q03 {Target; size 20 × 20 in, distance 600 yd; point at the box}
+Target puts a target into the scope. A twenty inch plate at six hundred yards. The box is where the bullet lands: low, and to the left, because of the wind. The plate is less than one milliradian wide, so the wind call must be right to a fraction of a milliradian.
 
-That is the argument for a ballistic calculator, in one picture. A printed range card is a photograph of
-one afternoon. This is the afternoon you are actually standing in.
+q04 {Load… → VCOG-16-762-175gr; Far BDC}
+The program comes with thirty-four reticles. Load. For example, the Trijicon V-COG for seven six two, made for a one hundred seventy-five grain bullet.
+
+q05 {point at the etched 4, then 10}
+Its marks say four to ten: hundreds of metres, for its own load and its own zero. With our zero at three hundred yards and today's air, the four is five hundred ninety-three yards, and the ten is one thousand two hundred sixty-three.
+
+q06
+An etched B D C is true only for the load, the zero and the air it was made for. The program labels it for yours.
+
+q06b {CARD: Reticle Editor screenshot, docs/screenshots/reticleeditor.png}
+The calculator also comes with a reticle editor, so you can draw your own reticles. And some of the reticles that come with it are quite fun.
+
+q06c {CARD: the reticle-designer skill name and its address}
+And if you use an AI assistant like Claude or Codex, there is a skill that makes a reticle file from a description, or even from a picture of a reticle. It is in the repository too. The link is in the description.
+
+q07
+The scope did not change. Only the day, the air and the wind did. A printed range card is a photo of one day. The calculator shows you the day you are standing in.
 
 ## Next up
-
-VOICE:
-One episode left, and it is the thing I most wanted to show you: a rifle zeroed with one cartridge,
-shooting a completely different one.
+n01
+Next time, the first special case: one rifle and two different cartridges. We zero it with one and shoot the other. Three hundred Blackout.
 
 {CARD 5 s: `Next → Episode 8: 300 Blackout — zero one load, shoot another`}
 
 ---
 
-# Episode 8 — 300 Blackout: zero one load, shoot another
+# Episode 8 — Zero one load, shoot another
 
-{CARD 3 s: `Ballistic Calculator 2   ·   8 of 8   ·   Zero One Load, Shoot Another`}
+As produced 2026-11-05 (`build/ep08/ep8-script.md`, `build/ep08/record.py`, `ep08.mp4` 5:05). Clip ids = files in `build/ep08/audio/`.
 
+{CARD 3 s: `Ballistic Calculator 2   ·   Episode 8   ·   Zero One Load, Shoot Another`}
 {ACTION: the shared cold open clip.}
 
-## Recap  (~12 s)
+Numbers: read from the app 2026-11-04 (`build/ep08/read_numbers.py`, `demo-numbers.md` §8).
+Both loads come from the ammunition library; the MVs are corrected to the ones Trijicon's reticle was made for.
+Order (Nikolay, 2026-11-05): the supersonic load first — the rifle is zeroed with it — then the subsonic one.
 
-{ACTION: the episode 7 window still open on the reticle view. Hold 3 s.}
+## Intro
+i01
+This is the first special case. A rifle in three hundred Blackout, with a Trijicon V-COG scope.
 
-VOICE:
-Everything so far has been one rifle and one cartridge, refined seven times. This last episode is a
-different rifle, a different problem, and a real scope.
+i02
+Three hundred Blackout is one cartridge with many loads. Two of them matter here. A fast supersonic load, close to the seven point six two by thirty-nine, makes it a classic assault rifle. A heavy, slow subsonic load, close to the nine by thirty-nine, makes it a quiet rifle with a suppressor.
 
-And this one I build from nothing, in clean standard air — because the point of it is a comparison
-against a manufacturer's own published data.
+i03
+The V-COG for three hundred Blackout is made for both. The rifle is zeroed with the supersonic load, the same reticle has marks for the subsonic one, and you change loads without touching the scope.
 
-## Body, part one — zeroing with a different cartridge  (~2 min 20 s)
+## First trajectory: the supersonic load
+a01 {Trajectory → New → Metric}
+Trajectory, New, and Metric, not by chance: the V-COG ladder is marked in metres.
 
-{ACTION: `Trajectory → New → Metric`. A fresh window — new rifle, new scope.}
+a02 {Ammunition: Load → .300 AAC → .300 AAC 115gr}
+We start with the supersonic load, because this is the load the rifle is zeroed with. Load, three hundred A A C, the other name of the same cartridge, and the one hundred fifteen grain load.
 
-VOICE:
-Three hundred Blackout is really two cartridges in one chamber. A fast supersonic load, and a heavy,
-slow, subsonic one. Most people zero with the supersonic load, and then shoot the subsonic one out of
-the same rifle without touching the scope.
+a03 {point at Weight, BC; MV 2295 → 2330}
+One hundred fifteen grains, B C zero point two nine, G one. The library says two thousand two hundred ninety-five feet per second. The V-COG reticle was made for two thousand three hundred thirty, so I type that.
 
-So the shot and the zero use different ammunition. Almost no free calculator can describe that.
+a04 {Rifle tab; Sight preset: Standard Optics (High, Mil)}
+On the Rifle tab, a scope with milliradian clicks.
 
-{FILL — silence. Ammunition tab — the SUBSONIC load: Weight `208` gr · BC `0.648` `G1` · Muzzle
-velocity `1010` ft/s · Diameter `0.308` in · Length `1.44` in. Rifle tab: Sight height `2.9` in ·
-clicks `0.1` mrad · Rifling `8` in, **Right**. Parameters: `200` m, step `25` m.}
+a05 {Sight Height 3 → 2.9 in}
+The V-COG sits on a tall mount: two point nine inches above the barrel.
 
-VOICE:
-The shot is the heavy subsonic load. Two hundred and eight grains, at one thousand and ten feet per
-second. Slower than the speed of sound.
+a06 {Rifling: Right; Twist 8 in}
+And the barrel: right hand, one turn in eight inches.
 
-{ACTION: click the **Zero** tab. Set Distance `100` m. Then open the zero ammunition group.}
+a07 {Zero tab; point at Distance "100 yd"; switch the unit to m}
+On the Zero tab, the sight preset gave us one hundred yards. We zero at one hundred metres, so I switch it to metres.
 
-{FILL — silence. Zero tab, zero ammunition: Weight `115` gr · BC `0.290` `G1` · Muzzle velocity
-`2330` ft/s. Press **OK**.}
+a08 {OK; standard weather, Yes}
+The rifle is zeroed with the load we shoot, so there is nothing more to set. OK, and standard weather.
 
-VOICE:
-And here is the Zero tab again. One hundred metres. But the ammunition used for that zero is the
-*other* load. One hundred fifteen grains, at two thousand three hundred thirty feet per second.
+q01 {Reticle tab; Load… → VCOG16-300BLK; Far BDC}
+Now the scope. The Reticle tab, Load, the V-COG for three hundred Blackout, and Far B D C.
 
-{HOLD 4 s on the table.}
+q02 {point at the crosshair, then down the ladder: 200, 300, 400, 500, 600 m}
+The crosshair is the zero, one hundred metres. And every mark below it is where Trijicon put it: two hundred, three hundred, four hundred, five hundred and six hundred metres.
 
-VOICE:
-Now look what that costs you.
+## Second trajectory: the subsonic load
+b01 {Trajectory → New → Metric; Load → .300 AAC 208gr Hornady}
+Now the subsonic load, in a second trajectory. New, Metric, Load, and the two hundred eight grain Hornady.
 
-At one hundred metres — the distance the rifle is zeroed at — the subsonic bullet is forty-two
-centimetres low. Almost half a metre, at one hundred metres.
+b02 {MV 1020 → 1010}
+B C zero point six four eight, G one. The library says one thousand twenty feet per second, the reticle was made for one thousand ten.
 
-At two hundred metres it is one metre eighty-eight below the line of sight.
+b03 {Rifle tab: Standard Optics (High, Mil); 2.9 in; Right; 8 in}
+The same rifle: the scope with milliradian clicks, two point nine inches, right hand, one in eight.
 
-That is the price of a shared zero. It is not a mistake. It is simply what happens, and now you can
-see it before you shoot.
+b04 {Zero tab: 100 yd → m; tick Other ammunition for zero}
+Zero at one hundred metres. And now the important part: Other ammunition for zero. The rifle was zeroed with the supersonic load, not with this one.
 
-## Body, part two — the sight picture  (~1 min 50 s)
+b05 {its Load → .300 AAC 115gr; MV 2295 → 2330}
+Load, the one hundred fifteen grain load, at two thousand three hundred thirty, the same as in the first trajectory.
 
-{ACTION: `Ctrl+R` → Reticle view → **Load…** → `VCOG16-300BLK.reticle`.}
+b06 {Parameters: 200 m, step 25 m; OK; standard weather, Yes}
+Parameters: two hundred metres, every twenty-five. OK, and standard weather.
 
-{HOLD 4 s on the reticle, before any overlay.}
+## What it costs
+t01 {point at the 100 m drop}
+Look at one hundred metres, the distance the rifle is zeroed at. The subsonic bullet is forty-two centimetres low.
 
-VOICE:
-And this is why that matters.
+t02 {point at the 200 m drop}
+At two hundred metres it is almost two metres low. The scope is right for one load, and very wrong for the other.
 
-This is the Trijicon V-COG, one to six by twenty-four, in three hundred Blackout. A real reticle, drawn
-from the manufacturer's own sheet.
+t03
+This is not a mistake. It is what a shared zero costs, and now you see it before you shoot.
 
-Look at it. There is a ladder of horizontal bars going down. Those are the supersonic holds — two
-hundred, three hundred, four hundred, five hundred, six hundred metres.
+## The same scope for the subsonic load
+r01 {Reticle tab; Load… → VCOG16-300BLK; Far BDC}
+The same reticle, and Far B D C.
 
-And there are three small diamonds. Those belong to the subsonic load. Trijicon etched them into the
-glass for exactly the situation we just calculated.
+r02 {point at the crosshair, then the top of the ladder and the next two bars}
+Trijicon uses one ladder for both loads. For the supersonic load it starts at the crosshair. For the subsonic load it starts lower, at the top of the ladder: fifty, one hundred, one hundred fifty.
 
-{ACTION: select **Far BDC**. Set **Split at** to something small, e.g. `25` m, so the subsonic holds
-are labelled.}
+r03 {point at Split at "100 m"; type 50}
+Far B D C labels the marks after the Split at distance. By default it is the zero, one hundred metres, so the top of the ladder has no label. The subsonic count starts at fifty, so I type fifty.
 
-{HOLD 5 s.}
+r04 {point at the 55, 102 and 151 m labels}
+And the program agrees: fifty-five, one hundred two, and one hundred fifty-one metres.
 
-VOICE:
-Now I turn on the labels, and the program marks where our subsonic bullet actually goes.
+r05 {click the first window: the supersonic labels again}
+One scope, two loads, one zero. Tell the program which load the zero was made with, and it labels the reticle for the load you shoot.
 
-Fifty metres. One hundred metres. One hundred fifty metres.
+## Next up
+n01
+Next time: shooting uphill and downhill, and why the program shows the drop in two different ways.
 
-{ACTION: slowly move the mouse from each computed label to the diamond it sits on.}
+{CARD 5 s: `Next → Episode 9: Shooting at an Angle`}
 
-VOICE:
-Every one of them lands on a diamond.
+---
 
-We did not copy those positions. We described a rifle, two cartridges and a zero, and the program
-computed where the bullet goes. Trijicon cut their glass from the same physics.
+# Episode 9 — Shooting at an angle
 
-That is a good way to check that a ballistic calculator is telling you the truth.
+As produced 2026-11-05 (`build/ep09/ep9-script.md`, `build/ep09/record.py`, `ep09.mp4` 3:42). Clip ids = files in `build/ep09/audio/`.
 
-## Outro  (~45 s)
+{CARD 3 s: `Ballistic Calculator 2   ·   Episode 9   ·   Shooting at an Angle`}
+{ACTION: the shared cold open clip.}
+
+Numbers: read from the app 2026-11-05 (`build/ep09/read_numbers.py`, `demo-numbers.md` §9).
+The shot is `bc2-demo` from episode 2: .308, 175 gr, G7 0.253, 2600 ft/s, zero 300 yd, Hold in mrad.
+Agreed with Nikolay 2026-11-05: the two kinds of drop only on the chart, not in the table; the rifleman's rule
+with a picture (`card-rifleman.png`); no BDC; the program is "a full model of the flight", never "exact".
+
+## Intro
+i01
+This is the second special case: shooting uphill and downhill.
+
+i02
+In the mountains the target is often above you or below you. The distance can be the same as on the flat, but the hold is not.
+
+## The flat shot
+a01 {Trajectory → Open → bc2-demo}
+Trajectory, Open. The same file from episode two: our rifle, our load, and a zero at three hundred yards.
+
+a02 {point at the 1000 yd Hold}
+On the flat, at one thousand yards, we hold ten milliradians.
+
+a03 {View → Drop → Over Muzzle Level; Chart tab}
+Now the chart, with the drop over muzzle level. View, Drop, Over Muzzle Level, and the Chart tab.
+
+a04 {point along the two lines near the muzzle, the crossing, 300 yd}
+Two lines: the bullet, and the line of sight. The bullet starts below the line of sight, goes above it, and comes back to it at three hundred yards, our zero. On the flat the line of sight is level, so both kinds of drop are the same.
+
+## Uphill
+u01 {View → Edit Parameters → Parameters tab; Shot Angle 30}
+Now the same target, thirty degrees uphill. Edit Parameters, the Parameters tab, and the shot angle: thirty.
+
+u02 {point at the Zero tab, no click}
+Not the shot angle on the Zero tab. That one is the angle you zeroed at, and this rifle was zeroed on the flat.
+
+u03 {OK; the chart: two slanted lines}
+OK. Now both lines go up. At one thousand yards the target is five hundred yards higher than we are: fifteen hundred feet.
+
+u04 {point at the 1000 yd end, ~18,000 in}
+This is the drop over muzzle level: where the bullet is in space. At the end it is almost fifteen hundred feet above the muzzle, and still a little below the line of sight.
+
+u05 {zoom into 800–1000 yd; View → Chart → Zoom Y Axis to Visible Range}
+Let us zoom in at the end. Now you see the gap. How far the bullet is from the line of sight, measured across it, is the other kind of drop: drop over the line of sight. This is the one you hold.
+
+u06 {View → Drop → Over Line of Sight; Table tab; point at the 1000 yd Hold}
+So back to drop over the line of sight, and the table. At one thousand yards the hold is eight point two milliradians, almost two less than on the flat.
+
+u07
+If you forget the angle and hold ten, the bullet goes more than five feet over the target.
+
+u08
+Why less? Gravity always pulls straight down. When the line of sight is tilted, only part of it pulls the bullet away from the line of sight.
+
+## Downhill
+d01 {Edit Parameters; Shot Angle −30; OK; point at the 1000 yd Hold}
+And thirty degrees downhill: minus thirty. Eight point four.
+
+d02
+Almost the same. Uphill or downhill, the bullet drops less than on the flat, for the same reason: only part of gravity pulls it away from the line of sight.
+
+## The rifleman's rule
+r01 {CARD `card-rifleman.png`}
+There is an old rule of thumb for this: the rifleman's rule. Hold as if the target were on the flat, at the horizontal distance. Here it is one thousand yards times the cosine of thirty degrees: eight hundred sixty-six yards.
+
+r02 {back to the table; point at the 1000 yd Hold}
+On the flat at eight hundred sixty-six yards, the hold is seven point three. The full calculation says eight point two. The rule is much better than nothing, but at one thousand yards the difference is almost one milliradian: almost three feet.
+
+r03
+The program does not use a shortcut. It calculates the whole flight along the tilted line of sight. It is still a model, but a full model of the flight, not a simplified rule.
+
+## Next up
+n01
+Next time: your own drag table. The program can build one from several ballistic coefficients, or from velocities you measured.
+
+{CARD 5 s: `Next → Episode 10: Your Own Drag Table`}
+
+---
+
+# Episode 10 — Your own drag table
+
+As produced 2026-11-05 (`build/ep10/ep10-script.md`, `build/ep10/record.py`). Clip ids = files in `build/ep10/audio/`. Cards: `card-bc-by-speed.png` (b01), `card-warner-sheet.png` (v01), `card-csv.png` (v04, first 8.6 s), overlaid after assembly (`overlay_cards.py`).
+
+{CARD 3 s: `Ballistic Calculator 2   ·   Episode 10   ·   Your Own Drag Table`}
+{ACTION: the shared cold open clip.}
+
+Numbers: read from the app 2026-11-05 (`build/ep10/probe.py`): 1000 yd hold 10.01 one BC / 10.28 five BCs / 10.30 radar
+(drop 360.51 / 370.01 / 370.81 in); .338 at 1500 yd 10.36 (G7 0.484) / 10.40 (our curve, 6000 ft 78 °F).
+Agreed with Nikolay 2026-11-05: part 1 builds the Scenar-L curve from several BCs taken off the ep. 6 radar curve
+and checks it against that radar `.drg`; part 2 builds the Warner .338 Flatline 285 gr from its published
+velocity table and shows why the air of the range (EMRTC, New Mexico Tech, Socorro NM) matters.
+
+## Intro
+i01
+In episode six we used a drag curve measured with a radar. It is the best data you can have for a bullet, but not every maker publishes one.
+
+i02
+If you do not have the file, the program can build an approximate curve for you. There are two ways: from several ballistic coefficients, or from velocities measured down range. Today we try both, and check each one against real radar data.
+
+## Part 1 — from several coefficients
+b01 {CARD `card-bc-by-speed.png`: the G7 BC of the Scenar-L against velocity, five points marked}
+Some makers give more than one coefficient: one for each speed range. For our bullet I take five points from the radar curve of episode six. At two thousand six hundred feet per second the G seven coefficient is zero point two five. At eleven hundred it is almost zero point three.
+
+b02 {Tools → Approximate Drag Table → From BC Curve}
+Tools, Approximate Drag Table, From BC Curve.
+
+b03 {Name; Weight 175 gr; Diameter 0.308 in}
+A name. The weight, one hundred seventy-five grains, and the diameter, point three oh eight. The program needs both: they turn the coefficients into a real drag curve.
+
+b04 {Base table G7}
+The base table is G seven, because our coefficients are G seven numbers.
+
+b05 {BC 0.250, Velocity 2600, Add}
+The first point: zero point two five oh, at two thousand six hundred feet per second. Add. The program turns the speed into a Mach number, for standard air.
+
+b06 {four more points, Add after each}
+Zero point two four oh at twenty-two hundred. Zero point two four four at eighteen hundred. Zero point two six three at fourteen hundred. And zero point two nine three at eleven hundred.
+
+b07 {Save Drg → name → Save; Close}
+Save Drg. I put it next to the radar file. Close.
+
+b08 {Trajectory → Open → bc2-demo; point at the 1000 yd Hold}
+Now let's check it. Trajectory, Open: our file from episode two, with one coefficient. At one thousand yards we hold ten point oh one.
+
+b09 {Edit Parameters → Browse → the new file; Name → "Five G7 BCs"; OK; point at the 1000 yd Hold}
+Edit Parameters, Browse, and the new file. A new name: five G seven BCs. OK. Now we hold ten point two eight.
+
+b10 {Trajectory → Open → bc2-demo-radar; point at the 1000 yd Hold}
+And the real radar curve from episode six: ten point three oh. Five coefficients came within one inch at one thousand yards. One coefficient was off by ten inches.
+
+b11 {in the radar window: View → Compare → Add}
+Let's put both on one chart. In the radar window: View, Compare, Add.
+
+b12 {Windows → the bc2-demo window (five coefficients); View → Compare → Add; Chart tab}
+Windows, our five coefficients. View, Compare, Add again. And the chart: the two curves lie on top of each other.
+
+## Part 2 — from measured velocities
+v01 {CARD `card-warner-sheet.png`: page 1 of Warner's data sheet + source line}
+The second way is velocities: the speed of the bullet at different distances, measured with a big Doppler radar. Some makers publish them. Warner Tool publishes radar data sheets for its Flatline bullets. Here is the three thirty-eight, two hundred eighty-five grains: the speed every hundred yards, out to fifteen hundred.
+
+v02 {Tools → Approximate Drag Table → From Measured Velocities}
+Tools, Approximate Drag Table, From Measured Velocities.
+
+v03 {Name; Weight 285 gr; Diameter 0.338 in}
+The name, the weight, two hundred eighty-five grains, and the diameter, point three three eight.
+
+v04 {CARD `card-csv.png` over the first two sentences: the file as plain text; then Load Csv → 338-flatline-velocities.csv → Open; the grid fills}
+I typed the table into a small text file. Here it is: a header, then a distance and a speed on each line, each with its unit. Load Csv. Sixteen readings.
+
+v05 {point at the status line: "standard atmosphere"}
+Before I save, one more thing: the air. The program has to know the air these speeds were measured in. In thin air the bullet slows down less, so the same speeds mean a different drag curve.
+
+v06
+So where were they measured? Warner tests its bullets at E M R T C, the Energetic Materials Research and Testing Center of New Mexico Tech, near Socorro, New Mexico. The town is at forty-six hundred feet, and the ranges go up into the hills.
+
+v07
+The sheet does not say what the weather was. But it also has the drag for standard air, so we can check which air fits. It is about six thousand feet on a warm day, seventy-eight degrees. That air is as thin as at almost nine thousand feet on a standard day.
+
+v08 {Set Atmosphere: 6000 ft, 23.98 inHg, 78 °F, 25 %; OK}
+Set Atmosphere. Six thousand feet, twenty-three point nine eight inches of pressure, seventy-eight degrees, and dry air: twenty-five percent. OK.
+
+v09 {Save Drg → "338 flatline" → Save; Close}
+Save Drg. Close.
+
+v10 {Trajectory → Open → 338-flatline (prepared); point at the 1500 yd Hold}
+I prepared a trajectory for this bullet: three thousand seventy-nine feet per second, a zero at one hundred yards, out to fifteen hundred. It uses Warner's own G seven coefficient: zero point four eight four. At fifteen hundred yards we hold ten point three six.
+
+v11 {Edit Parameters → Browse → 338 flatline.drg → OK; point at the Hold}
+Now our curve: ten point four oh. Almost the same as Warner's number.
+
+## Wrap-up
+x01
+Both ways give an approximation. A radar curve from the maker is still the best. But five good coefficients, or a good velocity table with the right air, come very close.
+
+x02
+This is the last episode of this series. The program can do more than we showed, and the user guide describes all of it. Thank you for watching.
+
+{CARD 5 s: the final end card `end-10.png` — free and open source, links}
+
+---
+
+# Series outro — not used
+
+Episode 10 ends with its own short x02 instead ("This is the last episode of this series…"); the end card
+`end-10.png` carries the links. Kept for reference.
+
+Written for whichever episode ends the series (episode 10 is planned now, so not episode 9).
 
 {ACTION: optional silent montage, about five seconds each, no narration: two loads compared on one
 chart · the hit probability dialog · export to C S V · the ammunition library · the drag table builder
@@ -953,54 +1411,183 @@ outro instead of a next-up line.
    the narration refers forward ("remember those numbers", "the number I promised you in episode three").
 2. **Never save from episodes 3, 4 or 5.** Close without saving, decline any prompt. If `bc2-demo.trajectory`
    picks up a stray change, every later episode's recap number is wrong. Keep a spare copy of the file.
-3. **Episode 4 opens the baseline twice** — once for spin drift and jump, once for Coriolis. Episode 5
+3. **Episode 4 opens the baseline twice** — once for spin drift and jump, once for Coriolis. Spin drift is shown
+   clean (no wind); the wind goes on only for the jump, and only the drop is discussed there. Episode 5
    likewise, once for clicks and once for the weather swap. That is deliberate: it is what keeps each
    effect measured against the baseline and nothing else.
 4. **Episode 7's fill is long.** Six tab groups in one `{FILL}` — speed it up hard in the edit. If it
-   still drags, save `bc2-demo-everything.trajectory` off camera beforehand and simply `File → Open` it;
+   still drags, save `bc2-demo-everything.trajectory` off camera beforehand and simply `Trajectory → Open` it;
    the numbers are identical either way.
 5. **The reticle is never restored by a file.** Mil-Dot in episodes 2 and 7, and the V-COG in episode 8,
    are always re-selected on camera.
 
 ## YouTube metadata
 
+**Channel description** (YouTube Studio → Customization → Basic info; draft 2026-11-05):
+Ballistic Calculator 2 is a free, open-source ballistic calculator for Windows, Linux and macOS. The videos
+here show how to use it, one step at a time: a first trajectory, weather and wind, spin drift, Coriolis, scope
+reticles and BDC, measured drag curves, shooting at an angle, and building your own drag table. The
+calculations come from the open-source BallisticCalculator library for .NET. It is a full model of the
+bullet's flight, but still a model: always check it against your own shots.
+
+Download: https://github.com/nikolaygekht/ballistic.calculator.app.avalonia/releases
+Source: https://github.com/nikolaygekht/ballistic.calculator.app.avalonia
+User guide: https://nikolaygekht.github.io/ballistic.calculator.app.avalonia
+Library: https://github.com/gehtsoft-usa/BallisticCalculator1
+
 **Playlist title:** Ballistic Calculator 2 — build one shot, step by step
 
-**Playlist description:** A free, open-source ballistic calculator for Windows, Linux and macOS. Eight
+**Playlist description:** A free, open-source ballistic calculator for Windows, Linux and macOS. Ten
 short episodes. We build one long-range shot, save it, and then add one thing at a time — weather, wind,
 spin drift, aerodynamic jump, Coriolis, dialled clicks, a winter zero in summer air, and a radar-measured
-drag curve — so you can see what each one is actually worth. Then we turn everything on at once, and
-finish by zeroing a rifle with one cartridge and shooting another.
+drag curve — so you can see what each one is actually worth. Then we turn everything on at once. The last
+three episodes are special cases: zeroing a rifle with one cartridge and shooting another, shooting uphill
+and downhill, and building your own drag table from several BCs or from measured velocities.
+
+**Episode 1 description** (the series overview lives here, not in the narration): A free, open-source
+ballistic calculator for Windows, Linux and macOS. In this series we build one shot, step by step. This
+first episode calculates a simple trajectory and shows how to keep a load in the ammunition library, so you never type it twice; then we save the shot, and every next episode opens the same file
+and adds one more thing — weather, wind, and the small effects that only matter at long range. Then we turn
+everything on together, and after that come the special cases: zeroing with one load and shooting another,
+shooting uphill or downhill, and building your own drag table.
 
 Per-episode titles, in playlist order:
 
 ```
-1. Your first trajectory — Ballistic Calculator 2 (1/8)
-2. Table, chart, reticle, summary — Ballistic Calculator 2 (2/8)
-3. Weather and wind — Ballistic Calculator 2 (3/8)
-4. Spin drift, aerodynamic jump and Coriolis — Ballistic Calculator 2 (4/8)
-5. Dialled clicks, and a winter zero in July — Ballistic Calculator 2 (5/8)
-6. A measured drag curve instead of a BC — Ballistic Calculator 2 (6/8)
-7. Everything at once — Ballistic Calculator 2 (7/8)
-8. 300 Blackout: zero one load, shoot another — Ballistic Calculator 2 (8/8)
+1. Your first trajectory — Ballistic Calculator 2, ep. 1
+2. Table, chart, reticle, summary — Ballistic Calculator 2, ep. 2
+3. Weather and wind — Ballistic Calculator 2, ep. 3
+4. Spin drift, aerodynamic jump and Coriolis — Ballistic Calculator 2, ep. 4
+5. Dialled clicks, and a winter zero in July — Ballistic Calculator 2, ep. 5
+6. A measured drag curve instead of a BC — Ballistic Calculator 2, ep. 6
+7. Everything at once — Ballistic Calculator 2, ep. 7
+8. 300 Blackout: zero one load, shoot another — Ballistic Calculator 2, ep. 8
+9. Shooting at an angle — Ballistic Calculator 2, ep. 9
+10. Your own drag table — Ballistic Calculator 2, ep. 10
 ```
 
-In-episode chapter markers, for the episodes with more than one part. Re-time after the edit.
+In-episode chapter markers. Eps. 1–6 are timed from the produced videos (title card 3 s + `video0` + the cue
+time in `build/epNN/timeline.json`); ep. 7 was checked against its take's `timeline.json` on 2026-11-05 (all ten marks match); eps. 8–10 are timed from their takes (2026-11-05). YouTube needs
+the first one at 0:00, at least three, each at least 10 s long.
 
 ```
-Episode 2          Episode 3        Episode 4         Episode 5
-0:00 Intro         0:00 Intro       0:00 Intro        0:00 Intro
-0:23 Imperial      0:23 Weather     0:23 Spin drift   0:23 Dialled clicks
-1:33 Three views   2:08 Wind        2:38 Coriolis     1:53 Winter zero
-3:23 Save it
+Episode 1
+0:00 Intro
+0:22 A new trajectory
+0:49 The load
+1:22 The ammunition library
+1:51 Rifle, zero, range
+3:05 The result
 
-Episode 6          Episode 7        Episode 8
-0:00 Intro         0:00 Intro       0:00 Intro
-0:23 The curve     0:26 Everything  0:23 Two cartridges
-2:43 Save it       1:46 The reticle 2:43 The sight picture
-                                    4:33 More
+Episode 2              Episode 3          Episode 4                 Episode 5
+0:00 Intro             0:00 Intro         0:00 Intro                0:00 Intro
+0:40 Imperial          0:46 Weather       0:38 Spin drift           0:36 Dialled clicks
+1:57 Summary, reticle  1:46 Wind          1:33 Aerodynamic jump     1:54 A winter zero in July
+3:03 Save it                              2:24 Coriolis
+
+Episode 6                          Episode 7
+0:00 Intro                         0:00 Intro
+0:34 What a BC really is           0:15 Recap: the radar file
+1:45 Where drag curves come from   0:53 Spin drift
+2:46 A trajectory on the radar curve 1:17 Coriolis
+4:26 Compare the two               1:39 July air, February zero
+5:33 Save it                       2:11 Wind and aerodynamic jump
+                                   2:54 The scope: Far and Near BDC
+                                   3:29 A target in the scope
+                                   3:46 A real BDC reticle: Trijicon V-COG
+                                   4:23 Reticle editor and the AI skill
+
+Episode 8                                      Episode 9
+0:00 Intro                                     0:00 Intro
+0:53 The supersonic load                       0:28 On the flat
+2:08 Its sight picture                         0:42 Two kinds of drop on the chart
+2:30 The subsonic load, zeroed with the other  1:07 Uphill
+3:37 What a shared zero costs                  2:26 Downhill
+4:00 The reticle for the subsonic load         2:42 The rifleman's rule
+
+Episode 10
+0:00 Intro
+0:40 From several ballistic coefficients
+1:54 Checking it against the radar curve
+2:44 From measured velocities
+3:29 The air of the range
+4:33 Checking it against Warner's BC
+5:08 Wrap-up
 ```
 
-Each description ends with the same block: downloads, source repository, user guide, and a link to the
-playlist. Episodes 2 to 8 additionally open by naming the previous episode, so a viewer who lands from
-search knows there is an earlier one.
+Every description ends with the same block (the playlist link goes in once the playlist exists):
+
+```
+Download: https://github.com/nikolaygekht/ballistic.calculator.app.avalonia/releases
+Source: https://github.com/nikolaygekht/ballistic.calculator.app.avalonia
+User guide: https://nikolaygekht.github.io/ballistic.calculator.app.avalonia
+Playlist: https://www.youtube.com/playlist?list=PLLcWDVvDdkbU
+```
+
+Episodes 2 to 8 open by naming the previous episode, so a viewer who lands from search knows there is an
+earlier one.
+
+### Episode descriptions (produced episodes)
+
+**Episode 2.** The same shot again, this time in imperial units: a
+.308 Winchester with a 175 grain Lapua Scenar-L at 2600 ft/s, zeroed at 300 yards. Then the three other views
+— the chart, the summary and the reticle with Mil-Dot holds — and we save the shot as the file every next
+episode opens.
+
+**Episode 3.** We open the saved shot and change the weather
+to a cold February day at 1000 feet: almost nothing changes, and we see why. Then a 10 mph wind from the right:
+104 inches of drift at 1000 yards, and the clicks to correct it.
+
+**Episode 4.** Three small effects that only matter far away. Spin drift
+from the bullet's size and the barrel twist (8 inches at 1000 yards, no wind needed), aerodynamic jump (only
+with a side wind), and the Coriolis effect shooting east and west at 45 degrees north.
+
+**Episode 5.** Two situations from the range.
+What the table shows after you have already dialled 62 clicks up. And a rifle zeroed in February shot on a
+hot, humid July day: 32 inches less drop at 1000 yards, and why the zero needs its own weather.
+
+**Episode 6.** What a ballistic coefficient
+really is — a ratio to a standard G1 or G7 bullet — and why one number cannot fit a real bullet at every
+speed. Where measured drag curves come from (Doppler radar), how to build one in the program when you cannot
+find one, and what Lapua's radar curve for the 175 grain Scenar-L does to the trajectory: 10 inches more drop
+at 1000 yards. We compare both on one chart and save the radar version.
+
+Pictures of the standard bullet profiles, the Hornady drag curves and the Doppler radar are from
+PrecisionRifleBlog — a very good article about G1, G7 and custom drag models:
+https://precisionrifleblog.com/2019/06/09/g1-vs-g7-vs-custom-drag-models/
+
+**Episode 7.** Everything at once, on the radar-curve
+shot: spin drift (1:10 right twist), Coriolis shooting east at 45 degrees north, a hot July day on a rifle zeroed
+in February, and a 10 mph wind from the right — with aerodynamic jump showing up in the drop. Then the scope: every
+Mil-Dot BDC label moves 20 to 30 yards, Near BDC for very short range, a 20 inch plate at 600 yards drawn in the
+reticle, and the Trijicon V-COG 7.62 etched BDC relabelled for our load, zero and air.
+
+The program comes with a reticle editor, and there is a skill for Claude Code, Codex and other AI assistants that
+makes a reticle file from a description or from a picture of a reticle:
+https://github.com/gehtsoft-usa/BallisticCalculator1/tree/main/SKILL/SKILLS/reticle-designer
+
+**Episode 8.** The first special case: a rifle in .300 Blackout with a
+Trijicon V-COG scope. One cartridge, two loads: a fast supersonic one, close to the 7.62x39, and a heavy
+subsonic one for a suppressor, close to the 9x39. The rifle is zeroed with the supersonic load, so the subsonic
+trajectory uses "Other ammunition for zero" — and shows what a shared zero costs: 42 cm low at the 100 m zero,
+almost 2 m low at 200 m. Then the V-COG's BDC ladder for both loads; with Split at 50 m the subsonic marks read
+55, 102 and 151 m.
+
+**Episode 9.** Shooting uphill and downhill, on the .308 shot
+from episode 2. At 1000 yards and 30 degrees the hold is 8.2 mrad instead of 10.0, uphill or downhill: only part
+of gravity pulls the bullet away from a tilted line of sight. The chart shows why the program has two kinds of
+drop — over muzzle level (where the bullet is in space) and over the line of sight (what you hold). And the
+rifleman's rule: much better than nothing, but at 1000 yards almost one milliradian away from the full
+calculation.
+
+**Episode 10.** No radar drag file for your bullet? The program can
+build an approximate one, in two ways. From several ballistic coefficients: five G7 numbers taken off Lapua's
+radar curve for the 175 grain Scenar-L give a curve within one inch of the radar file at 1000 yards, where the
+single box BC was off by ten inches. And from velocities measured down range: Warner Tool publishes Doppler radar
+sheets for its Flatline bullets, and the .338 285 grain table, loaded from a small CSV file, rebuilds the curve —
+as long as you enter the air it was measured in. Warner tests at EMRTC, New Mexico Tech, near Socorro, New
+Mexico, high in the desert. The last episode of the series.
+
+Warner Tool Doppler data sheets: https://www.warner-tool.com/doppler-data/
+
+The CSV format for Load Csv is in the user guide: https://nikolaygekht.github.io/ballistic.calculator.app.avalonia/approximating-a-drag-table.html

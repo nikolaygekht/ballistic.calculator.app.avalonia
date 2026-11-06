@@ -14,299 +14,283 @@ That is why the tables below are deltas from the baseline rather than a chain.
 
 ---
 
-## 1. Episode 1 — metric baseline
+## 1. Episode 1 — metric baseline: Tigr + PSO-1
 
-`11.3 g · 0.253 G7 · 790 m/s · 50 mm sight · 0.1 mrad clicks · 300 m zero · ICAO standard air · no wind`
+`11.3 g · 0.253 G7 · 790 m/s · Sight Preset "PSO-1 Optics" (65 mm, 0.5 ths clicks) · 300 m zero ·
+default weather · no wind`
 
-Zero elevation **2.935 mrad** (10.09 MOA).
+Read off the application by UI Automation on 2026-11-03. With 0.5 ths clicks the table's angular columns
+are in **thousandths (th)**, not mrad.
 
-| Range | Velocity | Mach | Drop | Hold | Energy | Time |
-|---|---|---|---|---|---|---|
-| 0 m | 790 m/s | 2.32 | −5.0 cm | — | 3526 J | 0.00 s |
-| 100 m | 732 m/s | 2.15 | **+16.1 cm** | 1.61 | 3025 J | 0.13 s |
-| 200 m | 676 m/s | 1.99 | +18.8 cm | 0.94 | 2582 J | 0.27 s |
-| 300 m | 623 m/s | 1.83 | **0.0 cm** | 0.00 | 2192 J | 0.43 s |
-| 400 m | 572 m/s | 1.68 | −44.1 cm | −1.10 | 1849 J | 0.60 s |
-| 500 m | 523 m/s | 1.54 | −118.3 cm | −2.37 | 1548 J | 0.78 s |
-| 600 m | 477 m/s | 1.40 | −228.5 cm | −3.81 | 1283 J | 0.98 s |
-| 700 m | 432 m/s | 1.27 | −382.0 cm | −5.46 | 1052 J | 1.20 s |
-| 800 m | 389 m/s | 1.14 | −588.4 cm | −7.35 | 854 J | 1.44 s |
-| 900 m | 349 m/s | 1.03 | −859.9 cm | −9.55 | 688 J | 1.71 s |
-| 1000 m | 322 m/s | 0.95 | **−1212 cm** | −12.12 | 585 J | 2.02 s |
+Zero elevation **2.85 th**.
 
-Spoken: *"twelve metres below the line of sight"* — −12.12 m.
+| Range | Velocity | Mach | Drop | Hold (th) | Clicks | Energy | Time |
+|---|---|---|---|---|---|---|---|
+| 0 m | 790 m/s | 2.32 | −6.5 cm | — | — | 3526 J | 0.00 s |
+| 100 m | 732 m/s | 2.15 | **+15.1 cm** | 1.44 | 3 | 3025 J | 0.13 s |
+| 200 m | 676 m/s | 1.99 | +18.3 cm | 0.87 | 2 | 2582 J | 0.27 s |
+| 300 m | 623 m/s | 1.83 | **0.0 cm** | 0.00 | 0 | 2192 J | 0.43 s |
+| 400 m | 572 m/s | 1.68 | −43.6 cm | −1.04 | −2 | 1849 J | 0.60 s |
+| 500 m | 523 m/s | 1.54 | −117.3 cm | −2.24 | −4 | 1548 J | 0.78 s |
+| 600 m | 477 m/s | 1.40 | −227.0 cm | −3.61 | −7 | 1283 J | 0.98 s |
+| 700 m | 432 m/s | 1.27 | −380.0 cm | −5.18 | −10 | 1052 J | 1.20 s |
+| 800 m | 389 m/s | 1.14 | −585.9 cm | −6.99 | −14 | 854 J | 1.44 s |
+| 900 m | 349 m/s | 1.03 | −857.0 cm | −9.09 | −18 | 688 J | 1.71 s |
+| 1000 m | 322 m/s | 0.95 | **−1208.7 cm** | −11.54 | −23 | 585 J | 2.02 s |
+
+Summary: subsonic at 923 m; near zero 23 m, far zero 300 m.
+
+Spoken: *"fifteen centimetres above"* at 100 m; *"twelve metres below the line of sight"* at 1000 m (−12.09 m).
 
 ---
 
-## 2. Episode 2 — THE BASELINE
+## 2. Episode 2 — THE BASELINE: AR-style .308 + standard optics
 
-`175 gr · 0.253 G7 · 2600 ft/s · 2 in sight · 0.1 mrad clicks · 300 yd zero · ICAO standard air · no wind`
+`175 gr · 0.253 G7 · 2600 ft/s · Sight Preset "Standard Optics (High, Mil)" (3 in, 0.1 mrad clicks) ·
+300 yd zero · default weather · no wind`
 
 **This is the file saved as `bc2-demo.trajectory` and reopened at the start of episodes 3, 4, 5 and 6.**
 Every delta in §3 to §6 is measured against this table.
 
-Zero elevation **2.664 mrad** (9.16 MOA).
+Read off the application by UI Automation on 2026-11-03 (the sight changed from 2 in to 3 in that day —
+**§3 to §7 still hold the 2 in numbers and must be recomputed** before those episodes are voiced).
 
-| Range | Velocity | Mach | Drop | Hold | Energy | Time |
-|---|---|---|---|---|---|---|
-| 0 yd | 2600 fps | 2.33 | −2.0 in | — | 2626 ftlb | 0.00 s |
-| 100 yd | 2425 fps | 2.17 | **+4.9 in** | 1.36 | 2284 ftlb | 0.12 s |
-| 200 yd | 2256 fps | 2.02 | +5.9 in | 0.82 | 1978 ftlb | 0.25 s |
-| 300 yd | 2095 fps | 1.88 | **0.0 in** | 0.00 | 1705 ftlb | 0.39 s |
-| 400 yd | 1940 fps | 1.74 | −13.8 in | −0.96 | 1463 ftlb | 0.53 s |
-| 500 yd | 1791 fps | 1.60 | −36.9 in | −2.05 | 1247 ftlb | 0.70 s |
-| 600 yd | 1648 fps | 1.48 | −70.8 in | −3.28 | 1055 ftlb | 0.87 s |
-| 700 yd | 1510 fps | 1.35 | −117.5 in | −4.66 | 886 ftlb | 1.06 s |
-| 800 yd | 1377 fps | 1.23 | −179.6 in | **−6.24** | 736 ftlb | 1.27 s |
-| 900 yd | 1250 fps | 1.12 | −260.1 in | −8.03 | 607 ftlb | 1.50 s |
-| 1000 yd | 1132 fps | **1.01** | **−362.8 in** | −10.08 | 498 ftlb | 1.75 s |
+Zero elevation **2.76 mrad**.
 
-**Summary view:** goes subsonic at **1017 yd** (930 m).
+| Range | Velocity | Mach | Drop | Hold | Clicks | Energy | Time |
+|---|---|---|---|---|---|---|---|
+| 0 yd | 2600 fps | 2.33 | −3.0 in | — | — | 2626 ftlb | 0.00 s |
+| 100 yd | 2425 fps | 2.17 | +4.2 in | 1.17 | 12 | 2284 ftlb | 0.12 s |
+| 200 yd | 2256 fps | 2.02 | +5.5 in | 0.77 | 8 | 1978 ftlb | 0.25 s |
+| 300 yd | 2095 fps | 1.88 | **0.0 in** | 0.00 | 0 | 1705 ftlb | 0.39 s |
+| 400 yd | 1940 fps | 1.74 | −13.5 in | −0.94 | −9 | 1463 ftlb | 0.53 s |
+| 500 yd | 1791 fps | 1.60 | −36.2 in | −2.01 | −20 | 1247 ftlb | 0.70 s |
+| 600 yd | 1648 fps | 1.48 | −69.8 in | −3.23 | −32 | 1055 ftlb | 0.87 s |
+| 700 yd | 1510 fps | 1.35 | −116.2 in | −4.61 | −46 | 886 ftlb | 1.06 s |
+| 800 yd | 1377 fps | 1.23 | −177.9 in | **−6.18** | **−62** | 736 ftlb | 1.27 s |
+| 900 yd | 1250 fps | 1.12 | −258.1 in | −7.96 | −80 | 607 ftlb | 1.50 s |
+| 1000 yd | 1132 fps | **1.01** | **−360.5 in** | −10.01 | −100 | 498 ftlb | 1.75 s |
 
-**Mil-Dot reticle, Far BDC** — where the whole-milliradian dots fall for this load:
+**Summary view:** goes subsonic at **1014 yd**; near zero 33 yd, far zero 300 yd.
 
-| Dot | Range |
+**Mil-Dot reticle, Far BDC** — labels read off the screen. The built-in Mil-Dot has **four** dots below the centre, then the
+thick post from 5 mrad:
+
+| Mark | Range |
 |---|---|
-| 1 mrad | 405 yd |
-| 2 mrad | 498 yd |
-| 3 mrad | 580 yd |
-| 4 mrad | 656 yd |
-| 5 mrad | 725 yd |
-| edge of the reticle (6 mrad) | **787 yd** |
+| 1st dot (1 mrad) | 406 yd |
+| 2nd dot (2 mrad) | 499 yd |
+| 3rd dot (3 mrad) | 582 yd |
+| 4th dot (4 mrad) | 657 yd |
+| top of the post (5 mrad, no label) | ≈ 725 yd (interpolated from the table: 700 yd −4.61, 800 yd −6.18) |
 
-> **Known 1–2 yd disagreement.** A standalone harness reproducing the app's BDC interpolation reads
-> 404 / 496 / 578 / 654 / 722 / 786 for this row and 1014 yd for the subsonic crossing. The values above
-> came from the application itself and are the ones to trust; the narration says "about four hundred"
-> where the difference could show. Same caveat applies to §7's mark table, which is harness-only.
+Ep. 5's "62 clicks" survives the sight change: the 800 yd hold is −6.18 mrad → 62 clicks.
 
 ---
 
 ## 3. Episode 3 — weather, then wind
 
+Read from the app on 2026-11-03 (`build/ep03/read_numbers.py`): open `bc2-demo`, then edit.
+
 ### 3a. Baseline + February weather
 
-Added: `1000 ft · 28.9 inHg station · 40 °F · 60 % RH`. Zero elevation **2.662 mrad**.
+Added: `1000 ft · 28.9 inHg (station) · 40 °F · 60 % RH`.
 
 | Range | Velocity | Mach | Drop | Hold | vs baseline |
 |---|---|---|---|---|---|
 | 300 yd | 2096 fps | 1.91 | 0.0 in | 0.00 | — |
-| 600 yd | 1652 fps | 1.51 | −70.7 in | −3.27 | +0.1 in |
-| 800 yd | 1382 fps | 1.26 | −179.1 in | −6.22 | +0.5 in |
-| 1000 yd | 1136 fps | 1.04 | **−361.5 in** | −10.04 | **+1.3 in** |
+| 600 yd | 1652 fps | 1.51 | −69.65 in | −3.22 | +0.1 in |
+| 800 yd | 1382 fps | 1.26 | −177.45 in | −6.16 | +0.5 in |
+| 1000 yd | 1136 fps | 1.04 | **−359.18 in** | −9.98 | **+1.3 in** (baseline −360.51) |
 
-Only **1.3 in** at 1000 yd — cold air and altitude nearly cancel. The narration says so rather than
-overselling it. (This is *not* the interesting weather number; §5b is.)
+Only **1.3 in** at 1000 yd — the cold makes the air denser, the altitude thinner; they nearly cancel.
+The narration says "about one inch" rather than overselling it.
 
 ### 3b. + 10 mph wind at 90° (from the right), no distance limit
 
-Drop is unchanged from 3a. Windage:
+Drop is unchanged from 3a. Windage (the bullet goes left):
 
-| Range | Windage | Wind hold |
-|---|---|---|
-| 300 yd | 6.9 in | 0.64 |
-| 600 yd | **31.1 in** | 1.44 |
-| 800 yd | 60.4 in | 2.10 |
-| 1000 yd | **104.2 in** | 2.89 |
+| Range | Windage | Wind hold | Clicks (0.1 mrad) |
+|---|---|---|---|
+| 300 yd | 6.94 in | 0.64 | 6 |
+| 600 yd | **31.14 in** | 1.44 | 14 |
+| 800 yd | 60.43 in | 2.10 | 21 |
+| 1000 yd | **104.17 in** (8.7 ft) | **2.89** | **29** |
 
 ---
 
 ## 4. Episode 4 — spin drift, aerodynamic jump, Coriolis
 
-### 4a. Baseline + wind only — the prerequisite
+Read from the app on 2026-11-03 (`build/ep04/read_numbers.py`), starting from `bc2-demo` (episode 2's
+baseline, 3 in sight; standard air, no wind). Windage is signed, **positive is left**.
 
-Added: `10 mph · 90°`. **No weather** (this episode starts from the baseline, not from episode 3).
+### 4a. Baseline
 
 | Range | Drop | Windage |
 |---|---|---|
-| 600 yd | −70.8 in | 31.3 in |
-| 1000 yd | **−362.8 in** | **104.8 in** |
+| 600 yd | −69.78 in | 0.00 |
+| 800 yd | −177.92 in | 0.00 |
+| 1000 yd | **−360.51 in** | 0.00 |
 
-Drop is bit-for-bit the baseline: with no bullet shape and no twist entered, a crosswind moves the
-bullet sideways only.
+### 4b. + bullet shape and rifling, NO wind — spin drift alone
 
-### 4b. + bullet shape and rifling
+Added: Ammunition `Diameter 0.308 in · Length 1.394 in`; Rifle `Rifling Right · Twist Rate 10 in`.
 
-Added: `diameter 0.308 in · length 1.394 in · rifling 1:10 in, right`
+| Range | Drop | vs 4a | Windage | Wnd.Adj. | Clicks |
+|---|---|---|---|---|---|
+| 600 yd | −69.78 in | **0.00** | −1.55 in (right) | −0.07 mrad | −1 |
+| 800 yd | −177.92 in | **0.00** | −3.92 in | −0.14 mrad | −1 |
+| 1000 yd | **−360.51 in** | **0.00** | **−8.00 in (8 in right)** | −0.22 mrad | −2 |
 
-| Range | Drop | vs 4a | Windage | vs 4a |
-|---|---|---|---|---|
-| 300 yd | +1.2 in | +1.2 | 7.0 in | 0.0 |
-| 600 yd | −68.4 in | +2.4 | 29.7 in | −1.6 |
-| 800 yd | −176.4 in | +3.2 | 56.9 in | −3.9 |
-| 1000 yd | **−358.8 in** | **+4.0** | **96.8 in** | **−8.0** |
+The drop is identical to the baseline: no aerodynamic jump without wind.
 
-The drop change is **aerodynamic jump**; the windage change is **spin drift** (right twist drifts right)
-partly cancelling a left-pushing wind.
+### 4c. + wind 10 mph from 90° (from the right), no distance limit
 
-### 4c. Bullet shape and rifling, with the wind REMOVED — the honest control
+Episode 4 shows only the **drop** here (jump: −360.51 → −356.51, 4.0 in up); the windage is not discussed.
 
-| Range | Drop | vs baseline | Windage |
-|---|---|---|---|
-| 600 yd | −70.8 in | **0.0** | −1.5 in |
-| 1000 yd | **−362.8 in** | **0.0** | **−8.0 in** |
+| Range | Drop | vs 4b | Windage | Wnd.Adj. | Clicks |
+|---|---|---|---|---|---|
+| 300 yd | +1.20 in | +1.2 | 6.97 in | 0.65 mrad | 6 |
+| 600 yd | −67.38 in | +2.4 | 29.74 in | 1.38 mrad | 14 |
+| 800 yd | −174.72 in | +3.2 | 56.85 in | 1.97 mrad | 20 |
+| 1000 yd | **−356.51 in** | **+4.0 (up)** | **96.83 in (left)** | 2.69 mrad | 27 |
 
-**Aerodynamic jump is exactly zero without wind** — the drop column is identical to the baseline to the
-last printed digit, while spin drift alone carries the bullet **8.0 in right** at 1000 yd. This is why
-episode 4 must put the wind back on before it can show jump at all, and the script says so out loud.
+The drop change is **aerodynamic jump**. Wind alone on the baseline ≈ 96.83 + 8.00 = **104.8 in** left at
+1000 yd (the script says "about one hundred and five"; episode 3's 104.17 had the February weather on).
 
 ### 4d. Baseline + Coriolis only
 
-Added: `barrel azimuth 90° (east) · latitude 45° N`. No wind, no shape, no weather.
+Added: Parameters `Calculate Coriolis Effect` · Azimuth · `Latitude 45 N`. No shape, no twist, no wind.
 
-| Range | Drop | vs baseline | Windage |
-|---|---|---|---|
-| 600 yd | −69.7 in | +1.1 in | −1.0 in |
-| 1000 yd | **−359.0 in** | **+3.8 in** | **−3.2 in** |
+| Azimuth | 600 yd drop | 1000 yd drop | vs 4a | 1000 yd windage |
+|---|---|---|---|---|
+| 90° (east) | −68.73 in | **−356.70 in** | **+3.8 (up)** | −3.25 in (right) |
+| 270° (west) | −70.83 in | **−364.32 in** | **−3.8 (down)** | −3.25 in (right) |
+| 0° (north) | −69.78 in | −360.51 in | 0.0 | −3.25 in (right) |
+| 180° (south) | −69.78 in | −360.51 in | 0.0 | −3.25 in (right) |
 
-Azimuth dependence at 1000 yd (the horizontal term does not depend on azimuth):
-
-| Azimuth | Drop |
-|---|---|
-| 0° north | −362.8 in |
-| 90° east | −359.0 in (up) |
-| 180° south | −362.8 in |
-| 270° west | −366.7 in (down) |
+The horizontal part does not depend on the azimuth (−3.25 in every direction); due north or south the
+vertical part is exactly zero (read from the app).
 
 ---
 
 ## 5. Episode 5 — dialled clicks, then the zero's own weather
 
-### 5a. Baseline + 62 clicks dialled up
+Read from the app on 2026-11-04 (`build/ep05/read_numbers.py`), starting from `bc2-demo` (episode 2's
+baseline, 3 in sight, 300 yd zero; standard air, no wind).
 
-The baseline hold at 800 yd is **−6.24 mrad** → **62 clicks** of 0.1 mrad. Enter `6.2 mrad` as the shot
-drop adjustment. (The old cumulative script said 60 clicks; against the naked baseline it is 62.)
+### 5a. Baseline, then V-Clicks 62
+
+The baseline hold at 800 yd is **−6.18 mrad**, Clicks **−62** (0.1 mrad). Parameters tab **V-Clicks `62`**
+(a count; positive is up — the 800 yd row goes to zero).
 
 | Range | Drop before | Drop after | Hold after |
 |---|---|---|---|
-| 100 yd | +4.9 in | +27.2 in | 7.56 |
-| 300 yd | 0.0 in | +67.0 in | 6.20 |
-| 400 yd | −13.8 in | **+75.5 in** | 5.24 |
-| 800 yd | −179.6 in | **−1.0 in** | −0.04 |
-| 1000 yd | −362.8 in | −139.6 in | −3.88 |
+| 300 yd | 0.00 in | +66.96 in | 6.20 |
+| 400 yd | −13.47 in | **+75.81 in** | 5.26 |
+| 600 yd | −69.78 in | +64.13 in | 2.97 |
+| 800 yd | −177.92 in | **+0.63 in** | 0.02 |
+| 1000 yd | −360.51 in | −137.30 in | **−3.81** |
 
-Sign check: a **positive** shot drop adjustment means clicks dialled **up**. Negative doubles the drop
-instead — if the 800 yd row does not go to zero, the sign is wrong.
+V-Clicks is a NumericUpDown: no automation id of its own; its text box is the first `PART_TextBox` under
+`ParametersSubPanel` (H-Clicks is the second).
 
-### 5b. Baseline + July air, the zero inheriting it
+### 5b. July air on the Weather tab, the zero inheriting it
 
-Shot air `1000 ft · 28.9 inHg · 100 °F · 30 % RH`, Zero tab left empty. Zero elevation **2.628 mrad**.
+Shot air `1000 ft · 28.9 inHg · 100 °F · 90 %`, Zero tab untouched. (Every typed field read back and
+checked by `read_numbers.py`.)
 
 | Range | Drop | Hold |
 |---|---|---|
-| 300 yd | 0.0 in | 0.00 |
-| 600 yd | −67.5 in | −3.12 |
-| 800 yd | −168.8 in | −5.86 |
-| 1000 yd | **−334.8 in** | −9.30 |
+| 300 yd | 0.00 in | 0.00 |
+| 600 yd | −66.03 in | −3.06 |
+| 800 yd | −165.57 in | −5.75 |
+| 1000 yd | **−328.59 in** | −9.13 |
 
-### 5c. + the Zero tab keeping the February air
+Versus episode 3's February table (−359.18 at 1000 yd): **30.6 in less** ("thirty").
 
-Zero atmosphere `1000 ft · 28.9 inHg · 40 °F · 60 % RH`. Zero elevation back to **2.662 mrad**.
+### 5c. + Zero tab, Other atmosphere for zero = February
+
+Zero air `1000 ft · 28.9 inHg · 40 °F · 40 %` (Zero tab → scroll down → `Other atmosphere for zero`).
+Episode 3 had 60 % in February; at 40 °F the humidity is worth 0.01 in, so the episode uses a realistic
+dry winter 40 %.
 
 | Range | Drop | vs 5b | Hold |
 |---|---|---|---|
-| 300 yd | **+0.4 in** | +0.4 | 0.03 |
-| 600 yd | −66.8 in | +0.7 | −3.09 |
-| 800 yd | −167.8 in | +1.0 | −5.83 |
-| 1000 yd | **−333.6 in** | **+1.2 in** | −9.27 |
+| 300 yd | **+0.42 in** | +0.42 | 0.04 |
+| 600 yd | −65.18 in | +0.85 | −3.02 |
+| 800 yd | −164.43 in | +1.14 | −5.71 |
+| 1000 yd | **−327.17 in** | **+1.42** | −9.09 |
 
-**The two figures the narration quotes, and which is which:**
+(With 60 % zero humidity: −327.18 at 1000 yd, +0.42 at 300 yd.) The 300 yd row is no longer zero: the
+rifle hits almost half an inch high at its own zero distance.
 
-- **27.9 in** — February air (§3a, −361.5) versus July air (5c, −333.6) at 1000 yd. Almost all of it is
-  *today's* air, which is episode 3's material.
-- **1.2 in** — what the *Zero tab's own atmosphere* is worth by itself (5b → 5c). Small at a 300 yd
-  zero, and the script states that honestly instead of claiming the 27.9.
+### 5d. The same pair with a 600 yd zero
 
-The zero-air share grows with the zero distance, because the sight angle is set over that flight:
+| | 600 yd drop | 1000 yd drop |
+|---|---|---|
+| July air, zero inherits it | 0.00 in | −218.54 in |
+| + February zero air (40 %) | **+4.50 in** | **−211.04 in** (**+7.50**) |
 
-| Zero distance | Zero-air share at 1000 yd |
-|---|---|
-| 100 yd | 0.1 in |
-| 300 yd | 1.2 in |
-| 500 yd | 4.1 in |
-| 600 yd | 6.5 in |
-
-Note the 300 yd row in 5c: **+0.4 in**, not zero. The rifle is no longer exactly zeroed at its zero
-distance, because the zero was taken in different air. That is a real, visible consequence.
-
-Air densities: 40 °F → 1.2695 kg/m³ (density altitude −1227 ft); 100 °F → 1.1214 kg/m³ (2988 ft).
+The zero-air share grows with the zero distance: 1.4 in at a 300 yd zero, 7.5 in at a 600 yd zero.
 
 ---
 
 ## 6. Episode 6 — the measured drag curve
 
-`data/drg/Lapua/30-lapua gb550 11,3g (175 gr) scenar-l_radar.drg`, table `GC`, form factor **1.0**.
-Header confirms the same bullet: 11.30 g, 7.83 mm, 35.4 mm. Standard air, no wind — a pure
-drag-model comparison against §2. Zero elevation **2.670 mrad**.
+Read from the app on 2026-11-04 (`build/ep06/read_numbers.py`; the take printed −370.81 again). Radar file
+`30-lapua gb550 11,3g (175 gr) scenar-l_radar.drg` (copied into `Documents\Ballistic Calculator demo`); Browse
+gives BC `1.000 GC`, form factor on, weight **174.38565 gr** (11.30 g), diameter 0.30827 in, length 1.3937 in, name
+`.308 Lapua GB550 Scenar-L 11.3 ( 175gr )`, source `Radar Data`. The take builds it as **Trajectory → New → Imperial**
+(MV 2600, Standard Optics (High, Mil), zero 300 yd, standard weather), next to the baseline window.
 
-| Range | Baseline G7 0.253 | Radar .drg | Change | Box G1 0.505 |
-|---|---|---|---|---|
-| 300 yd | 0.0 in | 0.0 in | — | 0.0 in |
-| 600 yd | −70.8 in | −71.9 in | −1.1 in | −70.6 in |
-| 800 yd | −179.6 in | −183.5 in | −3.9 in | −178.6 in |
-| 1000 yd | **−362.8 in** | **−371.4 in** | **−8.6 in** | **−357.4 in** |
+`bc2-demo.trajectory`'s load was renamed **Baseline G7** on 2026-11-04 (for the Compare legend); backup of the
+unnamed one in the session scratchpad.
 
-Both approximations are **optimistic** against the bullet's own measured curve:
+| Range | G7 0.253 (baseline) | Radar .drg | G1 0.505 |
+|---|---|---|---|
+| 600 yd | −69.78 in · 1648 fps | −71.14 in · 1616 fps | −69.63 in · 1656 fps |
+| 800 yd | −177.92 in · 1377 fps | −182.48 in · **1352 fps** (−25) | −176.97 in · 1407 fps |
+| 1000 yd | **−360.51 in** · −10.01 mrad · −100 | **−370.81 in** · −10.30 mrad · **−103** | −355.03 in · 1207 fps |
 
-| Against the radar curve at 1000 yd | Error |
-|---|---|
-| G7 0.253 (the good approximation) | 8.6 in high |
-| G1 0.505 (the number on the box) | **14.0 in high** |
+Radar vs G7: **10.3 in** more drop at 1000 yd, **3 clicks**. G1 0.505 vs radar: **15.8 in** ("sixteen").
 
-**Velocity.** At 800 yd the radar curve arrives **20 fps slower** (1357 vs 1377). By 1000 yd both read
-1132 fps — the curves converge near Mach 1, so quote the 800 yd figure, not the 1000 yd one.
-
-Saved as **`bc2-demo-radar.trajectory`**, a second file — the baseline is left untouched, and episode 7
-opens the radar one.
+The real G7 BC along the flight (`chart.py`: SD·Cd_G7(M)/Cd_radar(M), Mach from the app's table): 0.250 at the
+muzzle, **0.239 at ~285 yd**, back to 0.253 near 650 yd, **0.290 at 1000 yd** (Mach 1.01).
 
 ---
 
 ## 7. Episode 7 — everything at once
 
-Opens `bc2-demo-radar.trajectory` and adds every feature from episodes 3 to 6 except the dialled clicks:
-`July air 100 °F/30 % at 1000 ft/28.9 inHg` · `February zero air 40 °F/60 %` · `10 mph at 90°` ·
-`0.308 in / 1.394 in / 1:10 right` · `azimuth 90° / latitude 45°` · radar `.drg`.
+**Read from the app 2026-11-04** (`build/ep07/read_numbers.py`; the same numbers came up in the take, printed by
+`build/ep07/record.py`). Opens `bc2-demo-radar.trajectory` (ep. 6: radar `.drg`, which also supplies diameter
+and length) and adds, one step at a time: rifling **1:10 right** · Coriolis **azimuth 90° (east), latitude 45 N**
+· July air **1000 ft / 28.9 inHg / 100 °F / 90 %** with the Zero tab's February air **1000 ft / 28.9 / 40 °F /
+40 %** (the ep. 5 pair) · wind **10 mph from 90°**. No dialled clicks.
 
-Zero elevation **2.667 mrad**.
-
-| Range | Velocity | Mach | Drop | Hold | Windage | Wind hold | Energy | Time |
-|---|---|---|---|---|---|---|---|---|
-| 0 yd | 2600 fps | 2.24 | −2.0 in | — | 0.0 in | — | 2626 ftlb | 0.00 s |
-| 100 yd | 2438 fps | 2.10 | +5.4 in | 1.49 | 0.8 in | 0.21 | 2309 ftlb | 0.12 s |
-| 200 yd | 2279 fps | 1.96 | +6.9 in | 0.96 | 2.8 in | 0.39 | 2017 ftlb | 0.25 s |
-| 300 yd | 2124 fps | 1.83 | **+1.8 in** | 0.17 | 6.2 in | 0.57 | 1752 ftlb | 0.38 s |
-| 400 yd | 1975 fps | 1.70 | −10.9 in | −0.76 | 11.2 in | 0.78 | 1516 ftlb | 0.53 s |
-| 500 yd | 1834 fps | 1.58 | −32.5 in | −1.81 | 17.8 in | 0.99 | 1307 ftlb | 0.69 s |
-| 600 yd | 1699 fps | 1.47 | −64.4 in | −2.98 | 26.4 in | 1.22 | 1122 ftlb | 0.86 s |
-| 700 yd | 1571 fps | 1.35 | −108.2 in | −4.30 | 36.9 in | 1.47 | 959 ftlb | 1.04 s |
-| 800 yd | 1451 fps | 1.25 | −166.1 in | −5.77 | 49.8 in | 1.73 | 818 ftlb | 1.24 s |
-| 900 yd | 1339 fps | 1.15 | −240.3 in | −7.42 | 65.0 in | 2.01 | 696 ftlb | 1.45 s |
-| 1000 yd | 1234 fps | 1.06 | **−333.9 in** | −9.27 | **82.9 in** | 2.30 | 592 ftlb | 1.69 s |
-
-**The three things worth saying about this table.**
-
-1. **Not zeroed at its zero distance any more.** 300 yd reads **+1.8 in**, because the zero was taken in
-   February air and this shot is in July air, with jump and Coriolis on top.
-2. **The effects do not pile up in one direction.** Drop at 1000 yd is −333.9 in; the July-air-alone
-   figure (§5c) is −333.6 in. The radar curve's extra 8 in of drop is almost exactly cancelled by
-   aerodynamic jump plus Coriolis. Nearly the same number, arrived at for completely different reasons —
-   the script makes this the point rather than hiding it.
-3. **The range card moved.** Subsonic now at **1079 yd** against the baseline's 1017 — 62 yd further,
-   because the July air is thinner.
-
-**Mil-Dot reticle, Far BDC — the same reticle, re-labelled.** Harness values; see the caveat in §2, so
-the narration speaks these as "about":
-
-| Dot | Baseline (§2) | Everything | Shift |
+| Step | Drop at 1000 yd | Windage at 1000 yd | Drop at 300 yd |
 |---|---|---|---|
-| 1 mrad | 405 yd | ~424 yd | +19 yd |
-| 2 mrad | 498 yd | ~517 yd | +19 yd |
-| 3 mrad | 580 yd | ~601 yd | +21 yd |
-| 4 mrad | 656 yd | ~678 yd | +22 yd |
-| 5 mrad | 725 yd | ~749 yd | +24 yd |
-| 6 mrad (edge) | 787 yd | ~815 yd | +28 yd |
+| Radar baseline | −370.81 in | 0 | 0 |
+| + twist 1:10 right | −370.81 in | −8.22 in (right) | 0 |
+| + Coriolis, east, 45 N | −366.91 in | −11.51 in | +0.22 in |
+| + July air / February zero air | −332.87 in | −11.04 in | +0.62 in |
+| + wind 10 mph from 90° | **−328.66 in** (jump: +4.2) | **+81.69 in** (left) | **+1.88 in** |
 
-Every mark in the glass is now worth roughly twenty to thirty yards more than the naked baseline said.
-That is the closing argument of the .308 half of the playlist.
+Everything-on table at 600 yd: drop −62.96 in, hold −2.91 mrad, windage +26.02 in.
+
+**Mil-Dot, Far BDC (read off the screen)** — radar baseline **405 / 496 / 578 / 651 yd**, everything on
+**428 / 522 / 607 / 684 yd**: every dot is worth 20–30 yd more.
+
+**Near BDC** labels only the dots *below* the centre: **22 / 18 / 15 / 12 yd** (1–4 mrad). The bullet is also
+above the line of sight between the near and far zero (+1.18 mrad at 100 yd), but the library's Mil-Dot declares
+BDC points below the centre only — library defect #1 (`BallisticCalculator.Net/CLAUDE/DEFECTS.md`,
+gehtsoft-usa/BallisticCalculator1#50). The narration speaks only of the very short ranges.
+
+**Target**: 20 × 20 in at 600 yd = **0.93 × 0.93 mrad**, the box low and left of the centre (at 800 yd it sits on
+the bottom edge of the field, so 600 was used).
+
+**Trijicon VCOG-16-762-175gr, Far BDC** (etched in hundreds of metres for its own load and zero): etched 4 =
+**593 yd**, 6 = **809**, 8 = **1031**, 10 = **1263**; the unnumbered ticks between are 490 / 702 / 918 / 1143 yd.
 
 ---
 
@@ -353,8 +337,44 @@ shot above.
 | 100 m | −14.541 MOA (−4.23 mrad) | −14.540 MOA | −0.001 MOA |
 | 150 m | −23.121 MOA (−6.73 mrad) | −23.121 MOA | **0.000 MOA** |
 
-This is the closing shot of the playlist. Set **Split at** to a small value (25 m) so the subsonic holds
-are labelled as *Far* BDC rather than falling into the *Near* side of the 100 m zero.
+### Read from the app (2026-11-04, `build/ep08/read_numbers.py`) — what the episode shows
+
+Both loads are **loaded from the library** (`data/ammo/.300 AAC/`), then the MV is typed over:
+`.300 AAC 208gr Hornady` (G1 0.648, 208 gr, library **1020** → **1010** ft/s) and, as Other ammunition
+for zero, `.300 AAC 115gr` (G1 0.290, 115 gr, library **2295** → **2330** ft/s). Rifle: sight preset
+**Standard Optics (High, Mil)** → height 3 → **2.9 in**; Right, **8 in**. The preset sets the zero to
+**100 yd** — switch the unit to **m** (missed once: the supersonic check showed −0.31 cm at "100 m").
+
+Subsonic, zeroed 100 m with the supersonic load, 200 m / 25 m:
+
+| m | 0 | 25 | 50 | 75 | 100 | 125 | 150 | 175 | 200 |
+|---|---|---|---|---|---|---|---|---|---|
+| Drop, cm | −7.37 | −6.11 | −11.43 | −23.46 | **−42.30** | −68.07 | −100.89 | −140.86 | **−188.10** |
+| Hold, mrad | | −2.44 | −2.29 | −3.13 | −4.23 | −5.45 | −6.73 | −8.05 | −9.40 |
+
+Velocity 308 m/s at the muzzle, 297 m/s at 100 m.
+
+**Reticle `VCOG16-300BLK.reticle`, Far BDC, subsonic window.** Far BDC labels only ranges past
+**Split at** (`BdcSplitControl`, default = the zero, 100 m). With 100: the top bar is unlabelled, the next
+bars read **102 / 151** m (and the bottom one 208 m). With **Split at = 50** (Nikolay checked in the app):
+**55 / 102 / 151** m from the top of the ladder down — the subsonic 50 / 100 / 150. Split 50 does not
+disturb the supersonic labels either (checked).
+
+**Supersonic alone, zeroed 100 m** (second trajectory): holds 50 −0.18, 100 0.00, 150 −0.37, 200 −0.93,
+300 −2.41, 400 −4.35, 500 −6.80, 600 −9.82 mrad; Far BDC labels **200 / 300 / 400 / 500 / 600 m**, as on
+Trijicon's sheet.
+
+**Target 19 × 19 in** (subsonic): 9.65 mrad at 50 m, 4.83 at 100, 3.22 at 150; the 100 and 150 m boxes
+sit on the bars. Not in the script.
+
+**Near BDC (subsonic) — app defect, not shown:** lower bars 14 / 9 / 7 m, but the top bar gets two
+overlapping labels (≈25 m and ≈55 m: the bullet crosses that hold twice). Not yet filed anywhere.
+
+**Display mode lost across windows — app defect (found in the Ep. 8 take, 2026-11-05):** the
+None / Far BDC / Near BDC radios in `ReticlePanel.axaml` use `GroupName="DisplayMode"`, and Avalonia scopes a
+group to the root window, so every trajectory window shares one group. Picking Far BDC in window 2 clears the
+radios in window 1, and window 1's reticle loses its BDC labels. The take works around it (r05 re-clicks Far BDC
+in window 1). Filed as D-003 in `claude/Archive/DEFECTS.md`.
 
 ---
 
@@ -379,3 +399,61 @@ Gotchas that cost time:
 - Positive `ShotParameters.ShotDropAdjustment` = clicks dialled **up**. Negative doubles the drop.
 - The `.drg` header carries the bullet: `11.30 g / 7.83 mm / 35.4 mm` for the GB550 — that is where the
   episode 4 diameter and length come from.
+
+---
+
+## 9. Shooting at an angle
+
+Read from the app on 2026-11-05 (`build/ep09/read_numbers.py`): `bc2-demo` (.308 175 gr G7 0.253, 2600 ft/s,
+zero 300 yd, standard air), Parameters → Shot Angle. Hold in mrad (= Over Line of Sight; the Hold column does
+not change with View → Drop).
+
+| Range | Level: drop · hold | 30° uphill | 30° downhill |
+|---|---|---|---|
+| 300 yd | −0.00 in · 0 | +3.57 in · +0.33 | +3.60 in · +0.33 |
+| 600 yd | −69.78 in · −3.23 | −52.85 in · −2.45 | −52.87 in · −2.45 |
+| 800 yd | −177.92 in · −6.18 | −143.28 in · −4.97 | −144.45 in · −5.02 |
+| 1000 yd | −360.51 in · −10.01 | −296.49 in · −8.24 | −302.31 in · −8.40 |
+
+- Up and down are almost the same; the small difference at 1000 yd is the air (downhill the bullet goes ~1500 ft
+  lower into denser air: 1124 vs 1140 ft/s).
+- Over Muzzle Level, 30° uphill: +17,658 in at 1000 yd (1471 ft above the muzzle; the target is 1500 ft up);
+  downhill −18,349 in. On the chart (Drop, Over Muzzle Level) the two curves — bullet and line of sight — are
+  straight slanted lines that nearly overlap at full scale; the ~300 in gap needs a zoom to be seen.
+- **Rifleman's rule** (hold for the horizontal distance, 1000 × cos 30° = 866 yd): level 866 yd → −7.33 mrad
+  (−228.52 in), but the real hold at 1000 yd / 30° is −8.24 mrad: the rule leaves the shot ~0.9 mrad
+  (≈33 in) low at 1000 yd.
+
+## 10. Your own drag table
+
+Read from the app 2026-11-05 (`build/ep10/probe.py`), library 1.1.13.
+
+**Part 1 — five G7 BCs taken off Lapua's radar curve** (`BC(M) = SD · Cd_G7(M) / Cd_drg(M)`, standard air,
+1116.45 ft/s): 0.250 @ 2600, 0.240 @ 2200, 0.244 @ 1800, 0.263 @ 1400, 0.293 @ 1100 ft/s (Mach 2.329 … 0.985).
+Built with From BC Curve (175 gr, 0.308 in, base G7; the BC field's own table must be switched from G1 to G7),
+saved as `scenar-l-5bc.drg` (84 points) and put on `bc2-demo`:
+
+| bc2-demo at 1000 yd | Drop, in | Hold, mrad | Velocity, ft/s |
+|---|---|---|---|
+| one BC, G7 0.253 | −360.51 | −10.01 | 1,132 |
+| five BCs | −370.01 | −10.28 | 1,135 |
+| Lapua radar `.drg` | −370.81 | −10.30 | 1,127 |
+
+Three BCs (2600/2000/1400) already give −368.4 in (library console run).
+
+**Part 2 — Warner .338 Flatline 285 gr, 16 published velocities 0–1500 yd** (3078.8 → 1994.6 ft/s), built
+with From Measured Velocities in the air of the range: 6000 ft, 23.98 inHg, 78 °F, 25 % — density 0.770 of
+standard, density altitude ≈ 8,650 ft. That air is fitted, not logged: it is the one at which the velocity table
+reproduces the sheet's own CD column (WarnerReportTest in the library). EMRTC (New Mexico Tech, Socorro NM): town
+~4,600 ft. Recovered CD vs the sheet: within 0.5 % at Mach 1.75–2.5; with standard air every CD comes out ~22 % low.
+
+`338-flatline.trajectory` (3079 ft/s, sight 1.5 in, zero 100 yd, standard air, to 1500 yd):
+
+| at 1500 yd | Hold, mrad | Drop, in |
+|---|---|---|
+| Warner's G7 0.484 | −10.36 | −559.56 |
+| our velocity curve (right air) | −10.40 | −561.41 |
+| same curve built with standard air (console only, not in the video) | −9.32 | −503.4 |
+
+At sea level the bullet reaches Mach ~1.55 at 1500 yd, below the measured span (Mach ≥ 1.78 in Socorro air), so
+the last few hundred yards use the curve's extension — it still matches the sheet's own BC column to 0.4 in.

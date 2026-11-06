@@ -45,7 +45,7 @@ columns instead of distance and velocity.*
 
 The grid takes **knots**: a Mach number and the BC quoted at it. Add them with **Add**, correct one with
 **Change**, remove with **Delete**, and put them in order with **Sort**. **Load Csv** imports a
-two-column file.
+[two-column file](#the-file-load-csv-reads).
 
 Two details that matter:
 
@@ -87,6 +87,46 @@ measurements.
 offer short of a manufacturer's radar table. Its quality follows the data — more readings over a wider
 velocity span, measured in known air, give a better curve. Three readings 100 m apart describe one small
 piece of the curve and extrapolate the rest.
+
+## The file Load Csv reads
+
+Both dialogs read the same kind of file: plain text, **two columns**, one knot or reading per line. The
+velocities dialog, loaded with Warner's published radar data for the .338 Flatline 285 gr:
+
+```
+distance;velocity
+0yd;3078.8ft/s
+100yd;3001.2ft/s
+200yd;2923.9ft/s
+...
+1500yd;1994.6ft/s
+```
+
+And the BC dialog, with Mach in the first column and the BC in the second:
+
+```
+mach;bc
+1.5;0.462G7
+1.75;0.463G7
+2;0.470G7
+```
+
+The rules:
+
+- **Separator:** `;`, a tab or `,` — the dialog works out which one the file uses. With decimal commas
+  (`1,5;0,462`) use `;` or a tab.
+- **Header:** optional. A first line that is not data is taken as the header, and its names set the column
+  order: a header that names `velocity` (or `bc`) first swaps the columns. Without a header the order is
+  distance then velocity, and Mach then BC.
+- **Units are required for distance and velocity**, on every value: `100yd;3001.2ft/s`, `91.4m;914.8m/s`.
+  `fps` is accepted as well as `ft/s`, and a space before the unit is fine. A bare number is refused,
+  because a file read in the wrong unit gives a curve that looks fine and is wrong.
+- **Mach is a bare number.** A BC may name its table (`0.462G7`); a bare BC is taken against the **Base
+  table** selected in the dialog.
+- **Empty lines are skipped. Nothing else is** — there are no comment lines, `#` included.
+- **All or nothing.** One line that cannot be read stops the import, the grid stays as it was, and the
+  message quotes the line number and says what is wrong with it. A curve quietly missing a point is
+  worse than a refused file.
 
 ## Saving
 

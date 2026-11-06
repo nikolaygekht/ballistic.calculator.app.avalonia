@@ -1,0 +1,110 @@
+[
+ [
+  "i01",
+  "In episode six we used a drag curve measured with a radar. It is the best data you can have for a bullet, but not every maker publishes one."
+ ],
+ [
+  "i02",
+  "If you do not have the file, the program can build an approximate curve for you. There are two ways: from several ballistic coefficients, or from velocities measured down range. Today we try both, and check each one against real radar data."
+ ],
+ [
+  "b01",
+  "Some makers give more than one coefficient: one for each speed range. For our bullet I take five points from the radar curve of episode six. At two thousand six hundred feet per second the G seven coefficient is zero point two five. At eleven hundred it is almost zero point three."
+ ],
+ [
+  "b02",
+  "Tools, Approximate Drag Table, From B C Curve."
+ ],
+ [
+  "b03",
+  "A name. The weight, one hundred seventy-five grains, and the diameter, point three oh eight. The program needs both: they turn the coefficients into a real drag curve."
+ ],
+ [
+  "b04",
+  "The base table is G seven, because our coefficients are G seven numbers."
+ ],
+ [
+  "b05",
+  "The first point: zero point two five oh, at two thousand six hundred feet per second. Add. The program turns the speed into a Mach number, for standard air."
+ ],
+ [
+  "b06",
+  "Zero point two four oh at twenty-two hundred. Zero point two four four at eighteen hundred. Zero point two six three at fourteen hundred. And zero point two nine three at eleven hundred."
+ ],
+ [
+  "b07",
+  "Save D R G. I put it next to the radar file. Close."
+ ],
+ [
+  "b08",
+  "Now let's check it. Trajectory, Open: our file from episode two, with one coefficient. At one thousand yards we hold ten point oh one."
+ ],
+ [
+  "b09",
+  "Edit Parameters, Browse, and the new file. A new name: five G seven B C's. OK. Now we hold ten point two eight."
+ ],
+ [
+  "b10",
+  "And the real radar curve from episode six: ten point three oh. Five coefficients came within one inch at one thousand yards. One coefficient was off by ten inches."
+ ],
+ [
+  "b11",
+  "Let's put both on one chart. In the radar window: View, Compare, Add."
+ ],
+ [
+  "b12",
+  "Windows, our five coefficients. View, Compare, Add again. And the chart: the two curves lie on top of each other."
+ ],
+ [
+  "v01",
+  "The second way is velocities: the speed of the bullet at different distances, measured with a big Doppler radar. Some makers publish them. Warner Tool publishes radar data sheets for its Flatline bullets. Here is the three thirty-eight, two hundred eighty-five grains: the speed every hundred yards, out to fifteen hundred."
+ ],
+ [
+  "v02",
+  "Tools, Approximate Drag Table, From Measured Velocities."
+ ],
+ [
+  "v03",
+  "The name, the weight, two hundred eighty-five grains, and the diameter, point three three eight."
+ ],
+ [
+  "v04",
+  "I typed the table into a small text file. Here it is: a header, then a distance and a speed on each line, each with its unit. Load C S V. Sixteen readings."
+ ],
+ [
+  "v05",
+  "Before I save, one more thing: the air. The program has to know the air these speeds were measured in. In thin air the bullet slows down less, so the same speeds mean a different drag curve."
+ ],
+ [
+  "v06",
+  "So where were they measured? Warner tests its bullets at E M R T C, the Energetic Materials Research and Testing Center of New Mexico Tech, near Socorro, New Mexico. The town is at forty-six hundred feet, and the ranges go up into the hills."
+ ],
+ [
+  "v07",
+  "The sheet does not say what the weather was. But it also has the drag for standard air, so we can check which air fits. It is about six thousand feet on a warm day, seventy-eight degrees. That air is as thin as at almost nine thousand feet on a standard day."
+ ],
+ [
+  "v08",
+  "Set Atmosphere. Six thousand feet, twenty-three point nine eight inches of pressure, seventy-eight degrees, and dry air: twenty-five percent. OK."
+ ],
+ [
+  "v09",
+  "Save D R G. Close."
+ ],
+ [
+  "v10",
+  "I prepared a trajectory for this bullet: three thousand seventy-nine feet per second, a zero at one hundred yards, out to fifteen hundred. It uses Warner's own G seven coefficient: zero point four eight four. At fifteen hundred yards we hold ten point three six."
+ ],
+ [
+  "v11",
+  "Now our curve: ten point four oh. Almost the same as Warner's number."
+ ],
+ [
+  "x01",
+  "Both ways give an approximation. A radar curve from the maker is still the best. But five good coefficients, or a good velocity table with the right air, come very close."
+ ],
+ [
+  "x02",
+  "This is the last episode of this series. The program can do more than we showed, and the user guide describes all of it. Thank you for watching."
+ ]
+]

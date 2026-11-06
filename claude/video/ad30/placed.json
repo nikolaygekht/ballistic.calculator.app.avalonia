@@ -1,0 +1,160 @@
+{
+ "own": [
+  {
+   "text": "A trajectory is more than a number.",
+   "scene": "hook",
+   "start": 0.3,
+   "end": 2.54,
+   "words": [
+    0.3
+   ]
+  },
+  {
+   "text": "Wind. Drag. Spin. Earth's rotation.",
+   "scene": "variables",
+   "start": 3.2,
+   "end": 6.65,
+   "words": [
+    3.2,
+    4.051,
+    4.861,
+    5.803
+   ]
+  },
+  {
+   "text": "Ballistic Calculator Two brings the variables into focus.",
+   "scene": "product",
+   "start": 7.25,
+   "end": 10.64,
+   "words": [
+    7.25
+   ]
+  },
+  {
+   "text": "Explore trajectories. Compare loads.",
+   "scene": "compare",
+   "start": 11.2,
+   "end": 13.82,
+   "words": [
+    11.2,
+    12.844
+   ]
+  },
+  {
+   "text": "Build drag curves from measured data.",
+   "scene": "drag",
+   "start": 14.45,
+   "end": 16.52,
+   "words": [
+    14.45
+   ]
+  },
+  {
+   "text": "Visualize your reticle.",
+   "scene": "reticle",
+   "start": 17.25,
+   "end": 18.55,
+   "words": [
+    17.25
+   ]
+  },
+  {
+   "text": "Estimate hit probability with Monte Carlo analysis.",
+   "scene": "montecarlo",
+   "start": 19.9,
+   "end": 22.93,
+   "words": [
+    19.9
+   ]
+  },
+  {
+   "text": "Advanced external ballistics. Free and open source.",
+   "scene": "end",
+   "start": 23.6,
+   "end": 27.37,
+   "words": [
+    23.6,
+    25.676
+   ]
+  }
+ ],
+ "stock": [
+  {
+   "text": "A trajectory is more than a number.",
+   "scene": "hook",
+   "start": 0.3,
+   "end": 2.36,
+   "words": [
+    0.3
+   ]
+  },
+  {
+   "text": "Wind. Drag. Spin. Earth's rotation.",
+   "scene": "variables",
+   "start": 3.2,
+   "end": 6.78,
+   "words": [
+    3.2,
+    4.032,
+    4.901,
+    5.834
+   ]
+  },
+  {
+   "text": "Ballistic Calculator Two brings the variables into focus.",
+   "scene": "product",
+   "start": 7.25,
+   "end": 10.66,
+   "words": [
+    7.25
+   ]
+  },
+  {
+   "text": "Explore trajectories. Compare loads.",
+   "scene": "compare",
+   "start": 11.2,
+   "end": 13.73,
+   "words": [
+    11.2,
+    12.776
+   ]
+  },
+  {
+   "text": "Build drag curves from measured data.",
+   "scene": "drag",
+   "start": 14.45,
+   "end": 16.47,
+   "words": [
+    14.45
+   ]
+  },
+  {
+   "text": "Visualize your reticle.",
+   "scene": "reticle",
+   "start": 17.25,
+   "end": 18.57,
+   "words": [
+    17.25
+   ]
+  },
+  {
+   "text": "Estimate hit probability with Monte Carlo analysis.",
+   "scene": "montecarlo",
+   "start": 19.9,
+   "end": 22.77,
+   "words": [
+    19.9
+   ]
+  },
+  {
+   "text": "Advanced external ballistics. Free and open source.",
+   "scene": "end",
+   "start": 23.6,
+   "end": 27.22,
+   "words": [
+    23.6,
+    25.692
+   ]
+  }
+ ]
+}

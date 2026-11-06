@@ -2,7 +2,38 @@
 
 Found by manual testing. Newest first.
 
-Both entries below were **fixed on 2026-07-27** and are kept as the record of what went wrong.
+D-003 is **open**. D-001 and D-002 were **fixed on 2026-07-27** and are kept as the record of what went wrong.
+
+---
+
+## D-003 — Reticle tab: the display mode is shared by all trajectory windows
+
+- **Found:** 2026-11-05 (recording video Episode 8, two trajectory windows open)
+- **Status:** OPEN
+- **Area:** `Common/BallisticCalculator.Panels/Panels/ReticlePanel.axaml` — the Display radios
+  `RadioNone`, `RadioFarBdc`, `RadioNearBdc`, `RadioTarget`
+
+**Steps to reproduce**
+
+1. Open two trajectory windows (any shots).
+2. In window 1, Reticle tab: load a reticle (e.g. `VCOG16-300BLK.reticle`), select **Far BDC**. The BDC
+   labels appear.
+3. In window 2, Reticle tab: load a reticle, select **Far BDC**.
+4. Switch back to window 1.
+
+**Expected:** window 1 still has Far BDC selected and still shows its BDC labels.
+
+**Actual:** none of window 1's Display radios is selected (None, Far BDC, Near BDC, Target all off),
+and its reticle shows no BDC labels. Confirmed with UI Automation on the running app: window 1 all
+four off, window 2 Far BDC on.
+
+**Likely cause:** all four radios carry `GroupName="DisplayMode"`. In Avalonia a named group is
+scoped to the root (the main window), not to the `UserControl`, so every `ReticlePanel` in every MDI
+trajectory window joins one group: checking a radio in one window unchecks the others everywhere.
+The four radios are the only ones in their `StackPanel`, so dropping `GroupName` (grouping by parent)
+or making it per-instance should fix it. Check the other panels for the same pattern.
+
+**Workaround used in the video:** click Far BDC again after switching windows.
 
 ---
 

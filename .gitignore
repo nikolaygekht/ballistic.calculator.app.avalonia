@@ -14,3 +14,36 @@ Setup/content/
 # Linux and macOS builds, and the bare .tar is its intermediate.
 *.tar.gz
 *.tar
+# Video production (claude/video/): generated media and signed download links stay local.
+# Scripts (fetch.py, record.py, assemble.py, make_cards.py) and the card background are tracked.
+*.mp3
+*.mp4
+*.wav
+*.mkv
+claude/video/build/**/urls*.json
+claude/video/build/**/timeline*.json
+claude/video/build/**/_*.png
+claude/video/build/**/dry_end.png
+claude/video/cards/out/
+# Secrets (YouTube OAuth client secret and token): never committed.
+secrets/
+# The 30 s ad (claude/video/ad30/) and the thumbnails: signed links and generated images stay local.
+claude/video/ad30/urls.json
+claude/video/thumbs/*.jpg
+claude/video/thumbs/crops/
+claude/video/thumbs/frames/
+# Python venv for the YouTube uploader (claude/video/build/upload.py).
+claude/video/.venv/
+# Manual upload kit (videos + thumbnails + index.html), built by claude/video/build/make_upload_kit.py.
+claude/video/upload/
+# Video links written by claude/video/build/studio_upload.py
+claude/video/youtube-ids.json
+# Video production leftovers stay local: Python caches, the app-state backups, run logs, dry-run screenshots.
+__pycache__/
+*.pyc
+claude/video/build/_backup/
+claude/video/build/**/*.log
+claude/video/build/**/dry-*.png
+# Third-party pictures (PrecisionRifleBlog) shown with credit in episode 6: used in the video, not redistributed here.
+claude/video/build/ep06/prb/
+claude/video/build/ep06/card-prb-*.png

@@ -1,0 +1,126 @@
+[
+ [
+  "r01",
+  "Trajectory, Open. This time the file from episode six, with the measured drag curve."
+ ],
+ [
+  "r02",
+  "At one thousand yards the drop is three hundred seventy-one inches, and there is no windage at all."
+ ],
+ [
+  "r03",
+  "And the scope: the Reticle tab, Mil-Dot, Far B D C. The dots below the centre are four hundred five, four ninety-six, five seventy-eight and six fifty-one yards. Remember these numbers."
+ ],
+ [
+  "r04",
+  "Until now we added one effect at a time. Today we add them on top of each other, like on a real range day."
+ ],
+ [
+  "e01",
+  "View, Edit Parameters, the Rifle tab."
+ ],
+ [
+  "e02",
+  "The drag file already gave us the diameter and the length of the bullet. So we only need the rifling: right hand,"
+ ],
+ [
+  "e03",
+  "one turn in ten inches. OK."
+ ],
+ [
+  "e04",
+  "Spin drift: eight inches to the right. The drop did not change."
+ ],
+ [
+  "e05",
+  "Edit Parameters, the Parameters tab. Calculate Coriolis Effect,"
+ ],
+ [
+  "e06",
+  "we shoot to the east,"
+ ],
+ [
+  "e07",
+  "at forty-five degrees north. OK."
+ ],
+ [
+  "e08",
+  "The bullet hits almost four inches higher, and the drift to the right grows to eleven and a half inches."
+ ],
+ [
+  "e09",
+  "Now the weather from episode five. Edit Parameters, the Weather tab. July: one thousand feet, twenty-eight point nine, one hundred degrees, ninety percent."
+ ],
+ [
+  "e10",
+  "And the Zero tab: the rifle was zeroed in February."
+ ],
+ [
+  "e11",
+  "One thousand feet, twenty-eight point nine, forty degrees, forty percent. OK."
+ ],
+ [
+  "e12",
+  "Three hundred thirty-three inches: thirty-four inches less than before."
+ ],
+ [
+  "e13",
+  "And last, the wind. Edit Parameters, the Wind tab. Ten miles per hour, from the right. OK."
+ ],
+ [
+  "e14",
+  "The wind takes the bullet eighty-two inches to the left."
+ ],
+ [
+  "e15",
+  "And look at the drop: three hundred twenty-nine, four inches less than without the wind. This is aerodynamic jump from episode four. It needs everything together: the bullet's shape, the twist, and the wind."
+ ],
+ [
+  "e16",
+  "And at three hundred yards, our zero distance, the bullet is now almost two inches high."
+ ],
+ [
+  "e17",
+  "Some effects add up, some cancel each other. You cannot guess that. You put the real numbers in."
+ ],
+ [
+  "q01",
+  "The Reticle tab again. Four hundred five is now four hundred twenty-eight. Four ninety-six is five twenty-two. Five seventy-eight is six oh seven. And six fifty-one is six eighty-four. Every dot is worth twenty to thirty yards more."
+ ],
+ [
+  "q02",
+  "Near B D C shows the distances before the zero. The scope sits three inches above the barrel, so at very short range the bullet is still below the line of sight. At twenty-two yards you hold one milliradian high, at twelve yards four."
+ ],
+ [
+  "q03",
+  "Target puts a target into the scope. A twenty inch plate at six hundred yards. The box is where the bullet lands: low, and to the left, because of the wind. The plate is less than one milliradian wide, so the wind call must be right to a fraction of a milliradian."
+ ],
+ [
+  "q04",
+  "The program comes with thirty-four reticles. Load. For example, the Trijicon V-COG for seven six two, made for a one hundred seventy-five grain bullet."
+ ],
+ [
+  "q05",
+  "Its marks say four to ten: hundreds of metres, for its own load and its own zero. With our zero at three hundred yards and today's air, the four is five hundred ninety-three yards, and the ten is one thousand two hundred sixty-three."
+ ],
+ [
+  "q06",
+  "An etched B D C is true only for the load, the zero and the air it was made for. The program labels it for yours."
+ ],
+ [
+  "q06b",
+  "The calculator also comes with a reticle editor, so you can draw your own reticles. And some of the reticles that come with it are quite fun."
+ ],
+ [
+  "q06c",
+  "And if you use an AI assistant like Claude or Codex, there is a skill that makes a reticle file from a description, or even from a picture of a reticle. It is in the repository too. The link is in the description."
+ ],
+ [
+  "q07",
+  "The scope did not change. Only the day, the air and the wind did. A printed range card is a photo of one day. The calculator shows you the day you are standing in."
+ ],
+ [
+  "n01",
+  "Next time, the first special case: one rifle and two different cartridges. We zero it with one and shoot the other. Three hundred Blackout."
+ ]
+]

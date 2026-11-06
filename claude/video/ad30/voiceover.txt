@@ -1,0 +1,8 @@
+A trajectory is more than a number.
+Wind. Drag. Spin. Earth's rotation.
+Ballistic Calculator 2 brings the variables into focus.
+Explore trajectories. Compare loads.
+Build drag curves from measured data.
+Visualize your reticle.
+Estimate hit probability with Monte Carlo analysis.
+Advanced external ballistics. Free and open source.

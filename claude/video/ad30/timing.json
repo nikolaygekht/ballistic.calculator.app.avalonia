@@ -1,0 +1,31 @@
+{
+  "fps": 30,
+  "frames": 900,
+  "voice": "stock",
+  "music": "A2-pulse",
+  "note": "Seconds. Scene cuts sit on beats of music A2 (128 BPM, first beat 0.230 s, beats-A2.json), each before its line starts. Each VO line is cut from the voice file by speech chunks (silencedetect) and placed at 'at'.",
+  "scenes": [
+    {"id": "hook",      "from": 0.0,   "to": 3.043,  "text": "MORE THAN A NUMBER"},
+    {"id": "variables", "from": 3.043, "to": 6.793,  "text": "WIND · DRAG · SPIN · CORIOLIS"},
+    {"id": "product",   "from": 6.793, "to": 11.011, "text": "BALLISTIC CALCULATOR 2"},
+    {"id": "compare",   "from": 11.011,"to": 14.293, "text": "TRAJECTORIES -> COMPARE LOADS"},
+    {"id": "drag",      "from": 14.293,"to": 17.105, "text": "MEASURED DRAG DATA"},
+    {"id": "reticle",   "from": 17.105,"to": 19.449, "text": "RETICLE VIEW"},
+    {"id": "montecarlo","from": 19.449,"to": 23.199, "text": "MONTE CARLO / HIT PROBABILITY"},
+    {"id": "end",       "from": 23.199,"to": 30.0,   "text": "BALLISTIC CALCULATOR 2 / FREE & OPEN SOURCE / WINDOWS · LINUX · macOS / GET IT ON GITHUB", "cta_locked_from": 26.48}
+  ],
+  "lines": [
+    {"scene": "hook",       "chunks": [0],          "at": 0.30,  "text": "A trajectory is more than a number."},
+    {"scene": "variables",  "chunks": [1, 2, 3, 4], "at": 3.20,  "text": "Wind. Drag. Spin. Earth's rotation."},
+    {"scene": "product",    "chunks": [5],          "at": 7.25,  "text": "Ballistic Calculator Two brings the variables into focus."},
+    {"scene": "compare",    "chunks": [6, 7],       "at": 11.20, "text": "Explore trajectories. Compare loads."},
+    {"scene": "drag",       "chunks": [8],          "at": 14.45, "text": "Build drag curves from measured data."},
+    {"scene": "reticle",    "chunks": [9],          "at": 17.25, "text": "Visualize your reticle."},
+    {"scene": "montecarlo", "chunks": [10],         "at": 19.90, "text": "Estimate hit probability with Monte Carlo analysis."},
+    {"scene": "end",        "chunks": [11, 12],     "at": 23.60, "text": "Advanced external ballistics. Free and open source."}
+  ],
+  "voices": {
+    "own":   {"file": "audio/vo-own.mp3",   "voice": "Me. Teaching Tempo (H7bAez7p9ZBsZzNlxYxB), eleven_v4"},
+    "stock": {"file": "audio/vo-stock.mp3", "voice": "Justin Case - Warm, Trustworthy, Clear (DtQLDxHbTiQTpVVanTy1), eleven_v4"}
+  }
+}

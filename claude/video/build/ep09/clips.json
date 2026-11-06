@@ -1,0 +1,82 @@
+[
+ [
+  "i01",
+  "This is the second special case: shooting uphill and downhill."
+ ],
+ [
+  "i02",
+  "In the mountains the target is often above you or below you. The distance can be the same as on the flat, but the hold is not."
+ ],
+ [
+  "a01",
+  "Trajectory, Open. The same file from episode two: our rifle, our load, and a zero at three hundred yards."
+ ],
+ [
+  "a02",
+  "On the flat, at one thousand yards, we hold ten milliradians."
+ ],
+ [
+  "a03",
+  "Now the chart, with the drop over muzzle level. View, Drop, Over Muzzle Level, and the Chart tab."
+ ],
+ [
+  "a04",
+  "Two lines: the bullet, and the line of sight. The bullet starts below the line of sight, goes above it, and comes back to it at three hundred yards, our zero. On the flat the line of sight is level, so both kinds of drop are the same."
+ ],
+ [
+  "u01",
+  "Now the same target, thirty degrees uphill. Edit Parameters, the Parameters tab, and the shot angle: thirty."
+ ],
+ [
+  "u02",
+  "Not the shot angle on the Zero tab. That one is the angle you zeroed at, and this rifle was zeroed on the flat."
+ ],
+ [
+  "u03",
+  "OK. Now both lines go up. At one thousand yards the target is five hundred yards higher than we are: fifteen hundred feet."
+ ],
+ [
+  "u04",
+  "This is the drop over muzzle level: where the bullet is in space. At the end it is almost fifteen hundred feet above the muzzle, and still a little below the line of sight."
+ ],
+ [
+  "u05",
+  "Let us zoom in at the end. Now you see the gap. How far the bullet is from the line of sight, measured across it, is the other kind of drop: drop over the line of sight. This is the one you hold."
+ ],
+ [
+  "u06",
+  "So back to drop over the line of sight, and the table. At one thousand yards the hold is eight point two milliradians, almost two less than on the flat."
+ ],
+ [
+  "u07",
+  "If you forget the angle and hold ten, the bullet goes more than five feet over the target."
+ ],
+ [
+  "u08",
+  "Why less? Gravity always pulls straight down. When the line of sight is tilted, only part of it pulls the bullet away from the line of sight."
+ ],
+ [
+  "d01",
+  "And thirty degrees downhill: minus thirty. Eight point four."
+ ],
+ [
+  "d02",
+  "Almost the same. Uphill or downhill, the bullet drops less than on the flat, for the same reason: only part of gravity pulls it away from the line of sight."
+ ],
+ [
+  "r01",
+  "There is an old rule of thumb for this: the rifleman's rule. Hold as if the target were on the flat, at the horizontal distance. Here it is one thousand yards times the cosine of thirty degrees: eight hundred sixty-six yards."
+ ],
+ [
+  "r02",
+  "On the flat at eight hundred sixty-six yards, the hold is seven point three. The full calculation says eight point two. The rule is much better than nothing, but at one thousand yards the difference is almost one milliradian: almost three feet."
+ ],
+ [
+  "r03",
+  "The program does not use a shortcut. It calculates the whole flight along the tilted line of sight. It is still a model, but a full model of the flight, not a simplified rule."
+ ],
+ [
+  "n01",
+  "Next time: your own drag table. The program can build one from several ballistic coefficients, or from velocities you measured."
+ ]
+]

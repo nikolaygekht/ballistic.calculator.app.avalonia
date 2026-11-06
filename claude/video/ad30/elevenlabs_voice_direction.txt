@@ -1,0 +1,4 @@
+Brief direction (section 4):
+Delivery: English, neutral American accent, adult voice with a warm mid-low register; precise, knowledgeable, confident and modern. A technical storyteller, not a movie-trailer announcer. Moderate tempo with short, intentional pauses. No exaggerated enthusiasm or breathy whispering. Close-mic studio quality, minimal reverb, clear diction for “Coriolis” (if used in an alternate take), “Monte Carlo,” and “Ballistic Calculator Two.”
+
+Chosen: ElevenLabs library voice 'Justin Case - Warm, Trustworthy, Clear' (DtQLDxHbTiQTpVVanTy1), eleven_v4, one take, text as in voiceover.txt with 'Ballistic Calculator Two' spelled out.

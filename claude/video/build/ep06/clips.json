@@ -1,0 +1,98 @@
+[
+ [
+  "r01",
+  "Trajectory, Open. The same file from episode two, one more time."
+ ],
+ [
+  "r02",
+  "At one thousand yards the drop is three hundred sixty inches. All the numbers in this series came from one number: the ballistic coefficient, zero point two five three, G seven."
+ ],
+ [
+  "t01",
+  "What is this number? It compares your bullet to a standard bullet. G one is an old standard, a bullet with a flat base. G seven is a newer one: a long bullet with a boat tail, much closer to a modern long range bullet."
+ ],
+ [
+  "t02",
+  "The drag of the standard bullet was measured at every speed. The coefficient takes this curve and only makes it bigger or smaller. Here is the G seven curve, made smaller for zero point two five three, and the G one curve for zero point five oh five."
+ ],
+ [
+  "t03",
+  "And here, in blue, is the real drag of our bullet. Its shape is different. That's why one number cannot fit at every speed."
+ ],
+ [
+  "t04",
+  "And it is not only our bullet. Every bullet has its own curve. Here are four Hornady bullets against G seven. None of them follows it exactly."
+ ],
+ [
+  "t05",
+  "Here is the real G seven coefficient of our bullet, along the whole flight. Near the muzzle it is zero point two five. At three hundred yards it falls to zero point two four. Near one thousand yards it goes up to almost zero point three. The box gives you one number for all of this."
+ ],
+ [
+  "t06",
+  "So where do these curves come from? The maker shoots the bullet and follows it with a Doppler radar. The radar sees how fast the bullet slows down at every speed. From that, they get the drag of this exact bullet, without any standard bullet at all."
+ ],
+ [
+  "t07",
+  "Some of these pictures are from the Precision Rifle Blog. It has a very good article about G one, G seven and measured drag curves. The link is in the description."
+ ],
+ [
+  "t08",
+  "Lapua measured its bullets this way. Some makers publish these curves, others keep them inside their own apps. You have to look for the file for your bullet yourself. I have the one for our bullet, the one hundred seventy-five grain Scenar L."
+ ],
+ [
+  "t09",
+  "If you cannot find a file for your bullet, the program can build a curve for you. Tools, Approximate Drag Table. From BC Curve makes one from several ballistic coefficients for different speeds. From Measured Velocities makes one from velocities measured at different distances."
+ ],
+ [
+  "u01",
+  "Now let's use the file. View, Edit Parameters. Next to Drag table, I press Browse."
+ ],
+ [
+  "u02",
+  "I go to my folder. Here is the file. Open."
+ ],
+ [
+  "u03",
+  "The coefficient is now one, and the table is G C, a custom curve. One means: exactly as the curve says."
+ ],
+ [
+  "u04",
+  "The program also took the weight, the diameter and the length from the file. The file says eleven point three grams. That's one hundred seventy-four point four grains, not one seventy-five."
+ ],
+ [
+  "u05",
+  "The muzzle velocity stays ours. The file knows the bullet, not your rifle. OK."
+ ],
+ [
+  "u06",
+  "At one thousand yards the drop is now three hundred seventy-one inches. That's ten inches more than with the coefficient."
+ ],
+ [
+  "u07",
+  "On the turret, that's three more clicks."
+ ],
+ [
+  "u08",
+  "And at eight hundred yards the bullet is twenty-five feet per second slower. Remember the chart: in the first few hundred yards the real coefficient is worse than the box says. The bullet loses speed there, and it never gets it back."
+ ],
+ [
+  "u09",
+  "And zero point two five three is a good number. It is the G seven number. With the G one number from the box, zero point five oh five, the error is sixteen inches."
+ ],
+ [
+  "u10",
+  "Inside three hundred yards, a good coefficient is enough. Past eight hundred, the drag curve matters more than almost anything else, except your muzzle velocity."
+ ],
+ [
+  "s01",
+  "This one I keep. Trajectory, Save As."
+ ],
+ [
+  "s02",
+  "A new name: b c two demo radar. Save. The first file stays as it was."
+ ],
+ [
+  "n01",
+  "Next time: we turn on everything at once, and look through the scope."
+ ]
+]
