@@ -9,6 +9,9 @@ nav_order: 4
 six tabs owns which decision. It is the map; each step has (or will have) its own article for the
 detail.
 
+Prefer to watch? The first episode of the [video tutorials](https://www.youtube.com/playlist?list=PLLcWDVvDdkbU)
+walks through the same steps.
+
 Everything starts with **`Trajectory → New`**. One dialog — *Shot Parameters* — describes the whole
 shot across six tabs, and **OK** computes it. There is no separate "calculate" step and nothing is
 computed while you type.

@@ -17,6 +17,7 @@ and where they stop being trustworthy.
 | want it running | [Installation and first run](installation.md) — from the Releases archive to a trajectory on screen |
 | want to compute a shot | [Your first trajectory](first-trajectory.md) — the six tabs, the imperial/metric choice, and what OK does |
 | are new to external ballistics | [Recommended reading](recommended-reading.md) — the books and references this guide leans on instead of repeating |
+| would rather watch than read | [Video tutorials](https://www.youtube.com/playlist?list=PLLcWDVvDdkbU) — short episodes on YouTube that build one shot step by step |
 
 Everything else is below, in the [full contents](#all-articles).
 

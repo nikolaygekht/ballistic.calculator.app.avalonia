@@ -15,6 +15,9 @@ image to open it full size.*
 📖 **[User guide](https://nikolaygekht.github.io/ballistic.calculator.app.avalonia/)** — installation, what the
 model includes, and where to learn the ballistics behind the inputs.
 
+🎬 **[Video tutorials](https://www.youtube.com/playlist?list=PLLcWDVvDdkbU)** — a series of short episodes on
+YouTube that build one shot step by step, from the first trajectory to your own drag table.
+
 ## Goals
 
 **Accuracy comparable to commercial and 4DOF solvers.** The engine is a 3DOF (point-mass) integration with the
