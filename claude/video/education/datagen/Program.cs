@@ -134,3 +134,55 @@ Console.WriteLine($"rows {rows.Length}; muzzle v {rows[0].v} m/s, M {rows[0].mac
 Console.WriteLine($"race at 300/1000 m: G1 {race.g1[30]}/{race.g1[100]}  G7 {race.g7[30]}/{race.g7[100]}  radar {race.radar[30]}/{race.radar[100]} cm; " +
                   $"own Cd at M2.33: fromG7 {Interp(g7, 2.33) * sd / BC:F3} fromG1 {Interp(g1, 2.33) * sd / 0.505:F3} radar {Interp(radar, 2.33):F3}; " +
                   $"M1.0: {Interp(g7, 1) * sd / BC:F3} {Interp(g1, 1) * sd / 0.505:F3} {Interp(radar, 1):F3}; M0.8: {Interp(g7, .8) * sd / BC:F3} {Interp(g1, .8) * sd / 0.505:F3} {Interp(radar, .8):F3}");
+
+// ---------------------------------------------------------------- Episode 2: the point mass (public/ep02.json)
+// The level-bore flight (no sight height, no zero: the barrel points straight downrange), the same with a 4.5 m/s
+// cross wind from the right, and datagen's own semi-implicit Euler with big time steps for the step pictures.
+{
+    var lvlRifle = new Rifle(new Sight(new(0, DistanceUnit.Millimeter), Measurement<AngularUnit>.ZERO, Measurement<AngularUnit>.ZERO),
+                             new ZeroingParameters(new(100, DistanceUnit.Meter), null, null), null);
+    var lvlShot = new ShotParameters { Step = new(10, DistanceUnit.Meter), MaximumDistance = new(1000, DistanceUnit.Meter) };
+    var cross = new[] { new Wind(new(4.5, VelocityUnit.MetersPerSecond), new(90, AngularUnit.Degree)) };
+    var still = calc.Calculate(ammo, lvlRifle, air, lvlShot).Where(p => p != null).ToArray();
+    var windy = calc.Calculate(ammo, lvlRifle, air, lvlShot, cross).Where(p => p != null).ToArray();
+    var flight = still.Select((p, i) => new
+    {
+        x = R(p.Distance.In(DistanceUnit.Meter), 1),
+        t = R(p.Time.TotalSeconds, 4),
+        y = R(p.Drop.In(DistanceUnit.Meter), 4),                                   // negative: below the bore line
+        v = R(p.Velocity.In(VelocityUnit.MetersPerSecond), 2),
+        drag = R(DragAccel(p.Velocity.In(VelocityUnit.MetersPerSecond), p.Mach), 3),
+        z = R(windy[i].Windage.In(DistanceUnit.Meter), 4),                          // with the cross wind
+        tw = R(windy[i].Time.TotalSeconds, 4),
+    }).ToArray();
+
+    // Euler, as the episode tells it: v_new = v + a·Δt, r_new = r + v_new·Δt; a = -D·v/|v| + g. Starts at the
+    // narrated 790 m/s so the first step reads 790 -> 743.
+    object[] Euler(double dt, int stride = 1)
+    {
+        double x = 0, y = 0, vx = 790, vy = 0, t = 0;
+        var list = new List<object>();
+        for (int n = 0; ; n++)
+        {
+            double v = Math.Sqrt(vx * vx + vy * vy), D = DragAccel(v, v / air.SoundVelocity.In(VelocityUnit.MetersPerSecond));
+            double ax = -D * vx / v, ay = -D * vy / v - G;
+            if (n % stride == 0 || x >= 1000) list.Add(new { t = R(t, 4), x = R(x, 3), y = R(y, 4), vx = R(vx, 3), vy = R(vy, 4), ax = R(ax, 3), ay = R(ay, 4), D = R(D, 3) });
+            if (x >= 1000) break;
+            vx += ax * dt; vy += ay * dt; x += vx * dt; y += vy * dt; t += dt;
+        }
+        return list.ToArray();
+    }
+    var ep2 = new
+    {
+        sound = R(air.SoundVelocity.In(VelocityUnit.MetersPerSecond), 2),
+        flight,
+        euler = new { s100 = Euler(0.1), s050 = Euler(0.05), s020 = Euler(0.02), s005 = Euler(0.005) },
+        reference = Euler(0.0002, 50),                                              // the same model, a tiny step: the "real" path
+    };
+    var ep2Path = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(outPath))!, "ep02.json");
+    File.WriteAllText(ep2Path, JsonSerializer.Serialize(ep2));
+    var f1000 = flight[^1];
+    var e1 = (dynamic)ep2.euler.s100[1];
+    Console.WriteLine($"ep02: 1000 m level bore fall {f1000.y} m in {f1000.t} s, v {f1000.v}, drag {f1000.drag} m/s²; wind z {f1000.z} m (t {f1000.tw}); " +
+                      $"Euler 0.1 s first step vx {e1.vx} vy {e1.vy} x {e1.x}; steps {ep2.euler.s100.Length}");
+}

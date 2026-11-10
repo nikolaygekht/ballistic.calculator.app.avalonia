@@ -54,6 +54,13 @@ foreach (var cap in new[] { 200.0, 100, 50, 10, 1, 0.1 })
     catch (Exception e) { Console.WriteLine($"Euler cap {cap} m: {e.GetType().Name}"); }
 }
 
+foreach (var cap in new[] { 1.0, 0.1 })
+{
+    var c = new TrajectoryCalculator { Integrator = IntegrationMethod.MidpointRK2, MaximumCalculationStepSize = M(cap) };
+    var p = At(Shoot(Ammo(new BallisticCoefficient(0.253, DragTableId.G7)), calc: c, step: 1000, max: 1000), 1000);
+    Console.WriteLine($"RK2 cap {cap,6} m: drop {p.Drop.In(DistanceUnit.Centimeter):F2} cm, error {(p.Drop - refP.Drop).In(DistanceUnit.Centimeter):F3} cm");
+}
+
 Console.WriteLine("== Episode 3: the add-ons at 1000 m (G7 0.253)");
 var bc = new BallisticCoefficient(0.253, DragTableId.G7);
 var twist = new Rifling(new(10, DistanceUnit.Inch), TwistDirection.Right);
@@ -75,4 +82,19 @@ foreach (var m in new[] { 500.0, 1000 })
     Console.WriteLine("45N east      " + Row(At(corE, m)));
     Console.WriteLine("45N west      " + Row(At(corW, m)));
     Console.WriteLine("45N north     " + Row(At(corN, m)));
+}
+
+Console.WriteLine("== Episode 2: fall from the bore line (level bore, no sight height, no zero), G7 0.253");
+{
+    var calc = new TrajectoryCalculator();
+    var rifle = new Rifle(new Sight(new(0, DistanceUnit.Millimeter), Measurement<AngularUnit>.ZERO, Measurement<AngularUnit>.ZERO),
+                          new ZeroingParameters(M(100), null, null), null);
+    var shot = new ShotParameters { Step = M(100), MaximumDistance = M(1000) };
+    var t = calc.Calculate(Ammo(new BallisticCoefficient(0.253, DragTableId.G7)), rifle, new Atmosphere(), shot, null, null).Where(p => p != null).ToArray();
+    foreach (var m in new[] { 300.0, 500, 1000 })
+    {
+        var p = At(t, m); var s = p.Time.TotalSeconds; var tv = m / 790.0;
+        Console.WriteLine($"{m,5} m: air fall {-p.Drop.In(DistanceUnit.Meter):F2} m in {s:F3} s (½gt² {0.5 * 9.80665 * s * s:F2} m); " +
+                          $"no air {tv:F3} s, ½gt² {0.5 * 9.80665 * tv * tv:F2} m");
+    }
 }

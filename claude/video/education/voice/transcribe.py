@@ -1,5 +1,5 @@
 """Transcribe every take with word timestamps and score it against the script.
-Usage: python transcribe.py <takes_dir> <SCRIPTS.md> <out.json>"""
+Usage: python transcribe.py <takes_dir> <SCRIPTS.md> <out.json> [episode, default 1]"""
 import json, re, sys, difflib, glob, os
 import subprocess, numpy as np
 from faster_whisper import WhisperModel
@@ -11,8 +11,11 @@ def load(f):
     return np.frombuffer(raw[i:], np.int16).astype(np.float32) / 32768
 
 takes_dir, script_md, out = sys.argv[1:4]
+epn = int(sys.argv[4]) if len(sys.argv) > 4 else 1
 s = open(script_md, encoding='utf-8').read()
-ep = s[s.index('# Episode 1'):s.index('# Episode 2')]
+start = s.index(f'# Episode {epn}')
+end = s.find(f'# Episode {epn + 1}', start)
+ep = s[start:end if end > 0 else len(s)]
 blocks = re.findall(r'VOICE:\n(.*?)(?=\n\n)', ep, re.S)
 norm = lambda t: re.findall(r"[a-z0-9']+", t.lower().replace('-', ' '))
 

@@ -169,11 +169,12 @@ export const seeded = (seed: number) => {
 };
 
 // ---------------------------------------------------------------- formula, written term by term
-export type Tok = { s: string; key?: string; color?: string; bold?: boolean; sub?: boolean };
+/** `vec` draws a small arrow over the token: the letter is an arrow (three numbers), not one number. */
+export type Tok = { s: string; key?: string; color?: string; bold?: boolean; sub?: boolean; sup?: boolean; vec?: boolean };
 /** Monospace formula: every token sits at a computed x, so connectors and brackets can find it. */
 export const layoutFormula = (toks: Tok[], cx: number, size: number) => {
   const cw = size * 0.6;
-  const wOf = (t: Tok) => [...t.s].length * cw * (t.sub ? 0.6 : 1);
+  const wOf = (t: Tok) => [...t.s].length * cw * (t.sub || t.sup ? 0.6 : 1);
   const n = toks.reduce((a, t) => a + wOf(t), 0);
   let x = cx - n / 2;
   return toks.map((t) => {
@@ -197,9 +198,16 @@ export const Formula: React.FC<{
         {L.map((t, i) => {
           const isA = !!t.key && t.key === active;
           const isLit = !t.key || (lit?.has(t.key) ?? true);
+          const o = isA ? 1 : isLit ? 0.95 : 0.4, fs = t.sub || t.sup ? size * 0.6 : size, ty = t.sub ? y + size * 0.22 : t.sup ? y - size * 0.42 : y;
+          const ay = ty - fs * 0.9, ax0 = t.x + fs * 0.06, ax1 = t.x + t.w - fs * 0.04, hh = fs * 0.1;
           return (
-            <text key={i} x={t.x} y={t.sub ? y + size * 0.22 : y} style={mono(isA ? 1 : isLit ? 0.95 : 0.4, t.sub ? size * 0.6 : size, { fill: t.color ?? C.line, fontWeight: t.bold || isA ? 700 : 400 })}
-              filter={isA ? "url(#glow)" : undefined} xmlSpace="preserve">{t.s}</text>
+            <g key={i} filter={isA ? "url(#glow)" : undefined}>
+              <text x={t.x} y={ty} style={mono(o, fs, { fill: t.color ?? C.line, fontWeight: t.bold || isA ? 700 : 400 })} xmlSpace="preserve">{t.s}</text>
+              {t.vec && (
+                <path d={`M${ax0},${ay} L${ax1},${ay} M${ax1 - hh * 1.3},${ay - hh} L${ax1},${ay} L${ax1 - hh * 1.3},${ay + hh}`}
+                  stroke={t.color ?? C.line} strokeWidth={Math.max(1.5, fs * (isA ? 0.06 : 0.045))} fill="none" strokeLinecap="round" strokeLinejoin="round" opacity={o} />
+              )}
+            </g>
           );
         })}
       </g>

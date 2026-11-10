@@ -6,6 +6,12 @@
     "studio": "remotion studio",
     "render:pilot": "remotion render DecelPilot out/pilot-deceleration.mp4",
     "render:ep01": "remotion render Ep01 out/ep01-drag.mp4",
+    "render:ep02": "remotion render Ep02 out/ep02-point-mass.mp4",
+    "scenes:ep02": "node render-scenes.mjs 2",
+    "render:ep03": "remotion render Ep03 out/ep03-wind.mp4",
+    "scenes:ep03": "node render-scenes.mjs 3",
+    "render:ep04": "remotion render Ep04 out/ep04-spin-earth.mp4",
+    "scenes:ep04": "node render-scenes.mjs 4",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

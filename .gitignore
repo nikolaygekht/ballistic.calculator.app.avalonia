@@ -30,6 +30,7 @@ secrets/
 # The 30 s ad (claude/video/ad30/) and the thumbnails: signed links and generated images stay local.
 claude/video/ad30/urls.json
 claude/video/thumbs/*.jpg
+claude/video/education/thumbs/*.jpg
 claude/video/thumbs/crops/
 claude/video/thumbs/frames/
 # Python venv for the YouTube uploader (claude/video/build/upload.py).
