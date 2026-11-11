@@ -2,7 +2,8 @@
 (profile secrets/chrome-youtube, already signed in) - used because the API login is blocked.
 Each video: file, title, description, thumbnail, series playlist, not made for kids, tags, PRIVATE, Save.
 Every field is read back after it is set; a mismatch stops the run. Video links go to youtube-ids.json.
-Usage: claude/video/.venv/Scripts/python.exe claude/video/build/studio_upload.py ep05 ep06 ..."""
+Usage: claude/video/.venv/Scripts/python.exe claude/video/build/studio_upload.py ep05 ep06 ...
+The physics series (texts in education/YouTube.md, its own playlist): ... studio_upload.py phys01 phys02 ..."""
 import json, pathlib, re, sys
 from playwright.sync_api import sync_playwright
 
@@ -12,13 +13,27 @@ IDS = VIDEO / "youtube-ids.json"
 CHANNEL = "UC2IsMmLsSDYhi1RaGmhXbBQ"
 PLAYLIST = "Ballistic Calculator 2"
 MD = (VIDEO / "youtube-metadata.md").read_text(encoding="utf-8")
+EDU = VIDEO / "education"
+PHYS_PLAYLIST = "How Ballistic Calculator 2 Works"
+PHYS_MD = (EDU / "YouTube.md").read_text(encoding="utf-8").replace("\r\n", "\n")
 
 
-def meta(n):
-    sec = MD[MD.index(f"## Episode {n}\n"):]
+def meta(n, md=MD):
+    sec = md[md.index(f"## Episode {n}\n"):]
     nxt = re.search(r"\n## ", sec[3:]); sec = sec[: nxt.start() + 3] if nxt else sec
     return (re.search(r"\*\*Title:\*\* (.+)", sec).group(1).strip(), re.search(r"```\n(.*?)\n```", sec, re.S).group(1),
-            re.search(r"\*\*Tags\*\*[^:]*: (.+)", sec).group(1).strip())
+            re.search(r"\*\*Tags(?:\*\*[^:]*:|:\*\*) (.+)", sec).group(1).strip())
+
+
+def files(name):
+    """(video, thumbnail, (title, description, tags), playlist) of an app episode (epNN) or a physics one (physNN)."""
+    if name.startswith("phys"):
+        n = int(name[4:])
+        row = re.search(rf"^\| {n} \| `([^`]+)` \| `([^`]+)` \|", PHYS_MD, re.M)
+        return EDU / row.group(1), EDU / row.group(2), meta(n, PHYS_MD), PHYS_PLAYLIST
+    n = int(name[2:])
+    stem = next(p.stem for p in KIT.glob(f"{n:02d} *.mp4"))
+    return KIT / f"{stem}.mp4", KIT / f"{stem}.jpg", meta(n), PLAYLIST
 
 
 def norm(s):
@@ -26,14 +41,12 @@ def norm(s):
 
 
 def upload(pg, name):
-    n = int(name[2:])
-    stem = next(p.stem for p in KIT.glob(f"{n:02d} *.mp4"))
-    title, desc, tags = meta(n)
-    print(f"{name}: {stem}", flush=True)
+    video, thumb, (title, desc, tags), playlist = files(name)
+    print(f"{name}: {video.name} - {title}", flush=True)
     pg.goto(f"https://studio.youtube.com/channel/{CHANNEL}/videos/upload?d=ud")
     d = pg.locator("ytcp-uploads-dialog")
     d.locator("input[name=Filedata]").wait_for(state="attached", timeout=30000)
-    d.locator("input[name=Filedata]").set_input_files(str(KIT / f"{stem}.mp4"))
+    d.locator("input[name=Filedata]").set_input_files(str(video))
     d.locator("#title-textarea #textbox").wait_for(timeout=90000)
     pg.wait_for_timeout(2500)
     for sel, text in (("#title-textarea #textbox", title), ("#description-textarea #textbox", desc)):
@@ -43,16 +56,16 @@ def upload(pg, name):
         if norm(box.inner_text()) != norm(text):
             raise SystemExit(f"   {sel}: text did not stick")
     print("   title, description ok", flush=True)
-    d.locator("input#file-loader").set_input_files(str(KIT / f"{stem}.jpg"))
+    d.locator("input#file-loader").set_input_files(str(thumb))
     pg.wait_for_timeout(3000)
     d.locator("ytcp-video-metadata-playlists ytcp-text-dropdown-trigger").click()
     dlg = pg.locator("ytcp-playlist-dialog")
-    li = dlg.locator("li").filter(has_text=PLAYLIST).first
+    li = dlg.locator("li").filter(has_text=playlist).first
     li.wait_for(timeout=15000)
     if li.locator("[role=checkbox]").first.get_attribute("aria-checked") != "true":
         li.locator("ytcp-checkbox-lit").first.click(); pg.wait_for_timeout(600)
     dlg.locator("ytcp-button.done-button").click(); pg.wait_for_timeout(1200)
-    if PLAYLIST not in d.locator("ytcp-video-metadata-playlists").inner_text():
+    if playlist not in d.locator("ytcp-video-metadata-playlists").inner_text():
         raise SystemExit("   playlist not set")
     kids = d.locator("tp-yt-paper-radio-button[name=VIDEO_MADE_FOR_KIDS_NOT_MFK]")
     if kids.get_attribute("aria-checked") != "true":

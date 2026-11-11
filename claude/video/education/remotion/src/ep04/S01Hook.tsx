@@ -1,5 +1,6 @@
-// Scene 1 — hook: the dot grows a nose and starts to spin (3 100 turns per second). Four small effects from the first
-// series' table: two from the spin, two from the turning Earth. A dot can't do any of it: the camera swings round and
+// Scene 1 — hook: so far the bullet was a dot — gravity, drag and the wind, one small arrow each. Then the dot grows a
+// nose and starts to spin (3 100 turns per second). Four small effects a dot doesn't have: two from the spin, two from
+// the turning Earth. A dot can't do any of it: the camera swings round and
 // the dot's whole path turns out to stand in one upright plane. The program flies the dot first, then the four bend the
 // path out of that plane, one by one; at the target, the four add up, tip to tail. Title.
 import React from "react";
@@ -11,7 +12,8 @@ import { cue } from "./timing";
 
 const N = 1;
 const T = {
-  dot: cue(N, "dot"), nose: cue(N, "nose"), spins: cue(N, "spins"), turns: cue(N, "3"), four: cue(N, "four small"),
+  gravity: cue(N, "gravity"), drag: cue(N, "drag"), wind: cue(N, "wind carry"), enough: cue(N, "enough"),
+  dot: cue(N, "not a dot"), nose: cue(N, "nose"), spins: cue(N, "spins"), turns: cue(N, "3"), four: cue(N, "four small"),
   spin: cue(N, "Two of them"), earth: cue(N, "Two come"), cant: cue(N, "can't spin"), first: cue(N, "flies the dot"),
   adds: cue(N, "adds"), today: cue(N, "Today"), counts: cue(N, "counts"),
 };
@@ -30,7 +32,7 @@ export const S01Hook: React.FC = () => {
   const cam = face > 0 ? mixCam(BACK, FACE, face) : mixCam(SIDE, BACK, swing);
 
   // the bullet's ride: slowly to 380 m while it is shown, then the dot runs to the end
-  const xB = lerp(0, 380, ramp(v, -0.3, T.cant + 0.5));
+  const xB = v < T.dot ? lerp(0, 300, ramp(v, -0.3, T.dot + 0.3)) : lerp(lerp(0, 300, ramp(T.dot, -0.3, T.dot + 0.3)), 380, ramp(v, T.dot, T.cant + 0.5 - T.dot));
   const xD = lerp(xB, 1000, ramp(v, T.first - 0.2, 1.8));
   const x = v < T.first - 0.2 ? xB : xD;
   const kE = [0, 1, 2, 3].map((i) => ramp(v, T.adds - 0.25 + i * 0.7, 0.75, ease));
@@ -40,7 +42,7 @@ export const S01Hook: React.FC = () => {
   const grow = ramp(v, T.nose - 0.3, 0.6) * (1 - ramp(v, T.cant - 0.1, 0.6));
   const marks = ramp(v, T.spins - 0.1, 0.5);
   const spin = Math.max(0, v - T.spins) * 1.4;
-  const pathO = 0.25 + 0.75 * ramp(v, T.first - 0.2, 0.5);
+  const pathO = Math.max(0.6 * (1 - ramp(v, T.dot, 0.6)), 0.25) + 0.75 * ramp(v, T.first - 0.2, 0.5);
 
   const anyE = kE[0];
   const stageO = 1 - face;                             // the path and the ground step back while we look at the target
@@ -71,6 +73,28 @@ export const S01Hook: React.FC = () => {
         {anyE > 0 && <Path3 c={cam} k={[0, 0, 0, 0]} o={0.45 * stageO} w={2} dash="8 8" />}
         <Path3 c={cam} k={kE} p={x / 1000} o={pathO * stageO} w={anyE > 0 ? 4 : 2.5} stakes={swing * ramp(v, T.first, 0.8)} shadow={swing * ramp(v, T.first, 0.8)} glow={anyE > 0.5} />
 
+        {/* so far: a dot, pulled down by gravity, slowed by the drag, carried sideways by the wind */}
+        {(() => {
+          const fO = 1 - ramp(v, T.dot - 0.3, 0.5), a = (slope * Math.PI) / 180;
+          const back: P = [head[0] - 110 * Math.cos(a), head[1] + 110 * Math.sin(a)];
+          return (
+            <g opacity={fO}>
+              <g opacity={ramp(v, T.gravity - 0.1, 0.4)}>
+                <Arrow x1={head[0]} y1={head[1] + 14} x2={head[0]} y2={head[1] + 120} w={5} head={16} />
+                <text x={head[0] + 16} y={head[1] + 112} style={label(0.9, { fontSize: 24 })}>GRAVITY</text>
+              </g>
+              <g opacity={ramp(v, T.drag - 0.1, 0.4)}>
+                <Arrow x1={head[0] - 14 * Math.cos(a)} y1={head[1] + 14 * Math.sin(a)} x2={back[0]} y2={back[1]} color={C.drag} w={5} head={16} />
+                <text x={back[0] - 12} y={back[1] - 18} textAnchor="end" style={label(0.9, { fontSize: 24, fill: C.drag })}>DRAG</text>
+              </g>
+              <g opacity={ramp(v, T.wind - 0.1, 0.4)}>
+                <Arrow x1={head[0] + 10} y1={head[1] - 10} x2={head[0] + 75} y2={head[1] - 75} w={4} head={14} />
+                <text x={head[0] + 82} y={head[1] - 82} style={label(0.9, { fontSize: 24 })}>WIND · TO THE SIDE</text>
+              </g>
+            </g>
+          );
+        })()}
+        <text x={head[0]} y={head[1] - 130} textAnchor="middle" style={label(ramp(v, 0.2, 0.5) * (1 - ramp(v, T.dot - 0.3, 0.5)) * 0.85, { fontSize: 24 })}>SO FAR: A DOT</text>
         {/* the dot that grows a nose and spins */}
         <Dot x={head[0]} y={head[1]} r={lerp(11, 4, grow)} o={(1 - grow) * (1 - face)} />
         <g transform={`translate(${head[0]},${head[1]}) scale(${lerp(0.2, 1, grow)}) translate(${-head[0]},${-head[1]})`}>
@@ -129,6 +153,10 @@ export const S01Hook: React.FC = () => {
       })}
       <text x={540} y={950} textAnchor="middle" style={label(ramp(v, T.spin, 0.4) * (1 - ramp(v, T.cant, 0.4)) * 0.8, { fontSize: 22 })}>FROM THE SPIN</text>
       <text x={1380} y={950} textAnchor="middle" style={label(ramp(v, T.earth, 0.4) * (1 - ramp(v, T.cant, 0.4)) * 0.8, { fontSize: 22 })}>FROM THE TURNING EARTH</text>
+      <text x={960} y={110} textAnchor="middle" style={label(ramp(v, T.gravity - 0.2, 0.4) * (1 - ramp(v, T.dot - 0.4, 0.4)) * 0.85, { fontSize: 28 })}>
+        GRAVITY<tspan opacity={ramp(v, T.drag - 0.1, 0.4)}> · DRAG</tspan><tspan opacity={ramp(v, T.wind - 0.1, 0.4)}> · WIND</tspan><tspan opacity={ramp(v, T.enough - 0.1, 0.4)}> · ENOUGH FOR MOST OF THE FLIGHT</tspan>
+      </text>
+      <text x={960} y={110} textAnchor="middle" style={label(ramp(v, T.dot - 0.2, 0.4) * (1 - ramp(v, T.four - 0.4, 0.4)) * 0.85, { fontSize: 28 })}>A REAL BULLET IS NOT A DOT</text>
       <text x={960} y={110} textAnchor="middle" style={label(ramp(v, T.cant - 0.2, 0.4) * (1 - ramp(v, T.first - 0.5, 0.4)) * 0.85, { fontSize: 28 })}>
         A DOT CAN'T SPIN · IT DOESN'T KNOW THE EARTH TURNS
       </text>
@@ -139,7 +167,7 @@ export const S01Hook: React.FC = () => {
 
       <g opacity={titleO}>
         <text x={960} y={190} textAnchor="middle" style={label(1, { fontSize: 76, letterSpacing: "0.22em", fontWeight: 200 })}>WHAT A DOT CAN'T DO</text>
-        <text x={960} y={250} textAnchor="middle" style={label(0.6, { fontSize: 22 })}>PHYSICS OF A BALLISTIC CALCULATOR · 4</text>
+        <text x={960} y={250} textAnchor="middle" style={label(0.6, { fontSize: 22 })}>HOW BALLISTIC CALCULATOR 2 WORKS · 4</text>
       </g>
     </Scene>
   );

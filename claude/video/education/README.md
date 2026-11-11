@@ -70,7 +70,7 @@ and `ep02.json`. Timing: `public/voice/ep03/timing.json` (`python voice/build_ti
 
 ## Episode 4 — "What a dot can't do: spin, wind and the turning Earth"
 
-`Ep04`, ~9 min, nine scenes in `remotion/src/ep04/` (`S01Hook`, `S02WhySpin`, `S03Stability`, `S04Drift`,
+`Ep04`, ~10 min, nine scenes in `remotion/src/ep04/` (`S01Hook`, `S02WhySpin`, `S03Stability`, `S04Drift`,
 `S05Jump`, `S06Coriolis`, `S07EastWest`, `S08Honest`, `S09Outro`). Every effect goes physics first (no numbers),
 then whose formula the program uses (Miller, Litz — fitted; Coriolis, Eötvös — from physics), then each term, then
 our numbers. The precession rule is scene 2's clock face seen from behind ("a push → a quarter turn further, the

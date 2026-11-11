@@ -11,7 +11,7 @@ import { cue } from "./timing";
 const N = 2;
 const T = {
   why: cue(N, "why"), air: cue(N, "The air pushes"), notMid: cue(N, "not in the middle"), closer: cue(N, "closer"), center: cue(N, "center of mass"),
-  off: cue(N, "turns a little off"), more: cue(N, "even more"), tumble: cue(N, "tumble"), arrow: cue(N, "arrow"), feathers: cue(N, "feathers"),
+  off: cue(N, "turns a little off"), more: cue(N, "even more"), tumble: cue(N, "tumble"), arrow: cue(N, "arrow"), feathers: cue(N, "feathers"), moves: cue(N, "move the"), turnsBack: cue(N, "turns it back"),
   none: cue(N, "has none"), spins: cue(N, "so it spins"), strange: cue(N, "strange rule"), top: cue(N, "spinning top"), push: cue(N, "Push it"),
   fall: cue(N, "doesn't fall"), side: cue(N, "moves to the side"), bullet: cue(N, "For the bullet"), behind: cue(N, "from behind"),
   clockwise: cue(N, "clockwise"), left: cue(N, "Push the nose"), up: cue(N, "goes up"), pushUp: cue(N, "Push it up"), right: cue(N, "to the right"),
@@ -46,8 +46,8 @@ export const S02WhySpin: React.FC = () => {
 
   // ---- B: an arrow rights itself; the bullet spins instead
   const bO = ramp(v, T.arrow - 0.3, 0.5) * (1 - ramp(v, T.spins - 0.6, 0.4));
-  const ta = Math.max(0, v - (T.feathers + 0.2));
-  const arrowDeg = v < T.feathers + 0.2 ? lerp(0, 14, ramp(v, T.arrow + 0.2, 0.6)) : 14 * Math.exp(-1.6 * ta) * Math.cos(4.2 * ta);
+  const ta = Math.max(0, v - (T.turnsBack - 0.1));
+  const arrowDeg = v < T.turnsBack - 0.1 ? lerp(0, 14, ramp(v, T.arrow + 0.2, 0.6)) : 14 * Math.exp(-1.6 * ta) * Math.cos(4.2 * ta);
   const b2O = ramp(v, T.spins - 0.4, 0.5) * (1 - ramp(v, T.strange - 0.4, 0.5));
   const marks = ramp(v, T.spins - 0.2, 0.5);
   const spin = Math.max(0, v - T.spins) * 1.5;
@@ -139,7 +139,7 @@ export const S02WhySpin: React.FC = () => {
             const cy = 760, cg = 1010, cpX = 680;
             const a = (-arrowDeg * Math.PI) / 180;
             const rot = (x: number): P => [cg + (x - cg) * Math.cos(a), cy + (x - cg) * Math.sin(a)];
-            const cp = rot(cpX), pushK = ramp(v, T.feathers - 0.1, 0.4) * clamp01(arrowDeg / 6);
+            const cp = rot(cpX), pushK = ramp(v, T.moves - 0.1, 0.4) * clamp01(arrowDeg / 6);
             const arc: P[] = Array.from({ length: 13 }, (_, i) => { const q = Math.PI + a - 0.1 + (i / 12) * 0.3; return [cg + 420 * Math.cos(q), cy + 420 * Math.sin(q)]; });
             return (
               <>
@@ -155,7 +155,7 @@ export const S02WhySpin: React.FC = () => {
                   ))}
                   <circle cx={cg} cy={cy} r={10} fill={C.bg} stroke={C.line} strokeWidth={3} />
                 </g>
-                <g opacity={ramp(v, T.feathers - 0.2, 0.4)}>
+                <g opacity={ramp(v, T.moves - 0.2, 0.4)}>
                   <circle cx={cp[0]} cy={cp[1]} r={8} fill={C.drag} />
                   {pushK > 0.05 && (
                     <g filter="url(#glow)">
@@ -165,7 +165,7 @@ export const S02WhySpin: React.FC = () => {
                   )}
                   {pushK > 0.3 && <ArcHead pts={arc} />}
                 </g>
-                <text x={CX} y={cy + 120} textAnchor="middle" style={label(ramp(v, T.feathers, 0.4) * 0.95, { fontSize: 24 })}>AN ARROW: FEATHERS PUT THE PUSH BEHIND THE CENTRE → IT TURNS BACK</text>
+                <text x={CX} y={cy + 180} textAnchor="middle" style={label(ramp(v, T.moves, 0.4) * 0.95, { fontSize: 24 })}>AN ARROW: FEATHERS PUT THE PUSH BEHIND THE CENTRE → IT TURNS BACK</text>
               </>
             );
           })()}

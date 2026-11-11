@@ -29,7 +29,7 @@ const Frame: React.FC<{ n: number; lines: string[]; size: number; sub: string; c
         <Defs />
         {children}
         <text x={110} y={150} style={{ fontFamily: FONT, fontWeight: 500, fontSize: 34, letterSpacing: "0.24em", fill: C.line, opacity: 0.7 }}>
-          PHYSICS OF A BALLISTIC CALCULATOR · {n}
+          HOW BALLISTIC CALCULATOR 2 WORKS · {n}
         </text>
         {lines.map((s, i) => (
           <text key={i} x={104} y={y0 + i * size * 1.02} style={{ ...TITLE, fontSize: size }} filter="url(#glow)">{s}</text>

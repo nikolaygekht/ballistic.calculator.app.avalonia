@@ -69,7 +69,7 @@ const XSection: React.FC<{ c: P; r: number; lat: number; o: number; parts: numbe
       <line x1={c[0]} y1={c[1] - r - 140} x2={c[0]} y2={c[1] + r + 40} stroke={C.line} strokeWidth={2} strokeDasharray="8 8" opacity={0.6} />
       <ArrowA x={c[0]} y={c[1] - r - 20} a={-Math.PI / 2} len={130} w={4} head={16} />
       <TurnArrow x={c[0]} y={c[1] - r - 90} rx={60} k={1} ph={0.1} w={2.5} />
-      <text x={c[0] + 80} y={c[1] - r - 100} style={label(0.85, { fontSize: 20 })}>THE EARTH'S TURN</text>
+      <text x={c[0] - 80} y={c[1] - r - 100} textAnchor="end" style={label(0.85, { fontSize: 20 })}>THE EARTH'S TURN</text>
       <circle cx={p[0]} cy={p[1]} r={10} fill={C.line} filter="url(#glow)" />
       <text x={p[0] + 26} y={p[1] + 34} style={mono(0.9, 26, { fontWeight: 600 })}>{Math.round(lat)}°</text>
       {/* the same turn arrow, moved to our point, then its two parts */}
@@ -253,9 +253,9 @@ export const S07EastWest: React.FC = () => {
       </g>
       {/* cos φ: the wheel part of the turn */}
       <g opacity={xsO}>
-        <XSection c={[700, 700]} r={230} lat={lat} o={1} parts={1} carO={0.35} wheelHot={1} />
-        <text x={1480} y={640} textAnchor="middle" style={mono(1, 36, { fontWeight: 600 })}>φ = {Math.round(lat)}° · cos φ = {Math.cos(rad(lat)).toFixed(2)}</text>
-        <text x={1480} y={690} textAnchor="middle" style={label(0.7, { fontSize: 20 })}>THE WHEEL PART OF THE TURN</text>
+        <XSection c={[900, 720]} r={230} lat={lat} o={1} parts={1} carO={0.35} wheelHot={1} />
+        <text x={1580} y={640} textAnchor="middle" style={mono(1, 36, { fontWeight: 600 })}>φ = {Math.round(lat)}° · cos φ = {Math.cos(rad(lat)).toFixed(2)}</text>
+        <text x={1580} y={690} textAnchor="middle" style={label(0.7, { fontSize: 20 })}>THE WHEEL PART OF THE TURN</text>
       </g>
       {/* sin(Az): a compass rose */}
       <g opacity={roseO}>

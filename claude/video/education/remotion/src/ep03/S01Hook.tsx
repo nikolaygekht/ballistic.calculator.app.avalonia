@@ -52,7 +52,7 @@ export const S01Hook: React.FC = () => {
       <g opacity={ramp(v, T.today, 0.5)}>
         <clipPath id="t3hClip"><rect x={0} y={150} width={lerp(300, 1800, titleK)} height={200} /></clipPath>
         <text x={960} y={300} textAnchor="middle" clipPath="url(#t3hClip)" style={label(1, { fontSize: 100, letterSpacing: "0.32em", fontWeight: 200 })}>THE WIND</text>
-        <text x={960} y={360} textAnchor="middle" style={label(ramp(v, T.wind + 0.6, 0.6) * 0.6, { fontSize: 22 })}>PHYSICS OF A BALLISTIC CALCULATOR · 3</text>
+        <text x={960} y={360} textAnchor="middle" style={label(ramp(v, T.wind + 0.6, 0.6) * 0.6, { fontSize: 22 })}>HOW BALLISTIC CALCULATOR 2 WORKS · 3</text>
       </g>
     </Scene>
   );

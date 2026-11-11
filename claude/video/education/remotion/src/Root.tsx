@@ -12,6 +12,7 @@ import * as T3 from "./ep03/timing";
 import { Episode4, SceneWithVoice4 } from "./ep04/Episode4";
 import * as T4 from "./ep04/timing";
 import { Thumb } from "./thumbs/Thumbs";
+import { EndCard, END_SECONDS } from "./EndCard";
 import { FPS, H, W } from "./theme";
 
 // Hold every frame until both variable fonts are loaded, so no frame renders in a fallback face.
@@ -45,6 +46,9 @@ export const Root: React.FC = () => (
     {T4.SCENES.map((s) => (
       <Composition key={`e4-${s.n}`} id={`Ep04-S${String(s.n).padStart(2, "0")}`} component={SceneWithVoice4} defaultProps={{ n: s.n }}
         durationInFrames={T4.sceneFrames(s.n)} fps={FPS} width={W} height={H} />
+    ))}
+    {[1, 2, 3, 4].map((ep) => (
+      <Composition key={`end-${ep}`} id={`Ep0${ep}-End`} component={EndCard} defaultProps={{ ep }} durationInFrames={END_SECONDS * FPS} fps={FPS} width={W} height={H} />
     ))}
     {[1, 2, 3, 4].map((ep) => (
       <Composition key={`th-${ep}`} id={`Thumb0${ep}`} component={Thumb} defaultProps={{ ep }} durationInFrames={1} fps={FPS} width={W} height={H} />

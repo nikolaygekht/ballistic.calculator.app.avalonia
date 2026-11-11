@@ -1,5 +1,5 @@
 // Render an episode scene by scene, then join the scenes: the video without re-encoding, the sound as one track.
-// Usage: node render-scenes.mjs <ep> [scene ...] [--all]
+// Usage: node render-scenes.mjs <ep> [scene ...] [end] [--all]
 //   node render-scenes.mjs 2 4 10   re-render scenes 4 and 10 of episode 2 (plus any scene not rendered yet), then join
 //   node render-scenes.mjs 2 --all  re-render every scene
 // Scenes go to out/epNN/sNN.mp4; the joined episode to the same file as `npm run render:epNN`.
@@ -37,6 +37,19 @@ for (let n = 1; ; n++) {
   await renderMedia({ serveUrl, composition, codec: "h264", outputLocation: file, concurrency: CONCURRENCY,
     imageFormat: "jpeg", jpegQuality: 92, chromiumOptions: { gl: "angle" } });
   console.log(`${id}: ${composition.durationInFrames} frames in ${((Date.now() - t) / 1000).toFixed(0)} s`);
+}
+
+// The silent end card for YouTube's end screen goes last (re-rendered with --all, or with "end" in the list).
+{
+  const composition = await selectComposition({ serveUrl, id: `Ep${pad(ep)}-End` });
+  const file = path.join(dir, "end.mp4");
+  files.push(file);
+  seconds.push(composition.durationInFrames / composition.fps);
+  if (all || args.includes("end") || !fs.existsSync(file)) {
+    await renderMedia({ serveUrl, composition, codec: "h264", outputLocation: file, concurrency: CONCURRENCY, enforceAudioTrack: true,
+      imageFormat: "jpeg", jpegQuality: 92, chromiumOptions: { gl: "angle" } });
+    console.log(`Ep${pad(ep)}-End: ${composition.durationInFrames} frames`);
+  }
 }
 
 // Video: the scenes joined as they are. Audio: never joined as AAC — every AAC piece starts and ends on its own

@@ -1,4 +1,4 @@
-# YouTube — "Physics of a Ballistic Calculator"
+# YouTube — "How Ballistic Calculator 2 Works"
 
 Ready-to-paste text for the four physics episodes, their playlist and the channel. Uploads go the same way as
 the app series (YouTube Studio driven over CDP, see `claude/video/youtube.md`): **private first**, the user
@@ -6,14 +6,19 @@ publishes by hand. Category Science & Technology, language English, not made for
 
 | # | File | Thumbnail | Length |
 |---|---|---|---|
-| 1 | `remotion/out/ep01-drag.mp4` | `thumbs/ep01.jpg` | 5:18 |
-| 2 | `remotion/out/ep02-point-mass.mp4` | `thumbs/ep02.jpg` | 7:53 |
-| 3 | `remotion/out/ep03-wind.mp4` | `thumbs/ep03.jpg` | 3:53 |
-| 4 | `remotion/out/ep04-spin-earth.mp4` | `thumbs/ep04.jpg` | 9:01 |
+| 1 | `remotion/out/ep01-drag.mp4` | `thumbs/ep01.jpg` | 5:24 |
+| 2 | `remotion/out/ep02-point-mass.mp4` | `thumbs/ep02.jpg` | 7:59 |
+| 3 | `remotion/out/ep03-wind.mp4` | `thumbs/ep03.jpg` | 3:59 |
+| 4 | `remotion/out/ep04-spin-earth.mp4` | `thumbs/ep04.jpg` | 10:03 |
 
 Thumbnails: 1280×720 JPEG, `node thumbs.mjs [1 2 3 4]` in `remotion/` (compositions `Thumb01`…`Thumb04`,
 `src/thumbs/Thumbs.tsx`). Chapter times are the scene starts of the current cuts; re-check them after any
 re-render that changes a scene's length.
+
+End screen: every episode ends on a silent 6 s end card (`src/EndCard.tsx`, composition `EpNN-End`) with two
+dashed frames where the end-screen elements go — 620 × 349 px at (125, 424) and (1175, 424) of 1920 × 1080, set
+for the last 6 s. Left: the previous episode (ep. 1: this playlist). Right: the next episode (ep. 4: the app
+series playlist "Ballistic Calculator 2", the video tutorials).
 
 ## Channel description
 
@@ -23,7 +28,7 @@ there too if it is regenerated).
 ```
 Ballistic Calculator 2 is a free, open-source ballistic calculator for Windows, Linux and macOS.
 
-Two series live here. "Ballistic Calculator 2" shows how to use the program, one step at a time: a first trajectory, weather and wind, spin drift, Coriolis, scope reticles, measured drag curves, shooting at an angle, and building your own drag table. "Physics of a Ballistic Calculator" is the inside view: animated explainers of what the program actually computes — drag and the ballistic coefficient, the point-mass model, the wind, and the small effects a point mass can't do: spin drift, aerodynamic jump and the turning Earth.
+Two series live here. "Ballistic Calculator 2" shows how to use the program, one step at a time: a first trajectory, weather and wind, spin drift, Coriolis, scope reticles, measured drag curves, shooting at an angle, and building your own drag table. "How Ballistic Calculator 2 Works" is the inside view: animated explainers of what the program actually computes — drag and the ballistic coefficient, the point-mass model, the wind, and the small effects a point mass can't do: spin drift, aerodynamic jump and the turning Earth.
 
 The calculations come from the open-source BallisticCalculator library for .NET. It is a full model of the bullet's flight, but still a model: always check it against your own shots.
 
@@ -35,7 +40,7 @@ Library: https://github.com/gehtsoft-usa/BallisticCalculator1
 
 ## Playlist
 
-**Title:** Physics of a Ballistic Calculator
+**Title:** How Ballistic Calculator 2 Works
 
 ```
 What a ballistic calculator actually computes, drawn and animated, with every formula on screen. Four episodes: drag and the ballistic coefficient; the point-mass model that flies the bullet as a dot; the wind; and what a dot can't do — spin drift, aerodynamic jump, Coriolis and the east–west effect, and how the program adds them on top. The numbers come from the open-source BallisticCalculator library, the engine of Ballistic Calculator 2.
@@ -43,7 +48,7 @@ What a ballistic calculator actually computes, drawn and animated, with every fo
 
 ## Episode 1
 
-**Title:** Drag: where the velocity goes — Physics of a Ballistic Calculator, ep. 1
+**Title:** Drag: where the velocity goes — How Ballistic Calculator 2 Works, ep. 1
 
 **Description:**
 
@@ -75,7 +80,7 @@ User guide: https://nikolaygekht.github.io/ballistic.calculator.app.avalonia
 
 ## Episode 2
 
-**Title:** How a dot flies: the point-mass model — Physics of a Ballistic Calculator, ep. 2
+**Title:** How a dot flies: the point-mass model — How Ballistic Calculator 2 Works, ep. 2
 
 **Description:**
 
@@ -108,7 +113,7 @@ User guide: https://nikolaygekht.github.io/ballistic.calculator.app.avalonia
 
 ## Episode 3
 
-**Title:** The wind: why 3.35 m and not 9 — Physics of a Ballistic Calculator, ep. 3
+**Title:** The wind: why 3.35 m and not 9 — How Ballistic Calculator 2 Works, ep. 3
 
 **Description:**
 
@@ -133,7 +138,7 @@ User guide: https://nikolaygekht.github.io/ballistic.calculator.app.avalonia
 
 ## Episode 4
 
-**Title:** What a dot can't do: spin and the turning Earth — Physics of a Ballistic Calculator, ep. 4
+**Title:** What a dot can't do: spin and the turning Earth — How Ballistic Calculator 2 Works, ep. 4
 
 **Description:**
 
@@ -144,14 +149,14 @@ Why a bullet has to spin, and the rule of a spinning top: a push turns it a quar
 
 Chapters:
 0:00 Intro
-0:38 Why a bullet spins
-1:39 Stability
-2:48 Spin drift
-3:57 Aerodynamic jump
-5:17 The turning Earth: Coriolis
-6:21 East and west
-7:45 The honest part
-8:29 Outro
+0:50 Why a bullet spins
+1:57 Stability
+3:06 Spin drift
+4:15 Aerodynamic jump
+6:13 The turning Earth: Coriolis
+7:17 East and west
+8:42 The honest part
+9:26 Outro
 
 The method behind it:
 The empirical corrections: https://nikolaygekht.github.io/ballistic.calculator.app.avalonia/method/empirical-corrections.html

@@ -97,7 +97,7 @@ export const S04Outro: React.FC = () => {
         <text x={960} y={190} textAnchor="middle" style={label(ramp(v, T.next, 0.5) * 0.7, { fontSize: 26 })}>NEXT TIME</text>
         <clipPath id="t3Clip"><rect x={0} y={200} width={lerp(300, 1800, titleK)} height={140} /></clipPath>
         <text x={960} y={300} textAnchor="middle" clipPath="url(#t3Clip)" style={label(1, { fontSize: 70, letterSpacing: "0.26em", fontWeight: 200 })}>WHAT A DOT CAN'T DO</text>
-        <text x={960} y={352} textAnchor="middle" style={label(ramp(v, T.fixes - 0.4, 0.6) * 0.6, { fontSize: 22 })}>PHYSICS OF A BALLISTIC CALCULATOR · 4</text>
+        <text x={960} y={352} textAnchor="middle" style={label(ramp(v, T.fixes - 0.4, 0.6) * 0.6, { fontSize: 22 })}>HOW BALLISTIC CALCULATOR 2 WORKS · 4</text>
       </g>
     </Scene>
   );

@@ -103,7 +103,7 @@ export const S01Hook: React.FC = () => {
             clipPath="url(#titleClip)">DRAG</text>
           <clipPath id="titleClip"><rect x={0} y={600} width={lerp(560, 1500, ramp(v, T_TODAY, 1.2))} height={300} /></clipPath>
           <text x={960} y={840} textAnchor="middle" style={label(ramp(v, T_TODAY + 0.8, 0.6) * 0.6, { fontSize: 22 })}>
-            PHYSICS OF A BALLISTIC CALCULATOR · 1
+            HOW BALLISTIC CALCULATOR 2 WORKS · 1
           </text>
         </g>
       </g>

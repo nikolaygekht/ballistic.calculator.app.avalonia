@@ -423,9 +423,11 @@ and staying. At "our shot" the formula is written again with our numbers in it, 
 The "dot first, then the four on top" picture (scenes 1 and 8) and the jump (scene 5) are drawn on a 2.5D stage
 (`src/ep04/stage3d.tsx`): a hand-projected camera, a ground grid, the dot's path standing in its upright plane.
 
-## 1. Hook  (~40 s)
+## 1. Hook  (~50 s)
 
-{ANIM: The dot from episode 2 flies its path. It grows a body: the bullet, nose first. Rifling marks on its
+{ANIM: So far, a dot: it flies its path, side view ("SO FAR: A DOT"), and three small arrows show what we gave
+it, one by one with the words: GRAVITY down, DRAG back (coral), WIND to the side; caption "GRAVITY · DRAG · WIND ·
+ENOUGH FOR MOST OF THE FLIGHT". "A REAL BULLET IS NOT A DOT": it grows a body, nose first. Rifling marks on its
 side start to run around it; counter "3 100 turns per second". Four small cards line up under the path: SPIN
 DRIFT, AERODYNAMIC JUMP (a little bullet with a ring arrow round it), CORIOLIS, EAST–WEST (a little globe).
 "A dot can't spin": the camera swings round to behind and above the shooter; the path turns out to stand in one
@@ -436,18 +438,19 @@ times bigger"). The camera turns to face the target: the dot's hit, then the fou
 right, jump 11 cm up, Coriolis 10 cm right, east–west 12 cm up — to the real hit. Title.}
 
 VOICE:
-A real bullet is not a dot. It has a nose, and it spins. Our bullet leaves the barrel at more than three thousand turns per second.
-In episode four of the first series, you saw four small effects in the table. Two of them come from the spin: spin drift and aerodynamic jump. Two come from the turning Earth.
+So far in this series, our bullet was a dot: a point with a mass and no shape. We watched gravity pull it down, the drag slow it, and the wind carry it to the side. That's enough for most of the flight. But a real bullet is not a dot. It has a nose, and it spins. Our bullet leaves the barrel at more than three thousand turns per second.
+There are four small effects that a dot doesn't have. Two of them come from the spin: spin drift and aerodynamic jump. Two come from the turning Earth.
 A dot can't spin, and it doesn't know that the Earth turns. So the program flies the dot first, and then adds these four effects on top. Today, let's see where each of them comes from, and how the program counts it.
 
-## 2. Why a bullet spins  (~75 s)
+## 2. Why a bullet spins  (~65 s)
 
 {ANIM: The bullet, side view, big. A dot marks the centre of mass ("CENTRE OF MASS"). The air hits it; the
 air's push draws as one arrow, attached in front of the centre of mass ("THE AIR PUSHES HERE"). The nose
 tips a little: the push grows and tips it more; a ghost of the bullet tumbles over. Then the bullet and an
 arrow, one above the other, in the same picture language: the bullet tipped, the push (coral) in front of the
-centre of mass, a curved arrow — it turns further; the arrow tipped the same way, the feathers put the push behind
-the centre of mass, a curved arrow — it turns back, and it straightens. Back to the bullet: the rifling marks run,
+centre of mass, a curved arrow — it turns further; the arrow tipped the same way; on "the feathers move the air's
+push" the push (coral) appears behind the centre of mass with a curved arrow, and on "turns it back" the arrow
+straightens. Back to the bullet: the rifling marks run,
 it spins.
 Then a spinning top: a push from the side, and the top's axis moves at a right angle to the push.
 Then the bullet seen from behind, as a clock face, spinning clockwise (a curved arrow). A push on the nose
@@ -458,7 +461,7 @@ scenes 4 and 5.}
 VOICE:
 First, why does a bullet need to spin at all?
 The air pushes on the bullet. But this push is not in the middle of the bullet. It's closer to the nose, in front of the centre of mass. So if the nose turns a little off the path, the air turns it even more. Without help, the bullet would tumble.
-An arrow solves this with feathers at the back. A bullet has none. So it spins.
+An arrow solves this with feathers at the back. The feathers move the air's push behind the centre of mass. So when the arrow turns, the air turns it back. A bullet has none. So it spins.
 A spinning thing has a strange rule. Look at a spinning top. Push it, and it doesn't fall the way you pushed. It moves to the side instead.
 For the bullet, it works like this. Look at it from behind. It spins clockwise, like the hands of a clock. Push the nose to the left, to nine o'clock, and the nose goes up, to twelve. Push it up, and it goes to the right, to three. Always a quarter turn further, the same way the bullet spins.
 Remember this rule. Both spin effects come from it.
@@ -518,33 +521,43 @@ There are only two things in it. The stability, from the last formula. A more st
 And the time of flight. It has the power one point eight three, so the drift grows faster than the time. And the time itself grows faster than the distance, because the bullet slows down.
 At five hundred metres, it's about five centimetres. At one kilometre, thirty-one.
 
-## 5. Aerodynamic jump  (~100 s)
+## 5. Aerodynamic jump  (~120 s)
 
 {ANIM: The 2.5D stage at the muzzle, seen from behind and above: the barrel, its dashed line, wind streaks
-from the right, and v_air from episode 3, tilted towards the wind ("0.33° · DRAWN ×20"). The bullet comes out
-with its nose along the barrel: the gap between the nose and v_air glows ("THE NOSE IS OFF THE AIR FLOW"). The
-air's push (coral) points left, away from the wind; the nose goes up — at a right angle, seen in space. Then the
-nose circles the air flow in a shrinking spiral, starting at 9 o'clock, clockwise from behind. A coral arrow on
-the bullet: the air pushes where the nose points. An inset "THE NOSE, FROM BEHIND" draws the spiral, and a coral
-arrow "THE PUSHES, ADDED UP" grows and turns up — a quarter turn on from the start, the rule again. The path
-bends near the muzzle, then flies on straight, tilted up ("TILTED UP BY A TINY ANGLE").
+from the right, and v_air from episode 3 through the bullet, tilted towards the wind ("0.33° · DRAWN ×50"). Four
+phases, each on its words. (1) The bullet leaves exactly along the barrel's dashed line; the gap between the nose
+and v_air glows ("THE NOSE IS OFF THE AIR FLOW"). (2) The air's push (coral) grows to the left, away from the
+wind; a pale ghost of the bullet turns its nose left ("WITHOUT SPIN, THE NOSE WOULD TURN LEFT · BUT IT SPINS"),
+the real nose stays. (3) "Push left, and the nose goes up": the ghost fades, the nose goes up (9 → 12 o'clock
+round the air flow) and holds, the bullet still at the muzzle. (4) Only on "swings up and around": the bullet
+flies, the nose circles the air flow and the swings die out. One coral arrow on the bullet, "THE PUSHES, ADDED
+UP", grows and points up (no arrow for the push of the moment, no inset). The camera pulls back: the path flies on
+straight, tilted up. Then it comes close again: the nose lies on v_air ("THE NOSE TURNS INTO THE AIR FLOW · AND
+STAYS THERE"), the coral arrow stops growing ("THE AIR FLOWS ALONG THE BULLET: NOTHING PUSHES THE NOSE", "SO THE
+JUMP HAPPENS ONLY AT THE START", "THE DRAG STILL PUSHES SIDEWAYS · NOTHING PUSHES UP ANY MORE").
 The line writes the second Litz formula:
 
 $$\Delta y' = \left(0.01\,S_g - 0.0024\,L + 0.032\right)\cdot W_\perp$$
 
-S_g glows with a small "+", L with a small "−", then W⊥ with a sideways wind arrow. Unit captions: "W⊥ — side
-wind at the muzzle, mph", "Δy' — an angle, MOA". The angle opens as a thin wedge from the muzzle: 5.6 cm at
+S_g glows with a small "+", L with a small "−", then W⊥ with a sideways wind arrow. The legend names every
+letter, the last row the sign: "± — + FROM THE RIGHT · − FROM THE LEFT", with a "+ ←" and a "− →" under W⊥. The angle opens as a thin wedge from the muzzle: 5.6 cm at
 500 m, 11 cm at 1000 m, on a straight line. At the 1000 m target, the hit moves 11 cm up, while a long arrow
-shows the 3.35 m sideways push. Then the same shot with a wind that starts at 300 m: no jump.}
+shows the 3.35 m sideways push. Then the wind turns round (the streaks reverse): the hit slides to 11 cm down,
+the sideways arrow swings to the right, a small side view of the path tilts down ("A WIND FROM THE LEFT: THE JUMP
+GOES DOWN"); "A LEFT-HAND TWIST: ALL THE OTHER WAY ROUND". Last, a side view muzzle → 1000 m with the wind
+changing at 300 m: the path gets a small new kink up ("A SMALL NEW PUSH"), "THE PROGRAM COUNTS ONLY THE WIND AT
+THE MUZZLE".}
 
 VOICE:
 The second spin effect is aerodynamic jump. It needs a side wind, and it happens right at the muzzle.
 Remember the last episode: with a side wind, the velocity through the air is tilted. Our wind from the right tilts it by a third of a degree. But the bullet leaves the barrel with its nose along the barrel. So from the very first moment, the nose is a little off the air flow.
 The air pushes the nose further away from the wind, to the left. And the rule again: push left, and the nose goes up. The nose swings up and around a few times, and these swings quickly die out. But while they last, the air pushes the bullet up. So the path stays tilted up by a tiny angle.
-This is another formula by Bryan Litz. The stability adds a little. The length takes a little away. And all of it is multiplied by the side wind.
+Then the nose turns into the air flow, and it stays there. Now the air flows straight along the bullet, so it doesn't push the nose any more. That's why the jump happens only at the start. The drag still pushes the bullet sideways the whole way. But nothing pushes it up any more.
+This is another formula by Bryan Litz. The stability adds a little. The length takes a little away. And all of it is multiplied by the side wind. The side wind has a sign: plus from the right, and minus from the left.
 The answer is not a distance. It's an angle, and it's the same at every distance. So the jump grows in a straight line.
 Four and a half metres per second from the right, and at one kilometre the bullet hits eleven centimetres higher. While the wind itself moves it more than three metres to the side.
-And only the wind at the muzzle counts. A wind that starts three hundred metres away gives no jump at all.
+A wind from the left does the opposite. The nose ends up on the other side of the air flow, the push goes right, and the jump goes down: eleven centimetres lower. And with a left-hand twist, it's all the other way round.
+And if the wind changes further down the range, the air flow turns again, and the nose gets a small new push. But it's small, so the program counts only the wind at the muzzle.
 
 ## 6. The turning Earth: Coriolis  (~85 s)
 
@@ -615,7 +628,10 @@ So for a long shot, get a good drag curve first. It matters more than anything e
 
 {ANIM: The four motifs in a row: the drag arrow, the dot with its steps, the wind, and the spinning bullet. Link
 to the documentation. The last episode, so a farewell: the motifs fade, "THANK YOU FOR WATCHING", then "GOOD DAYS
-AT THE RANGE · ACCURATE SHOTS"; last, the line-drawn bullet flies in and hits the centre of a target.}
+AT THE RANGE · ACCURATE SHOTS". On "Now…" the author's own photo at the shooting bench draws itself as lines in a
+panel on the right; on "I wish you…" the real photo comes up under the lines, toned, with a slow push-in, and a
+small "THE AUTHOR". Last, a picture of its own on the left, apart from the photo: the dot flies its arc in from
+the left edge and hits the centre of a line target.}
 
 VOICE:
 So that's what's inside the calculator: the drag, the dot, the wind, and a few small fixes on top. If you want the formulas, they're all in the documentation. The link is in the description.

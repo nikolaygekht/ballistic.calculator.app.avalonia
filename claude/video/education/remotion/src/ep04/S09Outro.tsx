@@ -1,7 +1,9 @@
 // Scene 9 — the series outro: the four motifs in a row (the drag, the dot and its steps, the wind, the spinning
 // bullet), the link to the documentation. The last episode, so a farewell: thank you for watching, good days at the
-// range, a steady wind — and the dot flies in and hits the centre of a target.
-import React from "react";
+// range, a steady wind. The author's own photo at the bench draws itself as lines, then turns into the photo. Apart
+// from it, on the left, the last shot: the dot flies its arc in from the left and hits the centre of a line target.
+import React, { useEffect, useState } from "react";
+import { continueRender, delayRender, staticFile } from "remotion";
 import { C, ease, lerp, ramp } from "../theme";
 import { Bullet, P, Pen, label } from "../lib/draw";
 import { Dot, Scene, SpinBullet, useVoiceTime } from "./kit";
@@ -14,13 +16,30 @@ const T = {
   wish: cue(N, "wish"), range: cue(N, "range"), steady: cue(N, "steady"), every: cue(N, "every shot"), aimed: cue(N, "aimed"),
 };
 
-const TGT: P = [1400, 800];
-const START: P = [420, 830];
-const arc = (k: number): P => [lerp(START[0], TGT[0], k), lerp(START[1], TGT[1], k) - 190 * 4 * k * (1 - k)];
+// the photo panel (the photo is cropped to 16:9 at 1920 × 1080); the last shot is its own picture on the left
+const PH = { x: 680, y: 300, w: 1180, h: 664 };
+const TGT: P = [360, 780];
+const START: P = [-20, TGT[1] - 40];
+const arc = (k: number): P => [lerp(START[0], TGT[0], k), lerp(START[1], TGT[1], k) - 90 * 4 * k * (1 - k)];
+const PHOTO = staticFile("ep04/range-photo.jpg"), LINES = staticFile("ep04/range-lines.png");
+/** Hold the frame until both pictures are loaded (an SVG <image> is not tracked by Remotion). */
+const usePictures = () => {
+  const [h] = useState(() => delayRender("outro photo"));
+  useEffect(() => {
+    let left = 2;
+    const done = () => { if (--left === 0) continueRender(h); };
+    [PHOTO, LINES].forEach((src) => { const i = new Image(); i.onload = done; i.onerror = done; i.src = src; });
+  }, [h]);
+};
 
 export const S09Outro: React.FC = () => {
   const v = useVoiceTime();
+  usePictures();
   const m = (t: number) => ramp(v, t - 0.3, 0.5);
+  const reveal = ramp(v, T.now - 0.2, 2.8, ease);                   // the lines draw in from the shooter to the muzzle
+  const photoO = ramp(v, T.wish - 0.4, 1.6, ease);
+  const linesO = ramp(v, T.now - 0.2, 0.4) * (1 - 0.8 * photoO);
+  const zoom = 1 + 0.05 * ramp(v, T.wish - 0.4, 14);
   const away = 1 - ramp(v, T.end - 0.2, 0.9);           // the motifs make room for the farewell
   const Y = 560;
   const fly = ramp(v, T.every - 0.2, T.aimed + 0.2 - (T.every - 0.2), (x) => x);
@@ -30,7 +49,7 @@ export const S09Outro: React.FC = () => {
     <Scene n={N}>
       <g opacity={away}>
         <text x={960} y={200} textAnchor="middle" style={label(ramp(v, -0.3, 0.8), { fontSize: 54, letterSpacing: "0.22em", fontWeight: 200 })}>INSIDE THE CALCULATOR</text>
-        <text x={960} y={256} textAnchor="middle" style={label(ramp(v, 0.2, 0.8) * 0.6, { fontSize: 22 })}>PHYSICS OF A BALLISTIC CALCULATOR · 1 – 4</text>
+        <text x={960} y={256} textAnchor="middle" style={label(ramp(v, 0.2, 0.8) * 0.6, { fontSize: 22 })}>HOW BALLISTIC CALCULATOR 2 WORKS · 1 – 4</text>
 
         {/* the drag */}
         <g opacity={m(T.drag)}>
@@ -62,10 +81,27 @@ export const S09Outro: React.FC = () => {
         <text x={960} y={890} textAnchor="middle" style={label(m(T.link) * 0.7, { fontSize: 24 })}>THE LINK IS IN THE DESCRIPTION</text>
       </g>
 
-      {/* ---------------- the farewell */}
-      <text x={960} y={300} textAnchor="middle" style={label(ramp(v, T.thank - 0.2, 0.9), { fontSize: 72, letterSpacing: "0.2em", fontWeight: 200 })}>THANK YOU FOR WATCHING</text>
-      <text x={960} y={370} textAnchor="middle" style={label(ramp(v, T.now - 0.1, 0.8) * 0.7, { fontSize: 24 })}>NOW YOU KNOW WHERE THE NUMBERS COME FROM</text>
-      <text x={960} y={480} textAnchor="middle" style={label(1, { fontSize: 32, letterSpacing: "0.18em" })}>
+      {/* ---------------- the farewell: the author at the bench, first as lines, then as the photo */}
+      <defs>
+        <filter id="phFeather" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="22" /></filter>
+        <mask id="phMask" maskUnits="userSpaceOnUse" x={0} y={0} width={1920} height={1080}>
+          <rect x={PH.x + 26} y={PH.y + 26} width={PH.w - 52} height={PH.h - 52} fill="white" filter="url(#phFeather)" />
+        </mask>
+        <clipPath id="phWipe"><rect x={PH.x + PH.w * (1 - reveal) - 40} y={PH.y - 20} width={PH.w * reveal + 80} height={PH.h + 40} /></clipPath>
+      </defs>
+      <g mask="url(#phMask)">
+        <g transform={`translate(${PH.x + PH.w / 2},${PH.y + PH.h / 2}) scale(${zoom}) translate(${-(PH.x + PH.w / 2)},${-(PH.y + PH.h / 2)})`}>
+          <image href={PHOTO} x={PH.x} y={PH.y} width={PH.w} height={PH.h} opacity={photoO * 0.92} preserveAspectRatio="xMidYMid slice" />
+          <g clipPath="url(#phWipe)">
+            <image href={LINES} x={PH.x} y={PH.y} width={PH.w} height={PH.h} opacity={linesO} preserveAspectRatio="xMidYMid slice" />
+          </g>
+        </g>
+      </g>
+      <text x={PH.x + PH.w - 20} y={PH.y + PH.h + 36} textAnchor="end" style={label(photoO * 0.55, { fontSize: 16 })}>THE AUTHOR</text>
+
+      <text x={960} y={150} textAnchor="middle" style={label(ramp(v, T.thank - 0.2, 0.9), { fontSize: 64, letterSpacing: "0.2em", fontWeight: 200 })}>THANK YOU FOR WATCHING</text>
+      <text x={960} y={208} textAnchor="middle" style={label(ramp(v, T.now - 0.1, 0.8) * 0.7, { fontSize: 24 })}>NOW YOU KNOW WHERE THE NUMBERS COME FROM</text>
+      <text x={960} y={266} textAnchor="middle" style={label(1, { fontSize: 28, letterSpacing: "0.18em" })}>
         <tspan opacity={ramp(v, T.range - 0.5, 0.6)}>GOOD DAYS AT THE RANGE</tspan>
         <tspan opacity={ramp(v, T.steady - 0.2, 0.6)}> · A STEADY WIND</tspan>
         <tspan opacity={ramp(v, T.every - 0.2, 0.6)}> · ACCURATE SHOTS</tspan>
@@ -73,9 +109,9 @@ export const S09Outro: React.FC = () => {
 
       {/* the last shot: the dot flies in and hits the centre */}
       <g opacity={ramp(v, T.wish - 0.2, 0.8)}>
-        {[150, 100, 50].map((r, i) => <circle key={r} cx={TGT[0]} cy={TGT[1]} r={r} fill="none" stroke={C.line} strokeWidth={i === 2 ? 2.5 : 1.5} opacity={0.35 + 0.2 * i} />)}
-        <line x1={TGT[0] - 170} y1={TGT[1]} x2={TGT[0] + 170} y2={TGT[1]} stroke={C.line} strokeWidth={1} opacity={0.25} />
-        <line x1={TGT[0]} y1={TGT[1] - 170} x2={TGT[0]} y2={TGT[1] + 170} stroke={C.line} strokeWidth={1} opacity={0.25} />
+        {[110, 72, 36].map((r, i) => <circle key={r} cx={TGT[0]} cy={TGT[1]} r={r} fill="none" stroke={C.line} strokeWidth={i === 2 ? 2.5 : 1.5} opacity={0.35 + 0.2 * i} />)}
+        <line x1={TGT[0] - 130} y1={TGT[1]} x2={TGT[0] + 130} y2={TGT[1]} stroke={C.line} strokeWidth={1} opacity={0.25} />
+        <line x1={TGT[0]} y1={TGT[1] - 130} x2={TGT[0]} y2={TGT[1] + 130} stroke={C.line} strokeWidth={1} opacity={0.25} />
       </g>
       {fly > 0 && (
         <>
@@ -85,7 +121,7 @@ export const S09Outro: React.FC = () => {
       )}
       {hit > 0 && (
         <>
-          <circle cx={TGT[0]} cy={TGT[1]} r={14 + 160 * ease(Math.min(1, hit / 1.2))} fill="none" stroke={C.line} strokeWidth={2} opacity={Math.max(0, 1 - hit / 1.2)} />
+          <circle cx={TGT[0]} cy={TGT[1]} r={14 + 120 * ease(Math.min(1, hit / 1.2))} fill="none" stroke={C.line} strokeWidth={2} opacity={Math.max(0, 1 - hit / 1.2)} />
           <circle cx={TGT[0]} cy={TGT[1]} r={14} fill={C.line} filter="url(#glowBig)" />
         </>
       )}

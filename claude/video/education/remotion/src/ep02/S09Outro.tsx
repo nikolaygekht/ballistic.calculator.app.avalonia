@@ -53,7 +53,7 @@ export const S09Outro: React.FC = () => {
         <text x={960} y={190} textAnchor="middle" style={label(ramp(v, T.next, 0.5) * 0.7, { fontSize: 26 })}>NEXT TIME</text>
         <clipPath id="t3wClip"><rect x={0} y={200} width={lerp(300, 1800, titleK)} height={140} /></clipPath>
         <text x={960} y={300} textAnchor="middle" clipPath="url(#t3wClip)" style={label(1, { fontSize: 80, letterSpacing: "0.3em", fontWeight: 200 })}>THE WIND</text>
-        <text x={960} y={352} textAnchor="middle" style={label(ramp(v, T.wind + 0.4, 0.6) * 0.6, { fontSize: 22 })}>PHYSICS OF A BALLISTIC CALCULATOR · 3</text>
+        <text x={960} y={352} textAnchor="middle" style={label(ramp(v, T.wind + 0.4, 0.6) * 0.6, { fontSize: 22 })}>HOW BALLISTIC CALCULATOR 2 WORKS · 3</text>
       </g>
     </Scene>
   );

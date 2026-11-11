@@ -86,7 +86,7 @@ export const S01Hook: React.FC = () => {
       <g opacity={ramp(v, T.today, 0.4)}>
         <clipPath id="t2Clip"><rect x={0} y={150} width={lerp(300, 1700, titleK)} height={200} /></clipPath>
         <text x={960} y={290} textAnchor="middle" clipPath="url(#t2Clip)" style={label(1, { fontSize: 100, letterSpacing: "0.32em", fontWeight: 200 })}>HOW A DOT FLIES</text>
-        <text x={960} y={350} textAnchor="middle" style={label(ramp(v, T.today + 0.8, 0.6) * 0.6, { fontSize: 22 })}>PHYSICS OF A BALLISTIC CALCULATOR · 2</text>
+        <text x={960} y={350} textAnchor="middle" style={label(ramp(v, T.today + 0.8, 0.6) * 0.6, { fontSize: 22 })}>HOW BALLISTIC CALCULATOR 2 WORKS · 2</text>
       </g>
     </Scene>
   );
