@@ -12,6 +12,9 @@ added to it afterwards, where each formula comes from, and what each one needs f
 [The 3DOF model](3dof-model.md) integrates two forces, drag and gravity. Everything else in the reported
 drop and windage arrives here.
 
+Prefer to watch? Episode 4 of [How Ballistic Calculator 2 Works](https://www.youtube.com/playlist?list=PLT6PFXXzutKY), the animated video series, covers
+this article with every formula on screen.
+
 Mathematical symbols are set as inline math; code identifiers, literal values and units stay in `code` style.
 
 ## What "applied at output" means

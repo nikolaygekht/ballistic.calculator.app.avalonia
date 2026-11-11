@@ -71,6 +71,8 @@ The method behind it:
 The ballistic coefficient: https://nikolaygekht.github.io/ballistic.calculator.app.avalonia/method/ballistic-coefficient.html
 Choosing a drag model: https://nikolaygekht.github.io/ballistic.calculator.app.avalonia/choosing-a-drag-model.html
 
+The whole series: https://www.youtube.com/playlist?list=PLT6PFXXzutKY
+
 Ballistic Calculator 2 is free and open source (Windows, Linux, macOS):
 Download: https://github.com/nikolaygekht/ballistic.calculator.app.avalonia/releases
 User guide: https://nikolaygekht.github.io/ballistic.calculator.app.avalonia
@@ -104,6 +106,8 @@ The method behind it:
 The 3DOF point-mass model: https://nikolaygekht.github.io/ballistic.calculator.app.avalonia/method/3dof-model.html
 Integration modes: https://nikolaygekht.github.io/ballistic.calculator.app.avalonia/method/integration.html
 
+The whole series: https://www.youtube.com/playlist?list=PLT6PFXXzutKY
+
 Ballistic Calculator 2 is free and open source (Windows, Linux, macOS):
 Download: https://github.com/nikolaygekht/ballistic.calculator.app.avalonia/releases
 User guide: https://nikolaygekht.github.io/ballistic.calculator.app.avalonia
@@ -128,6 +132,8 @@ Chapters:
 
 The method behind it:
 The 3DOF point-mass model: https://nikolaygekht.github.io/ballistic.calculator.app.avalonia/method/3dof-model.html
+
+The whole series: https://www.youtube.com/playlist?list=PLT6PFXXzutKY
 
 Ballistic Calculator 2 is free and open source (Windows, Linux, macOS):
 Download: https://github.com/nikolaygekht/ballistic.calculator.app.avalonia/releases
@@ -161,6 +167,8 @@ Chapters:
 The method behind it:
 The empirical corrections: https://nikolaygekht.github.io/ballistic.calculator.app.avalonia/method/empirical-corrections.html
 What the model includes: https://nikolaygekht.github.io/ballistic.calculator.app.avalonia/what-the-model-includes.html
+
+The whole series: https://www.youtube.com/playlist?list=PLT6PFXXzutKY
 
 Ballistic Calculator 2 is free and open source (Windows, Linux, macOS):
 Download: https://github.com/nikolaygekht/ballistic.calculator.app.avalonia/releases

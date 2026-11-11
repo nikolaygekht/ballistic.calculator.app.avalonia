@@ -18,6 +18,10 @@ model includes, and where to learn the ballistics behind the inputs.
 🎬 **[Video tutorials](https://www.youtube.com/playlist?list=PLLcWDVvDdkbU)** — a series of short episodes on
 YouTube that build one shot step by step, from the first trajectory to your own drag table.
 
+🎓 **[How Ballistic Calculator 2 Works](https://www.youtube.com/playlist?list=PLT6PFXXzutKY)** — four animated videos on what the program computes, with
+every formula on screen: drag and the ballistic coefficient, the point-mass model, the wind, and the effects a
+point mass cannot do — spin drift, aerodynamic jump and the turning Earth.
+
 ## Goals
 
 **Accuracy comparable to commercial and 4DOF solvers.** The engine is a 3DOF (point-mass) integration with the

@@ -12,6 +12,9 @@ math: true
 This is a method article. It documents the mathematics the engine runs, not how to fill in the dialog —
 for that, see [Choosing a drag model](../choosing-a-drag-model.md).
 
+Prefer to watch? Episode 1 of [How Ballistic Calculator 2 Works](https://www.youtube.com/playlist?list=PLT6PFXXzutKY), the animated video series, covers
+this article with every formula on screen.
+
 Mathematical symbols are set as inline math; code identifiers, literal values and units stay in `code` style.
 
 ## Start with the drag force, not the coefficient

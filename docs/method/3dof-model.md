@@ -13,6 +13,9 @@ Two forces are integrated: drag and gravity. Everything else the output contains
 aerodynamic jump, earth rotation — is added afterwards in closed form and is the subject of a separate
 article, [the empirical corrections](empirical-corrections.md).
 
+Prefer to watch? Episodes 2 and 3 of [How Ballistic Calculator 2 Works](https://www.youtube.com/playlist?list=PLT6PFXXzutKY), the animated video series, cover
+this article with every formula on screen.
+
 This is a method article. For the plain-language account of which effects are in and which are out, read
 [What the model includes](../what-the-model-includes.md) instead.
 

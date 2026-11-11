@@ -40,13 +40,27 @@ def norm(s):
     return re.sub(r"\s+", " ", s).strip()
 
 
+def set_file(pg, loc, path):
+    """Give a file input a local file. Playwright over CDP refuses files above 50 MB ("browser not co-located"),
+    so hand the path to Chrome itself: DOM.setFileInputFiles on the element, found through a marker attribute."""
+    loc.evaluate("e => e.setAttribute('data-upload-target', '1')")
+    cdp = pg.context.new_cdp_session(pg)
+    find = """(function f(root) {
+        const e = root.querySelector('[data-upload-target]'); if (e) return e;
+        for (const n of root.querySelectorAll('*')) if (n.shadowRoot) { const r = f(n.shadowRoot); if (r) return r; }
+        return null; })(document)"""
+    obj = cdp.send("Runtime.evaluate", {"expression": find})["result"]
+    cdp.send("DOM.setFileInputFiles", {"files": [str(path)], "objectId": obj["objectId"]})
+    cdp.detach()
+
+
 def upload(pg, name):
     video, thumb, (title, desc, tags), playlist = files(name)
     print(f"{name}: {video.name} - {title}", flush=True)
     pg.goto(f"https://studio.youtube.com/channel/{CHANNEL}/videos/upload?d=ud")
     d = pg.locator("ytcp-uploads-dialog")
     d.locator("input[name=Filedata]").wait_for(state="attached", timeout=30000)
-    d.locator("input[name=Filedata]").set_input_files(str(video))
+    set_file(pg, d.locator("input[name=Filedata]"), video)
     d.locator("#title-textarea #textbox").wait_for(timeout=90000)
     pg.wait_for_timeout(2500)
     for sel, text in (("#title-textarea #textbox", title), ("#description-textarea #textbox", desc)):
@@ -98,8 +112,9 @@ def upload(pg, name):
     print(f"   saved PRIVATE: {link}", flush=True)
 
 
-with sync_playwright() as p:
-    br = p.chromium.connect_over_cdp("http://127.0.0.1:9222")
-    pg = [pg for c in br.contexts for pg in c.pages if "studio.youtube.com" in pg.url][0]
-    for name in sys.argv[1:]:
-        upload(pg, name)
+if __name__ == "__main__":
+    with sync_playwright() as p:
+        br = p.chromium.connect_over_cdp("http://127.0.0.1:9222")
+        pg = [pg for c in br.contexts for pg in c.pages if "studio.youtube.com" in pg.url][0]
+        for name in sys.argv[1:]:
+            upload(pg, name)

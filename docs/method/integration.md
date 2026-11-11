@@ -15,6 +15,10 @@ physics. The equations being discretized are in [the 3DOF model](3dof-model.md);
 afterwards are the same in both schemes and are covered in
 [the empirical corrections](empirical-corrections.md).
 
+Prefer to watch? Episode 2 of [How Ballistic Calculator 2 Works](https://www.youtube.com/playlist?list=PLT6PFXXzutKY)
+animates the idea of a time step with the simplest scheme; the schemes the program actually runs are the subject
+of this article.
+
 Mathematical symbols are set as inline math; code identifiers, literal values and units stay in `code` style.
 
 ## Why there is a step at all

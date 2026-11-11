@@ -98,6 +98,8 @@ planned** — the structure is listed in full so you can see what is coming and 
 **How the calculation works** — the mathematics, for readers who want to check a number rather than
 take it on trust
 
+Prefer to watch? [How Ballistic Calculator 2 Works](https://www.youtube.com/playlist?list=PLT6PFXXzutKY) — four animated videos with the same formulas.
+
 - [The ballistic coefficient](method/ballistic-coefficient.md) — the drag law itself, what a BC divides,
   and why one number cannot describe a bullet at every velocity
 - [The 3DOF point-mass model](method/3dof-model.md) — the two forces that are integrated, the frame they
