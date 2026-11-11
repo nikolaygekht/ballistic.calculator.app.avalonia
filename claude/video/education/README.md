@@ -70,11 +70,11 @@ and `ep02.json`. Timing: `public/voice/ep03/timing.json` (`python voice/build_ti
 
 ## Episode 4 — "What a dot can't do: spin, wind and the turning Earth"
 
-`Ep04`, ~8.7 min, nine scenes in `remotion/src/ep04/` (`S01Hook`, `S02WhySpin`, `S03Stability`, `S04Drift`,
+`Ep04`, ~9 min, nine scenes in `remotion/src/ep04/` (`S01Hook`, `S02WhySpin`, `S03Stability`, `S04Drift`,
 `S05Jump`, `S06Coriolis`, `S07EastWest`, `S08Honest`, `S09Outro`). Every effect goes physics first (no numbers),
 then whose formula the program uses (Miller, Litz — fitted; Coriolis, Eötvös — from physics), then each term, then
 our numbers. The precession rule is scene 2's clock face seen from behind ("a push → a quarter turn further, the
-way it spins"); it stays as a corner badge in scenes 4–5. Eötvös (scene 7) is told with the Earth's turn split in two: a carousel around the vertical (sin φ, Coriolis) and a wheel on its edge around the north–south line (cos φ): the ground in the east keeps dropping, so a shot east falls slower (g × 0.992), west faster; the carousel / "thrown outwards" story is wrong once the bullet outruns the ground (790 > 329 m/s). `src/ep04/kit.tsx`: the spinning bullet, the clock face,
+way it spins"); it stays as a corner badge in scenes 4–5. `src/ep04/stage3d.tsx` is a hand-projected 2.5D stage (camera, ground grid, the dot's path in its upright plane, the four effects bending it); scenes 1, 5 and 8 use it. Every formula carries a `Legend` (letter — meaning, unit) and, at "our shot", a line with our numbers substituted. Eötvös (scene 7) is told with the Earth's turn split in two: a carousel around the vertical (sin φ, Coriolis) and a wheel on its edge around the north–south line (cos φ): the ground in the east keeps dropping, so a shot east falls slower (g × 0.992), west faster; the carousel / "thrown outwards" story is wrong once the bullet outruns the ground (790 > 329 m/s). `src/ep04/kit.tsx`: the spinning bullet, the clock face,
 `MathLine` (formulas with fractions; `Tok.sup` for powers), the S_g gauge, the globe, the effect cards; drift numbers
 come from Litz's formula on `ep02.json` times, net of the 100 m windage zero (31 cm at 1000 m, as the engine).
 Timing: `python voice/build_timing.py --ep 4 03b 04b 08b`. `node render-scenes.mjs 4` → `out/ep04-spin-earth.mp4`.

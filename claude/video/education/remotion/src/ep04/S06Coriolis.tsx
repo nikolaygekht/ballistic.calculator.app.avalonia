@@ -5,7 +5,7 @@
 import React from "react";
 import { C, ease, lerp, ramp, window01 } from "../theme";
 import { P, Pen, label, mono } from "../lib/draw";
-import { Globe, Item, MathLine, Scene, Title, TurnArrow, k_, t_, useVoiceTime } from "./kit";
+import { Globe, Item, Legend, MathLine, Scene, Title, TurnArrow, k_, t_, useVoiceTime } from "./kit";
 import { cue } from "./timing";
 
 const N = 6;
@@ -20,14 +20,21 @@ const T = {
 const FX = 960, FY = 190, FS = 64;
 const COR: Item[] = [{ toks: [t_("Δz = "), k_("Ω", "om"), t_(" · "), k_("sin φ", "sin"), t_(" · "), k_("R", "R"), t_(" · "), k_("t", "t")] }];
 
-// the carousel: centre, radius, the throw
-const CC: P = [960, 600], CR = 320, OMEGA = 0.4;   // rad/s, drawn
+// the carousel: centre, radius, the throw. An honest throw: the thrower aims straight at the friend, and the ball also
+// takes the rim's own velocity. Seen from above it flies straight; on the carousel it starts at the friend and bends right.
+const CC: P = [960, 600], CR = 320, OMEGA = 0.155;   // rad/s, drawn: about 27° while the ball flies
 const A: P = [CC[0], CC[1] + CR], B0: P = [CC[0], CC[1] - CR];
-const FLY = 3.2;                                      // s from the rim to the rim
+const AIM = 210;                                      // px/s towards the friend, as the thrower sees it
+const RIM = OMEGA * CR;                               // the rim's own velocity at the thrower: to the right on screen
+const FLY = (2 * CR * AIM) / (AIM * AIM + RIM * RIM); // s from the rim to the rim
 const rot = (p: P, a: number): P => {                 // rotate about the centre, y-down (positive a = clockwise on screen)
   const dx = p[0] - CC[0], dy = p[1] - CC[1];
   return [CC[0] + dx * Math.cos(a) - dy * Math.sin(a), CC[1] + dx * Math.sin(a) + dy * Math.cos(a)];
 };
+/** The ball from above (the ground's frame), q seconds after the throw. */
+const ball = (q: number): P => [A[0] + RIM * q, A[1] - AIM * q];
+/** The same ball on the carousel's floor (the carousel's frame, as at the throw). */
+const onFloor = (q: number): P => rot(ball(q), OMEGA * q);
 
 export const S06Coriolis: React.FC = () => {
   const v = useVoiceTime();
@@ -35,11 +42,13 @@ export const S06Coriolis: React.FC = () => {
   const carO = ramp(v, T.carousel - 0.5, 0.5) * (1 - ramp(v, T.pole - 0.5, 0.5));
   const t0 = T.thrw + 0.4;
   const s = Math.max(0, Math.min(FLY, v - t0));
-  const ride = ramp(v, T.someone - 0.2, 0.8, ease);                // 0 = from above, fixed; 1 = riding the carousel
-  const disk = -OMEGA * (v - T.carousel);                            // the carousel's angle (counterclockwise)
-  const ball = (q: number): P => [lerp(A[0], B0[0], q / FLY), lerp(A[1], B0[1], q / FLY)];
-  // the ball's path on the carousel: undo the carousel's turn since the throw (clockwise on screen: it bends right)
-  const ridePath: P[] = Array.from({ length: 41 }, (_, i) => { const q = (s * i) / 40; return rot(ball(q), OMEGA * q); });
+  // the carousel turns counterclockwise; once the ball is down, it stops, so nobody runs away from the picture
+  const tStop = t0 + FLY;
+  const turned = -OMEGA * (Math.min(v, tStop) - t0);                 // the carousel's angle since the throw
+  const ride = ramp(v, T.someone - 0.3, 1.4, ease);                   // the camera turns with the carousel
+  const view = -turned * ride;                                        // the camera's turn, radians (clockwise on screen)
+  const trace: P[] = Array.from({ length: 41 }, (_, i) => rot(onFloor((s * i) / 40), turned));
+  const missO = ramp(v, T.someone + 1.2, 0.5);
   // ---- the globe
   const gO = ramp(v, T.pole - 0.4, 0.5);
   const G: P = [lerp(960, 560, ramp(v, T.omega - 0.6, 0.8, ease)), lerp(600, 640, ramp(v, T.omega - 0.6, 0.8, ease))];
@@ -63,43 +72,33 @@ export const S06Coriolis: React.FC = () => {
 
       {/* ---------------- the carousel */}
       <g opacity={carO}>
-        <text x={60} y={70} style={label(0.6, { fontSize: 20 })}>A CAROUSEL, FROM ABOVE</text>
-        {/* from above: the carousel turns, the ball flies straight */}
-        <g opacity={1 - ride}>
-          <g transform={`rotate(${(disk * 180) / Math.PI},${CC[0]},${CC[1]})`}>
+        <text x={60} y={70} style={label(0.6, { fontSize: 20 })}>{ride < 0.5 ? "A CAROUSEL, FROM ABOVE" : "RIDING THE CAROUSEL"}</text>
+        {/* one picture: from above the carousel turns and the ball flies straight, leaving a chalk line on the floor;
+            then the camera turns with the carousel, and the chalk line is the ball's path for the people on it */}
+        <g transform={`rotate(${(view * 180) / Math.PI},${CC[0]},${CC[1]})`}>
+          <g transform={`rotate(${(turned * 180) / Math.PI},${CC[0]},${CC[1]})`}>
             <circle cx={CC[0]} cy={CC[1]} r={CR} fill="none" stroke={C.line} strokeWidth={3} />
             {Array.from({ length: 8 }, (_, i) => {
-              const a = (i * Math.PI) / 4;
+              const a = (i * Math.PI) / 4 + 0.2;
               return <line key={i} x1={CC[0]} y1={CC[1]} x2={CC[0] + CR * Math.cos(a)} y2={CC[1] + CR * Math.sin(a)} stroke={C.line} strokeWidth={1.5} opacity={0.3} />;
             })}
+            {/* the aim: straight at the friend */}
+            <line x1={A[0]} y1={A[1]} x2={B0[0]} y2={B0[1]} stroke={C.dim} strokeWidth={2} strokeDasharray="8 10" opacity={ramp(v, T.thrw - 0.3, 0.4)} />
+            <rect x={A[0] - 12} y={A[1] - 12} width={24} height={24} fill="none" stroke={C.line} strokeWidth={3} />
+            <circle cx={B0[0]} cy={B0[1]} r={16} fill="none" stroke={C.line} strokeWidth={3} opacity={ramp(v, T.thrw - 0.3, 0.4)} />
           </g>
-          {/* the thrower and the friend ride the carousel; at the throw they are at A and B0 */}
-          {(() => {
-            const turned = disk - (-OMEGA * (t0 - T.carousel));
-            const th = rot(A, turned), fr = rot(B0, turned);
-            return (
-              <>
-                <rect x={th[0] - 12} y={th[1] - 12} width={24} height={24} fill="none" stroke={C.line} strokeWidth={3} />
-                <circle cx={fr[0]} cy={fr[1]} r={16} fill="none" stroke={C.line} strokeWidth={3} opacity={ramp(v, T.thrw - 0.3, 0.4)} />
-              </>
-            );
-          })()}
-          {s > 0 && <line x1={A[0]} y1={A[1]} x2={ball(s)[0]} y2={ball(s)[1]} stroke={C.line} strokeWidth={3} strokeDasharray="10 8" opacity={0.7} />}
+          {/* the ball's real, straight flight over the ground */}
+          {s > 0 && <line x1={A[0]} y1={A[1]} x2={ball(s)[0]} y2={ball(s)[1]} stroke={C.line} strokeWidth={3} strokeDasharray="10 10" opacity={0.85 * (1 - ride)} />}
+          {/* the chalk line it leaves on the turning floor */}
+          {s > 0 && <Pen pts={trace} p={1} w={4} tip={false} />}
           {s > 0 && <circle cx={ball(s)[0]} cy={ball(s)[1]} r={12} fill={C.line} filter="url(#glow)" />}
         </g>
-        {/* riding it: the carousel stands still, the same flight bends right */}
-        <g opacity={ride}>
-          <circle cx={CC[0]} cy={CC[1]} r={CR} fill="none" stroke={C.line} strokeWidth={3} />
-          {Array.from({ length: 8 }, (_, i) => {
-            const a = (i * Math.PI) / 4 + 0.2;
-            return <line key={i} x1={CC[0]} y1={CC[1]} x2={CC[0] + CR * Math.cos(a)} y2={CC[1] + CR * Math.sin(a)} stroke={C.line} strokeWidth={1.5} opacity={0.3} />;
-          })}
-          <rect x={A[0] - 12} y={A[1] - 12} width={24} height={24} fill="none" stroke={C.line} strokeWidth={3} />
-          <circle cx={B0[0]} cy={B0[1]} r={16} fill="none" stroke={C.line} strokeWidth={3} />
-          <line x1={A[0]} y1={A[1]} x2={B0[0]} y2={B0[1]} stroke={C.dim} strokeWidth={2} strokeDasharray="8 10" />
-          <Pen pts={ridePath} p={1} w={4} tip={false} />
-          <circle cx={ridePath[40][0]} cy={ridePath[40][1]} r={12} fill={C.line} filter="url(#glow)" />
+        <g opacity={missO}>
+          <text x={B0[0] - 40} y={B0[1] - 30} textAnchor="end" style={label(0.9, { fontSize: 24 })}>THE FRIEND</text>
+          <text x={onFloor(FLY)[0] + 30} y={onFloor(FLY)[1] + 8} style={label(1, { fontSize: 24 })}>MISSED: TO THE RIGHT</text>
         </g>
+        <text x={1320} y={300} style={label(window01(v, t0 + 0.6, T.someone, 0.3) * 0.75, { fontSize: 20 })}>SOLID: THE CHALK LINE ON THE FLOOR</text>
+        <text x={1320} y={330} style={label(window01(v, t0 + 0.6, T.someone, 0.3) * 0.75, { fontSize: 20 })}>DASHED: THE BALL'S STRAIGHT FLIGHT</text>
         <text x={960} y={1010} textAnchor="middle" style={label(window01(v, T.straight - 0.2, T.someone, 0.3), { fontSize: 26 })}>FROM ABOVE: THE BALL FLIES STRAIGHT · THE CAROUSEL TURNS UNDER IT</text>
         <text x={960} y={1010} textAnchor="middle" style={label(ramp(v, T.someone, 0.4), { fontSize: 26 })}>ON THE CAROUSEL: THE BALL BENDS TO THE RIGHT</text>
       </g>
@@ -150,9 +149,16 @@ export const S06Coriolis: React.FC = () => {
       {/* ---------------- the formula */}
       <g opacity={fO}>
         <MathLine items={COR} cx={FX} y={FY} size={FS} reveal={ramp(v, T.omega - 0.1, 1.2)} active={active} />
-        <text x={960} y={280} textAnchor="middle" style={label(window01(v, T.oneTurn - 0.2, T.sin, 0.3) * 0.8, { fontSize: 22 })}>Ω — HOW FAST THE EARTH TURNS: ONE TURN A DAY</text>
-        <text x={960} y={280} textAnchor="middle" style={label(window01(v, T.sin - 0.2, T.dist, 0.3) * 0.8, { fontSize: 22 })}>φ — YOUR LATITUDE</text>
-        <text x={960} y={280} textAnchor="middle" style={label(window01(v, T.dist - 0.2, T.north, 0.3) * 0.8, { fontSize: 22 })}>R — THE DISTANCE · t — THE TIME OF FLIGHT</text>
+        <Legend x={1420} y={110} size={18} gap={34} v={v} o={1} rows={[
+          { sym: "Δz", text: "TO THE SIDE · METRES", at: T.omega - 0.4 },
+          { sym: "Ω", text: "THE EARTH'S TURN: 1 A DAY", at: T.omega },
+          { sym: "φ", text: "YOUR LATITUDE", at: T.sin },
+          { sym: "R", text: "THE DISTANCE · METRES", at: T.dist },
+          { sym: "t", text: "TIME OF FLIGHT · SECONDS", at: T.tof },
+        ]} />
+        <text x={960} y={290} textAnchor="middle" style={mono(ramp(v, T.n45 - 0.3, 0.5), 30, { fontWeight: 600 })}>
+          Δz = 7.29·10<tspan fontSize={18} dy={-12}>−5</tspan><tspan dy={12}> · 0.71 · 1000 · 2.01 = 0.10 m</tspan>
+        </text>
       </g>
       <g opacity={ramp(v, T.n45 - 0.3, 0.5)}>
         <text x={1400} y={400} textAnchor="middle" style={label(0.8, { fontSize: 24 })}>45° NORTH · 1000 m</text>

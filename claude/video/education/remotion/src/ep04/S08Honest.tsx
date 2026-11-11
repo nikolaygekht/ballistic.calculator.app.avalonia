@@ -1,10 +1,12 @@
-// Scene 8 — the honest part. The program flies the dot, then puts the four effects on top: the hit moves, the
+// Scene 8 — the honest part. The program flies the dot (the 2.5D stage of scene 1), then puts the four effects on top,
+// all at once; facing the target: the hit moves, the
 // velocity and the time stay. A 4DOF model follows the nose. But all four are smaller than a wrong drag curve:
 // G1 against the radar curve, 57 cm at 1000 m.
 import React from "react";
-import { C, ease, lerp, ramp, window01 } from "../theme";
-import { P, Pen, label, mono } from "../lib/draw";
-import { Card, Dot, EFFECTS, FLIGHT, Scene, SpinBullet, atX, useVoiceTime } from "./kit";
+import { C, ease, easeInOut, ramp, window01 } from "../theme";
+import { Arrow, P, Pen, label, mono } from "../lib/draw";
+import { Card, Dot, EFFECTS, Scene, SpinBullet, useVoiceTime } from "./kit";
+import { Cam, Ground, Path3, ScaleNote, Sheet, Target3, mixCam, pathAt, pr } from "./stage3d";
 import { cue } from "./timing";
 
 const N = 8;
@@ -14,42 +16,58 @@ const T = {
   sizes: cue(N, "sizes"), smaller: cue(N, "smaller"), remember: cue(N, "Remember"), n57: cue(N, "57"), good: cue(N, "good drag curve"),
 };
 
-const px = (x: number) => 160 + x * 1.5, py = (y: number) => 300 - y * 18;
-const PATH: P[] = FLIGHT.map((r) => [px(r.x), py(r.y)] as P);
+const BACK: Cam = { yaw: 45, pitch: 16, dist: 1700, focal: 2150, target: [560, -100, 40], sx: 930, sy: 450 };
+const FACE: Cam = { yaw: 90, pitch: 0, dist: 640, focal: 2050, target: [1000, pathAt(1000)[1] + 50, 85], sx: 960, sy: 560 };
 const BARS = [["SPIN DRIFT", 31], ["AERODYNAMIC JUMP", 11], ["CORIOLIS", 10], ["EAST – WEST", 12]] as const;
 
 export const S08Honest: React.FC = () => {
   const v = useVoiceTime();
   const aO = 1 - ramp(v, T.models - 0.5, 0.5);
-  const fly = ramp(v, -0.2, Math.max(1, T.adds - 0.4), ease);
-  const head = atX(1000 * fly);
-  const end: P = [px(1000), py(atX(1000).y)];
-  const snap = ramp(v, T.adds - 0.1, 1.2, ease);
-  const shift = ramp(v, T.hits - 0.2, 0.8, ease);
+  const stage = ramp(v, -0.3, 0.8);
+  const fly = ramp(v, T.dot - 0.6, 1.8);
+  const all = ramp(v, T.adds - 0.1, 1.4, ease);
+  const k = [all, all, all, all];
+  const face = ramp(v, T.hits - 0.4, 1.2, easeInOut);
+  const cam = mixCam(BACK, FACE, face);
+  const head = pr(cam, pathAt(1000 * fly, k));
+  const h0 = pr(cam, pathAt(1000)), h1 = pr(cam, pathAt(1000, [1, 1, 1, 1]));
   const bO = window01(v, T.models - 0.3, T.sizes - 0.2, 0.4);
   const cO = ramp(v, T.sizes - 0.3, 0.5);
 
   return (
     <Scene n={N}>
-      {/* ---------------- the dot first, then the four on top */}
+      {/* ---------------- the dot first, then the four on top, all at once; then the hit moves, the velocity and the time stay */}
       <g opacity={aO}>
-        <text x={960} y={110} textAnchor="middle" style={label(ramp(v, T.really - 0.2, 0.4) * 0.85, { fontSize: 28 })}>NO SPINNING BULLET INSIDE · THE DOT FIRST</text>
-        <Pen pts={PATH} p={fly} w={3} tip={false} />
-        <Dot x={px(head.x)} y={py(head.y)} r={11} />
-        {EFFECTS.map((s, i) => {
-          const from: P = [960, 1150], to: P = [end[0] - 240, 640 + i * 78];
-          return <Card key={i} x={lerp(from[0], to[0], snap)} y={lerp(from[1], to[1], snap)} w={380} text={s} o={snap} icon={i < 2 ? "spin" : "earth"} />;
-        })}
-        {/* the hit moves; the velocity and the time stay */}
-        <g opacity={shift}>
-          <circle cx={end[0]} cy={end[1]} r={11} fill="none" stroke={C.line} strokeWidth={2} strokeDasharray="4 4" />
-          <circle cx={end[0] + 4} cy={end[1] - 26 * shift} r={11} fill={C.line} filter="url(#glow)" />
-          <text x={end[0] + 28} y={end[1] - 34} style={label(1, { fontSize: 20 })}>THE HIT MOVES</text>
+        <text x={960} y={110} textAnchor="middle" style={label(ramp(v, T.really - 0.2, 0.4) * (1 - ramp(v, T.hits - 0.6, 0.4)) * 0.85, { fontSize: 28 })}>
+          NO SPINNING BULLET INSIDE · THE DOT FIRST<tspan opacity={ramp(v, T.adds - 0.2, 0.4)}> · THEN THE FOUR</tspan>
+        </text>
+        <g opacity={stage * (1 - face)}>
+          <Ground c={cam} o={1} />
+          <Sheet c={cam} o={1 - 0.6 * all} top={120} />
+          {all > 0 && <Path3 c={cam} k={[0, 0, 0, 0]} o={0.45} w={2} dash="8 8" />}
+          <Path3 c={cam} k={k} p={fly} w={all > 0 ? 4 : 2.5} stakes={ramp(v, T.dot, 0.8)} shadow={ramp(v, T.dot, 0.8)} glow={all > 0.5} />
+          <Dot x={head[0]} y={head[1]} r={11} o={fly > 0 ? 1 : 0} />
+          <ScaleNote x={1880} y={760} anchor="end" o={all} />
+        </g>
+        <Target3 c={cam} o={stage} edge={1 - face} />
+        {EFFECTS.map((s, i) => (
+          <Card key={i} x={330 + i * 420} y={860} w={380} text={s} o={ramp(v, T.adds - 0.3, 0.5) * (1 - face)} hot={all * (1 - ramp(v, T.adds + 1.6, 0.6))} icon={i < 2 ? "spin" : "earth"} />
+        ))}
+        {/* at the target: the hit moves */}
+        <g opacity={face}>
+          <circle cx={h0[0]} cy={h0[1]} r={14} fill="none" stroke={C.line} strokeWidth={2.5} strokeDasharray="5 5" />
+          <text x={h0[0] - 24} y={h0[1] + 8} textAnchor="end" style={label(0.8, { fontSize: 20 })}>THE DOT'S HIT</text>
+          <Arrow x1={h0[0]} y1={h0[1]} x2={h1[0]} y2={h1[1]} p={ramp(v, T.hits + 0.6, 0.6, ease)} w={4} head={16} />
+          <g opacity={ramp(v, T.hits + 1.0, 0.4)}>
+            <circle cx={h1[0]} cy={h1[1]} r={13} fill={C.line} filter="url(#glow)" />
+            <text x={h1[0] + 26} y={h1[1] - 16} style={label(1, { fontSize: 22 })}>THE HIT MOVES</text>
+          </g>
+          <ScaleNote x={960} y={1010} anchor="middle" o={1} />
         </g>
         <g opacity={ramp(v, T.vel - 0.3, 0.5)}>
-          <text x={700} y={500} style={mono(1, 36)}>v = 322 m/s</text>
-          <text x={700} y={560} style={mono(ramp(v, T.tof - 0.3, 0.5), 36)}>t = 2.01 s</text>
-          <text x={700} y={610} style={label(ramp(v, T.tof, 0.5) * 0.75, { fontSize: 20 })}>AT 1000 m · UNCHANGED</text>
+          <text x={260} y={200} style={mono(1, 40)}>v = 322 m/s</text>
+          <text x={260} y={260} style={mono(ramp(v, T.tof - 0.3, 0.5), 40)}>t = 2.01 s</text>
+          <text x={260} y={310} style={label(ramp(v, T.tof, 0.5) * 0.8, { fontSize: 22 })}>AT 1000 m · UNCHANGED</text>
         </g>
       </g>
 

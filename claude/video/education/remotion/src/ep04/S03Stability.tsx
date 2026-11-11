@@ -5,7 +5,7 @@
 import React from "react";
 import { C, ease, lerp, ramp, window01 } from "../theme";
 import { Bracket, Bullet, P, label, mono, seeded } from "../lib/draw";
-import { BLEN, CG_F, CP_F, Card, ClockBack, Gauge, Item, MathLine, Scene, SpinBullet, k_, keyPos, sub, sup, t_, useVoiceTime } from "./kit";
+import { BLEN, CG_F, CP_F, Card, ClockBack, Gauge, Item, Legend, MathLine, Scene, SpinBullet, Sub, k_, keyPos, sub, sup, t_, useVoiceTime } from "./kit";
 import { cue } from "./timing";
 
 const N = 3;
@@ -90,8 +90,17 @@ export const S03Stability: React.FC = () => {
         <text x={960} y={340} textAnchor="middle" style={label(window01(v, T.miller + 1.0, T.weight - 0.2, 0.4) * 0.8, { fontSize: 22 })}>
           DON MILLER · A SIMPLE RULE, FITTED TO THE FULL THEORY
         </text>
-        <text x={960} y={340} textAnchor="middle" style={label(window01(v, T.weight - 0.2, T.fixes - 0.2, 0.4) * 0.6, { fontSize: 20 })}>
-          w — GRAINS · d — INCHES · t AND L — IN CALIBRES
+        <Legend x={60} y={400} v={v} o={1 - ramp(v, T.empty - 0.4, 0.4)} rows={[
+          { sym: "w", text: "WEIGHT · GRAINS", at: T.weight },
+          { sym: "d", text: "DIAMETER · INCHES", at: T.diameter },
+          { sym: "L", text: "LENGTH · CALIBRES", at: T.length },
+          { sym: "t", text: "TWIST · CALIBRES PER TURN", at: T.twist },
+          { sym: <>V<Sub s="0" /></>, text: "MUZZLE VELOCITY · ft/s", at: T.fixes },
+          { sym: "T", text: "AIR TEMPERATURE · °F", at: T.fixes + 0.3 },
+          { sym: "P", text: "AIR PRESSURE · inHg", at: T.fixes + 0.6 },
+        ]} />
+        <text x={960} y={345} textAnchor="middle" style={mono(ramp(v, T.our - 0.2, 0.5), 30, { fontWeight: 600 })}>
+          S<tspan fontSize={18} dy={6}>g</tspan><tspan dy={-6}> = 30·175 / (32.5² · 0.308³ · 4.53 · (1 + 4.53²)) · 0.97 · 1 · 1 = 1.71</tspan>
         </text>
       </g>
       {/* the two small fixes: ≈ 1 */}

@@ -1,11 +1,14 @@
-// Scene 5 — aerodynamic jump. Top view at the muzzle: the side wind tilts v_air (episode 3), the nose leaves along the
-// barrel, so it is off the air flow; the air pushes it away from the wind (left); by the rule the nose goes up. Side
-// view: the nose swings and settles, the path keeps a tiny upward angle. Litz's second formula; an angle, so a straight
+// Scene 5 — aerodynamic jump, on the 2.5D stage of scene 1, at the muzzle: the side wind tilts v_air (episode 3), the
+// nose leaves along the barrel, so it is off the air flow, to the left; the air pushes it further left; by the rule
+// the nose goes up — a right angle, seen in space. The nose circles the air flow in a shrinking spiral, the air's push
+// follows the nose, and added up the pushes point a quarter turn on from the start: up. The path bends at the muzzle,
+// then flies on straight, tilted up by a tiny angle. Litz's second formula; an angle, so a straight
 // wedge; to scale at 1000 m: 11 cm up against 3.35 m sideways. A wind that starts at 300 m gives no jump.
 import React from "react";
 import { C, ease, lerp, ramp, window01 } from "../theme";
-import { P, Pen, label, mono, seeded } from "../lib/draw";
-import { ArrowA, CornerRule, Item, MathLine, Scene, SpinBullet, Title, k_, keyPos, sub, t_, useVoiceTime } from "./kit";
+import { Arrow, P, Pen, label, mono, seeded } from "../lib/draw";
+import { Bullet3, Cam, V3, mixCam, pr, prLine } from "./stage3d";
+import { ArrowA, BLEN, CG_F, CornerRule, Item, Legend, MathLine, Scene, Sub, Title, k_, keyPos, sub, t_, useVoiceTime } from "./kit";
 import { cue } from "./timing";
 
 const N = 5;
@@ -22,26 +25,54 @@ const FX = 960, FY = 200, FS = 56;
 const AJ: Item[] = [{ toks: [t_("Δy' = (0.01 · "), k_("S", "sg"), sub("g", "sg"), t_(" − 0.0024 · "), k_("L", "L"), t_(" + 0.032) · "), k_("W", "w"), sub("⊥", "w")] }];
 const STREAKS = (() => { const r = seeded(5); return Array.from({ length: 60 }, () => ({ x: r() * 2100, y: 90 + r() * 960, l: 26 + r() * 40, a: 0.12 + r() * 0.25 })); })();
 
-const M: P = [960, 900];                       // the muzzle, top view
-const VL = 560, TILT = (0.33 * 20 * Math.PI) / 180;
-const S0: P = [220, 700];                      // the muzzle, side view
+// ---- the stage at the muzzle (drawn units: not to scale)
+const CAM0: Cam = { yaw: 40, pitch: 16, dist: 640, focal: 1700, target: [330, 20, 0], sx: 900, sy: 560 };
+const WIDE: Cam = { yaw: 62, pitch: 10, dist: 1900, focal: 1700, target: [700, 60, 0], sx: 900, sy: 560 };
+const BCAL = 24;                                   // the bullet: drawn units per calibre
+const GR = -190;                                   // the ground
+const TILT = (0.33 * 20 * Math.PI) / 180;          // v_air off the barrel, drawn ×20, to the right (towards the wind)
+const VAIR: V3 = [Math.cos(TILT), 0, Math.sin(TILT)];
+const OM = 2.2, KD = 0.38, YAW0 = TILT;            // the swings: rad/s, damping 1/s, start: the nose along the barrel
+const LIFT = 220;                                  // drawn units of path offset per (rad · s²)
+const X0 = 150, U = 80;                            // the bullet waits just past the muzzle, then flies on at U units/s
+/** The swings, s seconds after they start: the nose's offset from v_air as (right, up) in radians, the push added up
+ *  (rad·s), and the path's offset (rad·s²). From behind, the nose starts at 9 o'clock and circles clockwise. */
+const swingAt = (s: number) => {
+  let sz = 0, sy = 0, pz = 0, py = 0;
+  const dt = 0.02, n = Math.floor(Math.max(0, s) / dt);
+  for (let i = 0; i < n; i++) {
+    const t = i * dt, a = Math.PI - OM * t, A = YAW0 * Math.exp(-KD * t);
+    sz += A * Math.cos(a) * dt; sy += A * Math.sin(a) * dt; pz += sz * dt; py += sy * dt;
+  }
+  const a = Math.PI - OM * Math.max(0, s), A = YAW0 * Math.exp(-KD * Math.max(0, s));
+  return { yaw: [A * Math.cos(a), A * Math.sin(a)] as P, sum: [sz, sy] as P, off: [pz, py] as P };
+};
+const along = (k: number): V3 => [VAIR[0] * k, 0, VAIR[2] * k];
+const add = (a: V3, b: V3): V3 => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+const STREAKS3 = (() => { const r = seeded(9); return Array.from({ length: 46 }, () => ({ x: -200 + r() * 2000, y: GR + 30 + r() * 330, z: r() * 900, l: 40 + r() * 60 })); })();
 
 export const S05Jump: React.FC = () => {
   const v = useVoiceTime();
-  // ---- top view
-  const topO = ramp(v, T.remember - 0.4, 0.5) * (1 - ramp(v, T.swings - 0.5, 0.5));
+  // ---- the stage
+  const stO = ramp(v, T.remember - 0.4, 0.6) * (1 - ramp(v, T.formula - 0.4, 0.4));
   const vairP = ramp(v, T.tilted - 0.2, 0.8, ease);
   const bulO = ramp(v, T.leaves - 0.2, 0.5);
-  const gapHot = ramp(v, T.first - 0.2, 0.5);
-  const pushP = ramp(v, T.pushes - 0.1, 0.5);
-  const noseDeg = 90 + 7 * ramp(v, T.left - 0.2, 0.8);
-  // ---- side view: the swings and the tilt
-  const sideO = ramp(v, T.swings - 0.4, 0.5) * (1 - ramp(v, T.formula - 0.4, 0.4));
-  const ts = Math.max(0, v - T.swings);
-  const jumpK = ramp(v, T.last - 0.2, 2.6, ease);
-  const jumpDeg = 4 * jumpK;                                 // drawn
-  const bx = lerp(S0[0] + 120, 1500, ramp(v, T.swings - 0.2, 9, (x) => x));
-  const wob = 14 * Math.exp(-0.55 * ts) * Math.sin(5.5 * ts);
+  const gapHot = ramp(v, T.first - 0.2, 0.5) * (1 - ramp(v, T.up - 0.2, 0.4));
+  const pushP = ramp(v, T.pushes - 0.1, 0.5) * (1 - ramp(v, T.swings - 0.2, 0.4));
+  const s = v - (T.up - 0.3);                                     // the swings start when the nose goes up
+  const sw = swingAt(s);
+  const xB = X0 + U * Math.max(0, s);
+  // before the swings the nose is along the barrel: 9 o'clock from behind, a bit further left once the air pushes it
+  const yaw: P = s > 0 ? sw.yaw : [-YAW0 * (1 + 0.4 * ramp(v, T.left - 0.2, 0.8)), 0];
+  const centre = (x: number, off: P): V3 => [x, LIFT * off[1], LIFT * off[0]];      // the bullet leaves along the barrel's line
+  const C0 = centre(xB, s > 0 ? sw.off : [0, 0]);
+  const axisD = (k: number): V3 => add(along(k), [0, yaw[1] * 3.2 * k, yaw[0] * 3.2 * k]);     // the yaw drawn ×3.2 more
+  const trail: V3[] = s > 0 ? Array.from({ length: 41 }, (_, i) => { const q = (s * i) / 40; return centre(X0 + U * q, swingAt(q).off); }) : [];
+  const liftO = ramp(v, T.last - 0.4, 0.5);
+  const follow: Cam = { ...CAM0, target: [Math.max(330, xB + 180), 20 + 0.8 * C0[1], 0.5 * C0[2]] };
+  const cam = mixCam(follow, WIDE, ramp(v, T.tiltedUp - 0.5, 1.8));
+  const far = xB + 300;              // the lines and their labels run on ahead of the bullet
+  const pathO = ramp(v, T.tiltedUp - 0.6, 0.6);
   // ---- formula, the wedge, the target, the late wind
   const fO = ramp(v, T.formula - 0.3, 0.5);
   const active = v >= T.notDist - 0.3 ? null : v >= T.mult - 0.1 ? "w" : v >= T.length - 0.1 ? "L" : v >= T.adds - 0.3 ? "sg" : null;
@@ -54,85 +85,109 @@ export const S05Jump: React.FC = () => {
       <Title text="AERODYNAMIC JUMP" o={ramp(v, -0.5, 0.5) * (1 - ramp(v, T.remember - 0.6, 0.4))} />
       <CornerRule spin={v * 0.8} push="left" pushP={ramp(v, T.pushLeft - 0.1, 0.5)} noseP={ramp(v, T.up - 0.2, 0.7)}
         o={ramp(v, 0, 0.6) * (1 - ramp(v, T.formula - 0.6, 0.5))} hot={window01(v, T.rule - 0.2, T.swings, 0.3)} />
-      {/* the wind, from the right */}
-      <g opacity={ramp(v, T.sideWind - 0.2, 0.6) * (1 - ramp(v, T.swings - 0.5, 0.5))}>
-        {STREAKS.map((s, i) => {
-          const x = ((((s.x - 150 * v) % 2100) + 2100) % 2100) - 100;
-          return <line key={i} x1={x} y1={s.y} x2={x + s.l} y2={s.y} stroke={C.line} strokeOpacity={s.a} strokeWidth={2} />;
-        })}
-        <ArrowA x={1820} y={420} a={Math.PI} len={260} w={5} head={22} />
-        <text x={1820} y={390} textAnchor="end" style={label(0.8, { fontSize: 22 })}>SIDE WIND · FROM THE RIGHT</text>
-        <g opacity={window01(v, T.muzzle - 0.2, T.remember, 0.3)}>
-          <rect x={930} y={880} width={60} height={140} fill="none" stroke={C.line} strokeWidth={3} />
-          <text x={1010} y={900} style={label(1, { fontSize: 24 })}>RIGHT AT THE MUZZLE</text>
+      {/* ---------------- the stage at the muzzle, in space */}
+      <g opacity={stO}>
+        {/* the ground */}
+        {Array.from({ length: 25 }, (_, i) => { const x = -200 + i * 100, a = pr(cam, [x, GR, -300]), b = pr(cam, [x, GR, 300]); return <line key={`g${i}`} x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke={C.line} strokeWidth={1} opacity={0.16} />; })}
+        {[-300, -200, -100, 0, 100, 200, 300].map((z) => { const a = pr(cam, [-200, GR, z]), b = pr(cam, [2200, GR, z]); return <line key={`z${z}`} x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke={C.line} strokeWidth={1} opacity={0.16} />; })}
+        {/* the wind, from the right */}
+        <g opacity={ramp(v, T.sideWind - 0.2, 0.6) * (1 - ramp(v, T.swings - 0.3, 0.6))}>
+          {STREAKS3.map((q, i) => {
+            const z = 450 - ((((q.z + 180 * v) % 900) + 900) % 900);
+            const a = pr(cam, [q.x, q.y, z]), b = pr(cam, [q.x, q.y, z - q.l]);
+            return <line key={i} x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke={C.line} strokeOpacity={0.22} strokeWidth={2} />;
+          })}
+          <text x={1860} y={1000} textAnchor="end" style={label(0.8, { fontSize: 22 })}>SIDE WIND · FROM THE RIGHT</text>
+          <text x={960} y={120} textAnchor="middle" style={label(window01(v, T.muzzle - 0.2, T.remember + 0.4, 0.3), { fontSize: 26 })}>RIGHT AT THE MUZZLE</text>
         </g>
-      </g>
-
-      {/* ---------------- top view at the muzzle */}
-      <g opacity={topO}>
-        <text x={60} y={70} style={label(0.6, { fontSize: 20 })}>TOP VIEW · DOWNRANGE IS UP</text>
-        <path d={`M940,1060 L940,${M[1]} L980,${M[1]} L980,1060`} stroke={C.line} strokeWidth={3} fill="none" />
-        <line x1={M[0]} y1={M[1]} x2={M[0]} y2={M[1] - VL - 80} stroke={C.dim} strokeWidth={2} strokeDasharray="8 10" />
-        <text x={M[0] - 16} y={M[1] - VL - 90} textAnchor="end" style={label(0.6, { fontSize: 18 })}>THE BARREL'S LINE</text>
-        <g opacity={vairP} filter="url(#glow)">
-          <line x1={M[0]} y1={M[1]} x2={M[0] + VL * Math.sin(TILT) * vairP} y2={M[1] - VL * Math.cos(TILT)} stroke={C.line} strokeWidth={5} />
-        </g>
+        {/* the barrel and its line */}
+        {(() => { const a = pr(cam, [-260, 0, 0]), b = pr(cam, [0, 0, 0]); return <line x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke={C.line} strokeWidth={16} opacity={0.9} />; })()}
+        <Pen pts={prLine(cam, Array.from({ length: 23 }, (_, i) => [i * 100, 0, 0] as V3))} p={1} w={2} tip={false} dash="8 10" opacity={0.7} />
+        <text x={pr(cam, [far, 0, 0])[0] + 12} y={pr(cam, [far, 0, 0])[1] - 10} style={label(0.6, { fontSize: 18 })}>THE BARREL'S LINE</text>
+        {/* v_air: tilted a third of a degree towards the wind */}
         <g opacity={vairP}>
-          <text x={M[0] + 90} y={M[1] - VL + 40} style={mono(1, 36)}>v<tspan fontSize={22} dy={8}>air</tspan></text>
-          <text x={M[0] + 90} y={M[1] - VL + 80} style={label(ramp(v, T.third - 0.2, 0.4) * 0.85, { fontSize: 20 })}>0.33° · DRAWN ×20</text>
+          <g filter="url(#glow)"><Pen pts={prLine(cam, [add(C0, along(-260 * vairP)), add(C0, along(400 * vairP))])} p={1} w={4} tip={false} /></g>
+          <text x={pr(cam, add(C0, along(400)))[0] + 12} y={pr(cam, add(C0, along(400)))[1] + 30} style={mono(1, 32)}>v<tspan fontSize={20} dy={7}>air</tspan></text>
+          <text x={pr(cam, add(C0, along(400)))[0] + 12} y={pr(cam, add(C0, along(400)))[1] + 62} style={label(ramp(v, T.third - 0.2, 0.4) * 0.8, { fontSize: 18 })}>AIR FLOW · 0.33° · DRAWN ×20</text>
         </g>
+        {/* the bullet: its nose off the air flow, the push, the swings, the air's push following the nose */}
         <g opacity={bulO}>
-          <SpinBullet id="j" cx={M[0]} cy={M[1] - 220} cal={40} deg={noseDeg} spin={v} marks={0.8} />
-          <g opacity={gapHot}>
-            {(() => {
-              const r = 330, a0 = -Math.PI / 2 - ((noseDeg - 90) * Math.PI) / 180, a1 = -Math.PI / 2 + TILT, c: P = [M[0], M[1] - 220];
-              const pts: P[] = Array.from({ length: 13 }, (_, i) => { const a = lerp(a0, a1, i / 12); return [c[0] + r * Math.cos(a), c[1] + r * Math.sin(a)]; });
-              return <Pen pts={pts} p={1} w={4} tip={false} />;
-            })()}
-            <text x={M[0] + 110} y={M[1] - 250} style={label(1, { fontSize: 24 })}>THE NOSE IS OFF THE AIR FLOW</text>
-          </g>
-          {pushP > 0 && (
-            <g opacity={pushP} filter="url(#glow)">
-              <line x1={M[0] - 20} y1={M[1] - 330} x2={M[0] - 20 - 150 * pushP} y2={M[1] - 330} stroke={C.drag} strokeWidth={6} strokeLinecap="round" />
-              <path d={`M${M[0] - 152 - 20 * pushP},${M[1] - 344} L${M[0] - 170 * pushP - 20},${M[1] - 330} L${M[0] - 152 - 20 * pushP},${M[1] - 316}`} stroke={C.drag} strokeWidth={6} fill="none" />
-            </g>
-          )}
-          <text x={M[0] - 200} y={M[1] - 390} textAnchor="end" style={label(pushP, { fontSize: 22, fill: C.drag })}>AWAY FROM THE WIND</text>
-          <text x={M[0] - 200} y={M[1] - 360} textAnchor="end" style={label(ramp(v, T.up - 0.2, 0.4), { fontSize: 22 })}>PUSH LEFT → THE NOSE GOES UP</text>
-        </g>
-      </g>
-
-      {/* ---------------- side view: the swings die out, the tilt stays */}
-      <g opacity={sideO}>
-        <text x={60} y={70} style={label(0.6, { fontSize: 20 })}>SIDE VIEW</text>
-        <path d={`M60,${S0[1] - 22} L${S0[0]},${S0[1] - 22} L${S0[0]},${S0[1] + 22} L60,${S0[1] + 22}`} stroke={C.line} strokeWidth={3} fill="none" />
-        <line x1={S0[0]} y1={S0[1]} x2={1800} y2={S0[1]} stroke={C.dim} strokeWidth={2} strokeDasharray="8 10" />
-        <text x={1800} y={S0[1] + 40} textAnchor="end" style={label(0.55, { fontSize: 18 })}>WITHOUT THE JUMP</text>
-        {(() => {
-          const a = (jumpDeg * Math.PI) / 180, yAt = (x: number) => S0[1] - (x - S0[0]) * Math.tan(a);
-          return (
-            <>
-              <line x1={S0[0]} y1={S0[1]} x2={1800} y2={yAt(1800)} stroke={C.line} strokeWidth={3} opacity={0.4 + 0.6 * jumpK} />
-              <SpinBullet id="s" cx={bx} cy={yAt(bx)} cal={34} deg={jumpDeg + wob} spin={v} marks={0.7} />
-              <text x={1800} y={yAt(1800) - 24} textAnchor="end" style={label(ramp(v, T.tiltedUp - 0.2, 0.5), { fontSize: 24 })}>THE PATH: TILTED UP BY A TINY ANGLE · DRAWN ×600</text>
-            </>
-          );
-        })()}
-        <text x={960} y={250} textAnchor="middle" style={label(window01(v, T.swings - 0.2, T.last, 0.3), { fontSize: 26 })}>THE NOSE SWINGS UP AND AROUND · THE SWINGS DIE OUT</text>
-        <text x={960} y={250} textAnchor="middle" style={label(ramp(v, T.last - 0.2, 0.4), { fontSize: 26 })}>WHILE THEY LAST, THE AIR PUSHES THE BULLET UP</text>
-        {/* the nose, seen from behind: a shrinking circle */}
-        <g opacity={ramp(v, T.swings - 0.2, 0.5)}>
-          <circle cx={1560} cy={860} r={110} fill="none" stroke={C.line} strokeWidth={2.5} />
+          {s > 0 && <Pen pts={prLine(cam, trail)} p={1} w={3} tip={false} opacity={0.85} />}
           {(() => {
-            const pts: P[] = [];
-            for (let i = 0; i <= 140; i++) {
-              const s = (i / 140) * Math.min(ts, 6), r = 80 * Math.exp(-0.55 * s);
-              pts.push([1560 + r * Math.sin(5.5 * s), 860 - r * Math.cos(5.5 * s)]);
-            }
-            const e = pts[pts.length - 1];
-            return (<><Pen pts={pts} p={1} w={2} tip={false} opacity={0.6} /><circle cx={e[0]} cy={e[1]} r={8} fill={C.line} filter="url(#glow)" /></>);
+            const c = pr(cam, C0);
+            const ax = axisD(1), tipW = add(C0, axisD((1 - CG_F) * BLEN * BCAL)), baseW = add(C0, axisD(-CG_F * BLEN * BCAL));
+            const nose = pr(cam, add(C0, axisD(60)));
+            const tg = pr(cam, [tipW[0], GR, tipW[2]]), bg = pr(cam, [baseW[0], GR, baseW[2]]), tp = pr(cam, tipW);
+            const ym = Math.hypot(yaw[0], yaw[1]) || 1, ll = 70 + 110 * Math.min(1, ym / YAW0);
+            const lift = pr(cam, add(C0, [0, (yaw[1] / ym) * ll, (yaw[0] / ym) * ll]));
+            // directions round the bullet: a level ring (left, right) and a vertical (up)
+            const RR = 190, ringO = window01(v, T.pushes - 0.5, T.swings + 1.2, 0.4);
+            const ring = prLine(cam, Array.from({ length: 49 }, (_, i) => { const a = (i / 48) * Math.PI * 2; return add(C0, [RR * Math.cos(a), 0, RR * Math.sin(a)]); }));
+            const lft = pr(cam, add(C0, [0, 0, -RR - 40])), rgt = pr(cam, add(C0, [0, 0, RR + 40])), upP = pr(cam, add(C0, [0, RR, 0]));
+            const pa = pr(cam, add(C0, axisD(50))), pb = pr(cam, add(add(C0, axisD(50)), [0, 0, -RR * pushP]));
+            const flow = pr(cam, add(C0, along(60)));
+            return (
+              <>
+                {/* the nose's stake down to the ground, and the bullet's shadow: up shows in the stake, sideways in the shadow */}
+                <line x1={tp[0]} y1={tp[1]} x2={tg[0]} y2={tg[1]} stroke={C.line} strokeWidth={1.4} strokeDasharray="5 6" opacity={0.55} />
+                <line x1={bg[0]} y1={bg[1]} x2={tg[0]} y2={tg[1]} stroke={C.line} strokeWidth={5} strokeLinecap="round" opacity={0.3} />
+                <g opacity={ringO}>
+                  <Pen pts={ring} p={1} w={1.5} tip={false} dash="6 8" opacity={0.55} />
+                  <line x1={lft[0]} y1={lft[1]} x2={rgt[0]} y2={rgt[1]} stroke={C.line} strokeWidth={1.2} opacity={0.35} />
+                  <text x={lft[0] - 10} y={lft[1] + 8} textAnchor="end" style={label(0.8, { fontSize: 20 })}>LEFT</text>
+                  <text x={rgt[0] + 10} y={rgt[1] + 8} style={label(0.8, { fontSize: 20 })}>RIGHT</text>
+                  <g opacity={ramp(v, T.up - 0.3, 0.4)}>
+                    <line x1={c[0]} y1={c[1]} x2={upP[0]} y2={upP[1]} stroke={C.line} strokeWidth={1.2} strokeDasharray="6 8" opacity={0.6} />
+                    <text x={upP[0]} y={upP[1] - 12} textAnchor="middle" style={label(0.8, { fontSize: 20 })}>UP</text>
+                  </g>
+                </g>
+                <Bullet3 c={cam} cg={C0} axis={ax} cal={BCAL} spin={v * 0.9} />
+                {/* the gap between the nose and the air flow */}
+                <g opacity={gapHot}>
+                  <line x1={nose[0]} y1={nose[1]} x2={flow[0]} y2={flow[1]} stroke={C.line} strokeWidth={4} filter="url(#glow)" />
+                  <text x={960} y={120} textAnchor="middle" style={label(1, { fontSize: 26 })}>THE NOSE IS OFF THE AIR FLOW</text>
+                </g>
+                {pushP > 0.02 && <Arrow x1={pa[0]} y1={pa[1]} x2={pb[0]} y2={pb[1]} color={C.drag} w={6} head={18} />}
+                <text x={960} y={170} textAnchor="middle" style={label(pushP, { fontSize: 24, fill: C.drag })}>THE AIR PUSHES THE NOSE LEFT, AWAY FROM THE WIND</text>
+                <text x={960} y={220} textAnchor="middle" style={label(window01(v, T.up - 0.2, T.swings + 0.4, 0.3), { fontSize: 26 })}>PUSH LEFT → THE NOSE GOES UP</text>
+                <g opacity={liftO * (s > 0 ? 1 : 0) * (1 - pathO)}>
+                  <Arrow x1={c[0]} y1={c[1]} x2={lift[0]} y2={lift[1]} color={C.drag} w={5} head={14} />
+                </g>
+              </>
+            );
           })()}
-          <text x={1560} y={1010} textAnchor="middle" style={label(0.6, { fontSize: 16 })}>THE NOSE, FROM BEHIND</text>
+        </g>
+        {/* the path: without the jump, along v_air; with it, tilted up */}
+        <g opacity={pathO}>
+          <text x={pr(cam, C0)[0] - 20} y={pr(cam, C0)[1] - 50} textAnchor="end" style={label(1, { fontSize: 22 })}>TILTED UP BY A TINY ANGLE</text>
+          <text x={pr(cam, [far, 0, 0])[0] + 12} y={pr(cam, [far, 0, 0])[1] + 16} style={label(0.6, { fontSize: 18 })}>WITHOUT THE JUMP</text>
+        </g>
+        <text x={960} y={120} textAnchor="middle" style={label(window01(v, T.swings - 0.2, T.last, 0.3), { fontSize: 26 })}>THE NOSE SWINGS UP AND AROUND THE AIR FLOW · THE SWINGS DIE OUT</text>
+        <text x={960} y={120} textAnchor="middle" style={label(window01(v, T.last - 0.2, T.tiltedUp - 0.2, 0.3), { fontSize: 26 })}>THE AIR PUSHES WHERE THE NOSE POINTS</text>
+        <text x={960} y={120} textAnchor="middle" style={label(ramp(v, T.tiltedUp - 0.2, 0.4), { fontSize: 26 })}>ADDED UP, THE PUSHES POINT UP · SO THE PATH STAYS TILTED UP</text>
+        {/* the nose, from behind: the spiral, and the pushes added up */}
+        <g opacity={ramp(v, T.swings - 0.4, 0.5)}>
+          {(() => {
+            const cx = 1640, cy = 820, R = 110, k = (0.8 * R) / YAW0;
+            const n = Math.max(2, Math.min(200, Math.floor(Math.max(0, s) / 0.05)));
+            const pts: P[] = Array.from({ length: n + 1 }, (_, i) => { const y = swingAt((Math.max(0, s) * i) / n).yaw; return [cx + k * y[0], cy - k * y[1]]; });
+            const e = pts[pts.length - 1];
+            const sm = (0.8 * R) / (0.45 * YAW0);                       // the full sum (≈ 0.45 · start yaw · 1 s) drawn to 0.8 R
+            const sumEnd: P = [cx + sw.sum[0] * sm, cy - sw.sum[1] * sm];
+            return (
+              <>
+                <circle cx={cx} cy={cy} r={R} fill="none" stroke={C.line} strokeWidth={2.5} />
+                <line x1={cx - 8} y1={cy} x2={cx + 8} y2={cy} stroke={C.line} strokeWidth={1.5} opacity={0.5} />
+                <line x1={cx} y1={cy - 8} x2={cx} y2={cy + 8} stroke={C.line} strokeWidth={1.5} opacity={0.5} />
+                <Pen pts={pts} p={1} w={2} tip={false} opacity={0.6} />
+                <circle cx={e[0]} cy={e[1]} r={8} fill={C.line} filter="url(#glow)" />
+                <g opacity={liftO}><Arrow x1={cx} y1={cy} x2={sumEnd[0]} y2={sumEnd[1]} color={C.drag} w={5} head={14} /></g>
+                <text x={cx} y={cy + R + 32} textAnchor="middle" style={label(0.6, { fontSize: 16 })}>THE NOSE, FROM BEHIND</text>
+                <text x={cx} y={cy + R + 56} textAnchor="middle" style={label(0.5, { fontSize: 14 })}>THE CROSS: THE AIR FLOW</text>
+                <text x={cx} y={cy - R - 18} textAnchor="middle" style={label(liftO * 0.9, { fontSize: 16, fill: C.drag })}>THE PUSHES, ADDED UP</text>
+              </>
+            );
+          })()}
         </g>
       </g>
 
@@ -140,7 +195,15 @@ export const S05Jump: React.FC = () => {
       <g opacity={fO}>
         <MathLine items={AJ} cx={FX} y={FY} size={FS} reveal={ramp(v, T.formula, 1.6)} active={active} />
         <text x={960} y={290} textAnchor="middle" style={label(window01(v, T.formula + 0.6, T.adds - 0.3, 0.4) * 0.8, { fontSize: 22 })}>BRYAN LITZ</text>
-        <text x={960} y={290} textAnchor="middle" style={label(ramp(v, T.adds - 0.3, 0.4) * 0.6, { fontSize: 20 })}>W⊥ — SIDE WIND AT THE MUZZLE, mph · Δy' — AN ANGLE, MOA</text>
+        <Legend x={60} y={400} v={v} o={1 - ramp(v, T.only - 0.6, 0.4)} rows={[
+          { sym: "Δy'", text: "THE JUMP · AN ANGLE, MOA", at: T.adds - 0.3 },
+          { sym: <>S<Sub s="g" /></>, text: "STABILITY · FROM MILLER", at: T.adds },
+          { sym: "L", text: "LENGTH · CALIBRES", at: T.length },
+          { sym: <>W<Sub s="⊥" /></>, text: "SIDE WIND AT THE MUZZLE · mph", at: T.mult },
+        ]} />
+        <text x={960} y={300} textAnchor="middle" style={mono(ramp(v, T.four - 0.3, 0.5) * (1 - ramp(v, T.only - 0.6, 0.4)), 30, { fontWeight: 600 })}>
+          Δy' = (0.01 · 1.71 − 0.0024 · 4.53 + 0.032) · 10.1 = 0.39 MOA
+        </text>
         {(() => {
           const L = MathLineKey(AJ, "sg"), Lp = MathLineKey(AJ, "L"), W = MathLineKey(AJ, "w");
           return (
@@ -171,8 +234,8 @@ export const S05Jump: React.FC = () => {
                   </g>
                 );
               })}
-              <text x={960} y={420} textAnchor="middle" style={label(ramp(v, T.angle - 0.2, 0.4), { fontSize: 28 })}>NOT A DISTANCE: AN ANGLE, THE SAME AT EVERY DISTANCE</text>
-              <text x={960} y={470} textAnchor="middle" style={label(ramp(v, T.straight - 0.2, 0.4) * 0.8, { fontSize: 24 })}>SO IT GROWS IN A STRAIGHT LINE</text>
+              <text x={960} y={900} textAnchor="middle" style={label(ramp(v, T.angle - 0.2, 0.4), { fontSize: 28 })}>NOT A DISTANCE: AN ANGLE, THE SAME AT EVERY DISTANCE</text>
+              <text x={960} y={950} textAnchor="middle" style={label(ramp(v, T.straight - 0.2, 0.4) * 0.8, { fontSize: 24 })}>SO IT GROWS IN A STRAIGHT LINE</text>
             </>
           );
         })()}
@@ -183,7 +246,7 @@ export const S05Jump: React.FC = () => {
           const c: P = [1400, 640], s = 250;          // px per metre
           return (
             <>
-              <text x={960} y={400} textAnchor="middle" style={label(0.85, { fontSize: 26 })}>AT 1000 m · 4.5 m/s FROM THE RIGHT · TO SCALE</text>
+              <text x={960} y={900} textAnchor="middle" style={label(0.85, { fontSize: 26 })}>AT 1000 m · 4.5 m/s FROM THE RIGHT · TO SCALE</text>
               <circle cx={c[0]} cy={c[1]} r={s * 0.5} fill="none" stroke={C.line} strokeWidth={2} opacity={0.5} />
               <circle cx={c[0]} cy={c[1]} r={s * 0.25} fill="none" stroke={C.line} strokeWidth={1.5} opacity={0.4} />
               <circle cx={c[0]} cy={c[1]} r={6} fill={C.line} opacity={0.6} />

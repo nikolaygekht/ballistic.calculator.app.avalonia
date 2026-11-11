@@ -5,7 +5,7 @@
 import React from "react";
 import { C, ease, lerp, ramp, window01 } from "../theme";
 import { P, Pen, label, mono } from "../lib/draw";
-import { CornerRule, Dot, FLIGHT, Item, MathLine, Scene, SpinBullet, Title, atX, drift, k_, sub, sup, t_, useVoiceTime } from "./kit";
+import { CornerRule, Dot, FLIGHT, Item, Legend, MathLine, Scene, SpinBullet, Sub, Title, atX, drift, k_, sub, sup, t_, useVoiceTime } from "./kit";
 import { cue } from "./timing";
 
 const N = 4;
@@ -116,7 +116,17 @@ export const S04Drift: React.FC = () => {
       <g opacity={fO}>
         <MathLine items={LITZ} cx={FX} y={FY} size={FS} reveal={ramp(v, T.litz, 1.4)} active={active} />
         <text x={960} y={300} textAnchor="middle" style={label(window01(v, T.litz + 0.6, T.two, 0.4) * 0.8, { fontSize: 22 })}>BRYAN LITZ · FITTED TO MEASURED SHOTS</text>
-        <text x={960} y={300} textAnchor="middle" style={label(window01(v, T.two, T.m500 - 0.4, 0.4) * 0.6, { fontSize: 20 })}>Δz — INCHES · t — TIME OF FLIGHT, SECONDS</text>
+        <Legend x={60} y={300} v={v} o={1 - ramp(v, T.m500 - 0.6, 0.4)} rows={[
+          { sym: "Δz", text: "SPIN DRIFT · INCHES", at: T.two },
+          { sym: <>S<Sub s="g" /></>, text: "STABILITY · FROM MILLER", at: T.stab },
+          { sym: "t", text: "TIME OF FLIGHT · SECONDS", at: T.time },
+        ]} />
+        <g opacity={ramp(v, T.m500 - 0.3, 0.5)}>
+          <text x={960} y={305} textAnchor="middle" style={mono(1, 30, { fontWeight: 600 })}>
+            Δz = 1.25 · (1.71 + 1.2) · 2.01<tspan fontSize={18} dy={-12}>1.83</tspan><tspan dy={12}> = 13.0 in = 33 cm</tspan>
+          </text>
+          <text x={960} y={345} textAnchor="middle" style={label(0.6, { fontSize: 18 })}>THE PROGRAM SHOWS 31 cm: IT TAKES OFF WHAT THE ZERO AT 100 m ALREADY CORRECTS</text>
+        </g>
       </g>
       {/* a more stable bullet: a bigger lag, a bigger push */}
       <g opacity={cmpO}>

@@ -327,7 +327,7 @@ Why? Because the bullet falls the whole time it flies. Without air, falling foll
 With air, it needs two seconds. Two seconds of falling would be almost twenty metres. But the bullet falls only fifteen. Why less? Remember the up-and-down line. The bullet flies a little downward, so the drag pushes it a little up. The drag slows the falling, too.
 So the drag does two things here. It makes the flight longer, so the bullet falls more. And it brakes the fall, a little.
 
-## 9. Outro  (~20 s)
+## 9. Outro  (~35 s)
 
 {ANIM: The formulas of the episode gather on one screen and light up one by one as they are named:
 `r⃗, v⃗` · `a⃗ = F⃗ / m` · `a⃗_drag = − D · v⃗ / |v⃗|` · `+ g⃗` · `v⃗_new = v⃗ + a⃗ · Δt`, `r⃗_new = r⃗ + v⃗_new · Δt`.
@@ -418,13 +418,22 @@ Next time: what a dot can't do, and how the program fixes it.
 Every effect follows the same four beats: the physics, without numbers; "a dot can't do this, so the program
 adds a correction", and whose formula it is (fitted to shots, or straight from physics); the formula, each term
 acted out; the numbers for our shot.
+Every formula has a legend beside it: one row per letter (what it is, its unit), appearing as the voice names it
+and staying. At "our shot" the formula is written again with our numbers in it, and the result.
+The "dot first, then the four on top" picture (scenes 1 and 8) and the jump (scene 5) are drawn on a 2.5D stage
+(`src/ep04/stage3d.tsx`): a hand-projected camera, a ground grid, the dot's path standing in its upright plane.
 
 ## 1. Hook  (~40 s)
 
 {ANIM: The dot from episode 2 flies its path. It grows a body: the bullet, nose first. Rifling marks on its
 side start to run around it; counter "3 100 turns per second". Four small cards line up under the path: SPIN
-DRIFT, AERODYNAMIC JUMP (with a little spin icon), CORIOLIS, EAST–WEST (with a little globe icon). The dot
-flies again, alone, and the four cards snap onto its end.}
+DRIFT, AERODYNAMIC JUMP (a little bullet with a ring arrow round it), CORIOLIS, EAST–WEST (a little globe).
+"A dot can't spin": the camera swings round to behind and above the shooter; the path turns out to stand in one
+upright plane over a ground grid ("THE DOT: ALL IN ONE UPRIGHT PLANE"), with stakes down to its shadow and a
+target at 1000 m. The dot flies to the end. Then the four bend the path one by one, each card lighting as it does:
+the shadow on the ground curves right, the path rises; the old path stays as a dashed ghost ("drawn about 400
+times bigger"). The camera turns to face the target: the dot's hit, then the four tip to tail — spin drift 31 cm
+right, jump 11 cm up, Coriolis 10 cm right, east–west 12 cm up — to the real hit. Title.}
 
 VOICE:
 A real bullet is not a dot. It has a nose, and it spins. Our bullet leaves the barrel at more than three thousand turns per second.
@@ -435,8 +444,11 @@ A dot can't spin, and it doesn't know that the Earth turns. So the program flies
 
 {ANIM: The bullet, side view, big. A dot marks the centre of mass ("CENTRE OF MASS"). The air hits it; the
 air's push draws as one arrow, attached in front of the centre of mass ("THE AIR PUSHES HERE"). The nose
-tips a little: the push grows and tips it more; a ghost of the bullet tumbles over. Beside it, an arrow with
-feathers: the same tip, and the feathers turn it back. Back to the bullet: the rifling marks run, it spins.
+tips a little: the push grows and tips it more; a ghost of the bullet tumbles over. Then the bullet and an
+arrow, one above the other, in the same picture language: the bullet tipped, the push (coral) in front of the
+centre of mass, a curved arrow — it turns further; the arrow tipped the same way, the feathers put the push behind
+the centre of mass, a curved arrow — it turns back, and it straightens. Back to the bullet: the rifling marks run,
+it spins.
 Then a spinning top: a push from the side, and the top's axis moves at a right angle to the push.
 Then the bullet seen from behind, as a clock face, spinning clockwise (a curved arrow). A push on the nose
 towards 9 o'clock (an arrow): the nose moves to 12. A push towards 12: the nose moves to 3. Caption: "A PUSH
@@ -508,12 +520,14 @@ At five hundred metres, it's about five centimetres. At one kilometre, thirty-on
 
 ## 5. Aerodynamic jump  (~100 s)
 
-{ANIM: Top view at the muzzle, wind arrows from the right. The bullet's velocity arrow and, from episode 3,
-the tilted arrow v_air ("0.33° · DRAWN ×20"). The bullet comes out with its nose along the barrel: a small
-gap between the nose and v_air glows ("THE NOSE IS OFF THE AIR FLOW"). The air's push turns the nose to the
-left, away from the wind. The corner clock lights: a push to 9, the nose goes to 12. Side view: the nose
-swings up and circles a few times in a shrinking spiral, and settles; the path behind it is tilted up by a
-tiny angle, and the angle stays.
+{ANIM: The 2.5D stage at the muzzle, seen from behind and above: the barrel, its dashed line, wind streaks
+from the right, and v_air from episode 3, tilted towards the wind ("0.33° · DRAWN ×20"). The bullet comes out
+with its nose along the barrel: the gap between the nose and v_air glows ("THE NOSE IS OFF THE AIR FLOW"). The
+air's push (coral) points left, away from the wind; the nose goes up — at a right angle, seen in space. Then the
+nose circles the air flow in a shrinking spiral, starting at 9 o'clock, clockwise from behind. A coral arrow on
+the bullet: the air pushes where the nose points. An inset "THE NOSE, FROM BEHIND" draws the spiral, and a coral
+arrow "THE PUSHES, ADDED UP" grows and turns up — a quarter turn on from the start, the rule again. The path
+bends near the muzzle, then flies on straight, tilted up ("TILTED UP BY A TINY ANGLE").
 The line writes the second Litz formula:
 
 $$\Delta y' = \left(0.01\,S_g - 0.0024\,L + 0.032\right)\cdot W_\perp$$
@@ -534,8 +548,11 @@ And only the wind at the muzzle counts. A wind that starts three hundred metres 
 
 ## 6. The turning Earth: Coriolis  (~85 s)
 
-{ANIM: A playground carousel from above, turning counterclockwise. A ball is thrown across it: seen from
-above it flies straight; then the camera rides the carousel, and the same flight bends to the right.
+{ANIM: A playground carousel from above, turning counterclockwise. An honest throw: the thrower aims straight at
+the friend, and the ball also takes the rim's own velocity. Seen from above it flies straight (dashed) while the
+floor turns under it, and it leaves a chalk line on the floor (solid). When the ball is down the carousel stops;
+the camera turns with it until the thrower is at the bottom and the friend at the top again: the chalk line starts
+towards the friend and bends right ("MISSED: TO THE RIGHT").
 Then a line-drawn globe, the North Pole on top: the ground around the pole is the same disk, "ONE TURN A
 DAY". A shooter moves down to 45° north, then to the equator: a small turning disk under the shooter's
 feet shrinks to nothing at the equator ("sin φ": 1 at the pole, 0.71 at 45°, 0 at the equator).
@@ -582,8 +599,9 @@ For our shot, gravity gets less than one percent weaker to the east. At one kilo
 
 ## 8. The honest part  (~50 s)
 
-{ANIM: The dot's trajectory as a solid line. The four formula cards snap onto its end one by one: spin
-drift, jump, Coriolis, east-west. The velocity and time readouts beside the path stay exactly the same.
+{ANIM: The 2.5D stage of scene 1: the dot flies its path in its upright plane. The four cards come in together
+and bend the path at once. The camera turns to face the target: the dot's hit, one arrow, "THE HIT MOVES";
+"v = 322 m/s · t = 2.01 s · AT 1000 m · UNCHANGED".
 Then a separate picture: the bullet with an arc on its nose angle, "4DOF: COMPUTES THIS ITSELF". Then a bar
 chart by size: 31, 11, 10 and 12 cm, and one coral bar, "G1 vs radar: 57 cm", the longest.}
 
@@ -593,11 +611,13 @@ There are models that do more. A model with four degrees of freedom also follows
 But look at the sizes. All four effects are smaller than the mistake you get from a wrong drag curve. Remember G one against the radar curve at one kilometre? Fifty-seven centimetres.
 So for a long shot, get a good drag curve first. It matters more than anything else in this video.
 
-## 9. Outro  (~20 s)
+## 9. Outro  (~35 s)
 
 {ANIM: The four motifs in a row: the drag arrow, the dot with its steps, the wind, and the spinning bullet. Link
-to the documentation.}
+to the documentation. The last episode, so a farewell: the motifs fade, "THANK YOU FOR WATCHING", then "GOOD DAYS
+AT THE RANGE · ACCURATE SHOTS"; last, the line-drawn bullet flies in and hits the centre of a target.}
 
 VOICE:
 So that's what's inside the calculator: the drag, the dot, the wind, and a few small fixes on top. If you want the formulas, they're all in the documentation. The link is in the description.
+And that's the end of the series. Thank you for watching it to the end, formulas and all. Now, when your calculator gives you a number, you know where it comes from. I wish you good days at the range, a steady wind, and every shot exactly where you aimed it.
 

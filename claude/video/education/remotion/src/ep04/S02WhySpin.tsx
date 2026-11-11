@@ -21,6 +21,17 @@ const T = {
 const CX = 960, CY = 560, CAL = 80;
 const STREAKS = (() => { const r = seeded(42); return Array.from({ length: 40 }, () => ({ x: r() * 2000, y: 300 + r() * 520, l: 30 + r() * 50 })); })();
 
+/** A curved arrow along pts, with a head at the end: "it turns this way". */
+const ArcHead: React.FC<{ pts: P[] }> = ({ pts }) => {
+  const e = pts[pts.length - 1], d = pts[pts.length - 3], ang = Math.atan2(e[1] - d[1], e[0] - d[0]), h = 16;
+  return (
+    <g opacity={0.9}>
+      <Pen pts={pts} p={1} w={3.5} tip={false} />
+      <path d={`M${e[0] - h * Math.cos(ang - 0.5)},${e[1] - h * Math.sin(ang - 0.5)} L${e[0]},${e[1]} L${e[0] - h * Math.cos(ang + 0.5)},${e[1] - h * Math.sin(ang + 0.5)}`} stroke={C.line} strokeWidth={3.5} fill="none" strokeLinejoin="round" />
+    </g>
+  );
+};
+
 export const S02WhySpin: React.FC = () => {
   const v = useVoiceTime();
 
@@ -34,10 +45,10 @@ export const S02WhySpin: React.FC = () => {
   const lift = clamp01(tip / 22);
 
   // ---- B: an arrow rights itself; the bullet spins instead
-  const bO = ramp(v, T.arrow - 0.3, 0.5) * (1 - ramp(v, T.none - 0.3, 0.4));
+  const bO = ramp(v, T.arrow - 0.3, 0.5) * (1 - ramp(v, T.spins - 0.6, 0.4));
   const ta = Math.max(0, v - (T.feathers + 0.2));
   const arrowDeg = v < T.feathers + 0.2 ? lerp(0, 14, ramp(v, T.arrow + 0.2, 0.6)) : 14 * Math.exp(-1.6 * ta) * Math.cos(4.2 * ta);
-  const b2O = ramp(v, T.none - 0.2, 0.5) * (1 - ramp(v, T.strange - 0.4, 0.5));
+  const b2O = ramp(v, T.spins - 0.4, 0.5) * (1 - ramp(v, T.strange - 0.4, 0.5));
   const marks = ramp(v, T.spins - 0.2, 0.5);
   const spin = Math.max(0, v - T.spins) * 1.5;
 
@@ -102,17 +113,64 @@ export const S02WhySpin: React.FC = () => {
 
       {/* ---------------- B: the arrow, then the bullet spins */}
       <g opacity={bO}>
-        <g transform={`rotate(${-arrowDeg},${960},${CY})`}>
-          <line x1={640} y1={CY} x2={1290} y2={CY} stroke={C.line} strokeWidth={5} />
-          <path d={`M1260,${CY - 22} L1300,${CY} L1260,${CY + 22}`} stroke={C.line} strokeWidth={5} fill="none" strokeLinejoin="round" />
-          {[0, 1, 2].map((i) => (
-            <g key={i} filter={ramp(v, T.feathers, 0.4) > 0.5 ? "url(#glow)" : undefined}>
-              <path d={`M${650 + i * 24},${CY} L${620 + i * 24},${CY - 40}`} stroke={C.line} strokeWidth={3} />
-              <path d={`M${650 + i * 24},${CY} L${620 + i * 24},${CY + 40}`} stroke={C.line} strokeWidth={3} />
+        {/* the bullet, as we left it: the push in front of the centre of mass turns it further */}
+        {(() => {
+          const cy = 380, d = 10, a = (-d * Math.PI) / 180, off = (CP_F - CG_F) * BLEN * 60;
+          const cp: P = [CX + off * Math.cos(a), cy + off * Math.sin(a)];
+          const arc: P[] = Array.from({ length: 13 }, (_, i) => { const q = a - 0.06 - (i / 12) * 0.36; return [CX + 200 * Math.cos(q), cy + 200 * Math.sin(q)]; });
+          return (
+            <g>
+              <line x1={420} y1={cy} x2={1500} y2={cy} stroke={C.dim} strokeWidth={2} strokeDasharray="10 10" />
+              <SpinBullet id="cmpb" cx={CX} cy={cy} cal={60} deg={d} />
+              <circle cx={CX} cy={cy} r={10} fill="none" stroke={C.line} strokeWidth={3} />
+              <circle cx={cp[0]} cy={cp[1]} r={8} fill={C.drag} />
+              <g filter="url(#glow)">
+                <line x1={cp[0]} y1={cp[1]} x2={cp[0]} y2={cp[1] - 100} stroke={C.drag} strokeWidth={6} strokeLinecap="round" />
+                <path d={`M${cp[0] - 13},${cp[1] - 84} L${cp[0]},${cp[1] - 100} L${cp[0] + 13},${cp[1] - 84}`} stroke={C.drag} strokeWidth={6} fill="none" />
+              </g>
+              <ArcHead pts={arc} />
+              <text x={CX} y={cy + 110} textAnchor="middle" style={label(0.95, { fontSize: 24 })}>A BULLET: THE PUSH IN FRONT OF THE CENTRE → IT TURNS FURTHER</text>
             </g>
-          ))}
+          );
+        })()}
+        {/* the arrow: the feathers put the push behind the centre of mass, so it turns back */}
+        <g opacity={ramp(v, T.arrow - 0.3, 0.5)}>
+          {(() => {
+            const cy = 760, cg = 1010, cpX = 680;
+            const a = (-arrowDeg * Math.PI) / 180;
+            const rot = (x: number): P => [cg + (x - cg) * Math.cos(a), cy + (x - cg) * Math.sin(a)];
+            const cp = rot(cpX), pushK = ramp(v, T.feathers - 0.1, 0.4) * clamp01(arrowDeg / 6);
+            const arc: P[] = Array.from({ length: 13 }, (_, i) => { const q = Math.PI + a - 0.1 + (i / 12) * 0.3; return [cg + 420 * Math.cos(q), cy + 420 * Math.sin(q)]; });
+            return (
+              <>
+                <line x1={420} y1={cy} x2={1500} y2={cy} stroke={C.dim} strokeWidth={2} strokeDasharray="10 10" />
+                <g transform={`rotate(${-arrowDeg},${cg},${cy})`}>
+                  <line x1={640} y1={cy} x2={1290} y2={cy} stroke={C.line} strokeWidth={5} />
+                  <path d={`M1260,${cy - 22} L1300,${cy} L1260,${cy + 22}`} stroke={C.line} strokeWidth={5} fill="none" strokeLinejoin="round" />
+                  {[0, 1, 2].map((i) => (
+                    <g key={i} filter={ramp(v, T.feathers, 0.4) > 0.5 ? "url(#glow)" : undefined}>
+                      <path d={`M${650 + i * 24},${cy} L${620 + i * 24},${cy - 40}`} stroke={C.line} strokeWidth={3} />
+                      <path d={`M${650 + i * 24},${cy} L${620 + i * 24},${cy + 40}`} stroke={C.line} strokeWidth={3} />
+                    </g>
+                  ))}
+                  <circle cx={cg} cy={cy} r={10} fill={C.bg} stroke={C.line} strokeWidth={3} />
+                </g>
+                <g opacity={ramp(v, T.feathers - 0.2, 0.4)}>
+                  <circle cx={cp[0]} cy={cp[1]} r={8} fill={C.drag} />
+                  {pushK > 0.05 && (
+                    <g filter="url(#glow)">
+                      <line x1={cp[0]} y1={cp[1]} x2={cp[0]} y2={cp[1] - 100 * pushK} stroke={C.drag} strokeWidth={6} strokeLinecap="round" />
+                      <path d={`M${cp[0] - 13},${cp[1] - 100 * pushK + 16} L${cp[0]},${cp[1] - 100 * pushK} L${cp[0] + 13},${cp[1] - 100 * pushK + 16}`} stroke={C.drag} strokeWidth={6} fill="none" />
+                    </g>
+                  )}
+                  {pushK > 0.3 && <ArcHead pts={arc} />}
+                </g>
+                <text x={CX} y={cy + 120} textAnchor="middle" style={label(ramp(v, T.feathers, 0.4) * 0.95, { fontSize: 24 })}>AN ARROW: FEATHERS PUT THE PUSH BEHIND THE CENTRE → IT TURNS BACK</text>
+              </>
+            );
+          })()}
         </g>
-        <text x={960} y={250} textAnchor="middle" style={label(ramp(v, T.feathers, 0.4), { fontSize: 28 })}>AN ARROW: FEATHERS TURN IT BACK</text>
+        <text x={960} y={200} textAnchor="middle" style={label(0.6, { fontSize: 20 })}>THE CROSS-CIRCLE: THE CENTRE OF MASS · CORAL: WHERE THE AIR PUSHES</text>
       </g>
       <g opacity={b2O}>
         <SpinBullet id="b" cx={CX} cy={CY} cal={CAL} spin={spin} marks={marks} />

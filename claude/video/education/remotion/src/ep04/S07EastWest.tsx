@@ -8,7 +8,7 @@
 import React from "react";
 import { C, ease, lerp, ramp, window01 } from "../theme";
 import { P, Pen, label, mono } from "../lib/draw";
-import { ArrowA, Item, MathLine, Scene, Title, TurnArrow, k_, sub, t_, useVoiceTime } from "./kit";
+import { ArrowA, Item, k_, Legend, MathLine, Scene, sub, Sub, t_, Title, TurnArrow, useVoiceTime } from "./kit";
 import { cue } from "./timing";
 
 const N = 7;
@@ -238,7 +238,18 @@ export const S07EastWest: React.FC = () => {
       {/* ---------------- E: the formula */}
       <g opacity={fO}>
         <MathLine items={EOT} cx={FX} y={FY} size={FS} reveal={ramp(v, T.scales, 1.6)} active={active} />
-        <text x={960} y={320} textAnchor="middle" style={label(window01(v, T.scales + 0.4, T.omega, 0.4) * 0.85, { fontSize: 22 })}>THE PROGRAM SCALES THE DROP THAT GRAVITY MAKES, JUST A LITTLE</text>
+        <text x={960} y={330} textAnchor="middle" style={label(window01(v, T.scales + 0.4, T.omega, 0.4) * 0.85, { fontSize: 22 })}>THE PROGRAM SCALES THE DROP THAT GRAVITY MAKES, JUST A LITTLE</text>
+        <Legend x={60} y={400} v={v} o={1 - ramp(v, T.ours - 0.6, 0.4)} rows={[
+          { sym: <>g<Sub s="eff" /></>, text: "WHAT GRAVITY BECOMES", at: T.scales + 0.6 },
+          { sym: "g", text: "GRAVITY · 9.81 m/s²", at: T.scales + 0.9 },
+          { sym: "Ω", text: "THE EARTH'S TURN", at: T.omega },
+          { sym: "φ", text: "YOUR LATITUDE", at: T.cosine },
+          { sym: "Az", text: "THE SHOT'S DIRECTION", at: T.shot },
+          { sym: <>V<Sub s="0" /></>, text: "MUZZLE VELOCITY · m/s", at: T.muzzle },
+        ]} />
+        <text x={960} y={340} textAnchor="middle" style={mono(ramp(v, T.ours - 0.2, 0.5), 30, { fontWeight: 600 })}>
+          1 − 2 · 7.29·10<tspan fontSize={18} dy={-12}>−5</tspan><tspan dy={12}> · 0.71 · 1 · 790 / 9.81 = 0.992</tspan>
+        </text>
       </g>
       {/* cos φ: the wheel part of the turn */}
       <g opacity={xsO}>

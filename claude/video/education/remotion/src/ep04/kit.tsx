@@ -167,6 +167,29 @@ export const MathLine: React.FC<{ items: Item[]; cx: number; y: number; size: nu
     );
   };
 
+// ---------------------------------------------------------------- what the letters of a formula mean
+export type LegendRow = { sym: React.ReactNode; text: string; at: number };
+/** The letters of a formula, one row each, appearing as the voice names them and staying; the newest row is bright. */
+export const Legend: React.FC<{ x: number; y: number; rows: LegendRow[]; v: number; o: number; size?: number; gap?: number }> =
+  ({ x, y, rows, v, o, size = 20, gap = 38 }) => {
+    const shown = rows.filter((r) => v >= r.at - 0.2).length;
+    return (
+      <g opacity={o}>
+        {rows.map((r, i) => {
+          const k = clamp01((v - (r.at - 0.2)) / 0.4), hot = i === shown - 1 ? 1 : 0;
+          return (
+            <g key={i} opacity={k * (0.6 + 0.4 * hot)}>
+              <text x={x} y={y + i * gap} style={mono(1, size * 1.45, { fontWeight: 700 })}>{r.sym}</text>
+              <text x={x + size * 5.6} y={y + i * gap} style={label(1, { fontSize: size })}>{r.text}</text>
+            </g>
+          );
+        })}
+      </g>
+    );
+  };
+/** A subscript inside a legend symbol. */
+export const Sub: React.FC<{ s: string }> = ({ s }) => <tspan fontSize="0.6em" dy="0.3em">{s}</tspan>;
+
 // ---------------------------------------------------------------- the S_g gauge
 export const Gauge: React.FC<{ cx: number; cy: number; r: number; value: number; o: number; p?: number }> = ({ cx, cy, r, value, o, p = 1 }) => {
   const MAX = 2.5, a = (v: number) => Math.PI * (1 - Math.min(v, MAX) / MAX);
@@ -191,17 +214,25 @@ export const Gauge: React.FC<{ cx: number; cy: number; r: number; value: number;
 };
 
 // ---------------------------------------------------------------- the effect cards
+/** A small bullet lying nose-right with a ring arrow around its body: "it spins about its long axis". */
+export const SpinIcon: React.FC<{ x: number; y: number; o: number; s?: number }> = ({ x, y, o, s = 1 }) => {
+  const ring: P[] = Array.from({ length: 25 }, (_, i) => { const a = lerp(-Math.PI / 2, Math.PI * 1.1, i / 24); return [-5 + 5 * Math.cos(a), 12 * Math.sin(a)]; });
+  const e = ring[24], d = ring[22], ang = Math.atan2(e[1] - d[1], e[0] - d[0]), h = 5;
+  return (
+    <g transform={`translate(${x},${y}) scale(${s})`} opacity={o}>
+      <path d="M-18,-5 L2,-5 Q13,-4 19,0 Q13,4 2,5 L-18,5 Z" fill="none" stroke={C.line} strokeWidth={1.8} strokeLinejoin="round" />
+      <path d={`M${ring.map((p) => p.join(",")).join(" L")}`} fill="none" stroke={C.line} strokeWidth={1.8} />
+      <path d={`M${e[0] - h * Math.cos(ang - 0.55)},${e[1] - h * Math.sin(ang - 0.55)} L${e[0]},${e[1]} L${e[0] - h * Math.cos(ang + 0.55)},${e[1] - h * Math.sin(ang + 0.55)}`}
+        fill="none" stroke={C.line} strokeWidth={1.8} strokeLinejoin="round" />
+    </g>
+  );
+};
 export const EFFECTS = ["SPIN DRIFT", "AERODYNAMIC JUMP", "CORIOLIS", "EAST – WEST"];
 export const Card: React.FC<{ x: number; y: number; w: number; text: string; o: number; hot?: number; icon?: "spin" | "earth" }> = ({ x, y, w, text, o, hot = 0, icon }) => (
   <g opacity={o}>
     <rect x={x - w / 2} y={y - 34} width={w} height={68} rx={10} fill={C.bg} stroke={C.line} strokeWidth={2 + 1.5 * hot} filter={hot > 0.3 ? "url(#glow)" : undefined} />
     <text x={x + (icon ? 18 : 0)} y={y + 8} textAnchor="middle" style={label(0.7 + 0.3 * hot, { fontSize: 22 })}>{text}</text>
-    {icon === "spin" && (
-      <g transform={`translate(${x - w / 2 + 30},${y})`} opacity={0.5 + 0.5 * hot}>
-        <ellipse rx={9} ry={15} fill="none" stroke={C.line} strokeWidth={2} />
-        <path d="M-14,-18 A18,18 0 0 1 14,-18" stroke={C.line} strokeWidth={2} fill="none" />
-      </g>
-    )}
+    {icon === "spin" && <SpinIcon x={x - w / 2 + 34} y={y} o={0.5 + 0.5 * hot} />}
     {icon === "earth" && (
       <g transform={`translate(${x - w / 2 + 30},${y})`} opacity={0.5 + 0.5 * hot}>
         <circle r={16} fill="none" stroke={C.line} strokeWidth={2} />

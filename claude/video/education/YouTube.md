@@ -9,7 +9,7 @@ publishes by hand. Category Science & Technology, language English, not made for
 | 1 | `remotion/out/ep01-drag.mp4` | `thumbs/ep01.jpg` | 5:18 |
 | 2 | `remotion/out/ep02-point-mass.mp4` | `thumbs/ep02.jpg` | 7:53 |
 | 3 | `remotion/out/ep03-wind.mp4` | `thumbs/ep03.jpg` | 3:53 |
-| 4 | `remotion/out/ep04-spin-earth.mp4` | `thumbs/ep04.jpg` | 8:44 |
+| 4 | `remotion/out/ep04-spin-earth.mp4` | `thumbs/ep04.jpg` | 9:01 |
 
 Thumbnails: 1280×720 JPEG, `node thumbs.mjs [1 2 3 4]` in `remotion/` (compositions `Thumb01`…`Thumb04`,
 `src/thumbs/Thumbs.tsx`). Chapter times are the scene starts of the current cuts; re-check them after any
@@ -144,14 +144,14 @@ Why a bullet has to spin, and the rule of a spinning top: a push turns it a quar
 
 Chapters:
 0:00 Intro
-0:37 Why a bullet spins
-1:38 Stability
-2:47 Spin drift
-3:56 Aerodynamic jump
-5:16 The turning Earth: Coriolis
-6:19 East and west
-7:44 The honest part
-8:28 Outro
+0:38 Why a bullet spins
+1:39 Stability
+2:48 Spin drift
+3:57 Aerodynamic jump
+5:17 The turning Earth: Coriolis
+6:21 East and west
+7:45 The honest part
+8:29 Outro
 
 The method behind it:
 The empirical corrections: https://nikolaygekht.github.io/ballistic.calculator.app.avalonia/method/empirical-corrections.html
